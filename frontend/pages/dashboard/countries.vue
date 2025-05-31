@@ -1,5 +1,6 @@
 <script lang="ts" setup>
     import { Pencil, Trash } from 'lucide-vue-next';
+    import { useAppStore } from '~/store/app';
 
     useHead({
         title: 'Countries'
@@ -9,6 +10,8 @@
         layout: 'admin',
         middleware: 'auth'
     })
+
+    const { countries } = storeToRefs(useAppStore())
 </script>
 
 <template>
@@ -20,25 +23,16 @@
                 <TableHead>Name</TableHead>
                 <TableHead>Abbr</TableHead>
                 <TableHead>Flag</TableHead>
-                <TableHead></TableHead>
+                <TableHead>Code</TableHead>
             </TableRow>
         </TableHeader>
         <TableBody>
-            <TableRow>
-                <TableCell>1</TableCell>
-                <TableCell>Nepal</TableCell>
-                <TableCell>np</TableCell>
+            <TableRow v-for="(country, index) in countries">
+                <TableCell>{{ index + 1 }}</TableCell>
+                <TableCell>{{ country.name }}</TableCell>
+                <TableCell>{{ country.abbr }}</TableCell>
                 <TableCell></TableCell>
-                <TableCell>
-                    <div class="flex gap-2 justify-end">
-                        <Button size="sm">
-                            <Pencil />
-                        </Button>
-                        <Button size="sm">
-                            <Trash />
-                        </Button>
-                    </div>
-                </TableCell>
+                <TableCell>+{{ country.code }}</TableCell>
             </TableRow>
         </TableBody>
     </Table>

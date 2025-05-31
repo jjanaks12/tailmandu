@@ -24,17 +24,18 @@ export class AuthController {
     public static async login(request: Request<{}, {}, UserLoginRequest>, response: Response, next: NextFunction) {
         try {
             const result = await userLoginSchema.validate(request.body, { abortEarly: false })
-            const userExists = await prisma.user.findUnique({ where: { email: result.email } })
+            const personalDetail = await prisma.personal.findUnique({ where: { email: result.email } })
 
-            if (!userExists)
+            if (!personalDetail)
                 throw createHttpError.NotFound(`${result.email} has not been registered`)
+            const user = await prisma.user.findFirst({ where: { personal_id: personalDetail.id } })
 
-            const isMatch = await Bcrypt.compare(request.body.password, userExists.password)
+            const isMatch = await Bcrypt.compare(request.body.password, user.password)
             if (!isMatch)
                 throw createHttpError.Unauthorized('email / password not valid')
 
-            const accessToken = await AuthController.JWT_SERVICE.signAccessToken(userExists.id)
-            const refreshToken = await AuthController.JWT_SERVICE.signRefreshToken(userExists.id)
+            const accessToken = await AuthController.JWT_SERVICE.signAccessToken(user.id)
+            const refreshToken = await AuthController.JWT_SERVICE.signRefreshToken(user.id)
 
             response.send({ accessToken, refreshToken })
         } catch (error) {
@@ -48,21 +49,23 @@ export class AuthController {
     public static async register(request: Request<{}, {}, UserRegistrationRequest>, response: Response, next: NextFunction) {
         try {
             const result = await userRegistrationSchema.validate(request.body, { abortEarly: false })
-            const userExists = await prisma.user.findUnique({ where: { email: result.email } })
+            const personalDetail = await prisma.personal.findUnique({ where: { email: result.email } })
 
-            if (userExists)
+            if (personalDetail)
                 throw createHttpError.Conflict(`${result.email} is already been registered`)
 
             const salt = await Bcrypt.genSalt(10)
             const hashPassword = await Bcrypt.hash(result.password, salt)
 
-            const newUser = await prisma.user.create({
+            const newPersonalDetail = await prisma.personal.create({
                 data: {
                     email: result.email,
-                    password: hashPassword
-                },
-                omit: {
-                    password: true
+                }
+            })
+            const newUser = await prisma.user.create({
+                data: {
+                    password: hashPassword,
+                    personal_id: newPersonalDetail.id,
                 }
             })
 
@@ -104,6 +107,37 @@ export class AuthController {
             const refToken = await AuthController.JWT_SERVICE.signRefreshToken(userId)
 
             response.send({ accessToken, refreshToken: refToken })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async profile(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.user.findFirst({
+                where: {
+                    id: request.body.user_id
+                },
+                omit: {
+                    password: true
+                },
+                include: {
+                    personal: {
+                        include: {
+                            age_category: true,
+                            avatar: true,
+                            country: true,
+                            runners: true,
+                            volunteers: true
+                        }
+                    },
+                    role: {
+                        include: {
+                            permissions: true
+                        }
+                    }
+                }
+            }))
         } catch (error) {
             next(error)
         }

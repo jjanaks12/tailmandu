@@ -14,12 +14,18 @@
 
     const { login } = useAuthStore()
     const { isLoggedin, isLoading } = storeToRefs(useAuthStore())
+    const form = ref()
 
     const signIn = async (formData: any) => {
         await login(formData)
     }
 
     onMounted(() => {
+        if (form.value)
+            form.value.setValues({
+                email: 'admin@trailmandu.com',
+                password: 'password'
+            })
         if (isLoggedin.value)
             navigateTo('/dashboard')
     })
@@ -33,7 +39,7 @@
             <p>Access your account securely – please enter your login details.</p>
         </div>
         <Form :validation-schema="userLoginSchema" method="post" @submit="signIn" class="flex flex-col space-y-4"
-            v-slot="{ errors }">
+            ref="form">
             <Field name="email" v-slot="{ field }">
                 <label class="sr-only" for="lf__email">Email</label>
                 <div class="flex gap-2">

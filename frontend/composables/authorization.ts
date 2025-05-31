@@ -5,7 +5,7 @@ export const useAuthorization = () => {
 
     const can = (permission: string | string[], role: string | null = null): boolean => {
         if (role != null)
-            return (role == user.value?.role.name)
+            return (role == user.value?.role?.name)
 
         if (Array.isArray(permission)) {
             let isTrue = false

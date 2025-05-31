@@ -17,3 +17,17 @@ export const userChangePasswordSchema = Y.object({
     password: Y.string().min(6).required(),
     confirm_password: Y.string().required().oneOf([Y.ref('password')], 'Password do not match')
 })
+
+export const userDetailSchema = Y.object({
+    first_name: Y.string().required().label('First name'),
+    middle_name: Y.string().label('Middle name'),
+    last_name: Y.string().required().label('Last name'),
+    email: Y.string().label('Email'),
+    date_of_birth: Y.string().label('Date of birth'),
+    gender_id: Y.string().label('Gender'),
+    phone_number: Y.string().label('Phone number'),
+    country_id: Y.string().label('Country'),
+    age_catgory_id: Y.string().label('Age catgory'),
+    size_id: Y.string().label('Size'),
+    image: Y.string().label('Image'),
+})

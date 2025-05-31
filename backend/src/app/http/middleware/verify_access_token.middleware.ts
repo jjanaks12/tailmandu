@@ -8,12 +8,14 @@ export const verifyAccessToken = (request: Request, response: Response, next: Ne
 
     const token = request.headers['authorization'].split(' ')[1]
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, payload) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (error, payload) => {
         if (error) {
             return next(createHttpError.Unauthorized(error.name === 'JsonWebTokenError' ? '' : error.message))
         }
 
-        request.body = { ...request.body, payload }
+        if (typeof payload != 'string')
+            request.body = { ...request.body, user_id: payload.aud }
+
         next()
     })
 }

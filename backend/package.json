@@ -1,19 +1,20 @@
 {
-  "name": "test_express",
+  "name": "trailmandu",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/index.ts",
     "build": "tsc --build",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/index.js",
+    "key:generate": "npx ts-node src/app/lib/services/generate_keys.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.2.1",
+    "@prisma/client": "^6.8.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
@@ -34,7 +35,7 @@
     "@types/morgan": "^1.9.9",
     "dotenv": "^16.4.7",
     "nodemon": "^3.1.9",
-    "prisma": "^6.2.1",
+    "prisma": "^6.8.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"

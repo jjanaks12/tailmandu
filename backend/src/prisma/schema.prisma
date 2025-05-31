@@ -9,16 +9,215 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model AgeCategory {
+  id         String    @id @default(cuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  Personal Personal[]
+
+  @@map("age_categories")
+}
+
+model Checkpoint {
+  id         String    @id @default(cuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  event_id String
+  event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  runners EventRunner[]
+
+  @@map("checkpoints")
+}
+
+model Country {
+  id         String    @id @default(cuid())
+  name       String    @db.VarChar(255)
+  abbr       String    @unique
+  code       String    @db.VarChar(255)
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  Personal Personal[]
+
+  @@map("countries")
+}
+
+model Club {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  @@map("clubs")
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  name        String
+  start       DateTime
+  end         DateTime
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  volunteers  Volunteer[]
+  checkpoints Checkpoint[]
+  stages      Stage[]
+  runners     EventRunner[]
+
+  @@map("events")
+}
+
+model EventRunner {
+  id         String    @id @default(cuid())
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  personal_id String
+  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
+  event_id    String
+  event       Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  stage_id    String
+  stage       Stage    @relation(fields: [stage_id], references: [id], onDelete: Cascade)
+
+  checkpoints Checkpoint[]
+
+  @@map("event_runners")
+}
+
+model Gender {
+  id       String     @id @default(cuid())
+  name     String
+  Personal Personal[]
+
+  @@map("genders")
+}
+
+model Image {
+  id          String    @id @default(cuid())
+  file_name   String
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  personal Personal[]
+
+  @@map("images")
+}
+
+model Permission {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  roles Role[]
+
+  @@map("permissions")
+}
+
+model Personal {
+  id            String    @id @default(cuid())
+  first_name    String?
+  middle_name   String?
+  last_name     String?
+  email         String    @unique
+  date_of_birth DateTime?
+  phone_number  String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime?
+
+  country_id      String?
+  country         Country?     @relation(fields: [country_id], references: [id], onDelete: Cascade)
+  age_category_id String?
+  age_category    AgeCategory? @relation(fields: [age_category_id], references: [id], onDelete: Cascade)
+  size_id         String?
+  size            Size?        @relation(fields: [size_id], references: [id], onDelete: Cascade)
+  image_id        String?
+  avatar          Image?       @relation(fields: [image_id], references: [id], onDelete: Cascade)
+  gender_id       String?
+  gender          Gender?      @relation(fields: [gender_id], references: [id])
+
+  users      User[]
+  volunteers Volunteer[]
+  runners    EventRunner[]
+
+  @@map("personals")
+}
+
+model Role {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  permissions Permission[]
+  users       User[]
+
+  @@map("roles")
+}
+
+model Size {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  Personal Personal[]
+
+  @@map("sizes")
+}
+
+model Stage {
+  id         String    @id @default(cuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  event_id String
+  event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  runners EventRunner[]
+
+  @@map("stages")
 }
 
 model User {
   id         String    @id @default(cuid())
-  email      String    @unique
   password   String
   created_at DateTime  @default(now())
   updated_at DateTime?
 
+  personal_id String   @unique
+  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
+  role_id     String?
+  role        Role?    @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
   @@map("users")
+}
+
+model Volunteer {
+  id         String    @id @default(cuid())
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  personal_id String
+  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
+  event_id    String
+  event       Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@map("volunteers")
 }

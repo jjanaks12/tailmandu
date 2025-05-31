@@ -1,14 +1,23 @@
 <script lang="ts" setup>
+    import { useAuthStore } from '~/store/auth'
+    import { abbr } from '@/lib/filters'
+
+    const { public: { appName } } = useRuntimeConfig()
+    const { user } = storeToRefs(useAuthStore())
+
+    const name = computed(() => [user.value?.personal.first_name, user.value?.personal.middle_name, user.value?.personal.last_name].join(' ').trim())
+    const image = computed(() => user.value?.personal.avatar?.file_name || '')
 </script>
 
 <template>
     <div class="flex items-center gap-2 py-[3px]">
-        <figure class="bg-gray-200 aspect-square w-[60px] flex justify-center items-center rounded-full">
-            <img src="/assets/images/logo.png" alt="">
-        </figure>
+        <Avatar class="w-[60px] h-[60px]">
+            <AvatarImage :src="image" />
+            <AvatarFallback>{{ abbr(name) }}</AvatarFallback>
+        </Avatar>
         <div class="flex-grow">
-            <strong class="block">Janak Shrestha</strong>
-            <Badge variant="secondary">Admin</Badge>
+            <strong class="block">{{ name || appName }}</strong>
+            <Badge variant="secondary">{{ user?.role?.name }}</Badge>
         </div>
     </div>
 </template>

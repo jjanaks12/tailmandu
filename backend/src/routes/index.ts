@@ -20,6 +20,8 @@ router.use((error: any, request: Request, response: Response, next: NextFunction
         message: error.message
     }
 
+    console.log(error);
+
     if (error.errors && error.errors.length > 0) {
         status = 422
         newError.errors = error.errors

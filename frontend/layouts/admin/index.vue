@@ -1,5 +1,6 @@
 <script lang="ts" setup>
     import { ArrowLeftToLine } from 'lucide-vue-next'
+
     import AppSidebar from './_sidebar.vue'
 </script>
 
@@ -14,7 +15,6 @@
                         <span class="sr-only">Back to site</span>
                         <ArrowLeftToLine />
                     </Button>
-                    <SidebarTrigger />
                 </div>
             </div>
             <div class="p-4">

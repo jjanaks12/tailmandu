@@ -1,0 +1,1 @@
+export { abbr } from './abbr'
