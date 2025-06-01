@@ -23,7 +23,7 @@ export const useAxios = () => {
     instance.interceptors.response.use(response => response, async error => {
         const { status } = error.response || {}
         const { token } = storeToRefs(useAuthStore())
-        const { refreshToken } = useAuthStore()
+        const { refreshToken, logout } = useAuthStore()
         const currentRoute = null
 
         if ([401, 403].indexOf(status) !== -1) {
@@ -53,6 +53,9 @@ export const useAxios = () => {
                 variant: 'destructive',
             })
         }
+
+        /* if (status == 500)
+            await logout() */
 
         toast({
             title: error.message,

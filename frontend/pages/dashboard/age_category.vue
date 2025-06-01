@@ -1,21 +1,21 @@
 <script lang="ts" setup>
     import { EllipsisVertical, Pencil, Trash } from 'lucide-vue-next'
-    import { humanize } from '~/lib/filters'
     import { useAppStore } from '~/store/app'
 
     useHead({
-        title: 'Permissions'
+        title: 'Age Category'
     })
 
     definePageMeta({
         layout: 'admin',
         middleware: 'auth'
     })
-    const { permissions } = storeToRefs(useAppStore())
+
+    const { age_categories } = storeToRefs(useAppStore())
 </script>
 
 <template>
-    <h1 class="text-primary text-2xl mb-4">Permissions</h1>
+    <h1 class="text-primary text-2xl mb-4">Countries</h1>
     <Table>
         <TableHeader>
             <TableRow>
@@ -25,9 +25,9 @@
             </TableRow>
         </TableHeader>
         <TableBody>
-            <TableRow v-for="(permission, index) in permissions">
+            <TableRow v-for="(ageCategory, index) in age_categories">
                 <TableCell>{{ index + 1 }}</TableCell>
-                <TableCell>{{ humanize(permission.name) }}</TableCell>
+                <TableCell>{{ ageCategory.name }}</TableCell>
                 <TableCell class="text-right">
                     <DropdownMenu>
                         <DropdownMenuTrigger>

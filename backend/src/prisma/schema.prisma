@@ -19,7 +19,7 @@ model AgeCategory {
   created_at DateTime  @default(now())
   updated_at DateTime?
 
-  Personal Personal[]
+  personal Personal[]
 
   @@map("age_categories")
 }

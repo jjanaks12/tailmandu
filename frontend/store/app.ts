@@ -1,13 +1,16 @@
 import { breakpointsTailwind } from "@vueuse/core"
 import { defineStore } from "pinia"
 
-import type { Country, Gender } from "~/lib/types"
+import type { AgeCategory, Country, Gender, Permission, Role } from "~/lib/types"
 import { useAxios } from "~/services/axios"
 
 export const useAppStore = defineStore('app', () => {
     const breakpoints = ref()
     const genders = ref<Gender[]>([])
     const countries = ref<Country[]>([])
+    const roles = ref<Role[]>([])
+    const permissions = ref<Permission[]>([])
+    const age_categories = ref<AgeCategory[]>([])
 
     const { axios } = useAxios()
 
@@ -15,14 +18,30 @@ export const useAppStore = defineStore('app', () => {
         const { data } = await axios.get<Gender[]>('/genders')
         genders.value = data
     }
+
     const fetchCountries = async () => {
         const { data } = await axios.get<Country[]>('/countries')
         countries.value = data
+    }
+
+    const fetchRole = async () => {
+        const { data } = await axios.get<Role[]>('/roles')
+        roles.value = data
+    }
+
+    const fetchPermission = async () => {
+        const { data } = await axios.get<Permission[]>('/permissions')
+        permissions.value = data
+    }
+
+    const fetchAgeCategory = async () => {
+        const { data } = await axios.get<AgeCategory[]>('/age_categories')
+        age_categories.value = data
     }
 
     onBeforeMount(() => {
         breakpoints.value = useBreakpoints(breakpointsTailwind)
     })
 
-    return { breakpoints, genders, countries, fetchGender, fetchCountries }
+    return { breakpoints, genders, countries, roles, permissions, age_categories, fetchGender, fetchCountries, fetchRole, fetchPermission, fetchAgeCategory }
 })

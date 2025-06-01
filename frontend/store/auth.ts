@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
     const token = ref<Token | null>(null)
     const isLoading = ref(false)
 
-    const permissions = computed(() => user.value?.role.permissions.map(permission => permission.name) || [])
+    const permissions = computed(() => user.value?.role?.permissions.map(permission => permission.name) || [])
     const isLoggedin = computed(() => token.value != null)
 
     const fetch = async () => {
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
         await axios.post('/logout', {
             refreshToken: token.value?.refreshToken
         })
-        user.value = null
+        token.value = null
         isLoading.value = false
         navigateTo('/login')
     }
@@ -73,7 +73,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const updateDetail = async (formData: Y.InferType<typeof userDetailSchema>) => {
-
+        isLoading.value = true
+        await axios.put('profile', formData)
+        await fetch()
+        isLoading.value = false
     }
 
     const checkUser = async () => {

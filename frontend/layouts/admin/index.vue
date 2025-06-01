@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="p-4">
-                <div class="bg-white p-4 rounded-2xl">
+                <div class="bg-white p-12 rounded-2xl">
                     <slot />
                 </div>
             </div>

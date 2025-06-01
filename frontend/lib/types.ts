@@ -41,7 +41,13 @@ export type Personal = {
     volunteers: Volunteer[]
 }
 
-export type AgeCategory = {}
+export type AgeCategory = {
+    id: string
+    name: string
+    created_at: Date
+    updated_at?: Date
+    personal: Personal[]
+}
 
 export type Image = {
     id: string

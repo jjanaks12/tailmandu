@@ -17,7 +17,7 @@
         </Avatar>
         <div class="flex-grow">
             <strong class="block">{{ name || appName }}</strong>
-            <Badge variant="secondary">{{ user?.role?.name }}</Badge>
+            <Badge variant="secondary">{{ user?.role?.name || 'user' }}</Badge>
         </div>
     </div>
 </template>

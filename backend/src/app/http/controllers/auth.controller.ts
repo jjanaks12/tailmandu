@@ -114,7 +114,7 @@ export class AuthController {
 
     public static async profile(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send(await prisma.user.findFirst({
+            response.send(await prisma.user.findFirstOrThrow({
                 where: {
                     id: request.body.user_id
                 },

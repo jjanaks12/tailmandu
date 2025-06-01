@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-    import { Calendar, Flag, IdCard, Mail, Phone, VenusAndMars } from 'lucide-vue-next'
+    import { parseDate } from '@internationalized/date'
+    import { Baby, Calendar, Flag, IdCard, Loader, Mail, Phone, VenusAndMars } from 'lucide-vue-next'
+    import moment from 'moment'
     import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
+    import { abbr } from '~/lib/filters'
 
     import { userDetailSchema } from '~/lib/schema/user.schema'
     import { useAppStore } from '~/store/app'
@@ -17,19 +20,51 @@
 
     const { updateDetail } = useAuthStore()
     const { isLoading, user } = storeToRefs(useAuthStore())
-    const { genders, countries } = storeToRefs(useAppStore())
+    const { genders, countries, age_categories } = storeToRefs(useAppStore())
     const form = ref<FormContext | null>(null)
+    const dateOfBirth = ref()
 
-    watch(user, () => {
+    const fullName = computed(() => [user.value?.personal.first_name, user.value?.personal.middle_name, user.value?.personal.last_name].join(' ').trim())
+
+    const init = () => {
         if (form.value !== null && user.value !== null) {
             form.value.setFieldValue('first_name', user.value.personal.first_name)
             form.value.setFieldValue('middle_name', user.value.personal.middle_name || '')
             form.value.setFieldValue('last_name', user.value.personal.last_name)
             form.value.setFieldValue('email', user.value.personal.email)
             form.value.setFieldValue('date_of_birth', user.value.personal.date_of_birth)
-            form.value.setFieldValue('gender', user.value.personal.gender)
+            form.value.setFieldValue('gender_id', user.value.personal.gender_id)
+            form.value.setFieldValue('country_id', user.value.personal.country_id)
+            form.value.setFieldValue('age_category_id', user.value.personal.age_category_id)
             form.value.setFieldValue('phone_number', user.value.personal.phone_number)
+
+            dateOfBirth.value = parseDate(moment(user.value.personal.date_of_birth).format('YYYY-MM-DD'))
         }
+    }
+
+    const fileInputHandler = (event: Event) => {
+        const files = (event.target as HTMLInputElement).files
+        if (!files)
+            return
+
+        const reader = new FileReader()
+        reader.readAsDataURL(files[0])
+        reader.onload = () => {
+            form.value?.setFieldValue('image', reader.result)
+        }
+    }
+
+    watch(dateOfBirth, () => {
+        if (form.value)
+            form.value.setFieldValue('date_of_birth', `${dateOfBirth.value.year}-${dateOfBirth.value.month}-${dateOfBirth.value.day}`)
+    })
+
+    watch(user, () => {
+        init()
+    })
+
+    onMounted(() => {
+        init()
     })
 </script>
 
@@ -40,7 +75,14 @@
     </div>
     <!-- @vue-expect-error -->
     <Form :validation-schema="userDetailSchema" method="post" @submit="updateDetail"
-        class="max-w-[820px] flex flex-col space-y-4 mx-auto" ref=form>
+        class="max-w-[820px] flex flex-col space-y-4" ref=form v-slot="{ values, errors }">
+        <label class="self-center mb-16">
+            <Avatar class="w-[180px] h-[180px] bg-gray-300">
+                <AvatarImage :src="values.image || ''" />
+                <AvatarFallback class="text-4xl">{{ abbr(fullName) }}</AvatarFallback>
+            </Avatar>
+            <input type="file" @change="fileInputHandler" class="sr-only" accept="image/*">
+        </label>
         <div class="flex space-x-8">
             <div class="w-1/3">
                 <Field name="first_name" v-slot="{ field }">
@@ -109,25 +151,25 @@
                 </Field>
             </div>
         </div>
-        <Field name="date_of_birth" v-slot="{ field }">
+        <Field name="date_of_birth">
             <label class="sr-only" for="lf__date_of_birth">Date of birth</label>
             <div class="flex gap-2">
                 <Calendar class="mt-3" />
                 <div class="flex-grow">
-                    <Input type="text" v-bind="field" placeholder="Date of birth" id="lf__date_of_birth"
-                        autocomplete="bday-day" />
+                    <DatePicker label="Date of Birth" :model-value="dateOfBirth"
+                        @update:model-value="(dob) => dateOfBirth = dob" />
                     <ErrorMessage name="date_of_birth" />
                 </div>
             </div>
         </Field>
         <div class="flex space-x-8">
-            <div class="w-1/2">
-                <Field name="gender_id" v-slot="{ field }">
+            <div class="w-1/3">
+                <Field name="gender_id" v-slot="{ field }" id="lf__gender">
                     <label class="sr-only" for="lf__gender">Gender</label>
                     <div class="flex gap-2">
-                        <VenusAndMars class="mt-1" />
+                        <VenusAndMars class="mt-3" />
                         <div class="flex-grow">
-                            <Select v-bind="field" autocomplete="sex">
+                            <Select v-bind="field" autocomplete="sex" :default-value="user?.personal.gender_id">
                                 <SelectTrigger class="w-full">
                                     <SelectValue placeholder="Select a gender" />
                                 </SelectTrigger>
@@ -141,13 +183,14 @@
                     </div>
                 </Field>
             </div>
-            <div class="w-1/2">
+            <div class="w-1/3">
                 <Field name="country_id" v-slot="{ field }">
                     <label class="sr-only" for="lf__country">Country</label>
                     <div class="flex gap-2">
-                        <Flag class="mt-1" />
+                        <Flag class="mt-3" />
                         <div class="flex-grow">
-                            <Select v-bind="field" autocomplete="sex">
+                            <Select v-bind="field" autocomplete="sex" id="lf__country"
+                                :default-value="user?.personal.country_id">
                                 <SelectTrigger class="w-full">
                                     <SelectValue placeholder="Select a country" />
                                 </SelectTrigger>
@@ -161,25 +204,29 @@
                     </div>
                 </Field>
             </div>
-        </div>
-        <!-- <Field name="country_id" v-slot="{ field }">
-            <label class="sr-only" for="lf__country">Country</label>
-            <div class="flex gap-2">
-                <Flag class="mt-1" />
-                <div class="flex-grow">
-                    <Select v-bind="field" autocomplete="sex">
-                        <SelectTrigger class="w-full">
-                            <SelectValue placeholder="Select a country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="country in countries" :value="country.id">{{ country.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <ErrorMessage name="country_id" />
-                </div>
+            <div class="w-1/3">
+                <Field name="age_category_id" v-slot="{ field }">
+                    <label class="sr-only" for="lf__age_category_id">Age category</label>
+                    <div class="flex gap-2">
+                        <Baby class="mt-3" />
+                        <div class="flex-grow">
+                            <Select v-bind="field" autocomplete="sex" id="lf__country"
+                                :default-value="user?.personal.age_category_id">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Select an age group" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem v-for="ageCategory in age_categories" :value="ageCategory.id">{{
+                                        ageCategory.name }}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <ErrorMessage name="age_category_id" />
+                        </div>
+                    </div>
+                </Field>
             </div>
-        </Field> -->
+        </div>
         <div class="text-right">
             <Button variant="secondary" type="submit" class="w-[180px]" :disabled="isLoading">
                 <Loader class="animate-spin relative" v-if="isLoading" />

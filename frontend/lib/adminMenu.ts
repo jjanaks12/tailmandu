@@ -13,28 +13,24 @@ export const useMenu = () => {
             icon: 'Users',
             slug: 'users',
             path: '/dashboard/users',
-            role: 'Admin',
             permissions: 'manage_user'
         }, {
             title: 'Events',
             icon: 'Calendar1',
             slug: 'events',
             path: '/dashboard/events',
-            role: 'Admin',
             permissions: 'manage_event'
         }, {
             title: 'Roles',
             icon: 'ShieldCheck',
             slug: 'roles',
             path: '/dashboard/roles',
-            role: 'Admin',
             permissions: 'manage_role'
         }, {
             title: 'Permissions',
             icon: 'ShieldUser',
             slug: 'permissions',
             path: '/dashboard/permissions',
-            role: 'Admin',
             permissions: 'manage_permission'
         }]
     }, {
@@ -54,6 +50,12 @@ export const useMenu = () => {
             path: '/dashboard/gender',
             slug: 'gender',
             icon: 'VenusAndMars',
+            permissions: ''
+        }, {
+            title: 'Age category',
+            path: '/dashboard/age_category',
+            slug: 'age_category',
+            icon: 'Baby',
             permissions: ''
         }]
     }, {
@@ -80,7 +82,6 @@ export const useMenu = () => {
             path: '/dashboard/company',
             slug: 'company',
             icon: 'Building',
-            role: 'Admin',
             permissions: 'manage_company'
         }]
     }])
@@ -106,14 +107,36 @@ export const useMenu = () => {
                 menuItem = { ...menu }
                 menuList.value.push(menuItem)
             } */
-    const menuList = computed<Menu[]>(() => menus.value.filter(menu => menu.hasOwnProperty('role')
+    /* const menuList = computed<Menu[]>(() => menus.value.filter(menu => user.value?.role && menu.hasOwnProperty('role')
         ? menu.role == user.value?.role.name
             ? menu
             : false
         : menu.subMenu && menu.subMenu.length > 0
             ? menu.subMenu.filter(subMenu => can(subMenu.permissions, subMenu.role))
             : can(menu.permissions, menu.role)
-    ))
+    )) */
+    /* const menuList = computed<Menu[]>(() => menus.value.filter(menu => menu.role && user.value?.role
+        ? menu.role == user.value.role.name
+        : menu.subMenu && menu.subMenu.length > 0
+            ? menu.subMenu.filter(submenu => can(submenu.permissions)).length > 0
+            : can(menu.permissions)
+    )) */
+
+    // @ts-expect-error
+    const menuList = computed<Menu[]>(() => menus.value.map(menu => menu.role
+        ? menu.role == user.value?.role?.name ? menu : null
+        : menu.permissions.length > 0
+            ? can(menu.permissions) ? menu : null
+            : {
+                ...menu,
+                subMenu: menu.subMenu?.map(submenu => can(submenu.permissions) ? { ...submenu } : null)
+                    .filter(submenu => submenu != null)
+            })
+        .filter(menu => menu == null
+            ? false
+            : menu.subMenu && menu.subMenu.length > 0
+        )
+    )
 
     return { menuList }
 }

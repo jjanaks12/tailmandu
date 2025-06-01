@@ -32,6 +32,11 @@ export const roleSeed = async (prisma: PrismaClient) => {
     const stage_view = await prisma.permission.create({ data: { name: 'stage_view' } })
     const stage_delete = await prisma.permission.create({ data: { name: 'stage_delete' } })
 
+    const company_create = await prisma.permission.create({ data: { name: 'company_create' } })
+    const company_edit = await prisma.permission.create({ data: { name: 'company_edit' } })
+    const company_view = await prisma.permission.create({ data: { name: 'company_view' } })
+    const company_delete = await prisma.permission.create({ data: { name: 'company_delete' } })
+
     const adminRole = await prisma.role.create({
         data: {
             name: 'Admin',
@@ -66,6 +71,11 @@ export const roleSeed = async (prisma: PrismaClient) => {
                     { id: stage_edit.id },
                     { id: stage_view.id },
                     { id: stage_delete.id },
+
+                    { id: company_create.id },
+                    { id: company_edit.id },
+                    { id: company_view.id },
+                    { id: company_delete.id },
                 ]
             }
         }

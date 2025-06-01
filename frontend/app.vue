@@ -5,13 +5,16 @@
 
   const { isLoggedin } = storeToRefs(useAuthStore())
   const { fetch } = useAuthStore()
-  const { fetchGender, fetchCountries } = useAppStore()
+  const { fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory } = useAppStore()
 
   const isLoading = ref(true)
   const job = new Jobs()
 
   const initPage = async () => {
-    job.add([fetch, fetchGender, fetchCountries])
+    if (!isLoggedin.value)
+      return
+
+    job.add([fetch, fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory])
 
     await job.run()
       .finally(() => {
@@ -20,8 +23,7 @@
   }
 
   watch(isLoggedin, () => {
-    if (isLoggedin.value)
-      initPage()
+    initPage()
   })
 
   onMounted(() => {
