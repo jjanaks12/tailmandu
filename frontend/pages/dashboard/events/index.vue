@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-    import { EllipsisVertical, Eye, Pencil, Search, SlidersVertical, Trash } from 'lucide-vue-next'
+    import { CalendarIcon, EllipsisVertical, Eye, Pencil, Search, SlidersVertical, Trash } from 'lucide-vue-next'
     import { Form, Field } from 'vee-validate'
+    import EventForm from './form.vue'
 
     useHead({
         title: 'Events'
@@ -11,56 +12,46 @@
         middleware: 'auth'
     })
 
-    const items = [
-        {
-            id: 'recents',
-            label: 'Recents',
-        },
-        {
-            id: 'home',
-            label: 'Home',
-        },
-        {
-            id: 'applications',
-            label: 'Applications',
-        },
-        {
-            id: 'desktop',
-            label: 'Desktop',
-        },
-        {
-            id: 'downloads',
-            label: 'Downloads',
-        },
-        {
-            id: 'documents',
-            label: 'Documents',
-        },
-    ] as const
+    const statuses = ['completed', 'ongoing', 'coming soon']
 </script>
 <template>
-    <div class="flex gap-4 mb-20">
+    <div class="flex items-center justify-between mb-12">
+        <h1 class="text-2xl">Events</h1>
+        <Dialog>
+            <DialogTrigger as-child>
+                <Button>
+                    <CalendarIcon />
+                    Add new Event
+                </Button>
+            </DialogTrigger>
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Event</DialogTitle>
+                    <DialogDescription>
+                        Anyone who has this link will be able to view this.
+                    </DialogDescription>
+                </DialogHeader>
+                <EventForm />
+            </DialogContent>
+        </Dialog>
+    </div>
+    <div class="flex items-end gap-4 mb-20">
         <div class="flex-grow">
             <div class="flex gap-2 mb-4">
                 <SlidersVertical />
                 Filters
             </div>
             <Form class="flex flex-wrap gap-2" v-slot="{ values }">
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="outline">Status</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem v-for="item in items" :key="item.id">
-                            <Field as="div" type="radio" name="status" v-slot="{ field, handleChange }"
-                                :model-value="item.id" class="w-1/3 flex gap-2">
-                                <input type="radio" v-bind="field" :id="`eff__status_${item.id}`" :value="item.id"
-                                    @change="handleChange" />
-                                <label :for="`eff__status_${item.id}`">{{ item.label }}</label>
-                            </Field>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Field as="div" type="radio" name="status" class="w-1/3 flex gap-2" v-slot="{ field }">
+                    <Select v-bind="field">
+                        <SelectTrigger class="w-full">
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="status in statuses" :value="status">{{ status }}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </Field>
             </Form>
         </div>
         <Form class="max-w-[320px] w-full flex items-center gap-2">

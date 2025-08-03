@@ -1,5 +1,5 @@
-import type { Menu } from "~/lib/types";
-import { useAuthStore } from "~/store/auth";
+import type { Menu } from "~/lib/types"
+import { useAuthStore } from "~/store/auth"
 
 
 export const useMenu = () => {

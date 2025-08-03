@@ -18,6 +18,7 @@ model AgeCategory {
   name       String
   created_at DateTime  @default(now())
   updated_at DateTime?
+  deleted_at DateTime?
 
   personal Personal[]
 
@@ -29,6 +30,7 @@ model Checkpoint {
   name       String
   created_at DateTime  @default(now())
   updated_at DateTime?
+  deleted_at DateTime?
 
   event_id String
   event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
@@ -57,6 +59,7 @@ model Club {
   description String
   created_at  DateTime  @default(now())
   updated_at  DateTime?
+  deleted_at  DateTime?
 
   @@map("clubs")
 }
@@ -69,6 +72,7 @@ model Event {
   description String
   created_at  DateTime  @default(now())
   updated_at  DateTime?
+  deleted_at  DateTime?
 
   volunteers  Volunteer[]
   checkpoints Checkpoint[]
@@ -82,6 +86,7 @@ model EventRunner {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
   updated_at DateTime?
+  deleted_at DateTime?
 
   personal_id String
   personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
@@ -121,6 +126,7 @@ model Permission {
   description String?
   created_at  DateTime  @default(now())
   updated_at  DateTime?
+  deleted_at  DateTime?
 
   roles Role[]
 
@@ -137,6 +143,7 @@ model Personal {
   phone_number  String?
   created_at    DateTime  @default(now())
   updated_at    DateTime?
+  deleted_at    DateTime?
 
   country_id      String?
   country         Country?     @relation(fields: [country_id], references: [id], onDelete: Cascade)
@@ -160,8 +167,10 @@ model Role {
   id          String    @id @default(cuid())
   name        String
   description String?
+  publish     Boolean?
   created_at  DateTime  @default(now())
   updated_at  DateTime?
+  deleted_at  DateTime?
 
   permissions Permission[]
   users       User[]
@@ -175,6 +184,7 @@ model Size {
   description String
   created_at  DateTime  @default(now())
   updated_at  DateTime?
+  deleted_at  DateTime?
 
   Personal Personal[]
 
@@ -186,6 +196,7 @@ model Stage {
   name       String
   created_at DateTime  @default(now())
   updated_at DateTime?
+  deleted_at DateTime?
 
   event_id String
   event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
@@ -200,6 +211,7 @@ model User {
   password   String
   created_at DateTime  @default(now())
   updated_at DateTime?
+  deleted_at DateTime?
 
   personal_id String   @unique
   personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
@@ -213,6 +225,7 @@ model Volunteer {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
   updated_at DateTime?
+  deleted_at DateTime?
 
   personal_id String
   personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)

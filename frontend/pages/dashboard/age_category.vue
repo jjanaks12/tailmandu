@@ -8,7 +8,9 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        role: 'Admin',
+        authorization: ['manage_ageCategory']
     })
 
     const { age_categories } = storeToRefs(useAppStore())

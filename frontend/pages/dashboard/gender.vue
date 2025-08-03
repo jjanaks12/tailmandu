@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-    import { EllipsisVertical, Pencil, Plus, Trash } from 'lucide-vue-next';
-    import { useAppStore } from '~/store/app';
+    import { EllipsisVertical, Pencil, Plus, Trash } from 'lucide-vue-next'
+    import { useAppStore } from '~/store/app'
 
     useHead({
         title: 'Countries'
@@ -8,7 +8,9 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        role: 'Admin',
+        authorization: 'manage_gender'
     })
 
     const { genders } = storeToRefs(useAppStore())

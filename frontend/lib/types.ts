@@ -1,5 +1,26 @@
 import * as Icons from 'lucide-vue-next'
 
+type APISort<T> = {
+    order: "asc" | "desc"
+    field: keyof typeof T
+}
+
+export type APIQuery<T> = {
+    s: string
+    sort?: APISort<T>
+}
+
+export type APIParam = {
+    total_page: number
+    total: number
+    current: number
+    per_page: number
+}
+
+export type APIRequest<T> = APIParam & {
+    data: T
+}
+
 export type Gender = {
     id: string
     name: string
@@ -72,6 +93,7 @@ export type EventRunner = {}
 export type Volunteer = {}
 
 export type User = {
+    id: string
     personal: Personal
     role: Role
 }
@@ -84,6 +106,7 @@ export type Token = {
 export type Role = {
     id: string
     name: string
+    description: string
     permissions: Permission[]
 }
 

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-    import { Pencil, Trash } from 'lucide-vue-next';
-    import { useAppStore } from '~/store/app';
+    import { useAppStore } from '~/store/app'
 
     useHead({
         title: 'Countries'
@@ -8,7 +7,9 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        role: 'Admin',
+        authorization: 'manage__country'
     })
 
     const { countries } = storeToRefs(useAppStore())

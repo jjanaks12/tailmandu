@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { KeyRound } from 'lucide-vue-next'
+    import { KeyRound, Loader } from 'lucide-vue-next'
     import { Form, Field, ErrorMessage } from 'vee-validate'
 
     import { userChangePasswordSchema } from '~/lib/schema/user.schema'
@@ -11,7 +11,8 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        authorization: ['*']
     })
 
     const { changePassword } = useAuthStore()

@@ -2,11 +2,19 @@ import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
+import { FileHandler } from "@/app/lib/services/File.service"
+
 const prisma = new PrismaClient()
 export class PersonalController {
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
             const body: any = {}
+
+            if (request.body.image) {
+                const fileUpload = new FileHandler('images')
+                const image = await fileUpload.saveFile(request.body.image, request.body.image_id)
+                body.image_id = image.id
+            }
 
             if (request.body.date_of_birth)
                 body.date_of_birth = moment(request.body.date_of_birth, 'YYYY-MM-DD').toISOString()
@@ -35,7 +43,7 @@ export class PersonalController {
                     updated_at: moment().toISOString()
                 }
             })
-            response.send(request.body)
+            response.send('all ok!')
         } catch (error) {
             next(error)
         }

@@ -2,10 +2,14 @@
   import { useAuthStore } from '~/store/auth'
   import { useAppStore } from '~/store/app'
   import Jobs from '~/lib/jobs'
+  import { useRoleStore } from './store/role'
+  import { usePermissionStore } from './store/permission'
 
   const { isLoggedin } = storeToRefs(useAuthStore())
   const { fetch } = useAuthStore()
-  const { fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory } = useAppStore()
+  const { fetchGender, fetchCountries, fetchAgeCategory } = useAppStore()
+  const { fetch: fetchRole } = useRoleStore()
+  const { fetch: fetchPermission } = usePermissionStore()
 
   const isLoading = ref(true)
   const job = new Jobs()
@@ -26,13 +30,13 @@
     initPage()
   })
 
-  onMounted(() => {
+  onBeforeMount(() => {
     initPage()
   })
 </script>
 
 <template>
-  <NuxtLayout v-cloak>
+  <NuxtLayout v-cloak v-if="!isLoading">
     <NuxtPage />
   </NuxtLayout>
 </template>

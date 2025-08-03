@@ -1,7 +1,7 @@
 <script lang="ts" setup>
     import { EllipsisVertical, Pencil, Trash } from 'lucide-vue-next'
     import { humanize } from '~/lib/filters'
-    import { useAppStore } from '~/store/app'
+    import { usePermissionStore } from '~/store/permission'
 
     useHead({
         title: 'Permissions'
@@ -9,9 +9,10 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        authorization: ['manage_permission']
     })
-    const { permissions } = storeToRefs(useAppStore())
+    const { permissions } = storeToRefs(usePermissionStore())
 </script>
 
 <template>

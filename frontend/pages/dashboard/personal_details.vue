@@ -3,7 +3,7 @@
     import { Baby, Calendar, Flag, IdCard, Loader, Mail, Phone, VenusAndMars } from 'lucide-vue-next'
     import moment from 'moment'
     import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
-    import { abbr } from '~/lib/filters'
+    import { abbr, showImage } from '~/lib/filters'
 
     import { userDetailSchema } from '~/lib/schema/user.schema'
     import { useAppStore } from '~/store/app'
@@ -15,16 +15,17 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        authorization: ['*']
     })
 
     const { updateDetail } = useAuthStore()
-    const { isLoading, user } = storeToRefs(useAuthStore())
+    const { isLoading, user, fullName } = storeToRefs(useAuthStore())
     const { genders, countries, age_categories } = storeToRefs(useAppStore())
     const form = ref<FormContext | null>(null)
     const dateOfBirth = ref()
 
-    const fullName = computed(() => [user.value?.personal.first_name, user.value?.personal.middle_name, user.value?.personal.last_name].join(' ').trim())
+    const avatar = computed(() => showImage(user.value?.personal?.avatar?.file_name as string))
 
     const init = () => {
         if (form.value !== null && user.value !== null) {
@@ -32,13 +33,16 @@
             form.value.setFieldValue('middle_name', user.value.personal.middle_name || '')
             form.value.setFieldValue('last_name', user.value.personal.last_name)
             form.value.setFieldValue('email', user.value.personal.email)
-            form.value.setFieldValue('date_of_birth', user.value.personal.date_of_birth)
             form.value.setFieldValue('gender_id', user.value.personal.gender_id)
             form.value.setFieldValue('country_id', user.value.personal.country_id)
             form.value.setFieldValue('age_category_id', user.value.personal.age_category_id)
             form.value.setFieldValue('phone_number', user.value.personal.phone_number)
+            form.value.setFieldValue('image_id', user.value.personal?.image_id)
 
-            dateOfBirth.value = parseDate(moment(user.value.personal.date_of_birth).format('YYYY-MM-DD'))
+            if (user.value.personal.date_of_birth) {
+                form.value.setFieldValue('date_of_birth', user.value.personal.date_of_birth)
+                dateOfBirth.value = parseDate(moment(user.value.personal.date_of_birth).format('YYYY-MM-DD'))
+            }
         }
     }
 
@@ -48,9 +52,11 @@
             return
 
         const reader = new FileReader()
-        reader.readAsDataURL(files[0])
-        reader.onload = () => {
-            form.value?.setFieldValue('image', reader.result)
+        if (files[0]) {
+            reader.readAsDataURL(files[0])
+            reader.onload = () => {
+                form.value?.setFieldValue('image', reader.result)
+            }
         }
     }
 
@@ -78,7 +84,7 @@
         class="max-w-[820px] flex flex-col space-y-4" ref=form v-slot="{ values, errors }">
         <label class="self-center mb-16">
             <Avatar class="w-[180px] h-[180px] bg-gray-300">
-                <AvatarImage :src="values.image || ''" />
+                <AvatarImage :src="values.image || avatar || ''" class="object-cover" />
                 <AvatarFallback class="text-4xl">{{ abbr(fullName) }}</AvatarFallback>
             </Avatar>
             <input type="file" @change="fileInputHandler" class="sr-only" accept="image/*">

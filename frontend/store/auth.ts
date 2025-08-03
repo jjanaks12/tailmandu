@@ -1,4 +1,5 @@
 import * as Y from 'yup'
+import { showImage } from '~/lib/filters'
 import type { userDetailSchema, userLoginSchema, userRegisterSchema } from '~/lib/schema/user.schema'
 
 import type { Token, User } from "~/lib/types"
@@ -13,21 +14,28 @@ export const useAuthStore = defineStore('auth', () => {
 
     const permissions = computed(() => user.value?.role?.permissions.map(permission => permission.name) || [])
     const isLoggedin = computed(() => token.value != null)
+    const avatar = computed(() => showImage(user.value?.personal.avatar.file_name as string))
+    const fullName = computed(() => [user.value?.personal.first_name, user.value?.personal.middle_name, user.value?.personal.last_name].join(' ').trim())
+    const role = computed(() => user.value?.role?.name)
 
     const fetch = async () => {
+        isLoading.value = true
         const { data } = await axios.get<User>('/profile')
         user.value = data
+        isLoading.value = false
     }
 
     const login = async (formData: Y.InferType<typeof userLoginSchema>) => {
         isLoading.value = true
 
         const { data } = await axios.post<Token>('/login', formData)
-        token.value = data
-        await fetch()
+        if (data) {
+            token.value = data
+            await fetch()
 
+            navigateTo('/dashboard')
+        }
         isLoading.value = false
-        navigateTo('/dashboard')
     }
 
     const register = async (formData: Y.InferType<typeof userRegisterSchema>) => {
@@ -88,7 +96,11 @@ export const useAuthStore = defineStore('auth', () => {
         checkUser()
     })
 
-    return { user, permissions, isLoggedin, isLoading, token, fetch, login, register, logout, changePassword, refreshToken, updateDetail }
+    return {
+        user, isLoading, token,
+        fullName, permissions, isLoggedin, role,
+        fetch, login, register, logout, changePassword, refreshToken, updateDetail
+    }
 }, {
     persist: {
         pick: ['user', 'token']

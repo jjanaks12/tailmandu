@@ -8,7 +8,6 @@ export const useAppStore = defineStore('app', () => {
     const breakpoints = ref()
     const genders = ref<Gender[]>([])
     const countries = ref<Country[]>([])
-    const roles = ref<Role[]>([])
     const permissions = ref<Permission[]>([])
     const age_categories = ref<AgeCategory[]>([])
 
@@ -22,11 +21,6 @@ export const useAppStore = defineStore('app', () => {
     const fetchCountries = async () => {
         const { data } = await axios.get<Country[]>('/countries')
         countries.value = data
-    }
-
-    const fetchRole = async () => {
-        const { data } = await axios.get<Role[]>('/roles')
-        roles.value = data
     }
 
     const fetchPermission = async () => {
@@ -43,5 +37,8 @@ export const useAppStore = defineStore('app', () => {
         breakpoints.value = useBreakpoints(breakpointsTailwind)
     })
 
-    return { breakpoints, genders, countries, roles, permissions, age_categories, fetchGender, fetchCountries, fetchRole, fetchPermission, fetchAgeCategory }
+    return {
+        breakpoints, genders, countries, permissions, age_categories,
+        fetchGender, fetchCountries, fetchPermission, fetchAgeCategory
+    }
 })
