@@ -63,7 +63,6 @@
                     <UserInfo :user="user" />
                 </TableCell>
                 <TableCell>
-                    <Badge variant="success">{{ user?.role?.name || 'user' }}</Badge>
                 </TableCell>
                 <TableCell class="text-right">
                     <DropdownMenu v-if="user.personal.email != mailAdmin">
@@ -76,7 +75,7 @@
                             <DropdownMenuGroup>
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem @click="navigateTo('/dashboard/users?id=1')" v-if="can('user_view')">
+                                <!-- <DropdownMenuItem @click="navigateTo('/dashboard/users?id=1')" v-if="can('user_view')">
                                     <Eye />
                                     <span>View</span>
                                 </DropdownMenuItem>
@@ -87,7 +86,7 @@
                                 <DropdownMenuItem>
                                     <Trash />
                                     <span>Delete</span>
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> -->
                                 <DropdownMenuItem @click="() => {
                                     isUserRoleChangeDialogOpen = true
                                     tempUser = user

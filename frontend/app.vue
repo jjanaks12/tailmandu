@@ -15,10 +15,11 @@
   const job = new Jobs()
 
   const initPage = async () => {
-    if (!isLoggedin.value)
-      return
+    const jobList: Function[] = []
+    if (isLoggedin.value)
+      jobList.push(fetch, fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory)
 
-    job.add([fetch, fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory])
+    job.add(jobList)
 
     await job.run()
       .finally(() => {
