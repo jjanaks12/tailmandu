@@ -23,7 +23,10 @@ export default defineNuxtConfig({
   vite: {
     plugins: [
       tailwindcss()
-    ]
+    ],
+    server: {
+      allowedHosts: ['railmandu.janak.click']
+    }
   },
 
   app: {
