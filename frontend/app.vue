@@ -37,7 +37,7 @@
 </script>
 
 <template>
-  <NuxtLayout v-cloak v-if="!isLoading">
-    <NuxtPage />
+  <NuxtLayout v-cloak>
+    <NuxtPage v-if="!isLoading" />
   </NuxtLayout>
 </template>

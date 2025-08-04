@@ -1,0 +1,1 @@
+import{t,l as n}from"./VQ-eN-oM.js";import{h as u}from"./CMjavVp8.js";function i(o){return o==null}function l(o){return u(()=>{var r;return t(o)?!!((r=n(o))!=null&&r.closest("form")):!0})}export{i,l as u};
