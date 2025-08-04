@@ -165,7 +165,6 @@ interface _GlobalComponents {
     'SidebarRail': typeof import("../components/ui/sidebar/index")['SidebarRail']
     'SidebarSeparator': typeof import("../components/ui/sidebar/index")['SidebarSeparator']
     'SidebarTrigger': typeof import("../components/ui/sidebar/index")['SidebarTrigger']
-    'Skeleton': typeof import("../components/ui/skeleton/index")['Skeleton']
     'Toaster': typeof import("../components/ui/sonner/index")['Toaster']
     'Stepper': typeof import("../components/ui/stepper/index")['Stepper']
     'StepperDescription': typeof import("../components/ui/stepper/index")['StepperDescription']
@@ -187,11 +186,12 @@ interface _GlobalComponents {
     'TabsContent': typeof import("../components/ui/tabs/index")['TabsContent']
     'TabsList': typeof import("../components/ui/tabs/index")['TabsList']
     'TabsTrigger': typeof import("../components/ui/tabs/index")['TabsTrigger']
-    'Textarea': typeof import("../components/ui/textarea/index")['Textarea']
+    'Skeleton': typeof import("../components/ui/skeleton/index")['Skeleton']
     'Tooltip': typeof import("../components/ui/tooltip/index")['Tooltip']
     'TooltipContent': typeof import("../components/ui/tooltip/index")['TooltipContent']
     'TooltipProvider': typeof import("../components/ui/tooltip/index")['TooltipProvider']
     'TooltipTrigger': typeof import("../components/ui/tooltip/index")['TooltipTrigger']
+    'Textarea': typeof import("../components/ui/textarea/index")['Textarea']
     'AreaChart': typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaChart']
     'AreaStackedChart': typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaStackedChart']
     'LineChart': typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['LineChart']
@@ -362,7 +362,6 @@ interface _GlobalComponents {
     'LazySidebarRail': LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarRail']>
     'LazySidebarSeparator': LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarSeparator']>
     'LazySidebarTrigger': LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarTrigger']>
-    'LazySkeleton': LazyComponent<typeof import("../components/ui/skeleton/index")['Skeleton']>
     'LazyToaster': LazyComponent<typeof import("../components/ui/sonner/index")['Toaster']>
     'LazyStepper': LazyComponent<typeof import("../components/ui/stepper/index")['Stepper']>
     'LazyStepperDescription': LazyComponent<typeof import("../components/ui/stepper/index")['StepperDescription']>
@@ -384,11 +383,12 @@ interface _GlobalComponents {
     'LazyTabsContent': LazyComponent<typeof import("../components/ui/tabs/index")['TabsContent']>
     'LazyTabsList': LazyComponent<typeof import("../components/ui/tabs/index")['TabsList']>
     'LazyTabsTrigger': LazyComponent<typeof import("../components/ui/tabs/index")['TabsTrigger']>
-    'LazyTextarea': LazyComponent<typeof import("../components/ui/textarea/index")['Textarea']>
+    'LazySkeleton': LazyComponent<typeof import("../components/ui/skeleton/index")['Skeleton']>
     'LazyTooltip': LazyComponent<typeof import("../components/ui/tooltip/index")['Tooltip']>
     'LazyTooltipContent': LazyComponent<typeof import("../components/ui/tooltip/index")['TooltipContent']>
     'LazyTooltipProvider': LazyComponent<typeof import("../components/ui/tooltip/index")['TooltipProvider']>
     'LazyTooltipTrigger': LazyComponent<typeof import("../components/ui/tooltip/index")['TooltipTrigger']>
+    'LazyTextarea': LazyComponent<typeof import("../components/ui/textarea/index")['Textarea']>
     'LazyAreaChart': LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaChart']>
     'LazyAreaStackedChart': LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaStackedChart']>
     'LazyLineChart': LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['LineChart']>
@@ -565,7 +565,6 @@ export const SidebarProvider: typeof import("../components/ui/sidebar/index")['S
 export const SidebarRail: typeof import("../components/ui/sidebar/index")['SidebarRail']
 export const SidebarSeparator: typeof import("../components/ui/sidebar/index")['SidebarSeparator']
 export const SidebarTrigger: typeof import("../components/ui/sidebar/index")['SidebarTrigger']
-export const Skeleton: typeof import("../components/ui/skeleton/index")['Skeleton']
 export const Toaster: typeof import("../components/ui/sonner/index")['Toaster']
 export const Stepper: typeof import("../components/ui/stepper/index")['Stepper']
 export const StepperDescription: typeof import("../components/ui/stepper/index")['StepperDescription']
@@ -587,11 +586,12 @@ export const Tabs: typeof import("../components/ui/tabs/index")['Tabs']
 export const TabsContent: typeof import("../components/ui/tabs/index")['TabsContent']
 export const TabsList: typeof import("../components/ui/tabs/index")['TabsList']
 export const TabsTrigger: typeof import("../components/ui/tabs/index")['TabsTrigger']
-export const Textarea: typeof import("../components/ui/textarea/index")['Textarea']
+export const Skeleton: typeof import("../components/ui/skeleton/index")['Skeleton']
 export const Tooltip: typeof import("../components/ui/tooltip/index")['Tooltip']
 export const TooltipContent: typeof import("../components/ui/tooltip/index")['TooltipContent']
 export const TooltipProvider: typeof import("../components/ui/tooltip/index")['TooltipProvider']
 export const TooltipTrigger: typeof import("../components/ui/tooltip/index")['TooltipTrigger']
+export const Textarea: typeof import("../components/ui/textarea/index")['Textarea']
 export const AreaChart: typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaChart']
 export const AreaStackedChart: typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaStackedChart']
 export const LineChart: typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['LineChart']
@@ -762,7 +762,6 @@ export const LazySidebarProvider: LazyComponent<typeof import("../components/ui/
 export const LazySidebarRail: LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarRail']>
 export const LazySidebarSeparator: LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarSeparator']>
 export const LazySidebarTrigger: LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarTrigger']>
-export const LazySkeleton: LazyComponent<typeof import("../components/ui/skeleton/index")['Skeleton']>
 export const LazyToaster: LazyComponent<typeof import("../components/ui/sonner/index")['Toaster']>
 export const LazyStepper: LazyComponent<typeof import("../components/ui/stepper/index")['Stepper']>
 export const LazyStepperDescription: LazyComponent<typeof import("../components/ui/stepper/index")['StepperDescription']>
@@ -784,11 +783,12 @@ export const LazyTabs: LazyComponent<typeof import("../components/ui/tabs/index"
 export const LazyTabsContent: LazyComponent<typeof import("../components/ui/tabs/index")['TabsContent']>
 export const LazyTabsList: LazyComponent<typeof import("../components/ui/tabs/index")['TabsList']>
 export const LazyTabsTrigger: LazyComponent<typeof import("../components/ui/tabs/index")['TabsTrigger']>
-export const LazyTextarea: LazyComponent<typeof import("../components/ui/textarea/index")['Textarea']>
+export const LazySkeleton: LazyComponent<typeof import("../components/ui/skeleton/index")['Skeleton']>
 export const LazyTooltip: LazyComponent<typeof import("../components/ui/tooltip/index")['Tooltip']>
 export const LazyTooltipContent: LazyComponent<typeof import("../components/ui/tooltip/index")['TooltipContent']>
 export const LazyTooltipProvider: LazyComponent<typeof import("../components/ui/tooltip/index")['TooltipProvider']>
 export const LazyTooltipTrigger: LazyComponent<typeof import("../components/ui/tooltip/index")['TooltipTrigger']>
+export const LazyTextarea: LazyComponent<typeof import("../components/ui/textarea/index")['Textarea']>
 export const LazyAreaChart: LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaChart']>
 export const LazyAreaStackedChart: LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['AreaStackedChart']>
 export const LazyLineChart: LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts")['LineChart']>
