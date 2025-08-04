@@ -44,6 +44,6 @@
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma",
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} ./src/prisma/seed/index.ts"
+    "seed": "ts-node -r --compiler-options {\"module\":\"CommonJS\"} ./src/prisma/seed/index.ts"
   }
 }
