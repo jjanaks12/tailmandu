@@ -1,5 +1,5 @@
 export { showImage, getGPXFile } from './show_image'
 export { abbr } from './abbr'
-export { humanize, formatDate } from './humanize'
+export { humanize, formatDate, slugify } from './humanize'
 export { isObjEq } from './isObjectEqual'
 export { debounce } from './debounce'

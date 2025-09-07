@@ -3,3 +3,5 @@ dist
 .env
 *-dup.*
 .DS_Store
+
+resources/uploads

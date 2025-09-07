@@ -5,6 +5,8 @@ type APISort<T> = {
     field: keyof typeof T
 }
 
+type AddressType = 'BILLING' | 'SHIPPING' | 'PERMANENT_ADDRESS'
+
 export type APIQuery<T> = {
     s: string
     sort?: APISort<T>
@@ -91,8 +93,10 @@ export type Country = {
 export type TrailRace = {
     id: string
     name: string
+    slug: string
     start: string
     end: string
+    excerpt: string
     description: string
     created_at: string
     updated_at?: string
@@ -136,4 +140,31 @@ export type Role = {
 export type Permission = {
     id: string
     name: string
+}
+
+type Address = {
+    id: string
+    street: string
+    address: string
+    city: string
+    state: string
+    zipCode: string
+    countryId: string
+    country: Country
+    type: AddressType
+}
+
+export type Company = {
+    id: string
+    short_name: string
+    name: string
+    address: Address
+    email: string
+    image_id: string
+    logo: Image
+    phone: string
+    vat_registered: boolean
+    pan_no: string
+    vat_no: string
+    users: User[]
 }

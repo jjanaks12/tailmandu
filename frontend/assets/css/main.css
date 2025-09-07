@@ -155,3 +155,7 @@
 form [role=alert] {
   @apply text-destructive text-sm;
 }
+
+.container {
+  @apply mx-auto;
+}

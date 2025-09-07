@@ -6,14 +6,18 @@ export const useEventStore = defineStore('event', () => {
     const { isLoading, params } = useModalMeta()
     const { axios } = useAxios()
 
+    const currentRace = computed(() => events.value[events.value.length - 1])
+
     const fetch = async () => {
-        const { data: { data, ...p } } = await axios.get<APIRequest<TrailRace[]>>('/events', {
+        const { data } = await axios.get<APIRequest<TrailRace[]>>('/events', {
             params: params.value
         })
 
-        events.value = data
-        params.value = p
-        events.value = data
+        if (data) {
+            const { data: d, ...p } = data
+            events.value = d
+            params.value = p
+        }
     }
 
     const save = async (formData: any) => {
@@ -41,6 +45,7 @@ export const useEventStore = defineStore('event', () => {
 
     return {
         isLoading, params, events,
+        currentRace,
         fetch, save, get, saveDescription, saveMap
     }
 })

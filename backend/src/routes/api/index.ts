@@ -5,6 +5,7 @@ import authRouter from '@/routes/api/auth.router'
 import miscellanousRouter from '@/routes/api/miscellanous.router'
 import roleRouter from '@/routes/api/role.router'
 import eventRouter from '@/routes/api/event.router'
+import CompanyRouter from '@/routes/api/company.router'
 
 const router = Router()
 
@@ -13,5 +14,6 @@ router.use('/', authRouter)
 router.use('/', miscellanousRouter)
 router.use('/roles', roleRouter)
 router.use('/events', eventRouter)
+router.use('/companies', CompanyRouter)
 
 export default router

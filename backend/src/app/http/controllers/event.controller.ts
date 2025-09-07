@@ -54,9 +54,11 @@ export class EventController {
             response.send(await prisma.trailRace.create({
                 data: {
                     name: validationData.name,
+                    slug: validationData.slug,
                     description: '',
                     start,
-                    end
+                    end,
+                    excerpt: validationData.excerpt
                 }
             }))
         } catch (error) {
@@ -78,9 +80,11 @@ export class EventController {
                 where: { id },
                 data: {
                     name: validationData.name,
+                    slug: validationData.slug,
                     updated_at: moment().toISOString(),
                     start,
-                    end
+                    end,
+                    excerpt: validationData.excerpt
                 }
             }))
         } catch (error) {

@@ -76,6 +76,7 @@
                         <dt>Ends:</dt>
                         <dd>{{ formatDate(trailRace?.end as string) }}</dd>
                     </dl>
+                    <div class="text">{{ trailRace.excerpt }}</div>
                     <TrailMapUploadMap :trail-race="trailRace" @update="fetchEventDetail" />
                     <TrailRaceDescription :trail-race="trailRace" @update="fetchEventDetail" />
                 </div>

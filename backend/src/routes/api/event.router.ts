@@ -5,9 +5,9 @@ import { EventController } from '@/app/http/controllers/event.controller'
 
 const router = Router()
 
-router.get('/', [verifyAccessToken], EventController.index)
+router.get('/', [], EventController.index)
 router.post('/', [verifyAccessToken], EventController.create)
-router.get('/:event_id', [verifyAccessToken], EventController.get)
+router.get('/:event_id', [], EventController.get)
 router.put('/:event_id', [verifyAccessToken], EventController.update)
 router.put('/:event_id/update_description', [verifyAccessToken], EventController.updateDescription)
 router.put('/:event_id/upload_thumbnail', [verifyAccessToken], EventController.updateThumbnail)

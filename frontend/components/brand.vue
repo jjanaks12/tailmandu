@@ -1,19 +1,28 @@
 <script setup lang="ts">
-    const { public: { appName } } = useRuntimeConfig()
+    import { showImage } from '~/lib/filters'
+    import { useAppStore } from '~/store/app'
+    import { useAuthStore } from '~/store/auth'
 
-    interface BrandProps {
-        to?: string
-    }
+    const route = useRoute()
+    const { isLoggedin } = storeToRefs(useAuthStore())
+    const { company } = storeToRefs(useAppStore())
 
-    withDefaults(defineProps<BrandProps>(), {
-        to: '/'
-    })
+    const homeURL = computed(() => !isLoggedin.value
+        ? 'index'
+        : route.meta.layout == 'admin'
+            ? 'dashboard'
+            : 'index')
 </script>
 
 <template>
-    <div class="logo w-[140px]">
-        <NuxtLink :to="to">
-            <img src="/assets/images/logo.png" :alt="appName">
-        </NuxtLink>
-    </div>
+    <ClientOnly>
+        <div class="logo w-[160px]" v-if="company">
+            <nuxt-link :to="{ name: homeURL }">
+                <img :src="showImage(company?.logo?.file_name as string)" :alt="company?.name" class="w-full h-auto">
+            </nuxt-link>
+        </div>
+        <div class="w-[160px]" v-else>
+            <Skeleton class="w-full h-14"/>
+        </div>
+    </ClientOnly>
 </template>

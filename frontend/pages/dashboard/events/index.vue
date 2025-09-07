@@ -23,10 +23,6 @@
 
     const showForm = ref(false)
     const trailRace = ref<TrailRace | null>(null)
-
-    onMounted(() => {
-        fetch()
-    })
 </script>
 <template>
     <div class="flex items-center justify-between mb-12">
@@ -77,7 +73,8 @@
                 <TableCell>{{ index + 1 }}</TableCell>
                 <TableCell>
                     <strong class="block text-lg">
-                        <NuxtLink :to="`/dashboard/events/${trailEvent.id}`" class="hover:text-primary transition-colors">{{ trailEvent.name }}</NuxtLink>
+                        <NuxtLink :to="`/dashboard/events/${trailEvent.id}`"
+                            class="hover:text-primary transition-colors">{{ trailEvent.name }}</NuxtLink>
                     </strong>
                     <em class="not-italic block">Starts from {{ formatDate(trailEvent.start) }}</em>
                     <em class="not-italic block">Ends At {{ formatDate(trailEvent.end) }}</em>
@@ -174,7 +171,10 @@
                     Anyone who has this link will be able to view this.
                 </DialogDescription>
             </DialogHeader>
-            <EventForm @update="showForm = false" :trailRace="trailRace" />
+            <EventForm @update="() => {
+                showForm = false
+                fetch()
+            }" :trailRace="trailRace" />
         </DialogContent>
     </Dialog>
 </template>

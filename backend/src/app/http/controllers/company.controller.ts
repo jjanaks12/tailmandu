@@ -1,5 +1,5 @@
 import { companySchema } from "@/app/lib/schema/account.schema"
-import { FileHandler } from "@/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/File.service"
 import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 
@@ -47,6 +47,7 @@ export class CompanyController {
             response.send(await prisma.company.create({
                 data: {
                     name: validationData.name,
+                    short_name: validationData.short_name,
                     email: validationData.email,
                     address_id: address.id,
                     phone: validationData.phone,
@@ -108,6 +109,7 @@ export class CompanyController {
                 },
                 data: {
                     name: validationData.name ?? company.name,
+                    short_name: validationData.short_name ?? company.short_name,
                     email: validationData.email ?? company.email,
                     phone: validationData.phone ?? company.phone,
                     vat_no: validationData.vat_no ?? company.vat_no,

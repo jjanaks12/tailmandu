@@ -13,6 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AddressType {
+  BILLING
+  SHIPPING
+  PERMANENT_ADDRESS
+}
+
+model Address {
+  id      String @id @default(cuid())
+  street  String
+  address String
+  city    String
+  state   String
+  zipCode String
+
+  countryId String
+  country   Country     @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  type      AddressType
+
+  companies Company[]
+
+  @@map("addresses")
+}
+
 model AgeCategory {
   id         String    @id @default(cuid())
   name       String
@@ -48,9 +71,29 @@ model Country {
   created_at DateTime  @default(now())
   updated_at DateTime?
 
-  Personal Personal[]
+  Personal  Personal[]
+  addresses Address[]
 
   @@map("countries")
+}
+
+model Company {
+  id             String   @id @default(cuid())
+  name           String
+  short_name     String
+  email          String
+  address_id     String?
+  address        Address? @relation(fields: [address_id], references: [id], onDelete: Cascade)
+  phone          String
+  vat_registered Boolean
+  pan_no         String?
+  vat_no         String?
+  image_id       String?
+  logo           Image?   @relation(fields: [image_id], references: [id], onDelete: Cascade)
+
+  users User[]
+
+  @@map("companies")
 }
 
 model Club {
@@ -67,8 +110,10 @@ model Club {
 model TrailRace {
   id          String    @id @default(cuid())
   name        String
+  slug        String?
   start       DateTime
   end         DateTime
+  excerpt     String?
   description String    @db.LongText
   created_at  DateTime  @default(now())
   updated_at  DateTime?
@@ -123,6 +168,7 @@ model Image {
   personal Personal[]
   events   TrailRace[] @relation("thumbnail_image")
   maps     TrailRace[] @relation("map_image")
+  Company  Company[]
 
   @@map("images")
 }
@@ -224,6 +270,8 @@ model User {
   personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
   role_id     String?
   role        Role?    @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  Company     Company? @relation(fields: [companyId], references: [id])
+  companyId   String?
 
   @@map("users")
 }
