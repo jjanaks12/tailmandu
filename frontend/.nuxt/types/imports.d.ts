@@ -4,6 +4,33 @@ declare global {
   const CurveType: typeof import('../../node_modules/nuxt-charts/dist/runtime/vue-chrts')['CurveType']
   const LegendPosition: typeof import('../../node_modules/nuxt-charts/dist/runtime/vue-chrts')['LegendPosition']
   const Orientation: typeof import('../../node_modules/nuxt-charts/dist/runtime/vue-chrts')['Orientation']
+  const TiptapBlockquote: typeof import('@tiptap/extension-blockquote')['Blockquote']
+  const TiptapBold: typeof import('@tiptap/extension-bold')['Bold']
+  const TiptapBulletList: typeof import('@tiptap/extension-bullet-list')['BulletList']
+  const TiptapCode: typeof import('@tiptap/extension-code')['Code']
+  const TiptapCodeBlock: typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/extension-code-block')['CodeBlock']
+  const TiptapDocument: typeof import('@tiptap/extension-document')['Document']
+  const TiptapDropcursor: typeof import('@tiptap/extension-dropcursor')['Dropcursor']
+  const TiptapEditor: typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/vue-3')['Editor']
+  const TiptapExtension: typeof import('../../node_modules/@tiptap/core')['Extension']
+  const TiptapGapcursor: typeof import('@tiptap/extension-gapcursor')['Gapcursor']
+  const TiptapHardBreak: typeof import('@tiptap/extension-hard-break')['HardBreak']
+  const TiptapHeading: typeof import('@tiptap/extension-heading')['Heading']
+  const TiptapHistory: typeof import('@tiptap/extension-history')['History']
+  const TiptapHorizontalRule: typeof import('@tiptap/extension-horizontal-rule')['HorizontalRule']
+  const TiptapImage: typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/extension-image')['Image']
+  const TiptapImagePlaceholder: typeof import('../../node_modules/nuxt-tiptap-editor/dist/runtime/custom-extensions/extension-image-upload')['ImagePlaceholder']
+  const TiptapImageUpload: typeof import('../../node_modules/nuxt-tiptap-editor/dist/runtime/custom-extensions/extension-image-upload')['ImageUpload']
+  const TiptapItalic: typeof import('@tiptap/extension-italic')['Italic']
+  const TiptapLink: typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/extension-link')['Link']
+  const TiptapListItem: typeof import('@tiptap/extension-list-item')['ListItem']
+  const TiptapMark: typeof import('../../node_modules/@tiptap/core')['Mark']
+  const TiptapNode: typeof import('../../node_modules/@tiptap/core')['Node']
+  const TiptapOrderedList: typeof import('@tiptap/extension-ordered-list')['OrderedList']
+  const TiptapParagraph: typeof import('@tiptap/extension-paragraph')['Paragraph']
+  const TiptapStarterKit: typeof import('../../node_modules/@tiptap/starter-kit')['StarterKit']
+  const TiptapStrike: typeof import('@tiptap/extension-strike')['Strike']
+  const TiptapText: typeof import('@tiptap/extension-text')['Text']
   const abortNavigation: typeof import('../../node_modules/nuxt/dist/app/composables/router')['abortNavigation']
   const acceptHMRUpdate: typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['acceptHMRUpdate']
   const addRouteMiddleware: typeof import('../../node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']
@@ -37,6 +64,7 @@ declare global {
   const defineAppConfig: typeof import('../../node_modules/nuxt/dist/app/nuxt')['defineAppConfig']
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
+  const defineLazyHydrationComponent: typeof import('../../node_modules/nuxt/dist/app/composables/lazy-hydration')['defineLazyHydrationComponent']
   const defineNuxtComponent: typeof import('../../node_modules/nuxt/dist/app/composables/component')['defineNuxtComponent']
   const defineNuxtLink: typeof import('../../node_modules/nuxt/dist/app/components/nuxt-link')['defineNuxtLink']
   const defineNuxtPlugin: typeof import('../../node_modules/nuxt/dist/app/nuxt')['defineNuxtPlugin']
@@ -98,6 +126,7 @@ declare global {
   const onStartTyping: typeof import('@vueuse/core')['onStartTyping']
   const onUnmounted: typeof import('vue')['onUnmounted']
   const onUpdated: typeof import('vue')['onUpdated']
+  const onWatcherCleanup: typeof import('vue')['onWatcherCleanup']
   const pausableWatch: typeof import('@vueuse/core')['pausableWatch']
   const piniaPluginPersistedstate: typeof import('../../node_modules/pinia-plugin-persistedstate/dist/nuxt/runtime/storages')['storages']
   const prefetchComponents: typeof import('../../node_modules/nuxt/dist/app/composables/preload')['prefetchComponents']
@@ -210,6 +239,7 @@ declare global {
   const useDocumentVisibility: typeof import('@vueuse/core')['useDocumentVisibility']
   const useDraggable: typeof import('@vueuse/core')['useDraggable']
   const useDropZone: typeof import('@vueuse/core')['useDropZone']
+  const useEditor: typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/vue-3')['useEditor']
   const useElementBounding: typeof import('@vueuse/core')['useElementBounding']
   const useElementByPoint: typeof import('@vueuse/core')['useElementByPoint']
   const useElementHover: typeof import('@vueuse/core')['useElementHover']
@@ -264,6 +294,7 @@ declare global {
   const useNow: typeof import('@vueuse/core')['useNow']
   const useNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']
   const useNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']
+  const useNuxtDevTools: typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']
   const useObjectUrl: typeof import('@vueuse/core')['useObjectUrl']
   const useOffsetPagination: typeof import('@vueuse/core')['useOffsetPagination']
   const useOnline: typeof import('@vueuse/core')['useOnline']
@@ -357,6 +388,7 @@ declare global {
   const useThrottleFn: typeof import('@vueuse/core')['useThrottleFn']
   const useThrottledRefHistory: typeof import('@vueuse/core')['useThrottledRefHistory']
   const useTimeAgo: typeof import('@vueuse/core')['useTimeAgo']
+  const useTimeAgoIntl: typeof import('@vueuse/core')['useTimeAgoIntl']
   const useTimeout: typeof import('@vueuse/core')['useTimeout']
   const useTimeoutFn: typeof import('@vueuse/core')['useTimeoutFn']
   const useTimeoutPoll: typeof import('@vueuse/core')['useTimeoutPoll']
@@ -420,6 +452,33 @@ declare module 'vue' {
     readonly CurveType: UnwrapRef<typeof import('../../node_modules/nuxt-charts/dist/runtime/vue-chrts')['CurveType']>
     readonly LegendPosition: UnwrapRef<typeof import('../../node_modules/nuxt-charts/dist/runtime/vue-chrts')['LegendPosition']>
     readonly Orientation: UnwrapRef<typeof import('../../node_modules/nuxt-charts/dist/runtime/vue-chrts')['Orientation']>
+    readonly TiptapBlockquote: UnwrapRef<typeof import('@tiptap/extension-blockquote')['Blockquote']>
+    readonly TiptapBold: UnwrapRef<typeof import('@tiptap/extension-bold')['Bold']>
+    readonly TiptapBulletList: UnwrapRef<typeof import('@tiptap/extension-bullet-list')['BulletList']>
+    readonly TiptapCode: UnwrapRef<typeof import('@tiptap/extension-code')['Code']>
+    readonly TiptapCodeBlock: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/extension-code-block')['CodeBlock']>
+    readonly TiptapDocument: UnwrapRef<typeof import('@tiptap/extension-document')['Document']>
+    readonly TiptapDropcursor: UnwrapRef<typeof import('@tiptap/extension-dropcursor')['Dropcursor']>
+    readonly TiptapEditor: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/vue-3')['Editor']>
+    readonly TiptapExtension: UnwrapRef<typeof import('../../node_modules/@tiptap/core')['Extension']>
+    readonly TiptapGapcursor: UnwrapRef<typeof import('@tiptap/extension-gapcursor')['Gapcursor']>
+    readonly TiptapHardBreak: UnwrapRef<typeof import('@tiptap/extension-hard-break')['HardBreak']>
+    readonly TiptapHeading: UnwrapRef<typeof import('@tiptap/extension-heading')['Heading']>
+    readonly TiptapHistory: UnwrapRef<typeof import('@tiptap/extension-history')['History']>
+    readonly TiptapHorizontalRule: UnwrapRef<typeof import('@tiptap/extension-horizontal-rule')['HorizontalRule']>
+    readonly TiptapImage: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/extension-image')['Image']>
+    readonly TiptapImagePlaceholder: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/dist/runtime/custom-extensions/extension-image-upload')['ImagePlaceholder']>
+    readonly TiptapImageUpload: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/dist/runtime/custom-extensions/extension-image-upload')['ImageUpload']>
+    readonly TiptapItalic: UnwrapRef<typeof import('@tiptap/extension-italic')['Italic']>
+    readonly TiptapLink: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/extension-link')['Link']>
+    readonly TiptapListItem: UnwrapRef<typeof import('@tiptap/extension-list-item')['ListItem']>
+    readonly TiptapMark: UnwrapRef<typeof import('../../node_modules/@tiptap/core')['Mark']>
+    readonly TiptapNode: UnwrapRef<typeof import('../../node_modules/@tiptap/core')['Node']>
+    readonly TiptapOrderedList: UnwrapRef<typeof import('@tiptap/extension-ordered-list')['OrderedList']>
+    readonly TiptapParagraph: UnwrapRef<typeof import('@tiptap/extension-paragraph')['Paragraph']>
+    readonly TiptapStarterKit: UnwrapRef<typeof import('../../node_modules/@tiptap/starter-kit')['StarterKit']>
+    readonly TiptapStrike: UnwrapRef<typeof import('@tiptap/extension-strike')['Strike']>
+    readonly TiptapText: UnwrapRef<typeof import('@tiptap/extension-text')['Text']>
     readonly abortNavigation: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['abortNavigation']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['acceptHMRUpdate']>
     readonly addRouteMiddleware: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']>
@@ -453,6 +512,7 @@ declare module 'vue' {
     readonly defineAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['defineAppConfig']>
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
     readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
+    readonly defineLazyHydrationComponent: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/lazy-hydration')['defineLazyHydrationComponent']>
     readonly defineNuxtComponent: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/component')['defineNuxtComponent']>
     readonly defineNuxtLink: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/components/nuxt-link')['defineNuxtLink']>
     readonly defineNuxtPlugin: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['defineNuxtPlugin']>
@@ -514,6 +574,7 @@ declare module 'vue' {
     readonly onStartTyping: UnwrapRef<typeof import('@vueuse/core')['onStartTyping']>
     readonly onUnmounted: UnwrapRef<typeof import('vue')['onUnmounted']>
     readonly onUpdated: UnwrapRef<typeof import('vue')['onUpdated']>
+    readonly onWatcherCleanup: UnwrapRef<typeof import('vue')['onWatcherCleanup']>
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
     readonly piniaPluginPersistedstate: UnwrapRef<typeof import('../../node_modules/pinia-plugin-persistedstate/dist/nuxt/runtime/storages')['storages']>
     readonly prefetchComponents: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/preload')['prefetchComponents']>
@@ -626,6 +687,7 @@ declare module 'vue' {
     readonly useDocumentVisibility: UnwrapRef<typeof import('@vueuse/core')['useDocumentVisibility']>
     readonly useDraggable: UnwrapRef<typeof import('@vueuse/core')['useDraggable']>
     readonly useDropZone: UnwrapRef<typeof import('@vueuse/core')['useDropZone']>
+    readonly useEditor: UnwrapRef<typeof import('../../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/vue-3')['useEditor']>
     readonly useElementBounding: UnwrapRef<typeof import('@vueuse/core')['useElementBounding']>
     readonly useElementByPoint: UnwrapRef<typeof import('@vueuse/core')['useElementByPoint']>
     readonly useElementHover: UnwrapRef<typeof import('@vueuse/core')['useElementHover']>
@@ -680,6 +742,7 @@ declare module 'vue' {
     readonly useNow: UnwrapRef<typeof import('@vueuse/core')['useNow']>
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
+    readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
     readonly useObjectUrl: UnwrapRef<typeof import('@vueuse/core')['useObjectUrl']>
     readonly useOffsetPagination: UnwrapRef<typeof import('@vueuse/core')['useOffsetPagination']>
     readonly useOnline: UnwrapRef<typeof import('@vueuse/core')['useOnline']>
@@ -773,6 +836,7 @@ declare module 'vue' {
     readonly useThrottleFn: UnwrapRef<typeof import('@vueuse/core')['useThrottleFn']>
     readonly useThrottledRefHistory: UnwrapRef<typeof import('@vueuse/core')['useThrottledRefHistory']>
     readonly useTimeAgo: UnwrapRef<typeof import('@vueuse/core')['useTimeAgo']>
+    readonly useTimeAgoIntl: UnwrapRef<typeof import('@vueuse/core')['useTimeAgoIntl']>
     readonly useTimeout: UnwrapRef<typeof import('@vueuse/core')['useTimeout']>
     readonly useTimeoutFn: UnwrapRef<typeof import('@vueuse/core')['useTimeoutFn']>
     readonly useTimeoutPoll: UnwrapRef<typeof import('@vueuse/core')['useTimeoutPoll']>

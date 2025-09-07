@@ -131,7 +131,6 @@
                 Update <span v-if="tempUser?.personal?.first_name">{{ tempUser?.personal?.first_name }}'s</span> role
             </DialogTitle>
             <DialogDescription>Change role of users</DialogDescription>
-            {{ tempUser?.personal }}
             <ChangeRoleForm :user="tempUser" @update="() => {
                 isUserRoleChangeDialogOpen = false
                 tempUser = null

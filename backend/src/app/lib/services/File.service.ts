@@ -18,7 +18,7 @@ export class FileHandler {
             this.uploadPath = path.join(this.uploadPath, folderName)
     }
 
-    async saveFile(base64STR: any, image_id: string): Promise<Image> {
+    async saveFile(base64STR: any, image_id?: string, ext: string = null): Promise<Image> {
         let image: Image
         const match = base64STR.match(/^data:(.*?)base64,/)
         if (!match && !match[1])
@@ -27,7 +27,7 @@ export class FileHandler {
         const decodedBase64 = base64STR.split('base64,')[1]
         const buffer = Buffer.from(decodedBase64, 'base64')
         const type = base64STR.split(';')[0].split('/')[1];
-        let fileName = generateUUID() + Date.now().toString() + '.' + type
+        let fileName = generateUUID() + Date.now().toString() + '.' + (ext ?? type)
         const filePath = path.join(this.uploadPath, fileName)
 
         if (!fs.existsSync(this.uploadPath)) {

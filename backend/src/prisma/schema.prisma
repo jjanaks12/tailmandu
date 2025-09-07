@@ -33,7 +33,7 @@ model Checkpoint {
   deleted_at DateTime?
 
   event_id String
-  event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
 
   runners EventRunner[]
 
@@ -64,15 +64,20 @@ model Club {
   @@map("clubs")
 }
 
-model Event {
+model TrailRace {
   id          String    @id @default(cuid())
   name        String
   start       DateTime
   end         DateTime
-  description String
+  description String    @db.LongText
   created_at  DateTime  @default(now())
   updated_at  DateTime?
   deleted_at  DateTime?
+
+  image_id    String?
+  thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
+  map_file_id String?
+  map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: Cascade)
 
   volunteers  Volunteer[]
   checkpoints Checkpoint[]
@@ -89,11 +94,11 @@ model EventRunner {
   deleted_at DateTime?
 
   personal_id String
-  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
+  personal    Personal  @relation(fields: [personal_id], references: [id], onDelete: Cascade)
   event_id    String
-  event       Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
   stage_id    String
-  stage       Stage    @relation(fields: [stage_id], references: [id], onDelete: Cascade)
+  stage       Stage     @relation(fields: [stage_id], references: [id], onDelete: Cascade)
 
   checkpoints Checkpoint[]
 
@@ -116,6 +121,8 @@ model Image {
   updated_at  DateTime?
 
   personal Personal[]
+  events   TrailRace[] @relation("thumbnail_image")
+  maps     TrailRace[] @relation("map_image")
 
   @@map("images")
 }
@@ -199,7 +206,7 @@ model Stage {
   deleted_at DateTime?
 
   event_id String
-  event    Event  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
 
   runners EventRunner[]
 
@@ -228,9 +235,9 @@ model Volunteer {
   deleted_at DateTime?
 
   personal_id String
-  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
+  personal    Personal  @relation(fields: [personal_id], references: [id], onDelete: Cascade)
   event_id    String
-  event       Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
 
   @@map("volunteers")
 }

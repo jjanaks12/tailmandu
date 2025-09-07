@@ -20,7 +20,6 @@
       jobList.push(fetch, fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory)
 
     job.add(jobList)
-
     await job.run()
       .finally(() => {
         isLoading.value = false
@@ -37,7 +36,7 @@
 </script>
 
 <template>
-  <NuxtLayout v-cloak>
-    <NuxtPage v-if="!isLoading" />
+  <NuxtLayout>
+    <NuxtPage />
   </NuxtLayout>
 </template>

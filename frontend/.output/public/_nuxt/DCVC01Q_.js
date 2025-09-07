@@ -1,1 +1,0 @@
-import{X as r,ae as a,Y as e}from"./CMjavVp8.js";const i=r({name:e().required().label("Name"),description:e().label("Description"),permissions:a().of(e()).min(1).required().label("permissions")}),l=r({user_id:e().required().label("User"),role_id:e().required().label("Role")});export{l as a,i as r};

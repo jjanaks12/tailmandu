@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     '@vueuse/nuxt',
     'pinia-plugin-persistedstate',
-    'nuxt-charts'
+    'nuxt-charts',
+    'nuxt-tiptap-editor'
   ],
 
   css: ['@/assets/css/main.css'],

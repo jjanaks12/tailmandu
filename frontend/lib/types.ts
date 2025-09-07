@@ -88,6 +88,29 @@ export type Country = {
     updated_at?: Date
 }
 
+export type TrailRace = {
+    id: string
+    name: string
+    start: string
+    end: string
+    description: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+    image_id?: string
+    thumbnail?: Image
+    map_file_id?: string
+    map_file?: Image
+    volunteers: Volunteer[]
+    checkpoints: Checkpoint[]
+    stages: Stage[]
+    runners: EventRunner[]
+}
+
+export type Checkpoint = {}
+
+export type Stage = {}
+
 export type EventRunner = {}
 
 export type Volunteer = {}

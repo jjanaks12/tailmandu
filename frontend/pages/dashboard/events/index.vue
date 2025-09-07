@@ -1,7 +1,11 @@
 <script lang="ts" setup>
     import { CalendarIcon, EllipsisVertical, Eye, Pencil, Search, SlidersVertical, Trash } from 'lucide-vue-next'
     import { Form, Field } from 'vee-validate'
+
     import EventForm from './form.vue'
+    import { formatDate } from '@/lib/filters'
+    import { useEventStore } from '~/store/event'
+    import type { TrailRace } from '~/lib/types'
 
     useHead({
         title: 'Events'
@@ -9,31 +13,28 @@
 
     definePageMeta({
         layout: 'admin',
-        middleware: 'auth'
+        middleware: 'auth',
+        authorization: ['event_create', 'event_update', 'event_view', 'event_delete']
     })
 
     const statuses = ['completed', 'ongoing', 'coming soon']
+    const { events, isLoading, params } = storeToRefs(useEventStore())
+    const { fetch } = useEventStore()
+
+    const showForm = ref(false)
+    const trailRace = ref<TrailRace | null>(null)
+
+    onMounted(() => {
+        fetch()
+    })
 </script>
 <template>
     <div class="flex items-center justify-between mb-12">
         <h1 class="text-2xl">Events</h1>
-        <Dialog>
-            <DialogTrigger as-child>
-                <Button>
-                    <CalendarIcon />
-                    Add new Event
-                </Button>
-            </DialogTrigger>
-            <DialogContent class="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Event</DialogTitle>
-                    <DialogDescription>
-                        Anyone who has this link will be able to view this.
-                    </DialogDescription>
-                </DialogHeader>
-                <EventForm />
-            </DialogContent>
-        </Dialog>
+        <Button @click="showForm = true">
+            <CalendarIcon />
+            Add new Event
+        </Button>
     </div>
     <div class="flex items-end gap-4 mb-20">
         <div class="flex-grow">
@@ -68,20 +69,18 @@
             <TableRow>
                 <TableHead>SN</TableHead>
                 <TableHead>User</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead class="text-right">Action</TableHead>
             </TableRow>
         </TableHeader>
         <TableBody>
-            <TableRow>
-                <TableCell>1</TableCell>
+            <TableRow v-for="(trailEvent, index) in events" v-if="!isLoading">
+                <TableCell>{{ index + 1 }}</TableCell>
                 <TableCell>
-                    <NuxtLink to="/dashboard/events?id=1">Event Name</NuxtLink>
-                    <em class="not-italic block">Starts from</em>
-                    <em class="not-italic block">Ends At</em>
-                </TableCell>
-                <TableCell>
-                    <Badge variant="info">Comming soon</Badge>
+                    <strong class="block text-lg">
+                        <NuxtLink :to="`/dashboard/events/${trailEvent.id}`" class="hover:text-primary transition-colors">{{ trailEvent.name }}</NuxtLink>
+                    </strong>
+                    <em class="not-italic block">Starts from {{ formatDate(trailEvent.start) }}</em>
+                    <em class="not-italic block">Ends At {{ formatDate(trailEvent.end) }}</em>
                 </TableCell>
                 <TableCell class="text-right">
                     <DropdownMenu>
@@ -94,11 +93,16 @@
                             <DropdownMenuGroup>
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Eye />
-                                    <span>View</span>
+                                <DropdownMenuItem as-child>
+                                    <NuxtLink :to="`/dashboard/events/${trailEvent.id}`">
+                                        <Eye />
+                                        <span>View</span>
+                                    </NuxtLink>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem @click="() => {
+                                    trailRace = trailEvent
+                                    showForm = true
+                                }">
                                     <Pencil />
                                     <span>Edit</span>
                                 </DropdownMenuItem>
@@ -108,172 +112,69 @@
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
+                            <!-- <DropdownMenuGroup>
                                 <DropdownMenuLabel>Update status</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem class="text-yellow-500">Pending</DropdownMenuItem>
                                 <DropdownMenuItem class="text-red-500">Rejected</DropdownMenuItem>
                                 <DropdownMenuItem class="text-green-500">Approved</DropdownMenuItem>
                                 <DropdownMenuItem class="text-gray-500">Cancelled</DropdownMenuItem>
-                            </DropdownMenuGroup>
+                            </DropdownMenuGroup> -->
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </TableCell>
             </TableRow>
-            <TableRow>
-                <TableCell>1</TableCell>
+            <TableRow v-else>
                 <TableCell>
-                    <NuxtLink to="/dashboard/events?id=1">Event Name</NuxtLink>
-                    <em class="not-italic block">Starts from</em>
-                    <em class="not-italic block">Ends At</em>
+                    <Skeleton class="w-8 h-8" />
                 </TableCell>
                 <TableCell>
-                    <Badge variant="success">ongoing</Badge>
-                </TableCell>
-                <TableCell class="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger as-child>
-                            <Button variant="outline">
-                                <EllipsisVertical />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent class="w-56">
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Eye />
-                                    <span>View</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Pencil />
-                                    <span>Edit</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Trash />
-                                    <span>Delete</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Update status</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem class="text-yellow-500">Pending</DropdownMenuItem>
-                                <DropdownMenuItem class="text-red-500">Rejected</DropdownMenuItem>
-                                <DropdownMenuItem class="text-green-500">Approved</DropdownMenuItem>
-                                <DropdownMenuItem class="text-gray-500">Cancelled</DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </TableCell>
-            </TableRow>
-            <TableRow>
-                <TableCell>1</TableCell>
-                <TableCell>
-                    <NuxtLink to="/dashboard/events?id=1">Event Name</NuxtLink>
-                    <em class="not-italic block">Starts from</em>
-                    <em class="not-italic block">Ends At</em>
+                    <div class="flex flex-col gap-1">
+                        <Skeleton class="w-[250px] h-8" />
+                        <Skeleton class="w-[250px] h-4" />
+                        <Skeleton class="w-[250px] h-4" />
+                    </div>
                 </TableCell>
                 <TableCell>
-                    <Badge variant="outline">Finished</Badge>
-                </TableCell>
-                <TableCell class="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger as-child>
-                            <Button variant="outline">
-                                <EllipsisVertical />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent class="w-56">
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Eye />
-                                    <span>View</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Pencil />
-                                    <span>Edit</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Trash />
-                                    <span>Delete</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Update status</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem class="text-yellow-500">Pending</DropdownMenuItem>
-                                <DropdownMenuItem class="text-red-500">Rejected</DropdownMenuItem>
-                                <DropdownMenuItem class="text-green-500">Approved</DropdownMenuItem>
-                                <DropdownMenuItem class="text-gray-500">Cancelled</DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </TableCell>
-            </TableRow>
-            <TableRow>
-                <TableCell>1</TableCell>
-                <TableCell>
-                    <NuxtLink to="/dashboard/events?id=1">Event Name</NuxtLink>
-                    <em class="not-italic block">Starts from</em>
-                    <em class="not-italic block">Ends At</em>
-                </TableCell>
-                <TableCell>
-                    <Badge variant="destructive">Cancelled</Badge>
-                </TableCell>
-                <TableCell class="text-right">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger as-child>
-                            <Button variant="outline">
-                                <EllipsisVertical />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent class="w-56">
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Eye />
-                                    <span>View</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Pencil />
-                                    <span>Edit</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Trash />
-                                    <span>Delete</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Update status</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem class="text-yellow-500">Pending</DropdownMenuItem>
-                                <DropdownMenuItem class="text-red-500">Rejected</DropdownMenuItem>
-                                <DropdownMenuItem class="text-green-500">Approved</DropdownMenuItem>
-                                <DropdownMenuItem class="text-gray-500">Cancelled</DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Skeleton class="w-11 h-9 ml-auto" />
                 </TableCell>
             </TableRow>
         </TableBody>
     </Table>
-    <div class="flex items-center justify-end space-x-2 py-4">
+    <div class="flex items-center justify-end space-x-2 py-4" v-if="params.total_page > 1">
         <div class="flex-1 text-sm text-muted-foreground">
-            1 of 5
+            {{ params?.current }} of {{ params?.total_page }} pages
         </div>
         <div class="space-x-2">
-            <Button variant="outline" size="sm">
-                Previous
-            </Button>
-            <Button variant="outline" size="sm">
-                Next
-            </Button>
+            <Pagination v-slot="{ page }" :items-per-page="params.per_page" :total="params.total"
+                :default-page="params.current" @update:page="(p) => { params = { ...params, current: p } }">
+                <PaginationContent v-slot="{ items }">
+                    <PaginationPrevious />
+                    <template v-for="(item, index) in items" :key="index">
+                        <PaginationItem v-if="item.type === 'page'" :value="item.value"
+                            :is-active="item.value === page">
+                            {{ item.value }}
+                        </PaginationItem>
+                    </template>
+                    <PaginationEllipsis :index="4" />
+                    <PaginationNext />
+                </PaginationContent>
+            </Pagination>
         </div>
     </div>
+    <Dialog :open="showForm" @update:open="() => {
+        showForm = false
+    }">
+        <DialogTrigger as-child>
+        </DialogTrigger>
+        <DialogContent class="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>Event</DialogTitle>
+                <DialogDescription>
+                    Anyone who has this link will be able to view this.
+                </DialogDescription>
+            </DialogHeader>
+            <EventForm @update="showForm = false" :trailRace="trailRace" />
+        </DialogContent>
+    </Dialog>
 </template>

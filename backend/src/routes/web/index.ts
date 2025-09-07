@@ -8,6 +8,12 @@ import createHttpError from 'http-errors'
 
 const router = Router()
 
+const contentType = {
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'gpx': 'application/gpx+xml',
+}
 router.get('/', async (_: Request, response: Response) => {
     response.json({
         status: 'success',
@@ -24,7 +30,7 @@ router.get('/resources/:filetype/:filename', async (request: Request, response: 
         if (err)
             createHttpError.InternalServerError(err.message)
 
-        response.set('Content-Type', 'image/jpeg')
+        response.set('Content-Type', contentType[request.params.filetype])
         response.send(data)
     })
 })

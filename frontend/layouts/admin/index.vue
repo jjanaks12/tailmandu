@@ -26,7 +26,7 @@
     <SidebarProvider v-if="!isLoading">
         <AppSidebar />
         <main id="main" class="bg-gray-300 flex-grow relative">
-            <div class="bg-white p-4 flex justify-between items-center border-b">
+            <div class="bg-white p-4 flex justify-between items-center border-b sticky top-0 z-50">
                 <Brand to="/dashboard" />
                 <div class="flex justify-center items-center gap-4">
                     <Button @click="navigateTo('/')" variant="secondary" size="icon">
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="p-4">
-                <div class="bg-white p-12 rounded-2xl">
+                <div class="bg-white p-12 rounded-2xl overflow-hidden">
                     <ClientOnly>
                         <slot v-if="hasAccess" />
                         <p v-else>You do not have access to see this page</p>

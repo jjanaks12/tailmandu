@@ -21,11 +21,6 @@
     }
 
     onMounted(() => {
-        if (form.value)
-            form.value.setValues({
-                email: 'admin@trailmandu.com',
-                password: 'password'
-            })
         if (isLoggedin.value)
             navigateTo('/dashboard')
     })

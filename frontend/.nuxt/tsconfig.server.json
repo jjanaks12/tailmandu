@@ -3,6 +3,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noEmit": true,
+    "skipLibCheck": true,
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -73,11 +74,14 @@
       "vite/client": [
         "../node_modules/vite/client"
       ],
-      "@/lib/utils": [
-        "./shadcn-nuxt/utils"
+      "@tiptap/vue-3": [
+        "../node_modules/nuxt-tiptap-editor/node_modules/@tiptap/vue-3"
       ],
       "#shared": [
         "../shared"
+      ],
+      "#shared/*": [
+        "../shared/*"
       ],
       "assets": [
         "../assets"
@@ -112,14 +116,8 @@
   },
   "include": [
     "./types/nitro-nuxt.d.ts",
-    "../node_modules/@nuxt/fonts/runtime/server",
-    "../node_modules/@pinia/nuxt/runtime/server",
-    "../node_modules/shadcn-nuxt/runtime/server",
-    "../node_modules/@vueuse/nuxt/runtime/server",
-    "../node_modules/pinia-plugin-persistedstate/runtime/server",
-    "../node_modules/nuxt-charts/runtime/server",
-    "../node_modules/@nuxt/devtools/runtime/server",
-    "../node_modules/@nuxt/telemetry/runtime/server",
+    "../node_modules/runtime/server",
+    "../node_modules/dist/runtime/server",
     "./types/nitro.d.ts",
     "../**/*",
     "../server/**/*"
@@ -134,6 +132,7 @@
     "../node_modules/@vueuse/nuxt/node_modules",
     "../node_modules/pinia-plugin-persistedstate/node_modules",
     "../node_modules/nuxt-charts/node_modules",
+    "../node_modules/nuxt-tiptap-editor/node_modules",
     "../node_modules/@nuxt/devtools/node_modules",
     "../node_modules/@nuxt/telemetry/node_modules",
     "../dist"
