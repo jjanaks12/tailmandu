@@ -3,7 +3,7 @@
     import { useAppStore } from '~/store/app'
 
     useHead({
-        title: 'Countries'
+        title: 'Genders'
     })
 
     definePageMeta({

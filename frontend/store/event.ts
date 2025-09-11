@@ -35,6 +35,11 @@ export const useEventStore = defineStore('event', () => {
         return data
     }
 
+    const getBySlug = async (slug: string) => {
+        const { data } = await axios<TrailRace>(`/events/by_slug/${slug}`)
+        return data
+    }
+
     const saveDescription = async (id: string, description: string) => {
         await axios.put(`/events/${id}/update_description`, { description })
     }
@@ -46,6 +51,6 @@ export const useEventStore = defineStore('event', () => {
     return {
         isLoading, params, events,
         currentRace,
-        fetch, save, get, saveDescription, saveMap
+        fetch, save, get, saveDescription, saveMap, getBySlug
     }
 })

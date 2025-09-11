@@ -66,7 +66,7 @@ export class RoleController {
                 data: {
                     name: validationData.name,
                     description: validationData.description || role.description,
-                    updated_at: moment().toISOString(),
+                    updated_at: moment.utc().toISOString(),
                     permissions: {
                         connect: idsNotOnlist,
                         disconnect: idsTobeRemoved
@@ -85,9 +85,9 @@ export class RoleController {
             response.send(await prisma.role.update({
                 where: { id },
                 data: {
-                    updated_at: moment().toISOString(),
+                    updated_at: moment.utc().toISOString(),
                     publish: false,
-                    deleted_at: moment().toISOString()
+                    deleted_at: moment.utc().toISOString()
                 }
             }))
         } catch (error) {

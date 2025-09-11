@@ -12,7 +12,7 @@
 </script>
 
 <template>
-    <header id="header" class="py-3 px-2 border-b">
+    <header id="header" class="bg-white py-3 px-2 border-b sticky top-0 z-30">
         <div class="container mx-auto flex items-center justify-between">
             <Brand />
             <ClientOnly>

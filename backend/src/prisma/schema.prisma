@@ -128,6 +128,7 @@ model TrailRace {
   checkpoints Checkpoint[]
   stages      Stage[]
   runners     EventRunner[]
+  galleries   Image[]       @relation("trail_race_gallery")
 
   @@map("events")
 }
@@ -165,10 +166,12 @@ model Image {
   created_at  DateTime  @default(now())
   updated_at  DateTime?
 
-  personal Personal[]
-  events   TrailRace[] @relation("thumbnail_image")
-  maps     TrailRace[] @relation("map_image")
-  Company  Company[]
+  personal      Personal[]
+  events        TrailRace[] @relation("thumbnail_image")
+  maps          TrailRace[] @relation("map_image")
+  companies     Company[]
+  stages        Stage[]
+  gallery_event TrailRace[] @relation("trail_race_gallery")
 
   @@map("images")
 }
@@ -251,8 +254,10 @@ model Stage {
   updated_at DateTime?
   deleted_at DateTime?
 
-  event_id String
-  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event_id    String
+  event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  map_file_id String?
+  map_file    Image?    @relation(fields: [map_file_id], references: [id], onDelete: Cascade)
 
   runners EventRunner[]
 

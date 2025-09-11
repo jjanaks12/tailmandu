@@ -19,7 +19,11 @@ export class EventController {
                 include: {
                     volunteers: true,
                     checkpoints: true,
-                    stages: true,
+                    stages: {
+                        include: {
+                            map_file: true
+                        }
+                    },
                     runners: true,
                     thumbnail: true
                 },
@@ -81,7 +85,7 @@ export class EventController {
                 data: {
                     name: validationData.name,
                     slug: validationData.slug,
-                    updated_at: moment().toISOString(),
+                    updated_at: moment.utc().toISOString(),
                     start,
                     end,
                     excerpt: validationData.excerpt
@@ -94,8 +98,14 @@ export class EventController {
 
     public static async destory(request: Request, response: Response, next: NextFunction) {
         try {
-
-            response.send()
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id
+                },
+                data: {
+                    deleted_at: moment.utc().toISOString()
+                }
+            }))
         } catch (error) {
             next(error)
         }
@@ -103,13 +113,38 @@ export class EventController {
 
     public static async get(request: Request, response: Response, next: NextFunction) {
         try {
-
             response.send(await prisma.trailRace.findFirst({
                 where: { id: request.params.event_id },
                 include: {
                     volunteers: true,
                     checkpoints: true,
-                    stages: true,
+                    stages: {
+                        include: {
+                            map_file: true
+                        }
+                    },
+                    runners: true,
+                    thumbnail: true,
+                    map_file: true
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async getBySlug(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.findFirst({
+                where: { slug: request.params.slug },
+                include: {
+                    volunteers: true,
+                    checkpoints: true,
+                    stages: {
+                        include: {
+                            map_file: true
+                        }
+                    },
                     runners: true,
                     thumbnail: true,
                     map_file: true

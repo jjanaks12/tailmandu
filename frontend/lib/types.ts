@@ -1,5 +1,7 @@
 import * as Icons from 'lucide-vue-next'
 
+export type Leaflet = typeof import('leaflet')
+
 type APISort<T> = {
     order: "asc" | "desc"
     field: keyof typeof T
@@ -111,9 +113,29 @@ export type TrailRace = {
     runners: EventRunner[]
 }
 
-export type Checkpoint = {}
+export type Checkpoint = {
+    id: string
+    name: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    event_id: string
+    event: TrailRace
+    runners: EventRunner[]
+}
 
-export type Stage = {}
+export type Stage = {
+    id: string
+    name: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    event_id: string
+    event: TrailRace
+    map_file_id: string
+    map_file: Image
+    runners: EventRunner[]
+}
 
 export type EventRunner = {}
 

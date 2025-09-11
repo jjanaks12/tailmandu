@@ -70,15 +70,16 @@
             <span>{{ fileName ?? "Upload .gpx file" }}</span>
         </label>
     </div>
-    <Dialog :open="showMap" @update:open="showMap = false">
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Map</DialogTitle>
-                <DialogDescription>Some text</DialogDescription>
-            </DialogHeader>
-            <client-only>
-                {{ getGPXFile(trailRace.map_file?.file_name as string) }}
-            </client-only>
-        </DialogContent>
-    </Dialog>
+    <ClientOnly>
+        <Dialog :open="showMap" @update:open="showMap = false">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Map</DialogTitle>
+                    <DialogDescription>Some text</DialogDescription>
+                </DialogHeader>
+                <Map map-id="someId" :center="[27.756846786775668, 85.3124535214843]"
+                    :gpxFile="getGPXFile(trailRace.map_file?.file_name as string)" />
+            </DialogContent>
+        </Dialog>
+    </ClientOnly>
 </template>

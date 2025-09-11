@@ -51,7 +51,7 @@ export class FileHandler {
                 },
                 data: {
                     file_name: fileName,
-                    updated_at: moment().toISOString()
+                    updated_at: moment.utc().toISOString()
                 }
             })
         } else
@@ -63,5 +63,19 @@ export class FileHandler {
             })
 
         return image
+    }
+
+    async deleteFile(imageID: string) {
+        const previousImage = await prisma.image.findFirst({ where: { id: imageID } })
+        const deleteFilePath = path.join(this.uploadPath, previousImage.file_name)
+        if (fs.existsSync(deleteFilePath))
+            fs.unlinkSync(deleteFilePath)
+        await prisma.image.delete({
+            where: {
+                id: imageID
+            }
+        })
+
+        return true
     }
 }

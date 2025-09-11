@@ -1,13 +1,16 @@
 <script lang="ts" setup>
+    import { MoveLeftIcon } from 'lucide-vue-next'
+
     import type { TrailRace } from '~/lib/types'
     import { useEventStore } from '~/store/event'
-
     import { formatDate } from '~/lib/filters'
 
     import TrailRaceUploadImage from '@/components/pages/dashboard/event/imageUpload.vue'
     import TrailRaceDescription from '@/components/pages/dashboard/event/description.vue'
     import TrailMapUploadMap from '@/components/pages/dashboard/event/mapUpload.vue'
-    import { MoveLeftIcon } from 'lucide-vue-next'
+    import TrailRaceStageList from '@/components/pages/dashboard/event/stages/list.vue'
+    import TrailRaceCheckpointList from '@/components/pages/dashboard/event/checkpoint/list.vue'
+    import TrailRaceGallery from '@/components/pages/dashboard/event/gallery/list.vue'
 
     useHead({
         title: 'Events'
@@ -47,7 +50,7 @@
                 </Button>
             </div>
         </div>
-        <Tabs default-value="detail" class="text-gray-600">
+        <Tabs default-value="gallery" class="text-gray-600">
             <TabsList class="uppercase">
                 <TabsTrigger value="detail">
                     Details
@@ -82,10 +85,10 @@
                 </div>
             </TabsContent>
             <TabsContent value="checkpoint">
-                Checkpoint
+                <TrailRaceCheckpointList :event-id="route.params.id as string" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="stages">
-                Stages
+                <TrailRaceStageList :event-id="route.params.id as string" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="runners">
                 Runners
@@ -94,7 +97,7 @@
                 Volunteers
             </TabsContent>
             <TabsContent value="gallery">
-                Gallery
+                <TrailRaceGallery :event-id="route.params.id as string" />
             </TabsContent>
         </Tabs>
     </template>

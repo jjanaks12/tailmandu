@@ -7,3 +7,18 @@ export const eventSchema = Y.object({
     end_date: Y.string().required().label('End date'),
     excerpt: Y.string().required().label('Event short description')
 })
+
+export const stageSchema = Y.object({
+    event_id: Y.string().required().label('Event'),
+    name: Y.string().required().label('Name'),
+    map: Y.string().label('Map file')
+})
+
+export const checkpointSchema = Y.object({
+    event_id: Y.string().required().label('Event'),
+    name: Y.string().required().label('Name')
+})
+
+export const gallerySchema = Y.object({
+    images: Y.array().of(Y.string()).min(1).required().label('Gallery')
+})

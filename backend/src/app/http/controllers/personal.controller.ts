@@ -40,7 +40,7 @@ export class PersonalController {
                 },
                 data: {
                     ...body,
-                    updated_at: moment().toISOString()
+                    updated_at: moment.utc().toISOString()
                 }
             })
             response.send('all ok!')
