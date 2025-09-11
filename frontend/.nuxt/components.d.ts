@@ -184,6 +184,13 @@ interface _GlobalComponents {
     'SidebarTrigger': typeof import("../components/ui/sidebar/index")['SidebarTrigger']
     'Skeleton': typeof import("../components/ui/skeleton/index")['Skeleton']
     'Toaster': typeof import("../components/ui/sonner/index")['Toaster']
+    'Stepper': typeof import("../components/ui/stepper/index")['Stepper']
+    'StepperDescription': typeof import("../components/ui/stepper/index")['StepperDescription']
+    'StepperIndicator': typeof import("../components/ui/stepper/index")['StepperIndicator']
+    'StepperItem': typeof import("../components/ui/stepper/index")['StepperItem']
+    'StepperSeparator': typeof import("../components/ui/stepper/index")['StepperSeparator']
+    'StepperTitle': typeof import("../components/ui/stepper/index")['StepperTitle']
+    'StepperTrigger': typeof import("../components/ui/stepper/index")['StepperTrigger']
     'Table': typeof import("../components/ui/table/index")['Table']
     'TableBody': typeof import("../components/ui/table/index")['TableBody']
     'TableCaption': typeof import("../components/ui/table/index")['TableCaption']
@@ -193,13 +200,6 @@ interface _GlobalComponents {
     'TableHead': typeof import("../components/ui/table/index")['TableHead']
     'TableHeader': typeof import("../components/ui/table/index")['TableHeader']
     'TableRow': typeof import("../components/ui/table/index")['TableRow']
-    'Stepper': typeof import("../components/ui/stepper/index")['Stepper']
-    'StepperDescription': typeof import("../components/ui/stepper/index")['StepperDescription']
-    'StepperIndicator': typeof import("../components/ui/stepper/index")['StepperIndicator']
-    'StepperItem': typeof import("../components/ui/stepper/index")['StepperItem']
-    'StepperSeparator': typeof import("../components/ui/stepper/index")['StepperSeparator']
-    'StepperTitle': typeof import("../components/ui/stepper/index")['StepperTitle']
-    'StepperTrigger': typeof import("../components/ui/stepper/index")['StepperTrigger']
     'Tabs': typeof import("../components/ui/tabs/index")['Tabs']
     'TabsContent': typeof import("../components/ui/tabs/index")['TabsContent']
     'TabsList': typeof import("../components/ui/tabs/index")['TabsList']
@@ -401,6 +401,13 @@ interface _GlobalComponents {
     'LazySidebarTrigger': LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarTrigger']>
     'LazySkeleton': LazyComponent<typeof import("../components/ui/skeleton/index")['Skeleton']>
     'LazyToaster': LazyComponent<typeof import("../components/ui/sonner/index")['Toaster']>
+    'LazyStepper': LazyComponent<typeof import("../components/ui/stepper/index")['Stepper']>
+    'LazyStepperDescription': LazyComponent<typeof import("../components/ui/stepper/index")['StepperDescription']>
+    'LazyStepperIndicator': LazyComponent<typeof import("../components/ui/stepper/index")['StepperIndicator']>
+    'LazyStepperItem': LazyComponent<typeof import("../components/ui/stepper/index")['StepperItem']>
+    'LazyStepperSeparator': LazyComponent<typeof import("../components/ui/stepper/index")['StepperSeparator']>
+    'LazyStepperTitle': LazyComponent<typeof import("../components/ui/stepper/index")['StepperTitle']>
+    'LazyStepperTrigger': LazyComponent<typeof import("../components/ui/stepper/index")['StepperTrigger']>
     'LazyTable': LazyComponent<typeof import("../components/ui/table/index")['Table']>
     'LazyTableBody': LazyComponent<typeof import("../components/ui/table/index")['TableBody']>
     'LazyTableCaption': LazyComponent<typeof import("../components/ui/table/index")['TableCaption']>
@@ -410,13 +417,6 @@ interface _GlobalComponents {
     'LazyTableHead': LazyComponent<typeof import("../components/ui/table/index")['TableHead']>
     'LazyTableHeader': LazyComponent<typeof import("../components/ui/table/index")['TableHeader']>
     'LazyTableRow': LazyComponent<typeof import("../components/ui/table/index")['TableRow']>
-    'LazyStepper': LazyComponent<typeof import("../components/ui/stepper/index")['Stepper']>
-    'LazyStepperDescription': LazyComponent<typeof import("../components/ui/stepper/index")['StepperDescription']>
-    'LazyStepperIndicator': LazyComponent<typeof import("../components/ui/stepper/index")['StepperIndicator']>
-    'LazyStepperItem': LazyComponent<typeof import("../components/ui/stepper/index")['StepperItem']>
-    'LazyStepperSeparator': LazyComponent<typeof import("../components/ui/stepper/index")['StepperSeparator']>
-    'LazyStepperTitle': LazyComponent<typeof import("../components/ui/stepper/index")['StepperTitle']>
-    'LazyStepperTrigger': LazyComponent<typeof import("../components/ui/stepper/index")['StepperTrigger']>
     'LazyTabs': LazyComponent<typeof import("../components/ui/tabs/index")['Tabs']>
     'LazyTabsContent': LazyComponent<typeof import("../components/ui/tabs/index")['TabsContent']>
     'LazyTabsList': LazyComponent<typeof import("../components/ui/tabs/index")['TabsList']>
@@ -624,6 +624,13 @@ export const SidebarSeparator: typeof import("../components/ui/sidebar/index")['
 export const SidebarTrigger: typeof import("../components/ui/sidebar/index")['SidebarTrigger']
 export const Skeleton: typeof import("../components/ui/skeleton/index")['Skeleton']
 export const Toaster: typeof import("../components/ui/sonner/index")['Toaster']
+export const Stepper: typeof import("../components/ui/stepper/index")['Stepper']
+export const StepperDescription: typeof import("../components/ui/stepper/index")['StepperDescription']
+export const StepperIndicator: typeof import("../components/ui/stepper/index")['StepperIndicator']
+export const StepperItem: typeof import("../components/ui/stepper/index")['StepperItem']
+export const StepperSeparator: typeof import("../components/ui/stepper/index")['StepperSeparator']
+export const StepperTitle: typeof import("../components/ui/stepper/index")['StepperTitle']
+export const StepperTrigger: typeof import("../components/ui/stepper/index")['StepperTrigger']
 export const Table: typeof import("../components/ui/table/index")['Table']
 export const TableBody: typeof import("../components/ui/table/index")['TableBody']
 export const TableCaption: typeof import("../components/ui/table/index")['TableCaption']
@@ -633,13 +640,6 @@ export const TableFooter: typeof import("../components/ui/table/index")['TableFo
 export const TableHead: typeof import("../components/ui/table/index")['TableHead']
 export const TableHeader: typeof import("../components/ui/table/index")['TableHeader']
 export const TableRow: typeof import("../components/ui/table/index")['TableRow']
-export const Stepper: typeof import("../components/ui/stepper/index")['Stepper']
-export const StepperDescription: typeof import("../components/ui/stepper/index")['StepperDescription']
-export const StepperIndicator: typeof import("../components/ui/stepper/index")['StepperIndicator']
-export const StepperItem: typeof import("../components/ui/stepper/index")['StepperItem']
-export const StepperSeparator: typeof import("../components/ui/stepper/index")['StepperSeparator']
-export const StepperTitle: typeof import("../components/ui/stepper/index")['StepperTitle']
-export const StepperTrigger: typeof import("../components/ui/stepper/index")['StepperTrigger']
 export const Tabs: typeof import("../components/ui/tabs/index")['Tabs']
 export const TabsContent: typeof import("../components/ui/tabs/index")['TabsContent']
 export const TabsList: typeof import("../components/ui/tabs/index")['TabsList']
@@ -841,6 +841,13 @@ export const LazySidebarSeparator: LazyComponent<typeof import("../components/ui
 export const LazySidebarTrigger: LazyComponent<typeof import("../components/ui/sidebar/index")['SidebarTrigger']>
 export const LazySkeleton: LazyComponent<typeof import("../components/ui/skeleton/index")['Skeleton']>
 export const LazyToaster: LazyComponent<typeof import("../components/ui/sonner/index")['Toaster']>
+export const LazyStepper: LazyComponent<typeof import("../components/ui/stepper/index")['Stepper']>
+export const LazyStepperDescription: LazyComponent<typeof import("../components/ui/stepper/index")['StepperDescription']>
+export const LazyStepperIndicator: LazyComponent<typeof import("../components/ui/stepper/index")['StepperIndicator']>
+export const LazyStepperItem: LazyComponent<typeof import("../components/ui/stepper/index")['StepperItem']>
+export const LazyStepperSeparator: LazyComponent<typeof import("../components/ui/stepper/index")['StepperSeparator']>
+export const LazyStepperTitle: LazyComponent<typeof import("../components/ui/stepper/index")['StepperTitle']>
+export const LazyStepperTrigger: LazyComponent<typeof import("../components/ui/stepper/index")['StepperTrigger']>
 export const LazyTable: LazyComponent<typeof import("../components/ui/table/index")['Table']>
 export const LazyTableBody: LazyComponent<typeof import("../components/ui/table/index")['TableBody']>
 export const LazyTableCaption: LazyComponent<typeof import("../components/ui/table/index")['TableCaption']>
@@ -850,13 +857,6 @@ export const LazyTableFooter: LazyComponent<typeof import("../components/ui/tabl
 export const LazyTableHead: LazyComponent<typeof import("../components/ui/table/index")['TableHead']>
 export const LazyTableHeader: LazyComponent<typeof import("../components/ui/table/index")['TableHeader']>
 export const LazyTableRow: LazyComponent<typeof import("../components/ui/table/index")['TableRow']>
-export const LazyStepper: LazyComponent<typeof import("../components/ui/stepper/index")['Stepper']>
-export const LazyStepperDescription: LazyComponent<typeof import("../components/ui/stepper/index")['StepperDescription']>
-export const LazyStepperIndicator: LazyComponent<typeof import("../components/ui/stepper/index")['StepperIndicator']>
-export const LazyStepperItem: LazyComponent<typeof import("../components/ui/stepper/index")['StepperItem']>
-export const LazyStepperSeparator: LazyComponent<typeof import("../components/ui/stepper/index")['StepperSeparator']>
-export const LazyStepperTitle: LazyComponent<typeof import("../components/ui/stepper/index")['StepperTitle']>
-export const LazyStepperTrigger: LazyComponent<typeof import("../components/ui/stepper/index")['StepperTrigger']>
 export const LazyTabs: LazyComponent<typeof import("../components/ui/tabs/index")['Tabs']>
 export const LazyTabsContent: LazyComponent<typeof import("../components/ui/tabs/index")['TabsContent']>
 export const LazyTabsList: LazyComponent<typeof import("../components/ui/tabs/index")['TabsList']>
