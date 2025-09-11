@@ -1,0 +1,1 @@
+import{i as r,aR as a,j as e}from"./DtcwnfPe.js";const i=r({name:e().required().label("Name"),description:e().label("Description"),permissions:a().of(e()).min(1).required().label("permissions")}),l=r({user_id:e().required().label("User"),role_id:e().required().label("Role")});export{l as a,i as r};
