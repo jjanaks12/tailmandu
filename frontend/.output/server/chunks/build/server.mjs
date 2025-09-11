@@ -525,7 +525,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$i || {},
-    component: () => import('./index-BCgY5Toc.mjs')
+    component: () => import('./index-DINVaObR.mjs')
   },
   {
     name: "about_us",
@@ -567,36 +567,36 @@ const _routes = [
     name: "login",
     path: "/login",
     meta: __nuxt_page_meta$g || {},
-    component: () => import('./login-DHEZ-8cj.mjs')
+    component: () => import('./login-DLAQIzMw.mjs')
   },
   {
     name: "dashboard-gender",
     path: "/dashboard/gender",
     meta: { ...__nuxt_page_meta$f || {}, ...{ "middleware": "auth" } },
-    component: () => import('./gender-B7T39SD5.mjs')
+    component: () => import('./gender-BjPykhY6.mjs')
   },
   {
     name: "dashboard-company",
     path: "/dashboard/company",
     meta: { ...__nuxt_page_meta$e || {}, ...{ "middleware": "auth" } },
-    component: () => import('./company-CtAjVQw3.mjs')
+    component: () => import('./company-D3B1MIMd.mjs')
   },
   {
     name: "races-slug",
     path: "/races/:slug()",
-    component: () => import('./index-HzApX3sR.mjs')
+    component: () => import('./index-Dx13QTMK.mjs')
   },
   {
     name: "register",
     path: "/register",
     meta: __nuxt_page_meta$d || {},
-    component: () => import('./register-Ci3VhFtw.mjs')
+    component: () => import('./register-0TamHM2K.mjs')
   },
   {
     name: "dashboard-countries",
     path: "/dashboard/countries",
     meta: { ...__nuxt_page_meta$c || {}, ...{ "middleware": "auth" } },
-    component: () => import('./countries-DreHtq9W.mjs')
+    component: () => import('./countries-BVLbURPT.mjs')
   },
   {
     name: "races-slug-runner",
@@ -607,42 +607,42 @@ const _routes = [
     name: "dashboard-events-id",
     path: "/dashboard/events/:id()",
     meta: { ...__nuxt_page_meta$b || {}, ...{ "middleware": "auth" } },
-    component: () => import('./_id_-wivVvYr4.mjs')
+    component: () => import('./_id_-F-cyKtZm.mjs')
   },
   {
     name: "dashboard-events-form",
     path: "/dashboard/events/form",
-    component: () => import('./form-DcFAsuTg.mjs')
+    component: () => import('./form-BVsnobtw.mjs')
   },
   {
     name: "dashboard-permissions",
     path: "/dashboard/permissions",
     meta: { ...__nuxt_page_meta$a || {}, ...{ "middleware": "auth" } },
-    component: () => import('./permissions-FkOSTBB-.mjs')
+    component: () => import('./permissions-BmFnJHn3.mjs')
   },
   {
     name: "dashboard-roles",
     path: "/dashboard/roles",
     meta: { ...__nuxt_page_meta$9 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-BTHiK3Ih.mjs')
+    component: () => import('./index-B_jWm34e.mjs')
   },
   {
     name: "dashboard-users",
     path: "/dashboard/users",
     meta: { ...__nuxt_page_meta$8 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-CZS_bZBc.mjs')
+    component: () => import('./index-Dpwhm73r.mjs')
   },
   {
     name: "dashboard-age_category",
     path: "/dashboard/age_category",
     meta: { ...__nuxt_page_meta$7 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./age_category-D6NQjIqQ.mjs')
+    component: () => import('./age_category-CgXTb_aY.mjs')
   },
   {
     name: "dashboard-events",
     path: "/dashboard/events",
     meta: { ...__nuxt_page_meta$6 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-C3riVQ36.mjs')
+    component: () => import('./index-D4BQJJMm.mjs')
   },
   {
     name: "races-slug-volunteer",
@@ -659,7 +659,7 @@ const _routes = [
     name: "dashboard-change_password",
     path: "/dashboard/change_password",
     meta: { ...__nuxt_page_meta$4 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./change_password-C7JRAxEv.mjs')
+    component: () => import('./change_password-CtNxMr99.mjs')
   },
   {
     name: "forget_password",
@@ -671,13 +671,13 @@ const _routes = [
     name: "getting_started",
     path: "/getting_started",
     meta: __nuxt_page_meta$2 || {},
-    component: () => import('./getting_started-CnuUaF6X.mjs')
+    component: () => import('./getting_started-DX7rGYPr.mjs')
   },
   {
     name: "dashboard-personal_details",
     path: "/dashboard/personal_details",
     meta: { ...__nuxt_page_meta$1 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./personal_details-Bpu8jP90.mjs')
+    component: () => import('./personal_details-Cf-OFe8f.mjs')
   },
   {
     name: "dashboard-events-checkpoints",
@@ -688,12 +688,12 @@ const _routes = [
   {
     name: "dashboard-roles-_components-form",
     path: "/dashboard/roles/_components/form",
-    component: () => import('./form-MZEDc4bl.mjs')
+    component: () => import('./form-DtaUs5z3.mjs')
   },
   {
     name: "dashboard-users-_components-roleForm",
     path: "/dashboard/users/_components/roleForm",
-    component: () => import('./roleForm-BpWAmzDk.mjs')
+    component: () => import('./roleForm-Bv32gwFl.mjs')
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -1297,11 +1297,11 @@ const plugins = [
 ];
 const layouts = {
   "admin-sidebar": defineAsyncComponent(() => import('./_sidebar-C5gkv9C1.mjs').then((m) => m.default || m)),
-  admin: defineAsyncComponent(() => import('./index-B08efxNg.mjs').then((m) => m.default || m)),
+  admin: defineAsyncComponent(() => import('./index-D8EEyMlv.mjs').then((m) => m.default || m)),
   "default-footer": defineAsyncComponent(() => import('./_footer-BgpHzCBS.mjs').then((m) => m.default || m)),
   "default-header": defineAsyncComponent(() => import('./_header-C6jA4uGU.mjs').then((m) => m.default || m)),
   "default-sidebar": defineAsyncComponent(() => import('./_sidebar-BIS0KLul.mjs').then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import('./index-BCGzAbpC.mjs').then((m) => m.default || m)),
+  default: defineAsyncComponent(() => import('./index-Cqft0w1g.mjs').then((m) => m.default || m)),
   simple: defineAsyncComponent(() => import('./index-pWhHW54B.mjs').then((m) => m.default || m))
 };
 const LayoutLoader = defineComponent({

@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 
 } from "reka-ui"
-import { cn } from "@/lib/utils"
+import { cn } from "~/lib/helpers"
 
 const props = defineProps<AccordionTriggerProps & { class?: HTMLAttributes["class"] }>()
 
