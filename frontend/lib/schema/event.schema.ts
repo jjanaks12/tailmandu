@@ -13,3 +13,8 @@ export const stageSchema = Y.object({
     name: Y.string().required().label('Name'),
     map: Y.string().label('Map file')
 })
+
+export const trailRaceRunner = Y.object({
+    first_name: Y.string().required().label('First name'),
+    email: Y.string().email().required().label('Email')
+})
