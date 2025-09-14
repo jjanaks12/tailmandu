@@ -64,7 +64,6 @@ interface _GlobalComponents {
     'CalendarHeading': typeof import("../components/ui/calendar/index")['CalendarHeading']
     'CalendarNextButton': typeof import("../components/ui/calendar/index")['CalendarNextButton']
     'CalendarPrevButton': typeof import("../components/ui/calendar/index")['CalendarPrevButton']
-    'Checkbox': typeof import("../components/ui/checkbox/index")['Checkbox']
     'Combobox': typeof import("../components/ui/combobox/index")['Combobox']
     'ComboboxAnchor': typeof import("../components/ui/combobox/index")['ComboboxAnchor']
     'ComboboxEmpty': typeof import("../components/ui/combobox/index")['ComboboxEmpty']
@@ -77,6 +76,7 @@ interface _GlobalComponents {
     'ComboboxViewport': typeof import("../components/ui/combobox/index")['ComboboxViewport']
     'ComboboxCancel': typeof import("../components/ui/combobox/index")['ComboboxCancel']
     'ComboboxTrigger': typeof import("../components/ui/combobox/index")['ComboboxTrigger']
+    'Checkbox': typeof import("../components/ui/checkbox/index")['Checkbox']
     'Dialog': typeof import("../components/ui/dialog/index")['Dialog']
     'DialogClose': typeof import("../components/ui/dialog/index")['DialogClose']
     'DialogContent': typeof import("../components/ui/dialog/index")['DialogContent']
@@ -87,6 +87,7 @@ interface _GlobalComponents {
     'DialogScrollContent': typeof import("../components/ui/dialog/index")['DialogScrollContent']
     'DialogTitle': typeof import("../components/ui/dialog/index")['DialogTitle']
     'DialogTrigger': typeof import("../components/ui/dialog/index")['DialogTrigger']
+    'Input': typeof import("../components/ui/input/index")['Input']
     'DropdownMenu': typeof import("../components/ui/dropdown-menu/index")['DropdownMenu']
     'DropdownMenuCheckboxItem': typeof import("../components/ui/dropdown-menu/index")['DropdownMenuCheckboxItem']
     'DropdownMenuContent': typeof import("../components/ui/dropdown-menu/index")['DropdownMenuContent']
@@ -102,7 +103,6 @@ interface _GlobalComponents {
     'DropdownMenuSubTrigger': typeof import("../components/ui/dropdown-menu/index")['DropdownMenuSubTrigger']
     'DropdownMenuTrigger': typeof import("../components/ui/dropdown-menu/index")['DropdownMenuTrigger']
     'DropdownMenuPortal': typeof import("../components/ui/dropdown-menu/index")['DropdownMenuPortal']
-    'Input': typeof import("../components/ui/input/index")['Input']
     'Label': typeof import("../components/ui/label/index")['Label']
     'Menubar': typeof import("../components/ui/menubar/index")['Menubar']
     'MenubarCheckboxItem': typeof import("../components/ui/menubar/index")['MenubarCheckboxItem']
@@ -119,14 +119,6 @@ interface _GlobalComponents {
     'MenubarSubContent': typeof import("../components/ui/menubar/index")['MenubarSubContent']
     'MenubarSubTrigger': typeof import("../components/ui/menubar/index")['MenubarSubTrigger']
     'MenubarTrigger': typeof import("../components/ui/menubar/index")['MenubarTrigger']
-    'NavigationMenu': typeof import("../components/ui/navigation-menu/index")['NavigationMenu']
-    'NavigationMenuContent': typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']
-    'NavigationMenuIndicator': typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']
-    'NavigationMenuItem': typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']
-    'NavigationMenuLink': typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']
-    'NavigationMenuList': typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']
-    'NavigationMenuTrigger': typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']
-    'NavigationMenuViewport': typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']
     'Pagination': typeof import("../components/ui/pagination/index")['Pagination']
     'PaginationContent': typeof import("../components/ui/pagination/index")['PaginationContent']
     'PaginationEllipsis': typeof import("../components/ui/pagination/index")['PaginationEllipsis']
@@ -135,6 +127,14 @@ interface _GlobalComponents {
     'PaginationLast': typeof import("../components/ui/pagination/index")['PaginationLast']
     'PaginationNext': typeof import("../components/ui/pagination/index")['PaginationNext']
     'PaginationPrevious': typeof import("../components/ui/pagination/index")['PaginationPrevious']
+    'NavigationMenu': typeof import("../components/ui/navigation-menu/index")['NavigationMenu']
+    'NavigationMenuContent': typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']
+    'NavigationMenuIndicator': typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']
+    'NavigationMenuItem': typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']
+    'NavigationMenuLink': typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']
+    'NavigationMenuList': typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']
+    'NavigationMenuTrigger': typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']
+    'NavigationMenuViewport': typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']
     'Popover': typeof import("../components/ui/popover/index")['Popover']
     'PopoverAnchor': typeof import("../components/ui/popover/index")['PopoverAnchor']
     'PopoverContent': typeof import("../components/ui/popover/index")['PopoverContent']
@@ -281,7 +281,6 @@ interface _GlobalComponents {
     'LazyCalendarHeading': LazyComponent<typeof import("../components/ui/calendar/index")['CalendarHeading']>
     'LazyCalendarNextButton': LazyComponent<typeof import("../components/ui/calendar/index")['CalendarNextButton']>
     'LazyCalendarPrevButton': LazyComponent<typeof import("../components/ui/calendar/index")['CalendarPrevButton']>
-    'LazyCheckbox': LazyComponent<typeof import("../components/ui/checkbox/index")['Checkbox']>
     'LazyCombobox': LazyComponent<typeof import("../components/ui/combobox/index")['Combobox']>
     'LazyComboboxAnchor': LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxAnchor']>
     'LazyComboboxEmpty': LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxEmpty']>
@@ -294,6 +293,7 @@ interface _GlobalComponents {
     'LazyComboboxViewport': LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxViewport']>
     'LazyComboboxCancel': LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxCancel']>
     'LazyComboboxTrigger': LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxTrigger']>
+    'LazyCheckbox': LazyComponent<typeof import("../components/ui/checkbox/index")['Checkbox']>
     'LazyDialog': LazyComponent<typeof import("../components/ui/dialog/index")['Dialog']>
     'LazyDialogClose': LazyComponent<typeof import("../components/ui/dialog/index")['DialogClose']>
     'LazyDialogContent': LazyComponent<typeof import("../components/ui/dialog/index")['DialogContent']>
@@ -304,6 +304,7 @@ interface _GlobalComponents {
     'LazyDialogScrollContent': LazyComponent<typeof import("../components/ui/dialog/index")['DialogScrollContent']>
     'LazyDialogTitle': LazyComponent<typeof import("../components/ui/dialog/index")['DialogTitle']>
     'LazyDialogTrigger': LazyComponent<typeof import("../components/ui/dialog/index")['DialogTrigger']>
+    'LazyInput': LazyComponent<typeof import("../components/ui/input/index")['Input']>
     'LazyDropdownMenu': LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenu']>
     'LazyDropdownMenuCheckboxItem': LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuCheckboxItem']>
     'LazyDropdownMenuContent': LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuContent']>
@@ -319,7 +320,6 @@ interface _GlobalComponents {
     'LazyDropdownMenuSubTrigger': LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuSubTrigger']>
     'LazyDropdownMenuTrigger': LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuTrigger']>
     'LazyDropdownMenuPortal': LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuPortal']>
-    'LazyInput': LazyComponent<typeof import("../components/ui/input/index")['Input']>
     'LazyLabel': LazyComponent<typeof import("../components/ui/label/index")['Label']>
     'LazyMenubar': LazyComponent<typeof import("../components/ui/menubar/index")['Menubar']>
     'LazyMenubarCheckboxItem': LazyComponent<typeof import("../components/ui/menubar/index")['MenubarCheckboxItem']>
@@ -336,14 +336,6 @@ interface _GlobalComponents {
     'LazyMenubarSubContent': LazyComponent<typeof import("../components/ui/menubar/index")['MenubarSubContent']>
     'LazyMenubarSubTrigger': LazyComponent<typeof import("../components/ui/menubar/index")['MenubarSubTrigger']>
     'LazyMenubarTrigger': LazyComponent<typeof import("../components/ui/menubar/index")['MenubarTrigger']>
-    'LazyNavigationMenu': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenu']>
-    'LazyNavigationMenuContent': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']>
-    'LazyNavigationMenuIndicator': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']>
-    'LazyNavigationMenuItem': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']>
-    'LazyNavigationMenuLink': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']>
-    'LazyNavigationMenuList': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']>
-    'LazyNavigationMenuTrigger': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']>
-    'LazyNavigationMenuViewport': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']>
     'LazyPagination': LazyComponent<typeof import("../components/ui/pagination/index")['Pagination']>
     'LazyPaginationContent': LazyComponent<typeof import("../components/ui/pagination/index")['PaginationContent']>
     'LazyPaginationEllipsis': LazyComponent<typeof import("../components/ui/pagination/index")['PaginationEllipsis']>
@@ -352,6 +344,14 @@ interface _GlobalComponents {
     'LazyPaginationLast': LazyComponent<typeof import("../components/ui/pagination/index")['PaginationLast']>
     'LazyPaginationNext': LazyComponent<typeof import("../components/ui/pagination/index")['PaginationNext']>
     'LazyPaginationPrevious': LazyComponent<typeof import("../components/ui/pagination/index")['PaginationPrevious']>
+    'LazyNavigationMenu': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenu']>
+    'LazyNavigationMenuContent': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']>
+    'LazyNavigationMenuIndicator': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']>
+    'LazyNavigationMenuItem': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']>
+    'LazyNavigationMenuLink': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']>
+    'LazyNavigationMenuList': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']>
+    'LazyNavigationMenuTrigger': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']>
+    'LazyNavigationMenuViewport': LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']>
     'LazyPopover': LazyComponent<typeof import("../components/ui/popover/index")['Popover']>
     'LazyPopoverAnchor': LazyComponent<typeof import("../components/ui/popover/index")['PopoverAnchor']>
     'LazyPopoverContent': LazyComponent<typeof import("../components/ui/popover/index")['PopoverContent']>
@@ -504,7 +504,6 @@ export const CalendarHeader: typeof import("../components/ui/calendar/index")['C
 export const CalendarHeading: typeof import("../components/ui/calendar/index")['CalendarHeading']
 export const CalendarNextButton: typeof import("../components/ui/calendar/index")['CalendarNextButton']
 export const CalendarPrevButton: typeof import("../components/ui/calendar/index")['CalendarPrevButton']
-export const Checkbox: typeof import("../components/ui/checkbox/index")['Checkbox']
 export const Combobox: typeof import("../components/ui/combobox/index")['Combobox']
 export const ComboboxAnchor: typeof import("../components/ui/combobox/index")['ComboboxAnchor']
 export const ComboboxEmpty: typeof import("../components/ui/combobox/index")['ComboboxEmpty']
@@ -517,6 +516,7 @@ export const ComboboxSeparator: typeof import("../components/ui/combobox/index")
 export const ComboboxViewport: typeof import("../components/ui/combobox/index")['ComboboxViewport']
 export const ComboboxCancel: typeof import("../components/ui/combobox/index")['ComboboxCancel']
 export const ComboboxTrigger: typeof import("../components/ui/combobox/index")['ComboboxTrigger']
+export const Checkbox: typeof import("../components/ui/checkbox/index")['Checkbox']
 export const Dialog: typeof import("../components/ui/dialog/index")['Dialog']
 export const DialogClose: typeof import("../components/ui/dialog/index")['DialogClose']
 export const DialogContent: typeof import("../components/ui/dialog/index")['DialogContent']
@@ -527,6 +527,7 @@ export const DialogOverlay: typeof import("../components/ui/dialog/index")['Dial
 export const DialogScrollContent: typeof import("../components/ui/dialog/index")['DialogScrollContent']
 export const DialogTitle: typeof import("../components/ui/dialog/index")['DialogTitle']
 export const DialogTrigger: typeof import("../components/ui/dialog/index")['DialogTrigger']
+export const Input: typeof import("../components/ui/input/index")['Input']
 export const DropdownMenu: typeof import("../components/ui/dropdown-menu/index")['DropdownMenu']
 export const DropdownMenuCheckboxItem: typeof import("../components/ui/dropdown-menu/index")['DropdownMenuCheckboxItem']
 export const DropdownMenuContent: typeof import("../components/ui/dropdown-menu/index")['DropdownMenuContent']
@@ -542,7 +543,6 @@ export const DropdownMenuSubContent: typeof import("../components/ui/dropdown-me
 export const DropdownMenuSubTrigger: typeof import("../components/ui/dropdown-menu/index")['DropdownMenuSubTrigger']
 export const DropdownMenuTrigger: typeof import("../components/ui/dropdown-menu/index")['DropdownMenuTrigger']
 export const DropdownMenuPortal: typeof import("../components/ui/dropdown-menu/index")['DropdownMenuPortal']
-export const Input: typeof import("../components/ui/input/index")['Input']
 export const Label: typeof import("../components/ui/label/index")['Label']
 export const Menubar: typeof import("../components/ui/menubar/index")['Menubar']
 export const MenubarCheckboxItem: typeof import("../components/ui/menubar/index")['MenubarCheckboxItem']
@@ -559,14 +559,6 @@ export const MenubarSub: typeof import("../components/ui/menubar/index")['Menuba
 export const MenubarSubContent: typeof import("../components/ui/menubar/index")['MenubarSubContent']
 export const MenubarSubTrigger: typeof import("../components/ui/menubar/index")['MenubarSubTrigger']
 export const MenubarTrigger: typeof import("../components/ui/menubar/index")['MenubarTrigger']
-export const NavigationMenu: typeof import("../components/ui/navigation-menu/index")['NavigationMenu']
-export const NavigationMenuContent: typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']
-export const NavigationMenuIndicator: typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']
-export const NavigationMenuItem: typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']
-export const NavigationMenuLink: typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']
-export const NavigationMenuList: typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']
-export const NavigationMenuTrigger: typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']
-export const NavigationMenuViewport: typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']
 export const Pagination: typeof import("../components/ui/pagination/index")['Pagination']
 export const PaginationContent: typeof import("../components/ui/pagination/index")['PaginationContent']
 export const PaginationEllipsis: typeof import("../components/ui/pagination/index")['PaginationEllipsis']
@@ -575,6 +567,14 @@ export const PaginationItem: typeof import("../components/ui/pagination/index")[
 export const PaginationLast: typeof import("../components/ui/pagination/index")['PaginationLast']
 export const PaginationNext: typeof import("../components/ui/pagination/index")['PaginationNext']
 export const PaginationPrevious: typeof import("../components/ui/pagination/index")['PaginationPrevious']
+export const NavigationMenu: typeof import("../components/ui/navigation-menu/index")['NavigationMenu']
+export const NavigationMenuContent: typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']
+export const NavigationMenuIndicator: typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']
+export const NavigationMenuItem: typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']
+export const NavigationMenuLink: typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']
+export const NavigationMenuList: typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']
+export const NavigationMenuTrigger: typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']
+export const NavigationMenuViewport: typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']
 export const Popover: typeof import("../components/ui/popover/index")['Popover']
 export const PopoverAnchor: typeof import("../components/ui/popover/index")['PopoverAnchor']
 export const PopoverContent: typeof import("../components/ui/popover/index")['PopoverContent']
@@ -721,7 +721,6 @@ export const LazyCalendarHeader: LazyComponent<typeof import("../components/ui/c
 export const LazyCalendarHeading: LazyComponent<typeof import("../components/ui/calendar/index")['CalendarHeading']>
 export const LazyCalendarNextButton: LazyComponent<typeof import("../components/ui/calendar/index")['CalendarNextButton']>
 export const LazyCalendarPrevButton: LazyComponent<typeof import("../components/ui/calendar/index")['CalendarPrevButton']>
-export const LazyCheckbox: LazyComponent<typeof import("../components/ui/checkbox/index")['Checkbox']>
 export const LazyCombobox: LazyComponent<typeof import("../components/ui/combobox/index")['Combobox']>
 export const LazyComboboxAnchor: LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxAnchor']>
 export const LazyComboboxEmpty: LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxEmpty']>
@@ -734,6 +733,7 @@ export const LazyComboboxSeparator: LazyComponent<typeof import("../components/u
 export const LazyComboboxViewport: LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxViewport']>
 export const LazyComboboxCancel: LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxCancel']>
 export const LazyComboboxTrigger: LazyComponent<typeof import("../components/ui/combobox/index")['ComboboxTrigger']>
+export const LazyCheckbox: LazyComponent<typeof import("../components/ui/checkbox/index")['Checkbox']>
 export const LazyDialog: LazyComponent<typeof import("../components/ui/dialog/index")['Dialog']>
 export const LazyDialogClose: LazyComponent<typeof import("../components/ui/dialog/index")['DialogClose']>
 export const LazyDialogContent: LazyComponent<typeof import("../components/ui/dialog/index")['DialogContent']>
@@ -744,6 +744,7 @@ export const LazyDialogOverlay: LazyComponent<typeof import("../components/ui/di
 export const LazyDialogScrollContent: LazyComponent<typeof import("../components/ui/dialog/index")['DialogScrollContent']>
 export const LazyDialogTitle: LazyComponent<typeof import("../components/ui/dialog/index")['DialogTitle']>
 export const LazyDialogTrigger: LazyComponent<typeof import("../components/ui/dialog/index")['DialogTrigger']>
+export const LazyInput: LazyComponent<typeof import("../components/ui/input/index")['Input']>
 export const LazyDropdownMenu: LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenu']>
 export const LazyDropdownMenuCheckboxItem: LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuCheckboxItem']>
 export const LazyDropdownMenuContent: LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuContent']>
@@ -759,7 +760,6 @@ export const LazyDropdownMenuSubContent: LazyComponent<typeof import("../compone
 export const LazyDropdownMenuSubTrigger: LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuSubTrigger']>
 export const LazyDropdownMenuTrigger: LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuTrigger']>
 export const LazyDropdownMenuPortal: LazyComponent<typeof import("../components/ui/dropdown-menu/index")['DropdownMenuPortal']>
-export const LazyInput: LazyComponent<typeof import("../components/ui/input/index")['Input']>
 export const LazyLabel: LazyComponent<typeof import("../components/ui/label/index")['Label']>
 export const LazyMenubar: LazyComponent<typeof import("../components/ui/menubar/index")['Menubar']>
 export const LazyMenubarCheckboxItem: LazyComponent<typeof import("../components/ui/menubar/index")['MenubarCheckboxItem']>
@@ -776,14 +776,6 @@ export const LazyMenubarSub: LazyComponent<typeof import("../components/ui/menub
 export const LazyMenubarSubContent: LazyComponent<typeof import("../components/ui/menubar/index")['MenubarSubContent']>
 export const LazyMenubarSubTrigger: LazyComponent<typeof import("../components/ui/menubar/index")['MenubarSubTrigger']>
 export const LazyMenubarTrigger: LazyComponent<typeof import("../components/ui/menubar/index")['MenubarTrigger']>
-export const LazyNavigationMenu: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenu']>
-export const LazyNavigationMenuContent: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']>
-export const LazyNavigationMenuIndicator: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']>
-export const LazyNavigationMenuItem: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']>
-export const LazyNavigationMenuLink: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']>
-export const LazyNavigationMenuList: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']>
-export const LazyNavigationMenuTrigger: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']>
-export const LazyNavigationMenuViewport: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']>
 export const LazyPagination: LazyComponent<typeof import("../components/ui/pagination/index")['Pagination']>
 export const LazyPaginationContent: LazyComponent<typeof import("../components/ui/pagination/index")['PaginationContent']>
 export const LazyPaginationEllipsis: LazyComponent<typeof import("../components/ui/pagination/index")['PaginationEllipsis']>
@@ -792,6 +784,14 @@ export const LazyPaginationItem: LazyComponent<typeof import("../components/ui/p
 export const LazyPaginationLast: LazyComponent<typeof import("../components/ui/pagination/index")['PaginationLast']>
 export const LazyPaginationNext: LazyComponent<typeof import("../components/ui/pagination/index")['PaginationNext']>
 export const LazyPaginationPrevious: LazyComponent<typeof import("../components/ui/pagination/index")['PaginationPrevious']>
+export const LazyNavigationMenu: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenu']>
+export const LazyNavigationMenuContent: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuContent']>
+export const LazyNavigationMenuIndicator: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuIndicator']>
+export const LazyNavigationMenuItem: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuItem']>
+export const LazyNavigationMenuLink: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuLink']>
+export const LazyNavigationMenuList: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuList']>
+export const LazyNavigationMenuTrigger: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuTrigger']>
+export const LazyNavigationMenuViewport: LazyComponent<typeof import("../components/ui/navigation-menu/index")['NavigationMenuViewport']>
 export const LazyPopover: LazyComponent<typeof import("../components/ui/popover/index")['Popover']>
 export const LazyPopoverAnchor: LazyComponent<typeof import("../components/ui/popover/index")['PopoverAnchor']>
 export const LazyPopoverContent: LazyComponent<typeof import("../components/ui/popover/index")['PopoverContent']>

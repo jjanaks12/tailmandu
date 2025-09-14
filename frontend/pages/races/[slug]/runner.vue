@@ -3,5 +3,5 @@
 </script>
 
 <template>
-
+    <FeaturesRegistrationForm mode="runner" />
 </template>

@@ -3,5 +3,5 @@
 </script>
 
 <template>
-
+    <FeaturesRegistrationForm mode="volunteer" />
 </template>

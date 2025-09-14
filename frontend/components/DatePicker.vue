@@ -4,7 +4,7 @@
     import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFormatter, useForwardPropsEmits } from 'reka-ui'
     import { createDecade, createYear, toDate } from 'reka-ui/date'
     import { computed, type HTMLAttributes, type Ref } from 'vue'
-    import { cn } from '@/lib/utils'
+    import { cn } from '~/lib/helpers'
 
     const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
         modelValue: undefined,

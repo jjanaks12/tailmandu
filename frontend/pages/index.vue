@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import HomeBanner from "@/components/pages/default/home/banner.vue";
-import Newsletter from "@/components/pages/default/newsletter.vue";
-import RegistrationForm from "@/components/features/registration/RegistrationForm.vue";
-useTitle("Trailmandu - From The City To The Mountains");
+import HomeBanner from "@/components/pages/default/home/banner.vue"
+import Newsletter from "@/components/pages/default/newsletter.vue"
+useTitle("Trailmandu - From The City To The Mountains")
 
 definePageMeta({
   layout: "default",
@@ -20,6 +19,5 @@ useHead({
 
 <template>
   <HomeBanner />
-  <RegistrationForm />
   <Newsletter />
 </template>

@@ -18,6 +18,7 @@
     const form = ref()
 
     const signIn = async (formData: any) => {
+        console.log(formData);
         await login(formData, route.query.redirect_from as string)
     }
 
@@ -68,7 +69,7 @@
                 </Field>
             </div>
             <div class="text-right">
-                <Button type="submit" class="w-[120px]" :disabled="isLoading">
+                <Button type="submit" class="w-[120px]">
                     <Loader class="animate-spin relative" v-if="isLoading" />
                     Login
                 </Button>

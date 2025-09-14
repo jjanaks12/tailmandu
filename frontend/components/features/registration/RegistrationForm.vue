@@ -1,578 +1,330 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
-import { Form, Field, ErrorMessage, type FormContext } from "vee-validate";
-import { parseDate } from "@internationalized/date";
-import { storeToRefs } from "pinia";
-import Input from "@/components/ui/input/Input.vue";
-import DatePicker from "@/components/DatePicker.vue";
-import { useAppStore } from "~/store/app";
-import { trailRaceRunner } from "~/lib/schema/event.schema";
+import { ref, computed } from "vue"
+import { Form, Field, ErrorMessage, type FormContext } from "vee-validate"
+import { parseDate } from "@internationalized/date"
+import { storeToRefs } from "pinia"
+import type { SubmissionHandler } from "vee-validate"
+import {
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  MapPin,
+  Users,
+  Shirt,
+  Trophy,
+  Flag,
+  Target,
+  Loader2,
+  CheckCircle,
+  AlertCircle
+} from "lucide-vue-next"
 
-const USE_MOCK = true;
+import DatePicker from "@/components/DatePicker.vue"
+import { useAppStore } from "~/store/app"
+import { useEventStore } from "~/store/event"
+import { useRegistrationStore } from "~/store/registration"
+import { trailRaceRunner } from "~/lib/schema/event.schema"
 
-const { countries, genders, age_categories } = storeToRefs(useAppStore());
+const props = defineProps<{ mode: "volunteer" | "runner" }>()
 
-const fallbackCountries = [
-  { id: "np", name: "Nepal" },
-  { id: "us", name: "United States" },
-  { id: "gb", name: "United Kingdom" },
-];
-const fallbackGenders = [
-  { id: "m", name: "Male" },
-  { id: "f", name: "Female" },
-  { id: "o", name: "Other" },
-];
-const fallbackAgeCats = [
-  { id: "u18", name: "Under 18" },
-  { id: "18_29", name: "18–29" },
-  { id: "30_39", name: "30–39" },
-  { id: "40_49", name: "40–49" },
-  { id: "50p", name: "50+" },
-];
+const app = useAppStore()
+const { countries, genders, age_categories } = storeToRefs(app)
+
+const eventStore = useEventStore()
+const { events } = storeToRefs(eventStore)
+
+const reg = useRegistrationStore()
+const { isLoading, okMsg, errMsg } = storeToRefs(reg)
+
+const form = ref<FormContext<any> | null>(null)
+
 const sizes = [
   { id: "xs", name: "XS" },
   { id: "s", name: "S" },
   { id: "m", name: "M" },
   { id: "l", name: "L" },
   { id: "xl", name: "XL" },
-];
+]
 
-const countryOptions = computed(() =>
-  countries.value?.length ? countries.value : fallbackCountries
-);
-const genderOptions = computed(() =>
-  genders.value?.length ? genders.value : fallbackGenders
-);
-const ageCatOptions = computed(() =>
-  age_categories.value?.length ? age_categories.value : fallbackAgeCats
-);
+const eventOptions = computed(() =>
+  (events.value || []).map(e => ({ id: String(e.id), name: e.name }))
+)
 
-const events = [
-  { id: "e1", name: "Kathmandu Trail 2025" },
-  { id: "e2", name: "Everest Ultra 2025" },
-];
-const stageMap: Record<string, { id: string; name: string }[]> = {
-  e1: [
-    { id: "s1", name: "10K Trail" },
-    { id: "s2", name: "21K Half Marathon" },
-  ],
-  e2: [
-    { id: "s3", name: "Ultra 30K" },
-    { id: "s4", name: "Ultra 60K" },
-  ],
-};
-const stages = computed(() => stageMap[eventId.value] ?? []);
+const stageOptions = computed(() => {
+  const selectedId = form.value?.values?.event_id
+  const ev = (events.value || []).find(e => String(e.id) === String(selectedId))
+  const stages = (ev as any)?.stages ?? (ev as any)?.data?.stages ?? []
+  return stages.map((s: any) => ({ id: String(s.id), name: s.name }))
+})
 
-const mode = ref<"personal" | "runner">("personal");
-
-const form = ref<FormContext<any> | null>(null);
-
-const dateOfBirth = ref<any>(undefined);
-
-const eventId = ref<string>("e1");
-const stageId = ref<string>("");
-
-const initial = {
-  first_name: "Yogesh",
+const initialValues = {
+  first_name: "",
   middle_name: "",
-  last_name: "Shrestha",
-  email: "yogesh@example.com",
-  phone_number: "9800000000",
-  country_id: "np",
-  gender_id: "m",
-  size_id: "m",
-  age_category_id: "18_29",
-  date_of_birth: "2001-10-21",
-  event_id: "e1",
+  last_name: "",
+  email: "",
+  phone_number: "",
+  country_id: "",
+  gender_id: "",
+  size_id: "",
+  age_category_id: "",
+  date_of_birth: "",
+  event_id: "",
   stage_id: "",
-};
-
-function init() {
-  if (!form.value) return;
-  Object.entries(initial).forEach(([k, v]) =>
-    form.value!.setFieldValue(k, v as any)
-  );
-  dateOfBirth.value = initial.date_of_birth
-    ? parseDate(initial.date_of_birth)
-    : undefined;
-  eventId.value = initial.event_id;
-  stageId.value = initial.stage_id;
 }
 
-watch(dateOfBirth, (dob) => {
-  if (!form.value) return;
-  const ymd = dob && typeof dob.toString === "function" ? dob.toString() : "";
-  form.value.setFieldValue("date_of_birth", ymd);
-  form.value.setFieldValue(
-    "age_category_id",
-    ymd ? deriveAgeCategoryIdFromYMD(ymd) : ""
-  );
-});
-
-watch(eventId, (v) => {
-  stageId.value = "";
-  form.value?.setFieldValue("event_id", v || "");
-  form.value?.setFieldValue("stage_id", "");
-});
-watch(stageId, (v) => {
-  form.value?.setFieldValue("stage_id", v || "");
-});
-
-onMounted(() => init());
-
-const isLoading = ref(false);
-const okMsg = ref("");
-const errMsg = ref("");
-
-const submitted = ref(false);
-const emailOk = computed(() =>
-  /.+@.+\..+/.test(form.value?.values?.email || "")
-);
-
-/* --- submit handler (vee-validate style) --- */
-async function onRegister(values: Record<string, any>) {
-  submitted.value = true;
-  okMsg.value = "";
-  errMsg.value = "";
-
-  // Manual checks (email + runner fields)
-  if (!/.+@.+\..+/.test(values.email || "")) {
-    errMsg.value = "Enter a valid email.";
-    return;
-  }
-  if (mode.value === "runner") {
-    if (!eventId.value) {
-      errMsg.value = "Event is required.";
-      return;
-    }
-    if (!stageId.value) {
-      errMsg.value = "Stage is required.";
-      return;
-    }
-  }
-
-  isLoading.value = true;
-  try {
-    if (mode.value === "personal") {
-      const payload = {
-        first_name: values.first_name || null,
-        middle_name: values.middle_name || null,
-        last_name: values.last_name || null,
-        email: values.email,
-        phone_number: values.phone_number || null,
-        date_of_birth: isoFromYMD(values.date_of_birth),
-        country_id: values.country_id || null,
-        gender_id: values.gender_id || null,
-        size_id: values.size_id || null,
-        age_category_id: values.age_category_id || null,
-      };
-      if (USE_MOCK) {
-        await sleep(400);
-        okMsg.value = `Registered as Personal (${payload.email})`;
-      } else {
-        // await $fetch('/api/personal/register', { method: 'POST', body: payload })
-        okMsg.value = "Registered as Personal";
-      }
-    } else {
-      const payload = {
-        personal: {
-          first_name: values.first_name || null,
-          middle_name: values.middle_name || null,
-          last_name: values.last_name || null,
-          email: values.email,
-          phone_number: values.phone_number || null,
-          date_of_birth: isoFromYMD(values.date_of_birth),
-          country_id: values.country_id || null,
-          gender_id: values.gender_id || null,
-          size_id: values.size_id || null,
-          age_category_id: values.age_category_id || null,
-        },
-        runner: {
-          event_id: eventId.value,
-          stage_id: stageId.value,
-        },
-      };
-      if (USE_MOCK) {
-        await sleep(400);
-        okMsg.value = `Registered as Runner (${payload.personal.email})`;
-      } else {
-        // await $fetch('/api/register', { method: 'POST', body: payload })
-        okMsg.value = "Registered as Runner";
-      }
-    }
-  } catch (e: any) {
-    errMsg.value =
-      e?.data?.statusMessage || e?.message || "Registration failed";
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-/* --- reset (uses form.resetForm, like your example style) --- */
-function resetAll() {
-  okMsg.value = "";
-  errMsg.value = "";
-  mode.value = "personal";
-  form.value?.resetForm({
-    values: {
-      first_name: "",
-      middle_name: "",
-      last_name: "",
-      email: "",
-      phone_number: "",
-      country_id: "",
-      gender_id: "",
-      size_id: "",
-      age_category_id: "",
-      date_of_birth: "",
-      event_id: "",
-      stage_id: "",
-    },
-  });
-  dateOfBirth.value = undefined;
-  eventId.value = "";
-  stageId.value = "";
-}
-
-/* --- utils --- */
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-function isoFromYMD(ymd?: string | null) {
-  if (!ymd) return null;
-  const [y, m, d] = ymd.split("-").map(Number);
-  return new Date(Date.UTC(y, (m || 1) - 1, d || 1)).toISOString();
-}
-function deriveAgeCategoryIdFromYMD(ymd: string): string {
-  const [y, m, d] = ymd.split("-").map(Number);
-  const dob = new Date(Date.UTC(y, (m || 1) - 1, d || 1));
-  const today = new Date();
-  let age = today.getUTCFullYear() - dob.getUTCFullYear();
-  const mo = today.getUTCMonth() - dob.getUTCMonth();
-  if (mo < 0 || (mo === 0 && today.getUTCDate() < dob.getUTCDate())) age--;
-  if (age < 18) return "u18";
-  if (age <= 29) return "18_29";
-  if (age <= 39) return "30_39";
-  if (age <= 49) return "40_49";
-  return "50p";
+const onSubmit: SubmissionHandler = async (values) => {
+  const result = await reg.submit(props.mode, values)
+  console.log(props.mode === "volunteer" ? "VOLUNTEER PAYLOAD" : "RUNNER PAYLOAD", result)
 }
 </script>
 
 <template>
-  <section class="max-w-3xl mx-auto p-5 space-y-6">
-    <h2 class="text-2xl font-bold">Registration</h2>
+  <section class="max-w-4xl mx-auto p-6 space-y-8">
 
-    <!-- Mode -->
-    <div class="flex gap-3 items-center">
-      <span class="text-sm text-neutral-600">Register as:</span>
-      <label class="inline-flex items-center gap-2 text-sm">
-        <input
-          type="radio"
-          class="accent-blue-600"
-          value="personal"
-          v-model="mode"
-        />
-        <span>Personal</span>
-      </label>
-      <label class="inline-flex items-center gap-2 text-sm">
-        <input
-          type="radio"
-          class="accent-blue-600"
-          value="runner"
-          v-model="mode"
-        />
-        <span>Runner</span>
-      </label>
-    </div>
-
-    <Form
-      ref="form"
-      method="post"
-      class="flex flex-col space-y-6"
-      @submit="onRegister"
-      :validation-schema="trailRaceRunner"
-    >
-      <!-- Personal block -->
-      <div class="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5">
-        <h3 class="text-lg font-semibold">Personal details</h3>
-
-        <div class="grid md:grid-cols-2 gap-3">
-          <Field name="first_name" v-slot="{ field }">
-            <label
-              for="first_name"
-              class="block text-sm font-medium text-neutral-700"
-              >First name</label
-            >
-            <Input
-              id="first_name"
-              v-bind="field"
-              placeholder="First name"
-              autocomplete="given-name"
-            />
-            <ErrorMessage class="text-xs text-red-600" name="first_name" />
-          </Field>
-
-          <Field name="middle_name">
-            <template #default="{ field }">
-              <label
-                for="middle_name"
-                class="block text-sm font-medium text-neutral-700"
-                >Middle name</label
-              >
-              <Input
-                id="middle_name"
-                v-bind="field"
-                placeholder="Middle name"
-              />
-              <ErrorMessage class="text-xs text-red-600" name="middle_name" />
-            </template>
-          </Field>
-
-          <Field name="last_name">
-            <template #default="{ field }">
-              <label
-                for="last_name"
-                class="block text-sm font-medium text-neutral-700"
-                >Last name</label
-              >
-              <Input
-                id="last_name"
-                v-bind="field"
-                placeholder="Last name"
-                autocomplete="family-name"
-              />
-              <ErrorMessage class="text-xs text-red-600" name="last_name" />
-            </template>
-          </Field>
-
-          <Field name="email">
-            <template #default="{ field }">
-              <label
-                for="email"
-                class="block text-sm font-medium text-neutral-700"
-              >
-                Email <span class="text-red-500">*</span>
-              </label>
-              <Input
-                id="email"
-                type="email"
-                v-bind="field"
-                placeholder="Email"
-                autocomplete="email"
-                :aria-invalid="submitted && !emailOk"
-                data-error="true"
-              />
-              <ErrorMessage class="text-xs text-red-600" name="email" />
-              <p v-if="submitted && !emailOk" class="text-xs text-red-600 mt-1">
-                Enter a valid email.
-              </p>
-            </template>
-          </Field>
-
-          <Field name="phone_number">
-            <template #default="{ field }">
-              <label
-                for="phone_number"
-                class="block text-sm font-medium text-neutral-700"
-                >Phone</label
-              >
-              <Input
-                id="phone_number"
-                type="tel"
-                v-bind="field"
-                placeholder="98xxxxxxxx"
-                autocomplete="tel"
-              />
-              <ErrorMessage class="text-xs text-red-600" name="phone_number" />
-            </template>
-          </Field>
-
-          <!-- Date of birth like your example -->
-          <Field name="date_of_birth">
-            <template #default="{}">
-              <label
-                class="block text-sm font-medium text-neutral-700"
-                for="date_of_birth"
-                >Date of birth</label
-              >
-              <DatePicker
-                label="Date of Birth"
-                :model-value="dateOfBirth"
-                @update:model-value="(dob) => (dateOfBirth = dob)"
-              />
-              <ErrorMessage class="text-xs text-red-600" name="date_of_birth" />
-            </template>
-          </Field>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-3">
-          <Field name="country_id">
-            <template #default="{ field }">
-              <label
-                for="country_id"
-                class="block text-sm font-medium text-neutral-700"
-                >Country</label
-              >
-              <select
-                id="country_id"
-                class="h-12 w-full rounded-md border bg-white px-3 text-sm"
-                v-bind="field"
-              >
-                <option value="">Select…</option>
-                <option v-for="c in countryOptions" :key="c.id" :value="c.id">
-                  {{ c.name }}
-                </option>
-              </select>
-              <ErrorMessage class="text-xs text-red-600" name="country_id" />
-            </template>
-          </Field>
-
-          <Field name="gender_id">
-            <template #default="{ field }">
-              <label
-                for="gender_id"
-                class="block text-sm font-medium text-neutral-700"
-                >Gender</label
-              >
-              <select
-                id="gender_id"
-                class="h-12 w-full rounded-md border bg-white px-3 text-sm"
-                v-bind="field"
-              >
-                <option value="">Select…</option>
-                <option v-for="g in genderOptions" :key="g.id" :value="g.id">
-                  {{ g.name }}
-                </option>
-              </select>
-              <ErrorMessage class="text-xs text-red-600" name="gender_id" />
-            </template>
-          </Field>
-
-          <Field name="size_id">
-            <template #default="{ field }">
-              <label
-                for="size_id"
-                class="block text-sm font-medium text-neutral-700"
-                >Shirt size</label
-              >
-              <select
-                id="size_id"
-                class="h-12 w-full rounded-md border bg-white px-3 text-sm"
-                v-bind="field"
-              >
-                <option value="">Select…</option>
-                <option v-for="s in sizes" :key="s.id" :value="s.id">
-                  {{ s.name }}
-                </option>
-              </select>
-              <ErrorMessage class="text-xs text-red-600" name="size_id" />
-            </template>
-          </Field>
-
-          <Field name="age_category_id">
-            <template #default="{ field }">
-              <label
-                for="age_category_id"
-                class="block text-sm font-medium text-neutral-700"
-                >Age category</label
-              >
-              <select
-                id="age_category_id"
-                class="h-12 w-full rounded-md border bg-white px-3 text-sm"
-                v-bind="field"
-              >
-                <option value="">Select…</option>
-                <option v-for="a in ageCatOptions" :key="a.id" :value="a.id">
-                  {{ a.name }}
-                </option>
-              </select>
-              <ErrorMessage
-                class="text-xs text-red-600"
-                name="age_category_id"
-              />
-            </template>
-          </Field>
-        </div>
-      </div>
-
+    <Form ref="form" class="space-y-8" :initial-values="initialValues" :validation-schema="trailRaceRunner"
+      @submit="onSubmit">
       <div
-        v-if="mode === 'runner'"
-        class="space-y-4 rounded-2xl border border-neutral-200 bg-white p-5"
-      >
-        <h3 class="text-lg font-semibold">Runner details</h3>
-        <div class="grid md:grid-cols-2 gap-3">
-          <Field name="event_id">
-            <template #default="{}">
-              <label
-                for="event_id"
-                class="block text-sm font-medium text-neutral-700"
-              >
-                Event <span class="text-red-500">*</span>
-              </label>
-              <select
-                id="event_id"
-                class="h-12 w-full rounded-md border bg-white px-3 text-sm"
-                v-model="eventId"
-              >
-                <option value="">Select…</option>
-                <option v-for="e in events" :key="e.id" :value="e.id">
-                  {{ e.name }}
-                </option>
-              </select>
-              <ErrorMessage class="text-xs text-red-600" name="event_id" />
-            </template>
-          </Field>
+        class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600">
+              <User :size="20" />
+            </div>
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900">
+                {{ props.mode === 'volunteer' ? 'Volunteer Information' : 'Runner Information' }}
+              </h2>
+              <p class="text-sm text-gray-600">Tell us about yourself</p>
+            </div>
+          </div>
+        </div>
 
-          <Field name="stage_id">
-            <template #default="{}">
-              <label
-                for="stage_id"
-                class="block text-sm font-medium text-neutral-700"
-              >
-                Stage <span class="text-red-500">*</span>
-              </label>
-              <select
-                id="stage_id"
-                class="h-12 w-full rounded-md border bg-white px-3 text-sm disabled:opacity-60"
-                :disabled="!eventId"
-                v-model="stageId"
-              >
-                <option value="">
-                  {{ eventId ? "Select…" : "Select an event first…" }}
-                </option>
-                <option v-for="s in stages" :key="s.id" :value="s.id">
-                  {{ s.name }}
-                </option>
-              </select>
-              <ErrorMessage class="text-xs text-red-600" name="stage_id" />
-            </template>
-          </Field>
+        <div class="p-8 space-y-6">
+          <!-- Name Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Field name="first_name" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="first_name" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <User :size="16" class="text-gray-400" />
+                First name
+              </Label>
+              <Input id="first_name" v-bind="field" placeholder="Enter your first name" autocomplete="given-name"
+                class="h-12 text-base" />
+              <ErrorMessage name="first_name" />
+            </Field>
+
+            <Field name="middle_name" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="middle_name" class="text-sm font-medium text-gray-700">
+                Middle name <span class="text-gray-400 text-xs">(optional)</span>
+              </Label>
+              <Input id="middle_name" v-bind="field" placeholder="Middle name" class="h-12 text-base" />
+              <ErrorMessage name="middle_name" />
+            </Field>
+
+            <Field name="last_name" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="last_name" class="text-sm font-medium text-gray-700">
+                Last name
+              </Label>
+              <Input id="last_name" v-bind="field" placeholder="Enter your last name" autocomplete="family-name"
+                class="h-12 text-base" />
+              <ErrorMessage name="last_name" />
+            </Field>
+          </div>
+
+          <!-- Contact Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Field name="email" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="email" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Mail :size="16" class="text-gray-400" />
+                Email address
+              </Label>
+              <Input id="email" type="email" v-bind="field" placeholder="your.email@example.com" autocomplete="email"
+                class="h-12 text-base" />
+              <ErrorMessage name="email" />
+            </Field>
+
+            <Field name="phone_number" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="phone_number" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Phone :size="16" class="text-gray-400" />
+                Phone number
+              </Label>
+              <Input id="phone_number" type="tel" v-bind="field" placeholder="xxxxxxxxxx" autocomplete="tel"
+                class="h-12 text-base" />
+              <ErrorMessage name="phone_number" />
+            </Field>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Field name="date_of_birth" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="date_of_birth" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Calendar :size="16" class="text-gray-400" />
+                Date of birth
+              </Label>
+              <DatePicker Label="Select your birth date"
+                :model-value="field.value ? parseDate(field.value as string) : undefined"
+                @update:model-value="d => field.onChange(d ? d.toString() : '')" />
+              <ErrorMessage name="date_of_birth" />
+            </Field>
+          </div>
+
+          <!-- Demographics -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Field name="country_id" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="country_id" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <MapPin :size="16" class="text-gray-400" />
+                Country
+              </Label>
+              <Select id="country_id" :model-value="String(field.value ?? '')"
+                @update:model-value="v => field.onChange(v)">
+                <SelectTrigger class="w-full h-12">
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="country in countries" :key="country.id" :value="String(country.id)">
+                    {{ country.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <ErrorMessage name="country_id" />
+            </Field>
+
+            <Field name="gender_id" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="gender_id" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Users :size="16" class="text-gray-400" />
+                Gender
+              </Label>
+              <Select id="gender_id" :model-value="String(field.value ?? '')"
+                @update:model-value="v => field.onChange(v)">
+                <SelectTrigger class="w-full h-12">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="gender in genders" :key="gender.id" :value="String(gender.id)">
+                    {{ gender.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <ErrorMessage name="gender_id" />
+            </Field>
+
+            <Field name="size_id" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="size_id" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Shirt :size="16" class="text-gray-400" />
+                Shirt size
+              </Label>
+              <Select id="size_id" :model-value="String(field.value ?? '')"
+                @update:model-value="v => field.onChange(v)">
+                <SelectTrigger class="w-full h-12">
+                  <SelectValue placeholder="Size" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="s in sizes" :key="s.id" :value="String(s.id)">
+                    {{ s.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <ErrorMessage name="size_id" />
+            </Field>
+
+            <Field name="age_category_id" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="age_category_id" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Users :size="16" class="text-gray-400" />
+                Age group
+              </Label>
+              <Select id="age_category_id" :model-value="String(field.value ?? '')"
+                @update:model-value="v => field.onChange(v)">
+                <SelectTrigger class="w-full h-12">
+                  <SelectValue placeholder="Age group" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="ageCategory in age_categories" :key="ageCategory.id"
+                    :value="String(ageCategory.id)">
+                    {{ ageCategory.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <ErrorMessage name="age_category_id" />
+            </Field>
+          </div>
+          <div v-if="props.mode === 'runner'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Field name="event_id" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="event_id" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Flag :size="16" class="text-gray-400" />
+                Event
+              </Label>
+              <Select id="event_id" :model-value="String(field.value ?? '')"
+                @update:model-value="v => field.onChange(v)">
+                <SelectTrigger class="w-full h-12">
+                  <SelectValue placeholder="Choose your event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="e in eventOptions" :key="e.id" :value="String(e.id)">
+                    {{ e.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <ErrorMessage name="event_id" />
+            </Field>
+
+            <Field name="stage_id" as="div" v-slot="{ field }" class="space-y-2">
+              <Label for="stage_id" class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Target :size="16" class="text-gray-400" />
+                Stage
+              </Label>
+              <Select id="stage_id" :disabled="!(form?.values?.event_id)" :model-value="String(field.value ?? '')"
+                @update:model-value="v => field.onChange(v)">
+                <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <SelectValue :placeholder="form?.values?.event_id ? 'Choose your stage' : 'Select an event first'" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="s in stageOptions" :key="s.id" :value="String(s.id)">
+                    {{ s.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <ErrorMessage name="stage_id" />
+            </Field>
+          </div>
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="flex gap-2">
-        <button
-          type="button"
-          class="h-10 px-4 rounded-md border border-neutral-300"
-          @click="resetAll"
-        >
-          Reset
-        </button>
-        <button
-          type="submit"
-          class="h-10 px-4 rounded-md bg-blue-600 text-white disabled:opacity-60"
-          :disabled="isLoading"
-        >
-          <span v-if="!isLoading">{{
-            mode === "personal" ? "Register as Personal" : "Register as Runner"
-          }}</span>
-          <span v-else>Processing…</span>
-        </button>
-      </div>
+      <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div class="text-center sm:text-left">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Ready to register?</h3>
+            <p class="text-gray-600 text-sm">
+              {{ props.mode === 'volunteer'
+                ? 'Complete your volunteer registration and join our team!'
+                : 'Submit your registration and get ready for the race!'
+              }}
+            </p>
+          </div>
 
-      <p v-if="okMsg" class="text-green-600 text-sm">{{ okMsg }}</p>
-      <p v-if="errMsg" class="text-red-600 text-sm">{{ errMsg }}</p>
+          <Button variant="default" type="submit" class="w-full sm:w-auto px-8 py-3 h-12 text-base font-medium "
+            :disabled="isLoading" :aria-busy="isLoading">
+            <Loader2 v-if="isLoading" :size="20" class="animate-spin mr-2" />
+            <span v-if="!isLoading">
+              {{ props.mode === "volunteer" ? "Register as Volunteer" : "Register as Runner" }}
+            </span>
+            <span v-else>Processing Registration...</span>
+          </Button>
+        </div>
+
+        <!-- Status Messages -->
+        <div v-if="okMsg || errMsg" class="mt-6 pt-6 border-t border-gray-200">
+          <div v-if="okMsg"
+            class="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-xl border border-green-200">
+            <CheckCircle :size="20" />
+            <span class="font-medium">{{ okMsg }}</span>
+          </div>
+          <div v-if="errMsg"
+            class="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-xl border border-red-200">
+            <AlertCircle :size="20" />
+            <span class="font-medium">{{ errMsg }}</span>
+          </div>
+        </div>
+      </div>
     </Form>
   </section>
 </template>

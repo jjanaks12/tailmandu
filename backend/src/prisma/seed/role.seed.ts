@@ -87,11 +87,42 @@ export const roleSeed = async (prisma: PrismaClient) => {
         }
     })
 
+    const country = await prisma.country.findFirst({
+        where: {
+            abbr: 'np'
+        }
+    })
+
+    const companyAddress = await prisma.address.create({
+        data: {
+            address: 'a',
+            city: 'Kathmandu',
+            state: 'Bagmati',
+            street: 'a',
+            type: 'PERMANENT_ADDRESS',
+            zipCode: '00977',
+            countryId: country.id
+        }
+    })
+
+    const company = await prisma.company.create({
+        data: {
+            name: 'Trailmandu Pvt. Ltd.',
+            short_name: 'Trailmandu',
+            email: 'info@trailmandu.com',
+            address_id: companyAddress.id,
+            phone: '9876543210',
+            vat_registered: false,
+            pan_no: '5432'
+        }
+    })
+
     await prisma.user.create({
         data: {
             password: await Bcrypt.hash('password', await Bcrypt.genSalt(10)),
             personal_id: adminPersonalDetail.id,
-            role_id: adminRole.id
+            role_id: adminRole.id,
+            companyId: company.id
         }
     })
 }

@@ -48,7 +48,7 @@
                 </div>
             </div>
         </section>
-        <section class="bg-black text-white flex justify-center items-center relative z-[1] overflow-hidden" v-else
+        <section class="bg-white flex justify-center items-center relative z-[1] overflow-hidden" v-else
             key="two">
             <div class="container z-10">
                 <div class="max-w-[540px] flex flex-col gap-4 py-20">
