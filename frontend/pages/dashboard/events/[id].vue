@@ -50,7 +50,7 @@
                 </Button>
             </div>
         </div>
-        <Tabs default-value="gallery" class="text-gray-600">
+        <Tabs default-value="sponsor" class="text-gray-600">
             <TabsList class="uppercase">
                 <TabsTrigger value="detail">
                     Details
@@ -69,6 +69,9 @@
                 </TabsTrigger>
                 <TabsTrigger value="gallery">
                     Galleries
+                </TabsTrigger>
+                <TabsTrigger value="sponsor">
+                    Sponsors
                 </TabsTrigger>
             </TabsList>
             <TabsContent value="detail">

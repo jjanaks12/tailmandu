@@ -129,6 +129,7 @@ model TrailRace {
   stages      Stage[]
   runners     EventRunner[]
   galleries   Image[]       @relation("trail_race_gallery")
+  partners    Partner[]
 
   @@map("events")
 }
@@ -187,6 +188,30 @@ model Permission {
   roles Role[]
 
   @@map("permissions")
+}
+
+model Partner {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  events TrailRace[]
+
+  @@map("Partners")
+}
+
+model PartnerCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  @@map("PartnerCategories")
 }
 
 model Personal {
@@ -259,7 +284,8 @@ model Stage {
   map_file_id String?
   map_file    Image?    @relation(fields: [map_file_id], references: [id], onDelete: Cascade)
 
-  runners EventRunner[]
+  runners    EventRunner[]
+  volunteers Volunteer[]
 
   @@map("stages")
 }
@@ -282,15 +308,18 @@ model User {
 }
 
 model Volunteer {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-  deleted_at DateTime?
+  id          String    @id @default(cuid())
+  description String    @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
 
   personal_id String
   personal    Personal  @relation(fields: [personal_id], references: [id], onDelete: Cascade)
   event_id    String
   event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  stages Stage[]
 
   @@map("volunteers")
 }

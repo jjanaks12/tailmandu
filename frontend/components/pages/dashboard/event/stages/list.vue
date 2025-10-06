@@ -61,10 +61,7 @@
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>Stage form</DialogTitle>
-                <DialogDescription>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus assumenda, maxime
-                    distinctio at facere nesciunt vero eius neque voluptates numquam libero vel provident aliquam,
-                    iusto,
-                    dolorum non. Laboriosam, eveniet quibusdam.</DialogDescription>
+                <DialogDescription>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus assumenda, maxime.</DialogDescription>
             </DialogHeader>
             <TrailMapStageForm :event-id="eventId" :stage="editStage" @update="() => {
                 showDialog = false

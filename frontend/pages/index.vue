@@ -20,4 +20,6 @@
 <template>
     <HomeBanner />
     <Newsletter />
+    <!-- Sponsors -->
+    <!-- footer -->
 </template>
