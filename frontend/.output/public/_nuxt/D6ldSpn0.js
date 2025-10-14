@@ -1,0 +1,1 @@
+import{ai as a,aj as s,ak as r,H as u,al as o}from"./CwoOZn_i.js";function i(e){const t=e||s();return t?.ssrContext?.head||t?.runWithContext(()=>{if(r())return u(o)})}function x(e,t={}){const n=i(t.nuxt);if(n)return a(e,{head:n,...t})}export{x as u};
