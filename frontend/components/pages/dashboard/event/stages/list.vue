@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { PencilIcon, PlusIcon, ScanIcon, TrashIcon } from 'lucide-vue-next'
+    import { MapIcon, PencilIcon, PlusIcon, ScanIcon, TrashIcon } from 'lucide-vue-next'
 
     import TrailMapStageForm from '@/components/pages/dashboard/event/stages/form.vue'
     import { useStageStore } from '~/store/stage'
@@ -16,6 +16,7 @@
     const { stages } = storeToRefs(useStageStore())
 
     const showDialog = ref(false)
+    const trailRaceStage = ref<Stage | null>(null)
     const editStage = ref<Stage | null>(null)
 
     onMounted(async () => {
@@ -30,38 +31,39 @@
             Add stage
         </Button>
     </div>
-    <Accordion type="single">
-        <AccordionItem :value="stage.id" v-for="stage in stages">
-            <AccordionTrigger>
+    <ul>
+        <li v-for="stage in stages" class="flex">
+            <div class="flex-grow">
                 {{ stage.name }}
                 <Badge v-if="stage.runners.length > 0">{{ stage.runners.length }}</Badge>
-            </AccordionTrigger>
-            <AccordionContent>
-                <div class="flex justify-end gap-2 mb-8">
-                    <Button variant="destructive" @click="async () => {
-                        await destory(stage.id)
-                        fetch(eventId)
-                    }">
-                        <TrashIcon />
-                    </Button>
-                    <Button size="icon" @click="() => {
-                        showDialog = true
-                        editStage = stage
-                    }">
-                        <PencilIcon />
-                    </Button>
-                </div>
-                <!-- <ClientOnly>
-                    <Map :gpxFile="getGPXFile(stage.map_file.file_name)" v-if="stage.map_file" />
-                </ClientOnly> -->
-            </AccordionContent>
-        </AccordionItem>
-    </Accordion>
+            </div>
+            <div class="flex justify-end gap-2 mb-8">
+                <Button variant="runner" size="icon" @click="() => {
+                    trailRaceStage = stage
+                }">
+                    <MapIcon />
+                </Button>
+                <Button variant="destructive" @click="async () => {
+                    await destory(stage.id)
+                    fetch(eventId)
+                }">
+                    <TrashIcon />
+                </Button>
+                <Button size="icon" @click="() => {
+                    showDialog = true
+                    editStage = stage
+                }">
+                    <PencilIcon />
+                </Button>
+            </div>
+        </li>
+    </ul>
     <Dialog :open="showDialog" @update:open="showDialog = false">
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>Stage form</DialogTitle>
-                <DialogDescription>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus assumenda, maxime.</DialogDescription>
+                <DialogDescription>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus assumenda, maxime.
+                </DialogDescription>
             </DialogHeader>
             <TrailMapStageForm :event-id="eventId" :stage="editStage" @update="() => {
                 showDialog = false
@@ -69,6 +71,16 @@
                 fetch(eventId)
                 emit('update')
             }" />
+        </DialogContent>
+    </Dialog>
+    <Dialog :open="trailRaceStage != null" @update:open="trailRaceStage = null">
+        <DialogContent class="sm:max-w-[1000px]">
+            <DialogHeader>
+                <DialogTitle>Map</DialogTitle>
+                <DialogDescription>Some text</DialogDescription>
+            </DialogHeader>
+            <Map map-id="someId" :center="[27.756846786775668, 85.3124535214843]"
+                :gpxFile="getGPXFile(trailRaceStage?.map_file.file_name as string)" v-if="trailRaceStage" />
         </DialogContent>
     </Dialog>
 </template>

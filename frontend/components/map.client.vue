@@ -84,7 +84,6 @@
 
 <template>
     <div class="relative overflow-hidden w-full aspect-video">
-        {{ center }}
         <div class="bg-white w-full h-full rounded-md" ref="mapEl" />
         <div class="flex gap-2 p-2 absolute bottom-0 left-1/2 -translate-x-1/2">
             <Button variant="secondary" size="icon" @click="zoomIn">

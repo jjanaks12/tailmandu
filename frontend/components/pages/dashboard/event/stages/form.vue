@@ -78,7 +78,7 @@
             <ErrorMessage name="name" />
         </Field>
         <label>
-            <input type="file" @change="fileHandler">
+            <input type="file" @change="fileHandler" accept=".gpx">
             <ErrorMessage name="map" />
         </label>
         <div class="text-right">

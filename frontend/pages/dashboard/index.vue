@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { getGPXFile } from '~/lib/filters'
+    // import { getGPXFile } from '~/lib/filters'
 
     useHead({
         title: 'Dashboard'
@@ -43,10 +43,10 @@
             <LineChart :data="data" :categories="categories" :height="300" :xFormatter="xFormatter" xLabel="Month"
                 yLabel="Amount" />
         </div>
-        <div class="w-full">
+        <!-- <div class="w-full">
             <ClientOnly>
                 <Map :gpxFile="getGPXFile('0dec5b29-0098-4218-adef-aa4d102705321757309493845.gpx')" />
             </ClientOnly>
-        </div>
+        </div> -->
     </div>
 </template>

@@ -66,20 +66,18 @@
             </Button>
         </div>
         <label class="w-full text-center block p-3 border border-dashed rounded-md">
-            <input type="file" @change="fileHandler" class="hidden">
+            <input type="file" @change="fileHandler" class="hidden" accept=".gpx">
             <span>{{ fileName ?? "Upload .gpx file" }}</span>
         </label>
     </div>
-    <ClientOnly>
-        <Dialog :open="showMap" @update:open="showMap = false">
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Map</DialogTitle>
-                    <DialogDescription>Some text</DialogDescription>
-                </DialogHeader>
-                <Map map-id="someId" :center="[27.756846786775668, 85.3124535214843]"
-                    :gpxFile="getGPXFile(trailRace.map_file?.file_name as string)" />
-            </DialogContent>
-        </Dialog>
-    </ClientOnly>
+    <Dialog :open="showMap" @update:open="showMap = false">
+        <DialogContent class="sm:max-w-[1000px]">
+            <DialogHeader>
+                <DialogTitle>Map</DialogTitle>
+                <DialogDescription>Some text</DialogDescription>
+            </DialogHeader>
+            <Map map-id="someId" :center="[27.756846786775668, 85.3124535214843]"
+                :gpxFile="getGPXFile(trailRace.map_file?.file_name as string)" />
+        </DialogContent>
+    </Dialog>
 </template>
