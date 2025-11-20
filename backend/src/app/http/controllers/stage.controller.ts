@@ -132,7 +132,8 @@ export class StageController {
                         include: {
                             personal: {
                                 include: {
-                                    avatar: true
+                                    avatar: true,
+                                    country: true
                                 }
                             }
                         }

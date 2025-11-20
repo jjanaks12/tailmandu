@@ -17,7 +17,7 @@
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup class="bg-gray-200" v-for="menu in menuList">
-                    <SidebarGroupLabel>{{ menu.title }}</SidebarGroupLabel>
+                    <SidebarGroupLabel v-if="menu.title">{{ menu.title }}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem v-for="subMenu in menu.subMenu">

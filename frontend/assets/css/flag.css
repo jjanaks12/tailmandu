@@ -1,7 +1,8 @@
 span.flag {
     width: 44px;
     height: 30px;
-    display: inline-block
+    display: inline-block;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4))
 }
 
 img.flag {

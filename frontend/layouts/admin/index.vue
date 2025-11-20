@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-    import { ArrowLeftToLine } from 'lucide-vue-next'
-
+    import AppHeader from './_header.vue'
     import AppSidebar from './_sidebar.vue'
     import { useAuthStore } from '~/store/auth'
 
@@ -13,15 +12,7 @@
     <SidebarProvider v-if="!isLoading">
         <AppSidebar />
         <main id="main" class="bg-gray-300 flex-grow relative">
-            <div class="bg-white px-4 py-[13px] flex justify-between items-center border-b sticky top-0 z-50">
-                <Brand />
-                <div class="flex justify-center items-center gap-4">
-                    <Button @click="navigateTo('/')" variant="secondary" size="icon">
-                        <span class="sr-only">Back to site</span>
-                        <ArrowLeftToLine />
-                    </Button>
-                </div>
-            </div>
+            <AppHeader />
             <div class="p-4">
                 <div class="bg-white p-12 rounded-2xl overflow-hidden">
                     <ClientOnly>

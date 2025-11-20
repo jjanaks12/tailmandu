@@ -3,6 +3,18 @@ import { useAuthStore } from "~/store/auth"
 
 export const useMenu = () => {
     const menus = ref<Menu[]>([{
+        title: '',
+        path: '',
+        slug: '',
+        permissions: [],
+        subMenu: [{
+            title: 'Dashboard',
+            icon: 'LayoutDashboardIcon',
+            slug: 'dashboard',
+            path: '/dashboard',
+            permissions: '*'
+        }]
+    },{
         title: 'Users',
         path: '',
         slug: 'users',
