@@ -2,7 +2,7 @@
     <footer id="footer" class="bg-black p-4">
         <div class="footer__navigation py-12">
             <div class="container flex gap-8">
-                <Brand />
+                <Brand class="grayscale brightness-200" />
                 <div class="grow flex justify-end gap-4">
                     <nav>
                         <h3 class="text-xl mb-4">Useful links</h3>

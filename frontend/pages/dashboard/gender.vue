@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { EllipsisVertical, Pencil, Plus, Trash } from 'lucide-vue-next'
+    import { Plus } from 'lucide-vue-next'
     import { useAppStore } from '~/store/app'
 
     useHead({
@@ -39,7 +39,7 @@
                 <TableCell>{{ index + 1 }}</TableCell>
                 <TableCell>{{ country.name }}</TableCell>
                 <TableCell class="text-right">
-                    <DropdownMenu>
+                    <!-- <DropdownMenu>
                         <DropdownMenuTrigger>
                             <EllipsisVertical />
                         </DropdownMenuTrigger>
@@ -55,7 +55,7 @@
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> -->
                 </TableCell>
             </TableRow>
         </TableBody>

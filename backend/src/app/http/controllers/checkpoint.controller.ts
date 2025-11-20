@@ -9,8 +9,12 @@ export class CheckpointController {
         try {
             response.send(await prisma.checkpoint.findMany({
                 where: {
-                    event_id: request.params.event_id,
+                    stage_category_id: request.params.stage_category_id,
                     deleted_at: null
+                },
+                include: {
+                    runners: true,
+                    volunteers: true
                 }
             }))
         } catch (error) {
@@ -25,7 +29,7 @@ export class CheckpointController {
             response.send(await prisma.checkpoint.create({
                 data: {
                     name: validationData.name,
-                    event_id: validationData.event_id
+                    stage_category_id: validationData.stage_category_id
                 }
             }))
         } catch (error) {

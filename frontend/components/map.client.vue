@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-    import { LatLngBounds } from 'leaflet'
+    import { Icon, LatLngBounds, Layer, type LeafletEvent } from 'leaflet'
     import { MinusIcon, PlusIcon } from 'lucide-vue-next'
 
     import type { Leaflet } from '~/lib/types'
@@ -60,17 +60,32 @@
         })
             .addTo(map)
 
-        if (props.gpxFile)
+        if (props.gpxFile) {
             // @ts-expect-error
             new L.GPX(props.gpxFile, {
                 async: true,
-                polyline_options: { color: 'red' }
+                polyline_options: {
+                    color: '#f06723',
+                    weight: 3
+                },
+                marker_options: {
+                    endIconUrl: 'leaf-green.png',
+                    startIconUrl: 'leaf-red.png',
+                    wptIcons: {
+
+                    }
+                },
+
             })
                 .on('loaded', (e) => {
                     center = e.target.getBounds()
-
                     map.fitBounds(e.target.getBounds())
-                }).addTo(map)
+                })
+                .on('layeradd', (e) => {
+                    console.log(e.layer._layers);
+                })
+                .addTo(map)
+        }
     }
 
     watch(() => props.gpxFile, () => {

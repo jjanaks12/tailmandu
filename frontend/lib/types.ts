@@ -8,6 +8,7 @@ type APISort<T> = {
 }
 
 type AddressType = 'BILLING' | 'SHIPPING' | 'PERMANENT_ADDRESS'
+type StageDifficulty = 'moderate' | 'easy' | 'difficult'
 
 export type APIQuery<T> = {
     s: string
@@ -64,6 +65,7 @@ export type Personal = {
     gender: Gender
     runners: EventRunner[]
     volunteers: Volunteer[]
+    checkpoints: Checkpoint[]
 }
 
 export type AgeCategory = {
@@ -119,14 +121,23 @@ export type Checkpoint = {
     created_at: string
     updated_at: string
     deleted_at: string
-    event_id: string
-    event: TrailRace
+    stage_id: string
+    stage: Stage
     runners: EventRunner[]
+    volunteers: Volunteer[]
+    volunteer_on_checkpoints: VolunteerCheckpoint[]
 }
 
 export type Stage = {
     id: string
     name: string
+    excerpt: string
+    description: string
+    distance: string
+    difficulty: StageDifficulty
+    location: string
+    start: string
+    end: string
     created_at: string
     updated_at: string
     deleted_at: string
@@ -134,12 +145,42 @@ export type Stage = {
     event: TrailRace
     map_file_id: string
     map_file: Image
+    image_id: string
+    thumbnail: Image
     runners: EventRunner[]
+    volunteers: Volunteer[]
+    stage_categories: StageCategory[]
 }
 
-export type EventRunner = {}
+export type EventRunner = {
+    id: string
+    bib: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    personal_id: string
+    personal: Personal
+    event: TrailRace
+    stage: Stage
+    tshirt_size: TShirtSize
+    checkpoints: Checkpoint[]
+    payments: Payment[]
+    volunteer_on_checkpoints: VolunteerCheckpoint[]
+}
 
-export type Volunteer = {}
+export type Payment = {}
+
+export type Volunteer = {
+    id: string
+    description: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    personal_id: string
+    personal: Personal
+    checkpoints: Checkpoint[]
+    stages: Stage[]
+}
 
 export type User = {
     id: string
@@ -189,4 +230,43 @@ export type Company = {
     pan_no: string
     vat_no: string
     users: User[]
+}
+
+export type TShirtSize = {
+    id: string
+    name: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+}
+
+export type VolunteerCheckpoint = {
+    id: string
+    timer: string
+    volunteer_id: string
+    volunteer: Volunteer
+    runner_id: string
+    runner: EventRunner
+    checkpoint_id: string
+    checkpoint: Checkpoint
+}
+
+export type StageCategory = {
+    id: string
+    name: string
+    excerpt: string
+    description: string
+    distance: string
+    difficulty: string
+    location: string
+    start: string
+    end: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    stage_id: string
+    stage: Stage
+    map_file_id: string
+    map_file: Image
+    checkpoints: Checkpoint[]
 }

@@ -19,6 +19,11 @@ enum AddressType {
   PERMANENT_ADDRESS
 }
 
+enum PaymentType {
+  CASH
+  PAY_AT_VENUE
+}
+
 model Address {
   id      String @id @default(cuid())
   street  String
@@ -55,10 +60,12 @@ model Checkpoint {
   updated_at DateTime?
   deleted_at DateTime?
 
-  event_id String
-  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  stage_category_id String
+  stage_category    StageCategory @relation(fields: [stage_category_id], references: [id], onDelete: Cascade)
 
-  runners EventRunner[]
+  runners                  EventRunner[]
+  volunteers               Volunteer[]
+  volunteer_on_checkpoints VolunteerCheckpoint[]
 
   @@map("checkpoints")
 }
@@ -107,35 +114,9 @@ model Club {
   @@map("clubs")
 }
 
-model TrailRace {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String?
-  start       DateTime
-  end         DateTime
-  excerpt     String?
-  description String    @db.LongText
-  created_at  DateTime  @default(now())
-  updated_at  DateTime?
-  deleted_at  DateTime?
-
-  image_id    String?
-  thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
-  map_file_id String?
-  map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: Cascade)
-
-  volunteers  Volunteer[]
-  checkpoints Checkpoint[]
-  stages      Stage[]
-  runners     EventRunner[]
-  galleries   Image[]       @relation("trail_race_gallery")
-  partners    Partner[]
-
-  @@map("events")
-}
-
 model EventRunner {
   id         String    @id @default(cuid())
+  bib        String    @unique
   created_at DateTime  @default(now())
   updated_at DateTime?
   deleted_at DateTime?
@@ -146,8 +127,12 @@ model EventRunner {
   event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
   stage_id    String
   stage       Stage     @relation(fields: [stage_id], references: [id], onDelete: Cascade)
+  shirt_id    String
+  tshirt_size Size      @relation(fields: [shirt_id], references: [id], onDelete: Cascade)
 
-  checkpoints Checkpoint[]
+  checkpoints              Checkpoint[]
+  payments                 Payment[]
+  volunteer_on_checkpoints VolunteerCheckpoint[]
 
   @@map("event_runners")
 }
@@ -167,12 +152,15 @@ model Image {
   created_at  DateTime  @default(now())
   updated_at  DateTime?
 
-  personal      Personal[]
-  events        TrailRace[] @relation("thumbnail_image")
-  maps          TrailRace[] @relation("map_image")
-  companies     Company[]
-  stages        Stage[]
-  gallery_event TrailRace[] @relation("trail_race_gallery")
+  personal         Personal[]
+  events           TrailRace[]     @relation("thumbnail_image")
+  maps             TrailRace[]     @relation("map_image")
+  companies        Company[]
+  stages           Stage[]         @relation("gpx_file")
+  gallery_event    TrailRace[]     @relation("trail_race_gallery")
+  thumbnail_stages Stage[]         @relation("thumbnail_image")
+  payments         Payment[]
+  stage_categories StageCategory[] @relation("gpx_file")
 
   @@map("images")
 }
@@ -244,6 +232,21 @@ model Personal {
   @@map("personals")
 }
 
+model Payment {
+  id     String      @id @default(cuid())
+  amount Decimal
+  type   PaymentType
+
+  stage_id   String
+  stage      Stage       @relation(fields: [stage_id], references: [id])
+  runner_id  String
+  runner     EventRunner @relation(fields: [runner_id], references: [id])
+  image_id   String
+  screenshot Image       @relation(fields: [image_id], references: [id])
+
+  @@map("payments")
+}
+
 model Role {
   id          String    @id @default(cuid())
   name        String
@@ -268,26 +271,87 @@ model Size {
   deleted_at  DateTime?
 
   Personal Personal[]
+  runners  EventRunner[]
 
   @@map("sizes")
 }
 
 model Stage {
-  id         String    @id @default(cuid())
-  name       String
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-  deleted_at DateTime?
+  id          String    @id @default(cuid())
+  name        String
+  excerpt     String    @db.Text
+  description String    @db.LongText
+  distance    String?
+  difficulty  String?
+  location    String
+  start       DateTime?
+  end         DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
 
   event_id    String
   event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
   map_file_id String?
-  map_file    Image?    @relation(fields: [map_file_id], references: [id], onDelete: Cascade)
+  map_file    Image?    @relation("gpx_file", fields: [map_file_id], references: [id], onDelete: Cascade)
+  image_id    String?
+  thumbnail   Image?    @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
 
-  runners    EventRunner[]
-  volunteers Volunteer[]
+  runners          EventRunner[]
+  volunteers       Volunteer[]
+  payments         Payment[]
+  stage_categories StageCategory[]
 
   @@map("stages")
+}
+
+model StageCategory {
+  id          String    @id @default(cuid())
+  name        String
+  excerpt     String
+  description String    @db.Text
+  distance    String?
+  difficulty  String?
+  location    String
+  start       DateTime?
+  end         DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  stage_id    String
+  stage       Stage   @relation(fields: [stage_id], references: [id], onDelete: Cascade)
+  map_file_id String?
+  map_file    Image?  @relation("gpx_file", fields: [map_file_id], references: [id], onDelete: Cascade)
+
+  checkpoints Checkpoint[]
+
+  @@map("stage_categories")
+}
+
+model TrailRace {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String?
+  start       DateTime
+  end         DateTime
+  excerpt     String?   @db.Text
+  description String    @db.LongText
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  image_id    String?
+  thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
+  map_file_id String?
+  map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: Cascade)
+
+  stages    Stage[]
+  runners   EventRunner[]
+  galleries Image[]       @relation("trail_race_gallery")
+  partners  Partner[]
+
+  @@map("events")
 }
 
 model User {
@@ -315,11 +379,25 @@ model Volunteer {
   deleted_at  DateTime?
 
   personal_id String
-  personal    Personal  @relation(fields: [personal_id], references: [id], onDelete: Cascade)
-  event_id    String
-  event       TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
 
-  stages Stage[]
+  stages      Stage[]
+  checkpoints Checkpoint[]
+
+  volunteer_on_checkpoints VolunteerCheckpoint[]
 
   @@map("volunteers")
+}
+
+model VolunteerCheckpoint {
+  id            String      @id @default(cuid())
+  timer         DateTime    @default(now())
+  volunteer_id  String
+  volunteer     Volunteer   @relation(fields: [volunteer_id], references: [id], onDelete: Cascade)
+  runner_id     String
+  runner        EventRunner @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+  checkpoint_id String
+  checkpoint    Checkpoint  @relation(fields: [checkpoint_id], references: [id], onDelete: Cascade)
+
+  @@map("volunteer_on_checkpoints")
 }

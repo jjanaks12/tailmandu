@@ -1,7 +1,7 @@
 import { breakpointsTailwind } from "@vueuse/core"
 import { defineStore } from "pinia"
 
-import type { AgeCategory, Company, Country, Gender, Permission } from "~/lib/types"
+import type { AgeCategory, Company, Country, Gender, Permission, TShirtSize } from "~/lib/types"
 import { useAxios } from "~/services/axios"
 
 export const useAppStore = defineStore('app', () => {
@@ -11,6 +11,7 @@ export const useAppStore = defineStore('app', () => {
     const permissions = ref<Permission[]>([])
     const age_categories = ref<AgeCategory[]>([])
     const company = ref<Company | null>(null)
+    const shirtSizes = ref<TShirtSize[]>([])
 
     const { axios } = useAxios()
 
@@ -39,6 +40,11 @@ export const useAppStore = defineStore('app', () => {
         company.value = data
     }
 
+    const fetchShirtSizes = async () => {
+        const { data } = await axios.get<TShirtSize[]>('/shirtSizes')
+        shirtSizes.value = data
+    }
+
     const saveCompany = async (formData: any) => {
         const method = formData.id ? 'put' : 'post'
         const url = formData.id ? `/companies/${formData.id}` : '/companies'
@@ -51,7 +57,7 @@ export const useAppStore = defineStore('app', () => {
     })
 
     return {
-        breakpoints, genders, countries, permissions, age_categories, company,
-        fetchGender, fetchCountries, fetchPermission, fetchAgeCategory, fetchCompany, saveCompany
+        breakpoints, genders, countries, permissions, age_categories, company, shirtSizes,
+        fetchGender, fetchCountries, fetchPermission, fetchAgeCategory, fetchCompany, fetchShirtSizes, saveCompany
     }
 })

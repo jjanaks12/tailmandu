@@ -7,9 +7,9 @@ export const useCheckpointStore = defineStore('checkpoints', () => {
 
     const { axios } = useAxios()
 
-    const fetch = async (eventId: string) => {
+    const fetch = async (stageId: string) => {
         isLoading.value = true
-        const { data } = await axios.get<Checkpoint[]>(`/events/${eventId}/checkpoints`)
+        const { data } = await axios.get<Checkpoint[]>(`/events/${stageId}/checkpoints`)
 
         if (data)
             checkpoints.value = data
@@ -28,8 +28,12 @@ export const useCheckpointStore = defineStore('checkpoints', () => {
         await axios.delete(`/events/checkpoints/${checkpointId}`)
     }
 
+    const assignVolunteerToCheckpoint = async (volunteerId: string, checkpointId: string) => {
+        await axios.patch(`events/checkpoints/${checkpointId}/assign_volunteer/${volunteerId}`)
+    }
+
     return {
         checkpoints, isLoading,
-        fetch, save, destory
+        fetch, save, destory, assignVolunteerToCheckpoint
     }
 })

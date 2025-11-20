@@ -34,7 +34,7 @@
 <template>
     <Popover>
         <PopoverTrigger as-child>
-            <Button variant="outline"
+            <Button variant="muted" modifier="outline"
                 :class="cn('w-full justify-start text-left font-normal h-12', !placeholder && 'text-muted-foreground')">
                 {{ placeholder }}
             </Button>

@@ -1,25 +1,31 @@
 <script lang="ts" setup>
   import Underline from '@tiptap/extension-underline'
   import HorizontalRule from '@tiptap/extension-horizontal-rule'
-  import { BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon, Heading4Icon, Heading5Icon, Heading6Icon, ItalicIcon, ListIcon, ListOrderedIcon, MinusIcon, QuoteIcon, RedoIcon, RotateCcwIcon, StrikethroughIcon, UnderlineIcon, UndoIcon, WrapTextIcon, XIcon } from 'lucide-vue-next'
+  import { BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon, Heading4Icon, Heading5Icon, Heading6Icon, ItalicIcon, ListIcon, ListOrderedIcon, LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon, RotateCcwIcon, StrikethroughIcon, UnderlineIcon, UndoIcon, WrapTextIcon, XIcon } from 'lucide-vue-next'
 
   import { debounce } from '~/lib/filters'
 
   interface TiptapEditorProps {
     modelValue: string
     disabled?: boolean
+    timer?: number
   }
 
-  const props = defineProps<TiptapEditorProps>()
+  const props = withDefaults(defineProps<TiptapEditorProps>(), {
+    timer: 10000
+  })
   const emit = defineEmits(['update:modelValue'])
+  const isChanged = ref(false)
 
   const editor = useEditor({
     content: props.modelValue,
     extensions: [TiptapDocument, TiptapParagraph, TiptapText, TiptapBold, TiptapItalic, TiptapStrike, TiptapBlockquote, TiptapBulletList, TiptapHeading, TiptapListItem, TiptapHistory, TiptapOrderedList, Underline, HorizontalRule],
     onUpdate: ({ editor }) => {
+      isChanged.value = true
       debounce(() => {
+        isChanged.value = false
         emit('update:modelValue', editor.getHTML())
-      }, 10000)
+      }, props.timer)
     },
   })
 
@@ -30,7 +36,11 @@
 
   watch(() => props.modelValue, () => {
     editor.value?.commands.setContent(props.modelValue)
-    editor.value?.setEditable(props.disabled)
+    editor.value?.setEditable(!props.disabled)
+  })
+
+  watch(() => props.disabled, () => {
+    editor.value?.setEditable(!props.disabled)
   })
 
   onMounted(() => {
@@ -43,7 +53,7 @@
 
 <template>
   <div class="editor" v-if="editor">
-    <div class="flex gap-0.5 rounded-sm mb-2" v-if="!disabled">
+    <div class="flex items-center gap-0.5 rounded-sm mb-2" v-if="!disabled">
       <div class="bg-gray-300 p-0.5 rounded">
         <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleBold().run()"
           :disabled="!editor.can().chain().focus().toggleBold().run()"
@@ -144,6 +154,7 @@
           <RedoIcon />
         </Button>
       </div>
+      <LoaderCircleIcon class="text-green-600 animate-spin" :size="16" v-if="isChanged" />
     </div>
     <TiptapEditorContent class="content_editor p-3 bg-gray-100 text-gray-600 rounded-sm focus:outline-0"
       :editor="editor" />

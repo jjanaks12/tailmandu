@@ -1,7 +1,6 @@
 import type { Menu } from "~/lib/types"
 import { useAuthStore } from "~/store/auth"
 
-
 export const useMenu = () => {
     const menus = ref<Menu[]>([{
         title: 'Users',
@@ -57,6 +56,12 @@ export const useMenu = () => {
             slug: 'age_category',
             icon: 'Baby',
             permissions: ''
+        }, {
+            title: 'T-Shirt sizes',
+            path: '/dashboard/tshirt_sizes',
+            slug: 'age_category',
+            icon: 'Shirt',
+            permissions: ''
         }]
     }, {
         title: 'Settings',
@@ -83,44 +88,18 @@ export const useMenu = () => {
             slug: 'company',
             icon: 'Building',
             permissions: 'manage_company'
+        }, {
+            title: 'Health Check',
+            path: '/dashboard/health_check',
+            slug: 'health_check',
+            icon: 'HandHeart',
+            role: 'Admin',
+            permissions: 'manage_company'
         }]
     }])
 
     const { can } = useAuthorization()
     const { user } = storeToRefs(useAuthStore())
-    /* let menuItem: Menu
-
-    if (menu.hasOwnProperty('role')) {
-        if (menu.role == user.value?.role.name)
-            menuList.value.push({ ...menu })
-    } else
-        if (menu.subMenu && menu.subMenu.length > 0) {
-            const newSubmenus: Menu[] = []
-            for (const submenu of menu.subMenu) {
-                if (can(submenu.permissions, submenu.role))
-                    newSubmenus.push(submenu)
-            }
-            if (newSubmenus.length > 0)
-                menuList.value.push({ ...menu, subMenu: newSubmenus })
-        } else
-            if (can(menu.permissions, menu.role)) {
-                menuItem = { ...menu }
-                menuList.value.push(menuItem)
-            } */
-    /* const menuList = computed<Menu[]>(() => menus.value.filter(menu => user.value?.role && menu.hasOwnProperty('role')
-        ? menu.role == user.value?.role.name
-            ? menu
-            : false
-        : menu.subMenu && menu.subMenu.length > 0
-            ? menu.subMenu.filter(subMenu => can(subMenu.permissions, subMenu.role))
-            : can(menu.permissions, menu.role)
-    )) */
-    /* const menuList = computed<Menu[]>(() => menus.value.filter(menu => menu.role && user.value?.role
-        ? menu.role == user.value.role.name
-        : menu.subMenu && menu.subMenu.length > 0
-            ? menu.subMenu.filter(submenu => can(submenu.permissions)).length > 0
-            : can(menu.permissions)
-    )) */
 
     // @ts-expect-error
     const menuList = computed<Menu[]>(() => menus.value.map(menu => menu.role

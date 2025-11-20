@@ -8,7 +8,7 @@
 
   const { isLoggedin } = storeToRefs(useAuthStore())
   const { fetch } = useAuthStore()
-  const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany } = useAppStore()
+  const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany, fetchShirtSizes } = useAppStore()
   const { fetch: fetchRole } = useRoleStore()
   const { fetch: fetchPermission } = usePermissionStore()
   const { fetch: fetchEvents } = useEventStore()
@@ -17,10 +17,10 @@
   const job = new Jobs()
 
   const initPage = async () => {
-    const jobList: Function[] = [fetchCompany, fetchEvents]
+    const jobList: Function[] = [fetchCompany, fetchEvents, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes]
 
     if (isLoggedin.value)
-      jobList.push(fetch, fetchGender, fetchCountries, fetchPermission, fetchRole, fetchAgeCategory)
+      jobList.push(fetch, fetchPermission, fetchRole)
 
     job.add(jobList)
     await job.run()

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-    import { MoveLeftIcon } from 'lucide-vue-next'
+    import { MoveLeftIcon, RefreshCwIcon } from 'lucide-vue-next'
 
-    import type { TrailRace } from '~/lib/types'
+    import type { TrailRace, Volunteer } from '~/lib/types'
     import { useEventStore } from '~/store/event'
     import { formatDate } from '~/lib/filters'
 
@@ -9,8 +9,9 @@
     import TrailRaceDescription from '@/components/pages/dashboard/event/description.vue'
     import TrailMapUploadMap from '@/components/pages/dashboard/event/mapUpload.vue'
     import TrailRaceStageList from '@/components/pages/dashboard/event/stages/list.vue'
-    import TrailRaceCheckpointList from '@/components/pages/dashboard/event/checkpoint/list.vue'
     import TrailRaceGallery from '@/components/pages/dashboard/event/gallery/list.vue'
+    import VolunteerList from '@/components/pages/dashboard/event/volunteer/list.vue'
+    import RunnerList from '@/components/pages/dashboard/event/runner/list.vue'
 
     useHead({
         title: 'Events'
@@ -26,13 +27,16 @@
     const { get } = useEventStore()
 
     const trailRace = ref<TrailRace | null>(null)
+    const isLoading = ref(false)
 
     const fetchEventDetail = async () => {
         trailRace.value = await get(route.params.id as string)
     }
 
     onBeforeMount(() => {
+        isLoading.value = true
         fetchEventDetail()
+        isLoading.value = false
     })
 </script>
 
@@ -44,19 +48,19 @@
                 <h1 class="text-2xl">{{ trailRace?.name }}</h1>
             </div>
             <div class="flex gap-2 items-center">
+                <Button @click="fetchEventDetail" variant="secondary" modifier="outline" size="icon">
+                    <RefreshCwIcon :class="{ 'animate-spin': isLoading }" />
+                </Button>
                 <Button @click="navigateTo({ name: 'dashboard-events' })">
                     <MoveLeftIcon />
                     Back
                 </Button>
             </div>
         </div>
-        <Tabs default-value="sponsor" class="text-gray-600">
+        <Tabs default-value="volunteers" class="text-gray-600">
             <TabsList class="uppercase">
                 <TabsTrigger value="detail">
                     Details
-                </TabsTrigger>
-                <TabsTrigger value="checkpoint">
-                    Checkpoint
                 </TabsTrigger>
                 <TabsTrigger value="stages">
                     Stages
@@ -87,17 +91,14 @@
                     <TrailRaceDescription :trail-race="trailRace" @update="fetchEventDetail" />
                 </div>
             </TabsContent>
-            <TabsContent value="checkpoint">
-                <TrailRaceCheckpointList :event-id="route.params.id as string" @update="fetchEventDetail" />
-            </TabsContent>
             <TabsContent value="stages">
                 <TrailRaceStageList :event-id="route.params.id as string" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="runners">
-                Runners
+                <RunnerList :stages="trailRace.stages" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="volunteers">
-                Volunteers
+                <VolunteerList :stages="trailRace.stages" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="gallery">
                 <TrailRaceGallery :event-id="route.params.id as string" />

@@ -17,11 +17,12 @@ export class EventController {
                 skip,
                 take: parseInt(per_page.toString()),
                 include: {
-                    volunteers: true,
-                    checkpoints: true,
                     stages: {
                         include: {
                             map_file: true
+                        },
+                        where: {
+                            deleted_at: null
                         }
                     },
                     runners: true,
@@ -116,14 +117,53 @@ export class EventController {
             response.send(await prisma.trailRace.findFirst({
                 where: { id: request.params.event_id },
                 include: {
-                    volunteers: true,
-                    checkpoints: true,
                     stages: {
                         include: {
-                            map_file: true
+                            map_file: true,
+                            thumbnail: true,
+                            stage_categories: {
+                                include: {
+                                    checkpoints: true
+                                }
+                            },
+                            volunteers: {
+                                include: {
+                                    personal: {
+                                        include: {
+                                            avatar: true,
+                                            gender: true,
+                                            country: true,
+                                            age_category: true,
+                                            size: true
+                                        }
+                                    },
+                                    checkpoints: true,
+                                    stages: true
+                                }
+                            },
+                            runners: {
+                                include: {
+                                    personal: {
+                                        include: {
+                                            avatar: true,
+                                            gender: true,
+                                            country: true,
+                                            age_category: true,
+                                            size: true
+                                        }
+                                    },
+                                    volunteer_on_checkpoints: {
+                                        include: {
+                                            checkpoint: true
+                                        }
+                                    }
+                                }
+                            },
+                        },
+                        where: {
+                            deleted_at: null
                         }
                     },
-                    runners: true,
                     thumbnail: true,
                     map_file: true
                 }
@@ -138,11 +178,13 @@ export class EventController {
             response.send(await prisma.trailRace.findFirst({
                 where: { slug: request.params.slug },
                 include: {
-                    volunteers: true,
-                    checkpoints: true,
                     stages: {
                         include: {
-                            map_file: true
+                            map_file: true,
+                            thumbnail: true,
+                        },
+                        where: {
+                            deleted_at: null
                         }
                     },
                     runners: true,

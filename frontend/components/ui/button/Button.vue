@@ -10,6 +10,7 @@
     class?: HTMLAttributes['class']
     role?: string
     permissions?: string | string[]
+    modifier?: ButtonVariants['modifier']
   }
 
   const { can } = useAuthorization()
@@ -28,7 +29,7 @@
 </script>
 
 <template>
-  <Primitive data-slot="button" :as="as" :as-child="asChild" :class="cn(buttonVariants({ variant, size }), props.class)"
+  <Primitive data-slot="button" :as="as" :as-child="asChild" :class="cn(buttonVariants({ variant, size, modifier }), props.class)"
     v-if="showButton">
     <slot />
   </Primitive>

@@ -114,8 +114,6 @@ export class AuthController {
 
     public static async profile(request: Request, response: Response, next: NextFunction) {
         try {
-            console.log('Test::::',request.body.auth_user.id);
-            
             response.send(await prisma.user.findFirstOrThrow({
                 where: {
                     id: request.body.auth_user.id
@@ -130,7 +128,11 @@ export class AuthController {
                             avatar: true,
                             country: true,
                             runners: true,
-                            volunteers: true
+                            volunteers: {
+                                include: {
+                                    checkpoints: true
+                                }
+                            }
                         }
                     },
                     role: {

@@ -31,7 +31,7 @@
                 <TableCell>{{ index + 1 }}</TableCell>
                 <TableCell>{{ ageCategory.name }}</TableCell>
                 <TableCell class="text-right">
-                    <DropdownMenu>
+                   <!--  <DropdownMenu>
                         <DropdownMenuTrigger>
                             <EllipsisVertical />
                         </DropdownMenuTrigger>
@@ -47,7 +47,7 @@
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> -->
                 </TableCell>
             </TableRow>
         </TableBody>

@@ -11,7 +11,7 @@
     <ClientOnly>
         <section class="bg-black text-white flex justify-center items-center relative z-[1] overflow-hidden" key="one"
             v-if="currentRace">
-            <figure class="absolute inset-0 z-0 opacity-40">
+            <figure class="absolute inset-0 z-0 opacity-40" v-if="currentRace.thumbnail">
                 <img :src="showImage(currentRace?.thumbnail?.file_name as string)" :alt="currentRace.name"
                     class="w-full h-full object-cover">
             </figure>
@@ -25,7 +25,7 @@
                         </NuxtLink>
                         <DropdownMenu>
                             <DropdownMenuTrigger>
-                                <Button variant="outline" size="lg">
+                                <Button modifier="outline" size="lg">
                                     Register
                                     <ChevronDownIcon />
                                 </Button>

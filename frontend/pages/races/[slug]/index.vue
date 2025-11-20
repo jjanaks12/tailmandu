@@ -2,18 +2,23 @@
     import { formatDate, showImage } from '~/lib/filters'
     import type { TrailRace } from '~/lib/types'
     import { useEventStore } from '~/store/event'
+    import StageCard from '@/components/pages/default/home/card.vue'
+    import bg01 from '@/assets/images/bg-01.png'
 
     const route = useRoute()
     const trailRace = ref<TrailRace | null>(null)
     const { getBySlug } = useEventStore()
 
-    useHead({
-    })
-
-    useTitle(trailRace.value ? trailRace.value.name : 'Events')
-
     onBeforeMount(async () => {
         trailRace.value = await getBySlug(route.params.slug as string)
+        useTitle(trailRace.value ? trailRace.value.name : 'Events')
+        useSeoMeta({
+            title: trailRace.value.name,
+            ogTitle: trailRace.value.name,
+            description: trailRace.value.excerpt,
+            ogDescription: trailRace.value.excerpt,
+            ogImage: showImage(trailRace.value.thumbnail?.file_name as string)
+        })
     })
 </script>
 
@@ -49,5 +54,40 @@
                 </div>
             </div>
         </div>
+        <section class="relative overflow-hidden z-[1]">
+            <figure class="absolute inset-0 z-[-1]">
+                <img :src="bg01" />
+            </figure>
+            <div class="container text-[#13304a] py-[100px]">
+                <ul
+                    class="flex gap-12 [&>li>strong]:block [&>li>strong]:text-[25px] [&>li>em]:not-italic [&>li>em]:text-[40px]">
+                    <li>
+                        <strong>Total Distance</strong>
+                        <em>100KM +</em>
+                    </li>
+                    <li>
+                        <strong>Five Different</strong>
+                        <em>Places</em>
+                    </li>
+                    <li>
+                        <strong>Five Different</strong>
+                        <em>Summits</em>
+                    </li>
+                    <li>
+                        <strong>Grade</strong>
+                        <em>Challenging</em>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section class="bg-white py-12 relative z-[2]" v-if="trailRace.stages.length > 0">
+            <div class="container">
+                <h2 class="text-2xl mb-7">Stages</h2>
+                <div class="flex gap-4">
+                    <StageCard class="w-1/3" v-for="(stage, index) in trailRace.stages" :race-slug="trailRace.slug"
+                        :stage="stage" :race-name="`${trailRace.name} ${index + 1}`" />
+                </div>
+            </div>
+        </section>
     </section>
 </template>

@@ -2,12 +2,12 @@
     import { LoaderIcon, SaveIcon } from 'lucide-vue-next'
     import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
 
-    import { stageSchema } from '~/lib/schema/event.schema'
+    import { checkpointSchema } from '~/lib/schema/event.schema'
     import type { Checkpoint } from '~/lib/types'
     import { useCheckpointStore } from '~/store/checkpoint'
 
     interface StageFormProps {
-        eventId: string
+        stageCategoryId: string
         checkpoint?: Checkpoint | null
     }
 
@@ -20,14 +20,15 @@
 
     const formSubmit = async (values: any) => {
         isLoading.value = true
-        await save(props.eventId, values)
+        await save(props.stageCategoryId, values)
         isLoading.value = false
         emit('update')
+        reset()
     }
 
     const init = () => {
         if (form.value) {
-            form.value.setFieldValue('event_id', props.eventId)
+            form.value.setFieldValue('stage_category_id', props.stageCategoryId)
 
             if (props.checkpoint)
                 form.value.setValues({
@@ -35,6 +36,10 @@
                     name: props.checkpoint.name
                 })
         }
+    }
+
+    const reset = () => {
+        form.value?.resetForm()
     }
 
     watch(form, () => {
@@ -48,8 +53,8 @@
 </script>
 
 <template>
-    <Form @submit="formSubmit" :validation-schema="stageSchema" class="flex flex-col gap-4" ref="form">
-        <Field name="event_id" v-slot="{ field }" as="div" class="flex flex-col gap-2">
+    <Form @submit="formSubmit" :validation-schema="checkpointSchema" class="flex flex-col gap-4" ref="form">
+        <Field name="stage_category_id" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Input type="hidden" v-bind="field" id="esf__name" />
         </Field>
         <Field name="id" v-slot="{ field }" as="div" class="flex flex-col gap-2">

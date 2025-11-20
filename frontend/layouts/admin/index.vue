@@ -7,19 +7,6 @@
     const { isLoading } = storeToRefs(useAuthStore())
     const { can } = useAuthorization()
     const route = useRoute()
-    const hasAccess = ref(false)
-
-    onMounted(() => {
-        if (route.meta?.authorization)
-            // @ts-expect-error
-            hasAccess.value = can(route.meta?.authorization, route.meta?.role)
-    })
-
-    watchEffect(() => {
-        if (route.meta?.authorization)
-            // @ts-expect-error
-            hasAccess.value = can(route.meta?.authorization, route.meta?.role)
-    })
 </script>
 
 <template>
@@ -38,7 +25,7 @@
             <div class="p-4">
                 <div class="bg-white p-12 rounded-2xl overflow-hidden">
                     <ClientOnly>
-                        <slot v-if="hasAccess" />
+                        <slot v-if="can(route.meta?.authorization as string, route.meta?.role as string)" />
                         <p v-else>You do not have access to see this page</p>
                     </ClientOnly>
                 </div>

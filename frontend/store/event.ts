@@ -1,5 +1,7 @@
 import type { APIRequest, TrailRace } from "~/lib/types"
 import { useAxios } from "~/services/axios"
+import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
+import type { InferType } from "yup"
 
 export const useEventStore = defineStore('event', () => {
     const events = ref<TrailRace[]>([])
@@ -37,7 +39,8 @@ export const useEventStore = defineStore('event', () => {
 
     const getBySlug = async (slug: string) => {
         const { data } = await axios<TrailRace>(`/events/by_slug/${slug}`)
-        return data
+
+        return data ?? null
     }
 
     const saveDescription = async (id: string, description: string) => {
@@ -48,9 +51,17 @@ export const useEventStore = defineStore('event', () => {
         await axios.put(`/events/${id}/upload_map_file`, { description })
     }
 
+    const saveRunner = async (formData: InferType<typeof trailRaceRunner>, eventId: string) => {
+        await axios.post(`/events/${eventId}/runner/register`, formData)
+    }
+
+    const saveVoluteer = async (values: InferType<typeof trailRaceVolunteer>, eventId: string) => {
+        await axios.post(`/events/${eventId}/volunteer/register`, { ...values, event_id: eventId })
+    }
+
     return {
         isLoading, params, events,
         currentRace,
-        fetch, save, get, saveDescription, saveMap, getBySlug
+        fetch, save, get, saveDescription, saveMap, getBySlug, saveRunner, saveVoluteer
     }
 })

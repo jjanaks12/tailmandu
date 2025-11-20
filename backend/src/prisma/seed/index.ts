@@ -4,6 +4,7 @@ import { countrySeed } from "./country.seed"
 import { roleSeed } from "./role.seed"
 import { genderSeed } from "./gender.seed"
 import { ageCategorySeed } from './age_category.seed'
+import { TShritSizeSeed } from "./t_shirt_sizes.seed"
 
 const prisma = new PrismaClient()
 const main = async () => {
@@ -11,6 +12,7 @@ const main = async () => {
     await roleSeed(prisma)
     await genderSeed(prisma)
     await ageCategorySeed(prisma)
+    await TShritSizeSeed(prisma)
 }
 
 main()

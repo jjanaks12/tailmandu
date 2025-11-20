@@ -40,6 +40,7 @@
             image: imageToUpload.value
         })
         saving.value = false
+        editImage.value = true
         emit('update')
     }
 
@@ -58,7 +59,7 @@
         <label v-else
             class="bg-gray-100 hover:bg-gray-200 h-full flex justify-center items-center cursor-pointer transition-colors overflow-hidden"
             :diabled="saving">
-            <input type="file" class="hidden" @change="fileHandler" :disabled="saving" accept="image/*">
+            <input type="file" class="hidden" @change="fileHandler" :disabled="saving" accept=".jpg, .jpeg, .png">
             <img :src="imageToUpload" alt="Trail race preview image" v-if="imageToUpload"
                 class="w-full h-full object-cover absolute top-0 left-0 z-0">
             <span class="relative" v-else>Upload image</span>

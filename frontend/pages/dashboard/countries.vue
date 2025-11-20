@@ -31,8 +31,10 @@
             <TableRow v-for="(country, index) in countries">
                 <TableCell>{{ index + 1 }}</TableCell>
                 <TableCell>{{ country.name }}</TableCell>
-                <TableCell>{{ country.abbr }}</TableCell>
-                <TableCell></TableCell>
+                <TableCell>{{ country.abbr.toUpperCase() }}</TableCell>
+                <TableCell>
+                    <span :class="`flag flag-${country.abbr}`" />
+                </TableCell>
                 <TableCell>+{{ country.code }}</TableCell>
             </TableRow>
         </TableBody>

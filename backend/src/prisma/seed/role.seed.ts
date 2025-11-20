@@ -2,6 +2,11 @@ import Bcrypt from 'bcrypt'
 import type { PrismaClient } from "@prisma/client"
 
 export const roleSeed = async (prisma: PrismaClient) => {
+    await prisma.permission.create({ data: { name: 'timer_create' } })
+    await prisma.permission.create({ data: { name: 'timer_edit' } })
+    await prisma.permission.create({ data: { name: 'timer_view' } })
+    await prisma.permission.create({ data: { name: 'timer_delete' } })
+
     const user_create = await prisma.permission.create({ data: { name: 'user_create' } })
     const user_edit = await prisma.permission.create({ data: { name: 'user_edit' } })
     const user_view = await prisma.permission.create({ data: { name: 'user_view' } })

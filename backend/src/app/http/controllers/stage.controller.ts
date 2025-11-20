@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
+import moment from "moment"
 
 import { stageSchema } from "@/app/lib/schema/event.schema"
 import { FileHandler } from "@/app/lib/services/File.service"
-import moment from "moment"
+import { isBase64 } from "@/app/lib/plugins"
 
 const prisma = new PrismaClient()
 export class StageController {
@@ -16,7 +17,9 @@ export class StageController {
                 },
                 include: {
                     runners: true,
-                    map_file: true
+                    map_file: true,
+                    thumbnail: true,
+                    volunteers: true
                 }
             }))
         } catch (error) {
@@ -35,9 +38,26 @@ export class StageController {
                 body.map_file_id = image.id
             }
 
+            if (validationData.thumbnail) {
+                const file = new FileHandler('images')
+                const image = await file.saveFile(validationData.thumbnail)
+                body.image_id = image.id
+            }
+
+            if (request.body.start)
+                body.start = moment(request.body.start, 'YYYY-MM-DD').toISOString()
+
+            if (request.body.end)
+                body.end = moment(request.body.end, 'YYYY-MM-DD').toISOString()
+
             response.send(await prisma.stage.create({
                 data: {
                     name: validationData.name,
+                    excerpt: validationData.excerpt,
+                    description: validationData.description,
+                    distance: validationData.distance,
+                    difficulty: validationData.difficulty,
+                    location: validationData.location,
                     event_id: validationData.event_id,
                     ...body
                 }
@@ -53,10 +73,16 @@ export class StageController {
             const validationData = await stageSchema.validate(request.body, { abortEarly: false })
             const stage = await prisma.stage.findFirst({ where: { id: request.params.stage_id } })
 
-            if (validationData.map) {
+            if (validationData.map && isBase64(validationData.map)) {
                 const file = new FileHandler('gpx')
                 const image = await file.saveFile(validationData.map, stage.map_file_id)
                 body.map_file_id = image.id
+            }
+
+            if (validationData.thumbnail && isBase64(validationData.thumbnail)) {
+                const file = new FileHandler('images')
+                const image = await file.saveFile(validationData.thumbnail, stage.image_id)
+                body.image_id = image.id
             }
 
             response.send(await prisma.stage.update({
@@ -65,7 +91,13 @@ export class StageController {
                 },
                 data: {
                     ...body,
-                    name: validationData.name ?? stage.name,
+                    name: validationData.name,
+                    excerpt: validationData.excerpt,
+                    description: validationData.description,
+                    distance: validationData.distance,
+                    difficulty: validationData.difficulty,
+                    location: validationData.location,
+                    event_id: validationData.event_id,
                     updated_at: moment.utc().toISOString()
                 }
             }))
@@ -84,6 +116,30 @@ export class StageController {
                     deleted_at: moment.utc().toISOString()
                 }
             }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async listRunners(request: Request, response: Response, next: NextFunction) {
+        try {
+            const stage = await prisma.stage.findFirst({
+                where: {
+                    id: request.params.stage_id
+                },
+                include: {
+                    runners: {
+                        include: {
+                            personal: {
+                                include: {
+                                    avatar: true
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+            response.send(stage.runners)
         } catch (error) {
             next(error)
         }
