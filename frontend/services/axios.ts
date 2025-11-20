@@ -23,7 +23,7 @@ export const useAxios = () => {
     instance.interceptors.response.use(response => response, async error => {
         const { status } = error.response || {}
         const { token } = storeToRefs(useAuthStore())
-        const { refreshToken, logout } = useAuthStore()
+        const { refreshToken } = useAuthStore()
         const currentRoute = null
 
         if ([401, 403].indexOf(status) !== -1) {
@@ -46,22 +46,9 @@ export const useAxios = () => {
             if (error.response.data.error.message == 'Unauthorized') {
                 token.value = null
             }
-
-            toast({
-                title: 'Something went wrong',
-                description: error.response.data.error.message,
-                variant: 'destructive',
-            })
         }
 
-        /* if (status == 500)
-            await logout() */
-
-        toast({
-            title: error.message,
-            description: error.response?.data?.error?.message,
-            variant: 'destructive',
-        })
+        toast.error(error.response?.data?.error?.message)
 
         return error
     })

@@ -1,20 +1,24 @@
 <script lang="ts" setup>
+    import type { AxiosError, AxiosResponse } from 'axios'
     import { LoaderIcon } from 'lucide-vue-next'
     import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
     import { newsletterSchema } from '~/lib/schema/site.schema'
+    import { useAxios } from '~/services/axios'
+
+    const { axios } = useAxios()
+    const form = ref<FormContext | null>(null)
 
     const isLoading = ref(false)
     const hasFormSubmitted = ref(false)
-    const form = ref<FormContext | null>(null)
+    const message = ref('')
 
     const submitHandler = async (values: any) => {
         isLoading.value = true
+        const { status } = await axios.post('/newsletter', values)
+        isLoading.value = false
 
-        setTimeout(() => {
-            console.log(values)
-            isLoading.value = false
+        if (status === 200)
             hasFormSubmitted.value = true
-        }, 4000)
     }
 
     watchEffect(() => {
@@ -24,7 +28,7 @@
                     form.value.resetForm()
 
                 hasFormSubmitted.value = false
-            }, 5000)
+            }, 10000)
         }
     })
 </script>
@@ -53,7 +57,8 @@
             <template v-else>
                 <div class="mb-8">
                     <h2 class="text-2xl">Thank you for subscribing newsletter</h2>
-                    <p>We welcome you ours newsletter program. We will send you email when there is news that might interest you.</p>
+                    <p>We welcome you ours newsletter program. We will send you email when there is news that might
+                        interest you.</p>
                 </div>
             </template>
         </div>

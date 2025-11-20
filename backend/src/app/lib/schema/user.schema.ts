@@ -9,3 +9,7 @@ export const userLoginSchema = Y.object().shape({
     email: Y.string().email().required(),
     password: Y.string().required().min(6)
 })
+
+export const userNewsletterSchema = Y.object({
+    email: Y.string().email().required().label('Email address')
+})

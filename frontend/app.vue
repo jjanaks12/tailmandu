@@ -5,6 +5,8 @@
   import { useRoleStore } from './store/role'
   import { usePermissionStore } from './store/permission'
   import { useEventStore } from './store/event'
+  
+  import 'vue-sonner/style.css'
 
   const { isLoggedin } = storeToRefs(useAuthStore())
   const { fetch } = useAuthStore()

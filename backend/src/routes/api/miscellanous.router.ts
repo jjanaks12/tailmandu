@@ -9,6 +9,7 @@ import { AgeCategoryController } from '@/app/http/controllers/age_category.contr
 import { ShirtSizeController } from '@/app/http/controllers/shirt_size.controller'
 import { MediaController } from '@/app/http/controllers/media.controller'
 import { hasAdminAccess } from '@/app/http/middleware/admin_access.middleware'
+import { NewsletterController } from '@/app/http/controllers/newsletter.controller'
 
 const router = Router()
 
@@ -23,5 +24,9 @@ router.get('/image_health_check', [verifyAccessToken, hasAdminAccess], MediaCont
 
 router.get('/age_categories', [], AgeCategoryController.index)
 router.get('/shirtSizes', [], ShirtSizeController.index)
+
+router.get('/newsletter', [], NewsletterController.index)
+router.post('/newsletter', [], NewsletterController.store)
+router.patch('/newsletter/:email/unsubscribe', [], NewsletterController.unsubscribe)
 
 export default router

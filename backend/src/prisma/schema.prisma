@@ -10,6 +10,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 enum AddressType {
@@ -164,6 +165,18 @@ model Image {
   @@map("images")
 }
 
+model Newsletter {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  subscribed_at DateTime  @default(now())
+  deleted_at    DateTime?
+
+  user_id String?
+  user    Personal? @relation(fields: [user_id], references: [id])
+
+  @@map("newsletters")
+}
+
 model Permission {
   id          String    @id @default(cuid())
   name        String
@@ -224,9 +237,10 @@ model Personal {
   gender_id       String?
   gender          Gender?      @relation(fields: [gender_id], references: [id])
 
-  users      User[]
-  volunteers Volunteer[]
-  runners    EventRunner[]
+  users       User[]
+  volunteers  Volunteer[]
+  runners     EventRunner[]
+  newsletters Newsletter[]
 
   @@map("personals")
 }

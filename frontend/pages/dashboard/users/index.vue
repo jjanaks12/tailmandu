@@ -67,7 +67,7 @@
                 <TableCell class="text-right">
                     <DropdownMenu v-if="user.personal.email != mailAdmin">
                         <DropdownMenuTrigger as-child>
-                            <Button variant="outline">
+                            <Button modifier="outline">
                                 <EllipsisVertical />
                             </Button>
                         </DropdownMenuTrigger>

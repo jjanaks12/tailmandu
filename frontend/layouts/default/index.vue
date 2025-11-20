@@ -13,6 +13,7 @@
                 <slot />
             </main>
             <AppFooter />
+            <Toaster />
         </div>
     </SidebarProvider>
 </template>

@@ -74,6 +74,12 @@ export const useMenu = () => {
             slug: 'age_category',
             icon: 'Shirt',
             permissions: ''
+        }, {
+            title: 'Newsletters',
+            path: '/dashboard/newsletter',
+            slug: 'newsletter',
+            icon: 'NewspaperIcon',
+            permissions: ''
         }]
     }, {
         title: 'Settings',

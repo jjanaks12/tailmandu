@@ -270,3 +270,12 @@ export type StageCategory = {
     map_file: Image
     checkpoints: Checkpoint[]
 }
+
+export type Newsletter = {
+    id: string
+    email: string
+    subscribed_at: string
+    deleted_at?: string
+    user_id?: string
+    user?: Personal
+}

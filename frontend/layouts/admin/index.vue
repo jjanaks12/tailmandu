@@ -22,6 +22,7 @@
                 </div>
             </div>
         </main>
+        <Toaster />
     </SidebarProvider>
     <div class="h-screen flex w-full gap-4 p-4" v-else>
         <div class="h-full w-[250px]">
