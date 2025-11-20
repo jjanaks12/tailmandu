@@ -4,4 +4,5 @@ dist
 *-dup.*
 .DS_Store
 
-resources/uploads
+backend/src/resources/uploads/images/
+backend/src/resources/uploads/gpx/
