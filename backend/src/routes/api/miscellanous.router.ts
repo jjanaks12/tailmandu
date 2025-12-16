@@ -10,6 +10,8 @@ import { ShirtSizeController } from '@/app/http/controllers/shirt_size.controlle
 import { MediaController } from '@/app/http/controllers/media.controller'
 import { hasAdminAccess } from '@/app/http/middleware/admin_access.middleware'
 import { NewsletterController } from '@/app/http/controllers/newsletter.controller'
+import { SponsorTypeController } from '@/app/http/controllers/sponsor_type.controller'
+import { PaymentController } from '@/app/http/controllers/payment.controller'
 
 const router = Router()
 
@@ -28,5 +30,15 @@ router.get('/shirtSizes', [], ShirtSizeController.index)
 router.get('/newsletter', [], NewsletterController.index)
 router.post('/newsletter', [], NewsletterController.store)
 router.patch('/newsletter/:email/unsubscribe', [], NewsletterController.unsubscribe)
+
+// SPONSOR_TYPES
+router.get('/sponsor_types', [], SponsorTypeController.index)
+router.post('/sponsor_types', [], SponsorTypeController.create)
+router.put('/sponsor_types/:sponsor_type_id', [], SponsorTypeController.update)
+router.delete('/sponsor_types/:sponsor_type_id', [], SponsorTypeController.destroy)
+
+// PAYMENTS
+router.post('/payments', [verifyAccessToken], PaymentController.store)
+router.put('/payments/:payment_id', [verifyAccessToken], PaymentController.update)
 
 export default router

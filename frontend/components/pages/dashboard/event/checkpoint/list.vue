@@ -52,17 +52,17 @@
                     </Badge>
                 </div>
                 <div class="flex justify-end gap-2">
+                    <Button variant="secondary" modifier="outline" size="icon" @click="() => {
+                        showDialog = true
+                        editCheckpoint = checkpoint
+                    }">
+                        <PencilIcon />
+                    </Button>
                     <Button modifier="outline" variant="destructive" size="icon" @click="async () => {
                         await destory(checkpoint.id)
                         await fetch()
                     }">
                         <TrashIcon />
-                    </Button>
-                    <Button modifier="outline" size="icon" @click="() => {
-                        showDialog = true
-                        editCheckpoint = checkpoint
-                    }">
-                        <PencilIcon />
                     </Button>
                 </div>
             </li>

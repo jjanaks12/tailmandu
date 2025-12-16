@@ -66,7 +66,7 @@
                             <Badge v-if="stage.volunteers.length > 0">volunteers {{ stage.volunteers.length }}</Badge>
                         </div>
                         <p v-text="stage.excerpt" />
-                        <CategoryList :stage-id="stage.id" />
+                        <CategoryList :stage-id="stage.id" @update="emit('update')" />
                     </div>
                 </TabsContent>
             </div>

@@ -14,7 +14,7 @@ export const useMenu = () => {
             path: '/dashboard',
             permissions: '*'
         }]
-    },{
+    }, {
         title: 'Users',
         path: '',
         slug: 'users',
@@ -69,9 +69,15 @@ export const useMenu = () => {
             icon: 'Baby',
             permissions: ''
         }, {
+            title: 'Sponsor types',
+            path: '/dashboard/sponsor_types',
+            slug: 'sponsor_types',
+            icon: 'ShieldUser',
+            permissions: ''
+        }, {
             title: 'T-Shirt sizes',
             path: '/dashboard/tshirt_sizes',
-            slug: 'age_category',
+            slug: 'tshirt_sizes',
             icon: 'Shirt',
             permissions: ''
         }, {

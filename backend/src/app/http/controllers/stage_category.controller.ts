@@ -12,6 +12,15 @@ export class StageCategoryController {
                 where: {
                     stage_id: request.params.stage_id,
                     deleted_at: null
+                },
+                include: {
+                    map_file: true,
+                    payment: {
+                        include: {
+                            screenshot: true
+                        }
+                    },
+                    checkpoints: true
                 }
             }))
         } catch (error) {
@@ -31,10 +40,10 @@ export class StageCategoryController {
             }
 
             if (validationData.start)
-                body.start = moment(validationData.start, 'YYYY-MM-DD').toISOString()
+                body.start = moment(validationData.start, 'YYYY-MM-DD').startOf('day').toISOString()
 
             if (validationData.end)
-                body.end = moment(validationData.end, 'YYYY-MM-DD').toISOString()
+                body.end = moment(validationData.end, 'YYYY-MM-DD').startOf('day').toISOString()
 
             response.send(await prisma.stageCategory.create({
                 data: {
@@ -55,8 +64,67 @@ export class StageCategoryController {
 
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
+            const validationData = await stageCategorySchema.validate(request.body, { abortEarly: false })
+            const body: any = {}
 
-            response.send()
+            if (validationData.map) {
+                const file = new FileHandler('gpx')
+                const image = await file.saveFile(validationData.map, undefined, 'gpx')
+                body.map_file_id = image.id
+            }
+
+            if (validationData.start)
+                body.start = moment(validationData.start, 'YYYY-MM-DD').startOf('day').toISOString()
+
+            if (validationData.end)
+                body.end = moment(validationData.end, 'YYYY-MM-DD').startOf('day').toISOString()
+
+            response.send(await prisma.stageCategory.update({
+                where: {
+                    id: request.params.stage_category_id
+                },
+                data: {
+                    ...body,
+                    name: validationData.name,
+                    excerpt: validationData.excerpt,
+                    description: validationData.description,
+                    stage_id: validationData.stage_id,
+                    location: validationData.location,
+                    difficulty: validationData.difficulty,
+                    distance: validationData.distance
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async start(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.stageCategory.update({
+                where: {
+                    id: request.params.stage_category_id
+                },
+                data: {
+                    start: moment().toISOString()
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async end(request: Request, response: Response, next: NextFunction) {
+        try {
+
+            response.send(await prisma.stageCategory.update({
+                where: {
+                    id: request.params.stage_category_id
+                },
+                data: {
+                    end: moment().toISOString()
+                }
+            }))
         } catch (error) {
             next(error)
         }

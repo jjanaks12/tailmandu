@@ -1,43 +1,46 @@
 <script lang="ts" setup>
-    import { MoveLeftIcon, RefreshCwIcon } from 'lucide-vue-next'
+import { MoveLeftIcon, RefreshCwIcon } from 'lucide-vue-next'
 
-    import type { TrailRace, Volunteer } from '~/lib/types'
-    import { useEventStore } from '~/store/event'
-    import { formatDate } from '~/lib/filters'
+import type { TrailRace } from '~/lib/types'
+import { useEventStore } from '~/store/event'
+import { formatDate } from '~/lib/filters'
 
-    import TrailRaceUploadImage from '@/components/pages/dashboard/event/imageUpload.vue'
-    import TrailRaceDescription from '@/components/pages/dashboard/event/description.vue'
-    import TrailMapUploadMap from '@/components/pages/dashboard/event/mapUpload.vue'
-    import TrailRaceStageList from '@/components/pages/dashboard/event/stages/list.vue'
-    import TrailRaceGallery from '@/components/pages/dashboard/event/gallery/list.vue'
-    import VolunteerList from '@/components/pages/dashboard/event/volunteer/list.vue'
-    import RunnerList from '@/components/pages/dashboard/event/runner/list.vue'
+import TrailRaceUploadImage from '@/components/pages/dashboard/event/imageUpload.vue'
+import TrailRaceDescription from '@/components/pages/dashboard/event/description.vue'
+import TrailMapUploadMap from '@/components/pages/dashboard/event/mapUpload.vue'
+import TrailRaceStageList from '@/components/pages/dashboard/event/stages/list.vue'
+import TrailRaceGallery from '@/components/pages/dashboard/event/gallery/list.vue'
+import VolunteerList from '@/components/pages/dashboard/event/volunteer/list.vue'
+import RunnerList from '@/components/pages/dashboard/event/runner/list.vue'
+import TrailRaceSponsorList from '@/components/pages/dashboard/event/sponsor/list.vue'
+import TrailRaceSettings from '@/components/pages/dashboard/event/settings/list.vue'
+import TrailRacePaymentList from '@/components/pages/dashboard/event/payment/list.vue'
 
-    useHead({
-        title: 'Events'
-    })
+useHead({
+    title: 'Events'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: ['event_view']
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['event_view']
+})
 
-    const route = useRoute()
-    const { get } = useEventStore()
+const route = useRoute()
+const { get } = useEventStore()
 
-    const trailRace = ref<TrailRace | null>(null)
-    const isLoading = ref(false)
+const trailRace = ref<TrailRace | null>(null)
+const isLoading = ref(false)
 
-    const fetchEventDetail = async () => {
-        trailRace.value = await get(route.params.id as string)
-    }
+const fetchEventDetail = async () => {
+    trailRace.value = await get(route.params.id as string)
+}
 
-    onBeforeMount(() => {
-        isLoading.value = true
-        fetchEventDetail()
-        isLoading.value = false
-    })
+onBeforeMount(() => {
+    isLoading.value = true
+    fetchEventDetail()
+    isLoading.value = false
+})
 </script>
 
 <template>
@@ -57,7 +60,7 @@
                 </Button>
             </div>
         </div>
-        <Tabs default-value="volunteers" class="text-gray-600">
+        <Tabs default-value="detail" class="text-gray-600">
             <TabsList class="uppercase">
                 <TabsTrigger value="detail">
                     Details
@@ -77,6 +80,12 @@
                 <TabsTrigger value="sponsor">
                     Sponsors
                 </TabsTrigger>
+                <TabsTrigger value="payments">
+                    Payments
+                </TabsTrigger>
+                <TabsTrigger value="settings">
+                    Settings
+                </TabsTrigger>
             </TabsList>
             <TabsContent value="detail">
                 <div class="flex flex-col gap-4">
@@ -92,7 +101,7 @@
                 </div>
             </TabsContent>
             <TabsContent value="stages">
-                <TrailRaceStageList :event-id="route.params.id as string" @update="fetchEventDetail" />
+                <TrailRaceStageList :event-id="(route.params.id as string)" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="runners">
                 <RunnerList :stages="trailRace.stages" @update="fetchEventDetail" />
@@ -101,7 +110,16 @@
                 <VolunteerList :stages="trailRace.stages" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="gallery">
-                <TrailRaceGallery :event-id="route.params.id as string" />
+                <TrailRaceGallery :event-id="(route.params.id as string)" />
+            </TabsContent>
+            <TabsContent value="sponsor">
+                <TrailRaceSponsorList :event-id="(route.params.id as string)" />
+            </TabsContent>
+            <TabsContent value="payments">
+                <TrailRacePaymentList :event-id="(route.params.id as string)" />
+            </TabsContent>
+            <TabsContent value="settings">
+                <TrailRaceSettings :event-id="(route.params.id as string)" />
             </TabsContent>
         </Tabs>
     </template>

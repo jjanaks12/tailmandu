@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-    import type { Checkpoint, Stage, Volunteer } from '~/lib/types'
+import type { Checkpoint, Stage, Volunteer } from '~/lib/types'
 
-    interface VolunteerListProps {
-        stages: Stage[]
-    }
+interface VolunteerListProps {
+    stages: Stage[]
+}
 
-    const emit = defineEmits(['update'])
-    defineProps<VolunteerListProps>()
+const emit = defineEmits(['update'])
+defineProps<VolunteerListProps>()
 
-    const selectedVolunteer = ref<Volunteer | null>(null)
-    const checkpoints = ref<Checkpoint[]>([])
+const selectedVolunteer = ref<Volunteer | null>(null)
+const checkpoints = ref<Checkpoint[]>([])
 </script>
 
 <template>
@@ -22,7 +22,7 @@
                         {{ volunteer.personal.middle_name }}
                         {{ volunteer.personal.last_name }}
                     </strong>
-                    <Badge variant="outline">{{volunteer.stages.map(stage => stage.name).join(', ')}}</Badge>
+                    <Badge variant="outline">{{volunteer.stages.map(s => s.name).join(', ')}}</Badge>
                     <p v-if="volunteer?.checkpoints.length > 0">Assigned to: {{volunteer?.checkpoints.map(checkpoint =>
                         checkpoint.name).join(', ')}}</p>
                 </div>

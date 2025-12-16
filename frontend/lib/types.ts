@@ -7,8 +7,10 @@ type APISort<T> = {
     field: keyof typeof T
 }
 
+export const paymentTypes = ['CASH', 'PAY_AT_VENUE'] as const
 type AddressType = 'BILLING' | 'SHIPPING' | 'PERMANENT_ADDRESS'
 type StageDifficulty = 'moderate' | 'easy' | 'difficult'
+type PaymentType = typeof paymentTypes[number]
 
 export type APIQuery<T> = {
     s: string
@@ -123,6 +125,8 @@ export type Checkpoint = {
     deleted_at: string
     stage_id: string
     stage: Stage
+    stage_category_id: string
+    stage_category: StageCategory
     runners: EventRunner[]
     volunteers: Volunteer[]
     volunteer_on_checkpoints: VolunteerCheckpoint[]
@@ -161,14 +165,27 @@ export type EventRunner = {
     personal_id: string
     personal: Personal
     event: TrailRace
+    stage_id: string
     stage: Stage
     tshirt_size: TShirtSize
     checkpoints: Checkpoint[]
     payments: Payment[]
     volunteer_on_checkpoints: VolunteerCheckpoint[]
+    stage_category_id: string
+    stage_category: StageCategory
 }
 
-export type Payment = {}
+export type Payment = {
+    id: string
+    amount: number
+    type: PaymentType
+    runner_id: string
+    runner: EventRunner
+    stage_category_id: string
+    stage_category: StageCategory
+    image_id: string
+    screenshot: Image
+}
 
 export type Volunteer = {
     id: string
@@ -269,6 +286,9 @@ export type StageCategory = {
     map_file_id: string
     map_file: Image
     checkpoints: Checkpoint[]
+    runners: EventRunner[]
+    payment: StageCategoryPayment
+    payments: Payment[]
 }
 
 export type Newsletter = {
@@ -278,4 +298,42 @@ export type Newsletter = {
     deleted_at?: string
     user_id?: string
     user?: Personal
+}
+
+export type Sponsor = {
+    id: string
+    name: string
+    description: string
+    url: string
+    thumbnail_id: string
+    thumbnail: Image
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    event_id: string
+    event: TrailRace
+    sponsor_type_id: string
+    sponsorType: SponsorType
+}
+
+export type SponsorType = {
+    id: string
+    name: string
+    description: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    sponsors: Sponsor[]
+}
+
+export type StageCategoryPayment = {
+    id: string
+    amount: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    stage_category_id: string
+    stage_category: StageCategory
+    image_id: string
+    screenshot: Image
 }

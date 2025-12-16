@@ -17,7 +17,6 @@ export class StageController {
                 },
                 include: {
                     runners: true,
-                    map_file: true,
                     thumbnail: true,
                     volunteers: true
                 }
@@ -31,12 +30,6 @@ export class StageController {
         try {
             const body: any = {}
             const validationData = await stageSchema.validate(request.body, { abortEarly: false })
-
-            if (validationData.map) {
-                const file = new FileHandler('gpx')
-                const image = await file.saveFile(validationData.map, undefined, 'gpx')
-                body.map_file_id = image.id
-            }
 
             if (validationData.thumbnail) {
                 const file = new FileHandler('images')
@@ -55,8 +48,6 @@ export class StageController {
                     name: validationData.name,
                     excerpt: validationData.excerpt,
                     description: validationData.description,
-                    distance: validationData.distance,
-                    difficulty: validationData.difficulty,
                     location: validationData.location,
                     event_id: validationData.event_id,
                     ...body
@@ -73,12 +64,6 @@ export class StageController {
             const validationData = await stageSchema.validate(request.body, { abortEarly: false })
             const stage = await prisma.stage.findFirst({ where: { id: request.params.stage_id } })
 
-            if (validationData.map && isBase64(validationData.map)) {
-                const file = new FileHandler('gpx')
-                const image = await file.saveFile(validationData.map, stage.map_file_id)
-                body.map_file_id = image.id
-            }
-
             if (validationData.thumbnail && isBase64(validationData.thumbnail)) {
                 const file = new FileHandler('images')
                 const image = await file.saveFile(validationData.thumbnail, stage.image_id)
@@ -94,11 +79,26 @@ export class StageController {
                     name: validationData.name,
                     excerpt: validationData.excerpt,
                     description: validationData.description,
-                    distance: validationData.distance,
-                    difficulty: validationData.difficulty,
                     location: validationData.location,
                     event_id: validationData.event_id,
                     updated_at: moment.utc().toISOString()
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async view(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.stage.findFirst({
+                where: {
+                    id: request.params.stage_id as string
+                },
+                include: {
+                    thumbnail: true,
+                    stage_categories: true,
+                    event: true
                 }
             }))
         } catch (error) {
@@ -128,19 +128,23 @@ export class StageController {
                     id: request.params.stage_id
                 },
                 include: {
-                    runners: {
+                    stage_categories: {
                         include: {
-                            personal: {
+                            runners: {
                                 include: {
-                                    avatar: true,
-                                    country: true
+                                    personal: {
+                                        include: {
+                                            avatar: true,
+                                            country: true
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             })
-            response.send(stage.runners)
+            response.send(stage.stage_categories)
         } catch (error) {
             next(error)
         }

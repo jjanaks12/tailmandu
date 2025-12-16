@@ -1,6 +1,7 @@
 <script lang="ts" setup>
     import { MapIcon } from 'lucide-vue-next';
-import { formatDate, showImage } from '~/lib/filters'
+import moment from 'moment';
+    import { formatDate, showImage } from '~/lib/filters'
     import type { Stage } from '~/lib/types'
 
     interface StageCardProps {
@@ -8,17 +9,23 @@ import { formatDate, showImage } from '~/lib/filters'
         raceSlug: string
         raceName: string
     }
-    defineProps<StageCardProps>()
+    const props = defineProps<StageCardProps>()
+    const starts = computed(() => props.stage?.stage_categories
+        .map(category => category.start)
+        .map(date => moment(date))
+        .sort((a, b) => a.valueOf() - b.valueOf())[0]
+    )
 </script>
 
 <template>
     <NuxtLink :to="`/races/${raceSlug}/stage/${stage.id}`" class="shadow">
         <figure class="relative">
             <img :src="showImage(stage.thumbnail.file_name)" :alt="stage.name">
-            <Badge variant="secondary" class="rounded-xs absolute top-2 left-2">{{ formatDate(stage.start) }}</Badge>
+            <Badge variant="secondary" class="rounded-xs absolute top-2 left-2" v-if="starts">{{ formatDate(starts.toISOString()) }}</Badge>
         </figure>
         <div class="px-7 space-y-5 pb-7">
-            <ul class="bg-[#13304a] text-white/80 flex gap-4 px-[30px] py-[17px] -mt-4 [&>li>strong]:block [&>li>em]:text-[#4487a0] [&>li>em]:capitalize [&>li>em]:not-italic relative z-[2] rounded-sm">
+            <ul
+                class="bg-[#13304a] text-white/80 flex gap-4 px-[30px] py-[17px] -mt-4 [&>li>strong]:block [&>li>em]:text-[#4487a0] [&>li>em]:capitalize [&>li>em]:not-italic relative z-[2] rounded-sm">
                 <li>
                     <em>{{ stage.distance }}</em>
                     <strong>Distance</strong>

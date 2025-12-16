@@ -2,8 +2,6 @@
     import HomeBanner from '@/components/pages/default/home/banner.vue'
     import Newsletter from '@/components/pages/default/newsletter.vue'
 
-    useTitle('Trailmandu - From The City To The Mountains')
-
     definePageMeta({
         layout: 'default'
     })
@@ -15,6 +13,9 @@
         }]
     })
 
+    onMounted(() => {
+        useTitle('Trailmandu - From The City To The Mountains')
+    })
 </script>
 
 <template>

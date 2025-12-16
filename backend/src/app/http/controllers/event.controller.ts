@@ -18,9 +18,6 @@ export class EventController {
                 take: parseInt(per_page.toString()),
                 include: {
                     stages: {
-                        include: {
-                            map_file: true
-                        },
                         where: {
                             deleted_at: null
                         }
@@ -119,11 +116,24 @@ export class EventController {
                 include: {
                     stages: {
                         include: {
-                            map_file: true,
                             thumbnail: true,
                             stage_categories: {
                                 include: {
-                                    checkpoints: true
+                                    checkpoints: true,
+                                    runners: {
+                                        include: {
+                                            personal: {
+                                                include: {
+                                                    gender: true
+                                                }
+                                            },
+                                            volunteer_on_checkpoints: {
+                                                include: {
+                                                    checkpoint: true
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             volunteers: {
@@ -140,25 +150,7 @@ export class EventController {
                                     checkpoints: true,
                                     stages: true
                                 }
-                            },
-                            runners: {
-                                include: {
-                                    personal: {
-                                        include: {
-                                            avatar: true,
-                                            gender: true,
-                                            country: true,
-                                            age_category: true,
-                                            size: true
-                                        }
-                                    },
-                                    volunteer_on_checkpoints: {
-                                        include: {
-                                            checkpoint: true
-                                        }
-                                    }
-                                }
-                            },
+                            }
                         },
                         where: {
                             deleted_at: null
@@ -180,8 +172,8 @@ export class EventController {
                 include: {
                     stages: {
                         include: {
-                            map_file: true,
                             thumbnail: true,
+                            stage_categories: true
                         },
                         where: {
                             deleted_at: null

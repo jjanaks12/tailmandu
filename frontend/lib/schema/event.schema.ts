@@ -1,3 +1,4 @@
+import { paymentTypes } from '@/lib/types'
 import * as Y from 'yup'
 
 export const eventSchema = Y.object({
@@ -18,16 +19,13 @@ export const stageSchema = Y.object({
     name: Y.string().required().label('Name'),
     excerpt: Y.string().required().label('excerpt'),
     description: Y.string().required().label('Description'),
-    distance: Y.string().required().label('Distance'),
-    difficulty: Y.string().oneOf(['moderate', 'easy', 'difficult']).required().label('Difficulty'),
     location: Y.string().required().label('Location'),
-    start: Y.string().required().label('Start'),
-    thumbnail: Y.string().required().label('Thumbnail'),
-    map: Y.string().required().label('Map file')
+    thumbnail: Y.string().required().label('Thumbnail')
 })
 
 export const trailRaceRunner = Y.object({
     stage_id: Y.string().required().label('Stage'),
+    stage_category_id: Y.string().required().label('Stage category'),
     first_name: Y.string().required().label("First name"),
     middle_name: Y.string().nullable().label("Middle name"),
     last_name: Y.string().required().label("Last name"),
@@ -71,4 +69,29 @@ export const stageCategorySchema = Y.object({
     end: Y.string().required().label('End'),
     stage_id: Y.string().required().label('Stage'),
     map: Y.string().required().label('Map file')
+})
+
+export const sponsorSchema = Y.object({
+    event_id: Y.string().required().label('Event'),
+    name: Y.string().required().label('Name'),
+    description: Y.string().required().label('Description'),
+    image: Y.string().required().label('Image'),
+    type: Y.string().required().label('Sponsor type'),
+    url: Y.string().url().required().label('URL')
+})
+
+export const sponsorTypeSchema = Y.object({
+    name: Y.string().required().label('Name'),
+    description: Y.string().required().label('Description')
+})
+
+export const stageCategoryPaymentSchema = Y.object({
+    payment_id: Y.string().optional().label('Payment'),
+    stage_category_id: Y.string().required().label('Stage category'),
+    amount: Y.number().required().label('Amount'),
+    image: Y.string().when('payment_id', {
+        is: undefined,
+        then: schema => schema.required(),
+        otherwise: schema => schema.notRequired()
+    }).label('Image')
 })

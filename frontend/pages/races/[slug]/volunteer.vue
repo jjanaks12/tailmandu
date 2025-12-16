@@ -36,7 +36,7 @@
                         </Button>
                     </div>
                 </div>
-                <PagesDashboardEventRacesRegistrationForm :event-id="trailRace.id" :trail-race="trailRace" mode="volunteer" />
+                <PagesDefaultRacesRegistrationForm :event-id="trailRace.id" :trail-race="trailRace" mode="volunteer" />
             </div>
         </div>
     </section>

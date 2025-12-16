@@ -130,7 +130,11 @@ export class AuthController {
                             runners: true,
                             volunteers: {
                                 include: {
-                                    checkpoints: true
+                                    checkpoints: {
+                                        include: {
+                                            stage_category: true
+                                        }
+                                    }
                                 }
                             }
                         }

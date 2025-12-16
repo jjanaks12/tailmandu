@@ -55,101 +55,101 @@
   <div class="editor" v-if="editor">
     <div class="flex items-center gap-0.5 rounded-sm mb-2" v-if="!disabled">
       <div class="bg-gray-300 p-0.5 rounded">
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleBold().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleBold().run()"
           :disabled="!editor.can().chain().focus().toggleBold().run()"
           :class="{ 'is-active': editor.isActive('bold') }">
           <BoldIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleItalic().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleItalic().run()"
           :disabled="!editor.can().chain().focus().toggleItalic().run()"
           :class="{ 'is-active': editor.isActive('italic') }">
           <ItalicIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleUnderline().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleUnderline().run()"
           :disabled="!editor.can().chain().focus().toggleUnderline().run()"
           :class="{ 'is-active': editor.isActive('underline') }">
           <UnderlineIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleStrike().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleStrike().run()"
           :disabled="!editor.can().chain().focus().toggleStrike().run()"
           :class="{ 'is-active': editor.isActive('strike') }">
           <StrikethroughIcon />
         </Button>
       </div>
-      <!-- <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleCode().run()"
+      <!-- <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleCode().run()"
         :disabled="!editor.can().chain().focus().toggleCode().run()" :class="{ 'is-active': editor.isActive('code') }">
         <MdiIcon icon="mdiCodeBraces" />
       </Button> -->
       <div class="bg-gray-300 p-0.5 rounded">
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().unsetAllMarks().run()">
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().unsetAllMarks().run()">
           <XIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().clearNodes().run()">
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().clearNodes().run()">
           <RotateCcwIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().setParagraph().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().setParagraph().run()"
           :class="{ 'is-active': editor.isActive('paragraph') }">
           <WrapTextIcon />
         </Button>
       </div>
       <div class="bg-gray-300 p-0.5 rounded">
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
           :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }">
           <Heading1Icon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
           :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
           <Heading2Icon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
           :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }">
           <Heading3Icon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 4 }).run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 4 }).run()"
           :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }">
           <Heading4Icon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 5 }).run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 5 }).run()"
           :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }">
           <Heading5Icon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 6 }).run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleHeading({ level: 6 }).run()"
           :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }">
           <Heading6Icon />
         </Button>
       </div>
       <div class="bg-gray-300 p-0.5 rounded">
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleBulletList().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleBulletList().run()"
           :class="{ 'is-active': editor.isActive('bulletList') }">
           <ListIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleOrderedList().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleOrderedList().run()"
           :class="{ 'is-active': editor.isActive('orderedList') }">
           <ListOrderedIcon />
         </Button>
       </div>
-      <!-- <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleCodeBlock().run()"
+      <!-- <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleCodeBlock().run()"
         :class="{ 'is-active': editor.isActive('codeBlock') }">
         <MdiIcon icon="mdiCodeArray" />
       </Button> -->
       <div class="bg-gray-300 p-0.5 rounded">
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().toggleBlockquote().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleBlockquote().run()"
           :class="{ 'is-active': editor.isActive('blockquote') }">
           <QuoteIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().setHorizontalRule().run()">
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().setHorizontalRule().run()">
           <MinusIcon />
         </Button>
-        <!-- <Button size="sm" variant="ghost" @click="editor.chain().focus().setHardBreak().run()">
+        <!-- <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().setHardBreak().run()">
         hard break
       </Button> -->
       </div>
       <div class="bg-gray-300 p-0.5 rounded">
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().undo().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().undo().run()"
           :disabled="!editor.can().chain().focus().undo().run()">
           <UndoIcon />
         </Button>
-        <Button size="sm" variant="ghost" @click="editor.chain().focus().redo().run()"
+        <Button type="button" size="sm" variant="ghost" @click="editor.chain().focus().redo().run()"
           :disabled="!editor.can().chain().focus().redo().run()">
           <RedoIcon />
         </Button>

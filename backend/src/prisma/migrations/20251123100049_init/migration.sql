@@ -85,6 +85,7 @@ CREATE TABLE `event_runners` (
     `deleted_at` DATETIME(3) NULL,
     `personal_id` VARCHAR(191) NOT NULL,
     `event_id` VARCHAR(191) NOT NULL,
+    `stage_category_id` VARCHAR(191) NOT NULL,
     `stage_id` VARCHAR(191) NOT NULL,
     `shirt_id` VARCHAR(191) NOT NULL,
 
@@ -108,6 +109,18 @@ CREATE TABLE `images` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
 
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `newsletters` (
+    `id` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `subscribed_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `deleted_at` DATETIME(3) NULL,
+    `user_id` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `newsletters_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -210,8 +223,8 @@ CREATE TABLE `sizes` (
 CREATE TABLE `stages` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `excerpt` VARCHAR(191) NOT NULL,
-    `description` TEXT NOT NULL,
+    `excerpt` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
     `distance` VARCHAR(191) NULL,
     `difficulty` VARCHAR(191) NULL,
     `location` VARCHAR(191) NOT NULL,
@@ -238,7 +251,11 @@ CREATE TABLE `stage_categories` (
     `location` VARCHAR(191) NOT NULL,
     `start` DATETIME(3) NULL,
     `end` DATETIME(3) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
     `stage_id` VARCHAR(191) NOT NULL,
+    `map_file_id` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -372,10 +389,16 @@ ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_personal_id_fkey` FORE
 ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_event_id_fkey` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_stage_category_id_fkey` FOREIGN KEY (`stage_category_id`) REFERENCES `stage_categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_stage_id_fkey` FOREIGN KEY (`stage_id`) REFERENCES `stages`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_shirt_id_fkey` FOREIGN KEY (`shirt_id`) REFERENCES `sizes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `newsletters` ADD CONSTRAINT `newsletters_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `personals`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `personals` ADD CONSTRAINT `personals_country_id_fkey` FOREIGN KEY (`country_id`) REFERENCES `countries`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -412,6 +435,9 @@ ALTER TABLE `stages` ADD CONSTRAINT `stages_image_id_fkey` FOREIGN KEY (`image_i
 
 -- AddForeignKey
 ALTER TABLE `stage_categories` ADD CONSTRAINT `stage_categories_stage_id_fkey` FOREIGN KEY (`stage_id`) REFERENCES `stages`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `stage_categories` ADD CONSTRAINT `stage_categories_map_file_id_fkey` FOREIGN KEY (`map_file_id`) REFERENCES `images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `events` ADD CONSTRAINT `events_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

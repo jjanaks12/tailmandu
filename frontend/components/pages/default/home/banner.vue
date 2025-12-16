@@ -9,14 +9,14 @@
 
 <template>
     <ClientOnly>
-        <section class="bg-black text-white flex justify-center items-center relative z-[1] overflow-hidden" key="one"
+        <section class="bg-black min-h-[calc(100vh-81px)] text-white flex justify-center items-center relative z-[1] overflow-hidden" key="one"
             v-if="currentRace">
             <figure class="absolute inset-0 z-0 opacity-40" v-if="currentRace.thumbnail">
                 <img :src="showImage(currentRace?.thumbnail?.file_name as string)" :alt="currentRace.name"
                     class="w-full h-full object-cover">
             </figure>
             <div class="container z-10">
-                <div class="max-w-[540px] flex flex-col gap-4 py-20">
+                <div class="max-w-[540px] flex flex-col gap-4">
                     <h2 class="text-4xl">{{ currentRace.name }}</h2>
                     <p>{{ currentRace.excerpt }}</p>
                     <div class="flex gap-4">

@@ -84,6 +84,7 @@ export class RunnerController {
                     event_id: eventId,
                     personal_id: personal.id,
                     stage_id: validationData.stage_id,
+                    stage_category_id: validationData.stage_category_id,
                     shirt_id: validationData.size_id
                 }
             }))
@@ -95,15 +96,24 @@ export class RunnerController {
     public static async logTimer(request: Request, response: Response, next: NextFunction) {
         try {
             let foundCheckpoint: Checkpoint
-            const stage = await prisma.stage.findFirst({
+            const stageCategory = await prisma.stageCategory.findFirst({
                 where: {
-                    id: request.params.stage_id
+                    id: request.params.stage_category_id
                 },
                 include: {
+                    checkpoints: {
+                        include: {
+                            volunteers: {
+                                include: {
+                                    personal: true
+                                }
+                            }
+                        }
+                    }
                 }
             })
 
-            /* for (const checkpoint of stage.checkpoints) {
+            for (const checkpoint of stageCategory.checkpoints) {
                 let isFound = false
                 for (const volunteer of checkpoint.volunteers) {
                     if (volunteer.personal_id == request.body.auth_user.personal_id) {
@@ -115,7 +125,7 @@ export class RunnerController {
 
                 if (isFound)
                     break
-            } */
+            }
 
             const volunteer = await prisma.volunteer.findFirst({
                 where: {

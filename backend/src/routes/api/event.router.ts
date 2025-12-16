@@ -8,6 +8,8 @@ import { GalleryController } from '@/app/http/controllers/gallery.controller'
 import { VolunteerController } from '@/app/http/controllers/volunteer.controller'
 import { RunnerController } from '@/app/http/controllers/runner.controller'
 import { StageCategoryController } from '@/app/http/controllers/stage_category.controller'
+import { SponsorController } from '@/app/http/controllers/sponsor.controller'
+import { PaymentController } from '@/app/http/controllers/payment.controller'
 
 const router = Router()
 
@@ -26,6 +28,7 @@ router.get('/:event_id/stages', [verifyAccessToken], StageController.index)
 router.post('/:event_id/stages', [verifyAccessToken], StageController.create)
 router.put('/stages/:stage_id', [verifyAccessToken], StageController.update)
 router.delete('/stages/:stage_id', [verifyAccessToken], StageController.destory)
+router.get('/stages/:stage_id', [], StageController.view)
 router.get('/stages/:stage_id/runners', [verifyAccessToken], StageController.listRunners)
 
 // CHECKPOINTS
@@ -50,5 +53,15 @@ router.post('/:event_id/runner/register', [], RunnerController.save)
 router.get('/:stage_id/stage_categories', [], StageCategoryController.index)
 router.post('/:stage_id/stage_categories', [], StageCategoryController.create)
 router.put('/:stage_id/stage_categories/:stage_category_id', [], StageCategoryController.update)
+router.patch('/stage_categories/:stage_category_id/start', [], StageCategoryController.start)
+router.patch('/stage_categories/:stage_category_id/end', [], StageCategoryController.end)
+
+// SPONSORS
+router.get('/:event_id/sponsors', [verifyAccessToken], SponsorController.index)
+router.post('/:event_id/sponsors', [verifyAccessToken], SponsorController.create)
+router.put('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.update)
+router.delete('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.destroy)
+
+router.get('/:event_id/payments', [verifyAccessToken], PaymentController.index)
 
 export default router

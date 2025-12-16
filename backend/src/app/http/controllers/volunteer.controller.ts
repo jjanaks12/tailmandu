@@ -73,13 +73,13 @@ export class VolunteerController {
         try {
             let role = await prisma.role.findFirst({
                 where: {
-                    name: 'Checkpoint manager'
+                    name: 'Checkpoint Manager'
                 }
             })
 
             if (role == null)
                 role = await prisma.role.create({
-                    data: { name: 'Checkpoint manager' }
+                    data: { name: 'Checkpoint Manager' }
                 })
 
             const volunteer = await prisma.volunteer.findFirst({ where: { id: request.params.volunteer_id } })
@@ -119,7 +119,6 @@ export class VolunteerController {
                     stages: {
                         include: {
                             event: true,
-                            map_file: true,
                             thumbnail: true
                         }
                     }

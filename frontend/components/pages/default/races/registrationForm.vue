@@ -1,41 +1,42 @@
 <script setup lang="ts">
-    import { ref, computed } from "vue"
-    import { Form, Field, ErrorMessage, type FormContext } from "vee-validate"
-    import { parseDate } from "@internationalized/date"
-    import { storeToRefs } from "pinia"
-    import type { SubmissionHandler } from "vee-validate"
-    import { User, Mail, Phone, Calendar, Users, Shirt, Flag, Target, Loader2 } from "lucide-vue-next"
+import { ref, computed } from "vue"
+import { Form, Field, ErrorMessage, type FormContext } from "vee-validate"
+import { parseDate } from "@internationalized/date"
+import { storeToRefs } from "pinia"
+import type { SubmissionHandler } from "vee-validate"
+import { User, Mail, Phone, Calendar, Users, Shirt, Flag, Target, Loader2 } from "lucide-vue-next"
 
-    import DatePicker from "@/components/DatePicker.vue"
-    import { useAppStore } from "~/store/app"
-    import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
-    import type { TrailRace } from "~/lib/types"
-    import { useEventStore } from "~/store/event"
+import DatePicker from "@/components/DatePicker.vue"
+import { useAppStore } from "~/store/app"
+import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
+import type { TrailRace } from "~/lib/types"
+import { useEventStore } from "~/store/event"
 
-    interface RegistrationFormProps {
-        mode: "volunteer" | "runner"
-        trailRace: TrailRace
-    }
+interface RegistrationFormProps {
+    mode: "volunteer" | "runner"
+    trailRace: TrailRace
+}
 
-    const props = defineProps<RegistrationFormProps>()
-    const { countries, genders, age_categories, shirtSizes } = storeToRefs(useAppStore())
-    const { saveVoluteer, saveRunner } = useEventStore()
-    const route = useRoute()
+const props = defineProps<RegistrationFormProps>()
+const { countries, genders, age_categories, shirtSizes } = storeToRefs(useAppStore())
+const { saveVoluteer, saveRunner } = useEventStore()
+const route = useRoute()
 
-    const form = ref<FormContext<any> | null>(null)
-    const isLoading = ref(false)
+const form = ref<FormContext<any> | null>(null)
+const isLoading = ref(false)
 
-    const stageOptions = computed(() => props.trailRace.stages)
+const stageList = computed(() => props.trailRace.stages)
+const availabelStageCategoryList = computed(() => stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories)
 
-    const onSubmit: SubmissionHandler = async (values: any) => {
-        isLoading.value = true
-        if (props.mode == 'volunteer')
-            await saveVoluteer(values, props.trailRace.id)
-        else
-            await saveRunner(values, props.trailRace.id)
-        isLoading.value = false
-        navigateTo(`/races/${route.params.slug as string}`)
-    }
+const onSubmit: SubmissionHandler = async (values: any) => {
+    isLoading.value = true
+    if (props.mode == 'volunteer')
+        await saveVoluteer(values, props.trailRace.id)
+    else
+        await saveRunner(values, props.trailRace.id)
+    isLoading.value = false
+    navigateTo(`/races/${route.params.slug as string}`)
+}
 </script>
 
 <template>
@@ -208,24 +209,48 @@
                             <ErrorMessage name="age_category_id" />
                         </Field>
                     </div>
-                    <Field name="stage_id" as="div" v-slot="{ field }" class="space-y-2">
-                        <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
-                            <Target :size="16" class="text-gray-400" />
-                            Stage
-                        </Label>
-                        <Select :model-value="String(field.value ?? '')" @update:model-value="v => field.onChange(v)">
-                            <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <SelectValue
-                                    :placeholder="form?.values?.event_id ? 'Choose your stage' : 'Select an event first'" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem v-for="s in stageOptions" :key="s.id" :value="String(s.id)">
-                                    {{ s.name }}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <ErrorMessage name="stage_id" />
-                    </Field>
+                    <div class="flex gap-4">
+                        <Field name="stage_id" as="div" v-slot="{ field }"
+                            :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner', 'w-full': mode === 'volunteer' }">
+                            <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                <Target :size="16" class="text-gray-400" />
+                                Stage
+                            </Label>
+                            <Select :model-value="String(field.value ?? '')"
+                                @update:model-value="v => field.onChange(v)">
+                                <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <SelectValue placeholder="Choose your stage" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem v-for="s in stageList" :key="s.id" :value="String(s.id)">
+                                        {{ s.name }}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <ErrorMessage name="stage_id" />
+                        </Field>
+                        <Field name="stage_category_id" as="div" v-slot="{ field }" class="w-1/2 space-y-2"
+                            v-if="mode === 'runner'">
+                            <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                <Target :size="16" class="text-gray-400" />
+                                Stage Category
+                            </Label>
+                            <Select :model-value="String(field.value ?? '')"
+                                @update:model-value="v => field.onChange(v)">
+                                <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <SelectValue
+                                        :placeholder="form?.values?.stage_id ? 'Choose your stage catgeory' : 'Select an stage first'" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem v-for="sc in availabelStageCategoryList" :key="sc.id"
+                                        :value="String(sc.id)">
+                                        {{ sc.name }}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <ErrorMessage name="stage_category_id" />
+                        </Field>
+                    </div>
                     <template v-if="mode == 'runner'">
                         <Field name="description.club_name" as="div" v-slot="{ field }" class="space-y-2">
                             <Label for="rf__description.club_name"
@@ -272,6 +297,13 @@
                         </Field>
                     </template>
                 </div>
+            </div>
+
+            <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8" v-if="mode == 'runner'">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Registration fees</h3>
+                Season pass
+                or
+                only one race
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">

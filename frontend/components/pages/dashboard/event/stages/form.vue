@@ -1,10 +1,10 @@
 <script lang="ts" setup>
     import { parseDate } from '@internationalized/date'
-    import { LoaderIcon, MapIcon, SaveIcon, XIcon } from 'lucide-vue-next'
+    import { LoaderIcon, SaveIcon, XIcon } from 'lucide-vue-next'
     import moment from 'moment'
     import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
     
-    import { getGPXFile, showImage } from '~/lib/filters'
+    import { showImage } from '~/lib/filters'
     import { stageSchema } from '~/lib/schema/event.schema'
     import type { Stage } from '~/lib/types'
     import { useStageStore } from '~/store/stage'
@@ -19,13 +19,11 @@
     const { save } = useStageStore()
 
     const isLoading = ref(false)
-    const GPXFilename = ref('')
     const thumbnailFile = ref('')
     const form = ref<FormContext | null>(null)
     const startDate = ref()
     const endDate = ref()
     const showFile = ref({
-        map: false,
         thumbnail: false
     })
 
@@ -34,24 +32,6 @@
         await save(props.eventId, values)
         isLoading.value = false
         emit('update')
-    }
-
-    const mapFileHandler = (event: Event, fieldName: string) => {
-        const files = (event.target as HTMLInputElement).files ?? []
-
-        if (files?.length == 0)
-            return
-
-        const reader = new FileReader()
-        const file = files[0]
-        reader.onload = () => {
-            GPXFilename.value = file.name
-
-            if (form.value)
-                form.value.setFieldValue(fieldName, reader.result as string)
-        }
-        if (file)
-            reader.readAsDataURL(file)
     }
 
     const imageFileHandler = (event: Event, fieldName: string) => {
@@ -92,22 +72,10 @@
                     difficulty: props.stage.difficulty,
                     distance: props.stage.distance,
                     thumbnail: props.stage.thumbnail.file_name,
-                    map: props.stage.map_file.file_name,
                 })
 
                 if (props.stage.thumbnail.file_name)
                     showFile.value.thumbnail = true
-                if (props.stage.map_file.file_name)
-                    showFile.value.map = true
-
-                if (props.stage.start) {
-                    form.value.setFieldValue('start', props.stage.start)
-                    startDate.value = parseDate(moment(props.stage.start).format('YYYY-MM-DD'))
-                }
-                if (props.stage.end) {
-                    form.value.setFieldValue('end', props.stage.end)
-                    endDate.value = parseDate(moment(props.stage.end).format('YYYY-MM-DD'))
-                }
             }
         }
     }
@@ -177,39 +145,6 @@
             <Textarea v-bind="field" id="esf__excerpt" />
             <ErrorMessage name="excerpt" />
         </Field>
-        <div class="flex gap-4">
-            <Field name="start" as="div" class="w-1/4 flex flex-col gap-2">
-                <Label for="ef__start">Start Date</Label>
-                <DatePicker label="Start date" :model-value="startDate"
-                    @update:model-value="(dob) => startDate = dob" />
-                <ErrorMessage name="start" />
-            </Field>
-            <Field name="end" as="div" class="w-1/4 flex flex-col gap-2">
-                <Label for="ef__end">End Date</Label>
-                <DatePicker label="End date" :min-value="startDate" :model-value="endDate"
-                    @update:model-value="(dob) => endDate = dob" />
-                <ErrorMessage name="end" />
-            </Field>
-            <Field name="difficulty" v-slot="{ field }" as="div" class="w-1/4 flex flex-col gap-2">
-                <Label for="ef__difficulty">Difficulty</Label>
-                <Select v-bind="field" autocomplete="sex" :default-value="stage?.difficulty">
-                    <SelectTrigger class="w-full">
-                        <SelectValue placeholder="Select a difficulty" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem v-for="difficulty in ['moderate', 'easy', 'difficult']" :value="difficulty">
-                            {{ difficulty }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <ErrorMessage name="difficulty" />
-            </Field>
-            <Field name="distance" v-slot="{ field }" as="div" class="w-1/4 flex flex-col gap-2">
-                <Label for="ef__distance">Distance</Label>
-                <Input v-bind="field" id="ef__distance" />
-                <ErrorMessage name="distance" />
-            </Field>
-        </div>
         <Field name="location" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Label for="esf__location">Location</Label>
             <Input v-bind="field" id="esf__location" />
@@ -219,33 +154,6 @@
             <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange" :disabled="false"
                 :timer="1000" />
         </Field>
-        <div class="flex flex-col gap-2 relative">
-            <template v-if="!showFile.map">
-                <label class="py-4 px-4 flex border border-dashed rounded-sm">
-                    <input type="file" @change="$event => mapFileHandler($event, 'map')" accept=".gpx" class="hidden">
-                    <span class="text-gray-700 flex-grow">{{ GPXFilename ? GPXFilename : 'Upload GPX file' }}</span>
-                </label>
-                <Button type="button" @click="() => {
-                    removeFile('map')
-                    GPXFilename = ''
-                }" size="icon" modifier="outline" class="absolute top-1/2 right-2 -translate-y-1/2" v-if="GPXFilename">
-                    <XIcon />
-                </Button>
-                <ErrorMessage name="map" />
-            </template>
-            <Dialog v-else>
-                <DialogTrigger as-child>
-                    <Button type="button" size="icon" variant="ghost">
-                        <MapIcon />
-                    </Button>
-                </DialogTrigger>
-                <DialogContent class="sm:max-w-[1000px]">
-                    <DialogTitle>{{ stage?.name }}'s map</DialogTitle>
-                    <DialogDescription>lorem</DialogDescription>
-                    <Map :gpx-file="getGPXFile(stage?.map_file.file_name as string)" />
-                </DialogContent>
-            </Dialog>
-        </div>
         <div class="text-right">
             <Button type="submit" :disabled="isLoading">
                 <LoaderIcon class="animate-spin" v-if="isLoading" />

@@ -1,27 +1,27 @@
 <script lang="ts" setup>
-    import moment from 'moment'
-    import { abbr, showImage } from '~/lib/filters'
-    import type { EventRunner } from '~/lib/types'
-    import { useAxios } from '~/services/axios'
+import moment from 'moment'
+import { abbr, showImage } from '~/lib/filters'
+import type { EventRunner } from '~/lib/types'
+import { useAxios } from '~/services/axios'
 
-    interface VolunteerRunnerProps {
-        runner: EventRunner
-        timer?: string
-        stageId: string
+interface VolunteerRunnerProps {
+    runner: EventRunner
+    timer?: string
+    stageId: string
+}
+
+const emit = defineEmits(['update'])
+const props = defineProps<VolunteerRunnerProps>()
+const { axios } = useAxios()
+
+const fullName = computed(() => [props.runner.personal.first_name, props.runner.personal.middle_name, props.runner.personal.last_name].join(' '))
+
+const logTimer = async () => {
+    if (props.timer == undefined) {
+        await axios.post(`/volunteers/${props.runner.stage_category_id}/log_timer/${props.runner.id}`)
+        emit('update')
     }
-
-    const emit = defineEmits(['update'])
-    const props = defineProps<VolunteerRunnerProps>()
-    const { axios } = useAxios()
-
-    const fullName = computed(() => [props.runner.personal.first_name, props.runner.personal.middle_name, props.runner.personal.last_name].join(' '))
-
-    const logTimer = async () => {
-        if (props.timer == undefined) {
-            await axios.post(`/volunteers/${props.stageId}/log_timer/${props.runner.id}`)
-            emit('update')
-        }
-    }
+}
 
 </script>
 
