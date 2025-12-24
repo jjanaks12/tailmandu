@@ -48,7 +48,7 @@ export const trailRaceRunner = Y.object({
         otherwise: schema => schema
     }).label("Payment screenshot"),
     description: Y.object({
-        club_name: Y.string().required().label('Club name'),
+        club_name: Y.string().label('Club name'),
         emergency_contact_name: Y.string().required().label('Emergency Contact name'),
         emergency_contact_phone: Y.string().required().label('Emergency Contact number'),
         want_lunch: Y.boolean().label('Want lunch'),

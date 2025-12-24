@@ -5,6 +5,7 @@ import Bcrypt from 'bcrypt'
 import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/File.service"
+import { useMailTrap } from "@/app/lib/services/mailtrap"
 
 const prisma = new PrismaClient()
 export class RunnerController {
@@ -83,6 +84,7 @@ export class RunnerController {
             const validationData = await trailRaceRunner.validate(request.body, { abortEarly: false })
             const eventId = request.params.event_id
             const body: any = {}
+            const { sendEmail } = useMailTrap()
 
             if (validationData.date_of_birth)
                 body.date_of_birth = moment(validationData.date_of_birth, "YYYY-MM-DD").toISOString()
@@ -98,9 +100,14 @@ export class RunnerController {
                 }
             })
 
-            const stageCategory = await prisma.stageCategory.findFirst({ where: { id: validationData.stage_category_id } })
+            const stageCategory = await prisma.stageCategory.findFirst({
+                where: { id: validationData.stage_category_id },
+                include: {
+                    stage: true
+                }
+            })
 
-            let personal = await prisma.personal.findFirst({ where: { email: validationData.email } })
+            let personal = await prisma.personal.findFirst({ where: { email: validationData.email }, include: { gender: true } })
             if (!personal)
                 personal = await prisma.personal.create({
                     data: {
@@ -114,6 +121,9 @@ export class RunnerController {
                         country_id: validationData.country_id,
                         // size_id: validationData.size_id,
                         gender_id: validationData.gender_id
+                    },
+                    include: {
+                        gender: true
                     }
                 })
 
@@ -163,8 +173,7 @@ export class RunnerController {
                     type: validationData.payment_type
                 }
             })
-
-            response.send(await prisma.payment.create({
+            const payment = await prisma.payment.create({
                 data: {
                     ...paymentBody,
                     amount: stageCategoryPayment.amount,
@@ -172,7 +181,35 @@ export class RunnerController {
                     runner_id: runner.id,
                     method: validationData.payment_method
                 }
-            }))
+            })
+
+            await sendEmail('welcome', {
+                title: 'Thank you for signing up for race',
+                user: {
+                    name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
+                    email: validationData.email,
+                    bib: runner.bib,
+                    gender: personal.gender.name,
+                    contact_no: personal.phone_number,
+                    dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
+                    emergency_contact: validationData.description.emergency_contact_name,
+                    emergency_contact_no: validationData.description.emergency_contact_phone,
+                },
+                stage: stageCategory.stage,
+                stageCategory: {
+                    ...stageCategory,
+                    start: moment(stageCategory.start).format('DD-MM-YYYY'),
+                    end: moment(stageCategory.end).format('DD-MM-YYYY')
+                }
+            }, {
+                recipients: [{
+                    email: validationData.email,
+                    name: validationData.first_name,
+                }],
+                subject: 'Welcome to Trailmandu'
+            })
+
+            response.send(payment)
         } catch (error) {
             next(error)
         }
