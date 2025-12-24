@@ -1,0 +1,8 @@
+const Countdown_vue_vue_type_style_index_0_scoped_ea4e6f67_lang = 'em[data-v-ea4e6f67]{font-style:normal}.countdown[data-v-ea4e6f67]{margin-left:auto;margin-right:auto;width:500px}.countdown__holder[data-v-ea4e6f67]{display:flex}.countdown__tile[data-v-ea4e6f67]{align-items:end;display:flex;flex:calc(100%/var(--v1798b80d));flex-wrap:wrap;gap:4px;justify-content:end;text-align:center}.countdown__tile+.countdown__tile[data-v-ea4e6f67]:before{align-self:start;content:":";padding-top:20px}.countdown__tile span[data-v-ea4e6f67]{border:1px solid #aeaeae;border-radius:4px;flex:calc(50% - 8px) 0 0;font-size:40px}.countdown__tile em[data-v-ea4e6f67]{flex:100% 0 0}';
+
+const CountdownStyles_CyMn32Y = [
+  Countdown_vue_vue_type_style_index_0_scoped_ea4e6f67_lang
+];
+
+export { CountdownStyles_CyMn32Y as default };
+//# sourceMappingURL=Countdown-styles.Cy-Mn32Y.mjs.map

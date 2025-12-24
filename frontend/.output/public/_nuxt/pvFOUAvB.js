@@ -1,1 +1,0 @@
-import{at as u,au as s,av as r,aw as o,ax as c,ay as i}from"./BWYtlrHP.js";function n(e){const t=e||r();return t?.ssrContext?.head||t?.runWithContext(()=>{if(o())return c(i)})}function d(e,t={}){const a=n(t.nuxt);if(a)return u(e,{head:a,...t})}function f(e,t={}){const a=n(t.nuxt);if(a)return s(e,{head:a,...t})}export{f as a,d as u};

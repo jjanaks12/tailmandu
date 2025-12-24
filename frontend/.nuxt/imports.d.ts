@@ -60,4 +60,3 @@ export { Dropcursor as TiptapDropcursor } from '@tiptap/extension-dropcursor';
 export { History as TiptapHistory } from '@tiptap/extension-history';
 export { Image as TiptapImage } from '@tiptap/extension-image';
 export { ImageUpload as TiptapImageUpload, ImagePlaceholder as TiptapImagePlaceholder } from '../node_modules/nuxt-tiptap-editor/dist/runtime/custom-extensions/extension-image-upload';
-export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';

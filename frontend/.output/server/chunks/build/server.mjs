@@ -1,4 +1,4 @@
-import { defineComponent, shallowRef, getCurrentInstance, provide, cloneVNode, h, createElementBlock, hasInjectionContext, inject, ref, computed, watch, defineAsyncComponent, unref, shallowReactive, Suspense, Fragment, useSSRContext, createApp, withCtx, createBlock, openBlock, toRef, onErrorCaptured, onServerPrefetch, createVNode, resolveDynamicComponent, reactive, effectScope, isReadonly, isRef, isShallow, isReactive, toRaw, nextTick, mergeProps, getCurrentScope } from 'vue';
+import process from 'node:process';globalThis._importMeta_=globalThis._importMeta_||{url:"file:///_entry.js",env:process.env};import { defineComponent, ref, watch, shallowRef, getCurrentInstance, provide, cloneVNode, h, createElementBlock, hasInjectionContext, inject, computed, defineAsyncComponent, unref, shallowReactive, Suspense, Fragment, useSSRContext, createApp, withCtx, createBlock, openBlock, toRef, onErrorCaptured, onServerPrefetch, createVNode, resolveDynamicComponent, reactive, effectScope, isReadonly, isRef, isShallow, isReactive, toRaw, nextTick, mergeProps, getCurrentScope } from 'vue';
 import { h as hasProtocol, i as isScriptProtocol, k as joinURL, w as withQuery, s as sanitizeStatusCode, l as getContext, $ as $fetch, m as createHooks, n as executeAsync, c as createError$1, t as toRouteMatcher, o as createRouter$1, p as defu, q as destr, r as klona, v as getRequestHeader, x as isEqual, y as setCookie, z as getCookie, A as deleteCookie } from '../nitro/nitro.mjs';
 import { b as baseURL } from '../routes/renderer.mjs';
 import { defineStore, storeToRefs, createPinia, setActivePinia, shouldHydrate } from 'pinia';
@@ -95,7 +95,7 @@ function createNuxtApp(options) {
     globalName: "nuxt",
     versions: {
       get nuxt() {
-        return "3.18.1";
+        return "3.20.2";
       },
       get vue() {
         return nuxtApp.vueApp.version;
@@ -292,8 +292,9 @@ function useRuntimeConfig(_event) {
 function defineGetter(obj, key, val) {
   Object.defineProperty(obj, key, { get: () => val });
 }
-const LayoutMetaSymbol = Symbol("layout-meta");
-const PageRouteSymbol = Symbol("route");
+const LayoutMetaSymbol = /* @__PURE__ */ Symbol("layout-meta");
+const PageRouteSymbol = /* @__PURE__ */ Symbol("route");
+globalThis._importMeta_.url.replace(/\/app\/.*$/, "/");
 const useRouter = () => {
   return useNuxtApp()?.$router;
 };
@@ -392,12 +393,11 @@ function encodeURL(location2, isExternalHost = false) {
   return url.toString();
 }
 const NUXT_ERROR_SIGNATURE = "__nuxt_error";
-const useError = () => toRef(useNuxtApp().payload, "error");
+const useError = /* @__NO_SIDE_EFFECTS__ */ () => toRef(useNuxtApp().payload, "error");
 const showError = (error) => {
   const nuxtError = createError(error);
   try {
-    const nuxtApp = useNuxtApp();
-    const error2 = useError();
+    const error2 = /* @__PURE__ */ useError();
     if (false) ;
     error2.value ||= nuxtError;
   } catch {
@@ -448,75 +448,83 @@ const unhead_k2P3m_ZDyjlr2mMYnoDPwavjsDN8hBlk9cFai0bbopU = /* @__PURE__ */ defin
 function toArray(value) {
   return Array.isArray(value) ? value : [value];
 }
-const __nuxt_page_meta$m = {
+const __nuxt_page_meta$o = {
   layout: "default"
 };
-const __nuxt_page_meta$l = {
+const __nuxt_page_meta$n = {
+  layout: "default"
+};
+const __nuxt_page_meta$m = {
   layout: "admin",
   authorization: "*"
 };
-const __nuxt_page_meta$k = {
+const __nuxt_page_meta$l = {
   layout: "simple"
 };
-const __nuxt_page_meta$j = {
+const __nuxt_page_meta$k = {
   layout: "admin",
   role: "Admin",
   authorization: "manage_gender"
 };
-const __nuxt_page_meta$i = {
+const __nuxt_page_meta$j = {
   layout: "admin",
   authorization: "*",
   role: "Admin"
 };
-const __nuxt_page_meta$h = {
+const __nuxt_page_meta$i = {
   layout: "simple"
 };
-const __nuxt_page_meta$g = {
+const __nuxt_page_meta$h = {
   layout: "admin",
   role: "Admin",
   authorization: "manage__country"
 };
-const __nuxt_page_meta$f = {
+const __nuxt_page_meta$g = {
   layout: "admin",
   authorization: "*"
 };
-const __nuxt_page_meta$e = {
+const __nuxt_page_meta$f = {
   layout: "admin",
   authorization: ["event_view"]
 };
-const __nuxt_page_meta$d = {
+const __nuxt_page_meta$e = {
   layout: "admin",
   authorization: ["manage_permission"]
 };
-const __nuxt_page_meta$c = {
+const __nuxt_page_meta$d = {
   layout: "admin",
   authorization: ["role_create", "role_edit", "role_view", "role_delete"]
 };
-const __nuxt_page_meta$b = {
+const __nuxt_page_meta$c = {
   layout: "admin",
   authorization: ["manage_user"]
 };
-const __nuxt_page_meta$a = {
+const __nuxt_page_meta$b = {
   layout: "admin",
   role: "Admin",
   authorization: ["manage_ageCategory"]
 };
-const __nuxt_page_meta$9 = {
+const __nuxt_page_meta$a = {
   layout: "admin",
   authorization: ["event_create", "event_update", "event_view", "event_delete"]
 };
-const __nuxt_page_meta$8 = {
+const __nuxt_page_meta$9 = {
   layout: "admin",
   role: "Admin",
   permissions: "*"
 };
-const __nuxt_page_meta$7 = {
+const __nuxt_page_meta$8 = {
   layout: "admin",
   role: "Admin",
   authorization: ["manage_tshirt"]
 };
-const __nuxt_page_meta$6 = {
+const __nuxt_page_meta$7 = {
   layout: "admin"
+};
+const __nuxt_page_meta$6 = {
+  layout: "admin",
+  role: "Admin",
+  authorization: ["manage_sponsorType"]
 };
 const __nuxt_page_meta$5 = {
   layout: "admin",
@@ -544,8 +552,13 @@ const _routes = [
   {
     name: "index",
     path: "/",
-    meta: __nuxt_page_meta$m || {},
-    component: () => import('./index-DcGsM6MD.mjs')
+    meta: __nuxt_page_meta$o || {},
+    component: () => import('./index-D715IEx4.mjs')
+  },
+  {
+    name: "review",
+    path: "/review",
+    component: () => import('./review-Bv0kXBVe.mjs')
   },
   {
     name: "about_us",
@@ -556,6 +569,17 @@ const _routes = [
     name: "checkout",
     path: "/checkout",
     component: () => import('./checkout-zk0W9NBl.mjs')
+  },
+  {
+    name: "our_team",
+    path: "/our_team",
+    component: () => import('./our_team-DYy0zIDh.mjs')
+  },
+  {
+    name: "our_story",
+    path: "/our_story",
+    meta: __nuxt_page_meta$n || {},
+    component: () => import('./our_story-CMHn3dI6.mjs')
   },
   {
     name: "tm_clicks",
@@ -580,169 +604,175 @@ const _routes = [
   {
     name: "dashboard",
     path: "/dashboard",
-    meta: { ...__nuxt_page_meta$l || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-BWrUGtpq.mjs')
+    meta: { ...__nuxt_page_meta$m || {}, ...{ "middleware": "auth" } },
+    component: () => import('./index-DRWbyuPn.mjs')
   },
   {
     name: "login",
     path: "/login",
-    meta: __nuxt_page_meta$k || {},
-    component: () => import('./login-1kIaoFI6.mjs')
+    meta: __nuxt_page_meta$l || {},
+    component: () => import('./login-CD5Pwl1f.mjs')
   },
   {
     name: "dashboard-gender",
     path: "/dashboard/gender",
-    meta: { ...__nuxt_page_meta$j || {}, ...{ "middleware": "auth" } },
-    component: () => import('./gender-Ca6Pyju1.mjs')
+    meta: { ...__nuxt_page_meta$k || {}, ...{ "middleware": "auth" } },
+    component: () => import('./gender-u2byOpPE.mjs')
   },
   {
     name: "dashboard-company",
     path: "/dashboard/company",
-    meta: { ...__nuxt_page_meta$i || {}, ...{ "middleware": "auth" } },
-    component: () => import('./company-BPolG_sL.mjs')
+    meta: { ...__nuxt_page_meta$j || {}, ...{ "middleware": "auth" } },
+    component: () => import('./company-B-s18HMG.mjs')
   },
   {
     name: "races-slug",
     path: "/races/:slug()",
-    component: () => import('./index-CyC2PBS9.mjs')
+    component: () => import('./index-NfiwDt7k.mjs')
   },
   {
     name: "register",
     path: "/register",
-    meta: __nuxt_page_meta$h || {},
-    component: () => import('./register-KSwkYteJ.mjs')
+    meta: __nuxt_page_meta$i || {},
+    component: () => import('./register-DakpYhMh.mjs')
   },
   {
     name: "dashboard-countries",
     path: "/dashboard/countries",
-    meta: { ...__nuxt_page_meta$g || {}, ...{ "middleware": "auth" } },
-    component: () => import('./countries-B42l6Q0D.mjs')
+    meta: { ...__nuxt_page_meta$h || {}, ...{ "middleware": "auth" } },
+    component: () => import('./countries-BsidDK-7.mjs')
   },
   {
     name: "races-slug-runner",
     path: "/races/:slug()/runner",
-    component: () => import('./runner-Do_4w1aO.mjs')
+    component: () => import('./runner-Do14S1TD.mjs')
   },
   {
     name: "dashboard-newsletter",
     path: "/dashboard/newsletter",
-    meta: { ...__nuxt_page_meta$f || {}, ...{ "middleware": "auth" } },
-    component: () => import('./newsletter-B2oydUNk.mjs')
+    meta: { ...__nuxt_page_meta$g || {}, ...{ "middleware": "auth" } },
+    component: () => import('./newsletter-BcdVKhrh.mjs')
   },
   {
     name: "dashboard-events-id",
     path: "/dashboard/events/:id()",
-    meta: { ...__nuxt_page_meta$e || {}, ...{ "middleware": "auth" } },
-    component: () => import('./_id_-CPN_q3jg.mjs')
+    meta: { ...__nuxt_page_meta$f || {}, ...{ "middleware": "auth" } },
+    component: () => import('./_id_-C8GxIFMr.mjs')
   },
   {
     name: "dashboard-events-form",
     path: "/dashboard/events/form",
-    component: () => import('./form-CH5T-LUv.mjs')
+    component: () => import('./form-CG6o2W17.mjs')
   },
   {
     name: "dashboard-permissions",
     path: "/dashboard/permissions",
-    meta: { ...__nuxt_page_meta$d || {}, ...{ "middleware": "auth" } },
-    component: () => import('./permissions-BROgiGaq.mjs')
+    meta: { ...__nuxt_page_meta$e || {}, ...{ "middleware": "auth" } },
+    component: () => import('./permissions-C2UKmN6s.mjs')
   },
   {
     name: "dashboard-roles",
     path: "/dashboard/roles",
-    meta: { ...__nuxt_page_meta$c || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-DWiYX0FP.mjs')
+    meta: { ...__nuxt_page_meta$d || {}, ...{ "middleware": "auth" } },
+    component: () => import('./index-B4wTUlhc.mjs')
   },
   {
     name: "dashboard-users",
     path: "/dashboard/users",
-    meta: { ...__nuxt_page_meta$b || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-CjVb2cA4.mjs')
+    meta: { ...__nuxt_page_meta$c || {}, ...{ "middleware": "auth" } },
+    component: () => import('./index-CkSOPIq_.mjs')
   },
   {
     name: "dashboard-age_category",
     path: "/dashboard/age_category",
-    meta: { ...__nuxt_page_meta$a || {}, ...{ "middleware": "auth" } },
-    component: () => import('./age_category-BVAoHb1D.mjs')
+    meta: { ...__nuxt_page_meta$b || {}, ...{ "middleware": "auth" } },
+    component: () => import('./age_category-C4e7nkW1.mjs')
   },
   {
     name: "dashboard-events",
     path: "/dashboard/events",
-    meta: { ...__nuxt_page_meta$9 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-DIgmb_bJ.mjs')
+    meta: { ...__nuxt_page_meta$a || {}, ...{ "middleware": "auth" } },
+    component: () => import('./index-D2CZHp2S.mjs')
   },
   {
     name: "dashboard-health_check",
     path: "/dashboard/health_check",
-    meta: { ...__nuxt_page_meta$8 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./health_check-CYsyIrK3.mjs')
+    meta: { ...__nuxt_page_meta$9 || {}, ...{ "middleware": "auth" } },
+    component: () => import('./health_check-DF6PgO2D.mjs')
   },
   {
     name: "dashboard-tshirt_sizes",
     path: "/dashboard/tshirt_sizes",
-    meta: { ...__nuxt_page_meta$7 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./tshirt_sizes-NG7qoX6g.mjs')
+    meta: { ...__nuxt_page_meta$8 || {}, ...{ "middleware": "auth" } },
+    component: () => import('./tshirt_sizes-CVBEOdE_.mjs')
   },
   {
     name: "races-slug-volunteer",
     path: "/races/:slug()/volunteer",
-    component: () => import('./volunteer-BOuz0CIy.mjs')
+    component: () => import('./volunteer-CvKFLLMy.mjs')
   },
   {
     name: "dashboard-events-stages",
     path: "/dashboard/events/stages",
+    meta: { ...__nuxt_page_meta$7 || {}, ...{ "middleware": "auth" } },
+    component: () => import('./stages-CmYFBlYm.mjs')
+  },
+  {
+    name: "dashboard-sponsor_types",
+    path: "/dashboard/sponsor_types",
     meta: { ...__nuxt_page_meta$6 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./stages-Boh1q1sH.mjs')
+    component: () => import('./sponsor_types-Bp8sS0Mv.mjs')
   },
   {
     name: "races-slug-stage-id",
     path: "/races/:slug()/stage/:id()",
-    component: () => import('./_id_-CSzNNaMw.mjs')
+    component: () => import('./_id_-9rN9sK-X.mjs')
   },
   {
     name: "dashboard-change_password",
     path: "/dashboard/change_password",
     meta: { ...__nuxt_page_meta$5 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./change_password-BCoLb5XO.mjs')
+    component: () => import('./change_password-vDlBlX97.mjs')
   },
   {
     name: "forget_password",
     path: "/forget_password",
     meta: __nuxt_page_meta$4 || {},
-    component: () => import('./forget_password-D5fpFpwf.mjs')
+    component: () => import('./forget_password-Blk2wUeN.mjs')
   },
   {
     name: "getting_started",
     path: "/getting_started",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./getting_started-1shSFDRB.mjs')
+    component: () => import('./getting_started-CP3PfaMG.mjs')
   },
   {
     name: "dashboard-personal_details",
     path: "/dashboard/personal_details",
     meta: { ...__nuxt_page_meta$2 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./personal_details-B3mL2T34.mjs')
+    component: () => import('./personal_details-CFHlhB_0.mjs')
   },
   {
     name: "dashboard-events-checkpoints",
     path: "/dashboard/events/checkpoints",
     meta: { ...__nuxt_page_meta$1 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./checkpoints-CyC00XNa.mjs')
+    component: () => import('./checkpoints-BxuCYf2X.mjs')
   },
   {
     name: "dashboard-roles-_components-form",
     path: "/dashboard/roles/_components/form",
-    component: () => import('./form-7mL--REf.mjs')
+    component: () => import('./form-CkgQcP1G.mjs')
   },
   {
     name: "dashboard-users-_components-roleForm",
     path: "/dashboard/users/_components/roleForm",
-    component: () => import('./roleForm-CPgsIlGm.mjs')
+    component: () => import('./roleForm-BFpitJhH.mjs')
   },
   {
     name: "dashboard-volunteer-checkpoint-stage_id",
     path: "/dashboard/volunteer/checkpoint/:stage_id()",
     meta: { ...__nuxt_page_meta || {}, ...{ "middleware": "auth" } },
-    component: () => import('./_stage_id_-BNNQPNYg.mjs')
+    component: () => import('./_stage_id_-CKDNkr95.mjs')
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -774,7 +804,7 @@ const routerOptions0 = {
   scrollBehavior(to, from, savedPosition) {
     const nuxtApp = useNuxtApp();
     const hashScrollBehaviour = useRouter().options?.scrollBehaviorType ?? "auto";
-    if (to.path === from.path) {
+    if (to.path.replace(/\/$/, "") === from.path.replace(/\/$/, "")) {
       if (from.hash && !to.hash) {
         return { left: 0, top: 0 };
       }
@@ -865,7 +895,7 @@ const globalMiddleware = [
   manifest_45route_45rule
 ];
 const namedMiddleware = {
-  auth: () => import('./auth-_LBoLAA0.mjs')
+  auth: () => import('./auth-DrI1GMkx.mjs')
 };
 const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:router",
@@ -910,13 +940,12 @@ const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
     const syncCurrentRoute = () => {
       _route.value = router.currentRoute.value;
     };
-    nuxtApp.hook("page:finish", syncCurrentRoute);
     router.afterEach((to, from) => {
-      if (to.matched[0]?.components?.default === from.matched[0]?.components?.default) {
+      if (to.matched.at(-1)?.components?.default === from.matched.at(-1)?.components?.default) {
         syncCurrentRoute();
       }
     });
-    const route = {};
+    const route = { sync: syncCurrentRoute };
     for (const key in _route.value) {
       Object.defineProperty(route, key, {
         get: () => _route.value[key],
@@ -928,7 +957,6 @@ const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
       global: [],
       named: {}
     };
-    useError();
     if (!nuxtApp.ssrContext?.islandContext) {
       router.afterEach(async (to, _from, failure) => {
         delete nuxtApp._processingMiddleware;
@@ -997,6 +1025,7 @@ const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
             throw new Error(`Unknown route middleware: '${entry2}'.`);
           }
           try {
+            if (false) ;
             const result = await nuxtApp.runWithContext(() => middleware(to, from));
             if (true) {
               if (result === false || result instanceof Error) {
@@ -1034,9 +1063,9 @@ const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
       delete nuxtApp._processingMiddleware;
       await nuxtApp.callHook("page:loading:end");
     });
-    router.afterEach(async (to, _from) => {
+    router.afterEach((to) => {
       if (to.matched.length === 0) {
-        await nuxtApp.runWithContext(() => showError(createError({
+        return nuxtApp.runWithContext(() => showError(createError({
           statusCode: 404,
           fatal: false,
           statusMessage: `Page not found: ${to.fullPath}`,
@@ -1086,7 +1115,7 @@ const __nuxt_component_11 = defineComponent({
     return createElementBlock("div");
   }
 });
-const clientOnlySymbol = Symbol.for("nuxt:client-only");
+const clientOnlySymbol = /* @__PURE__ */ Symbol.for("nuxt:client-only");
 const __nuxt_component_0$1 = defineComponent({
   name: "ClientOnly",
   inheritAttrs: false,
@@ -1345,13 +1374,13 @@ const plugins = [
   plugin_jjl2DFTrQxMG7TqNyE_rvcIV8r2uFVLO_Sius2B7lXg
 ];
 const layouts = {
-  "admin-header": defineAsyncComponent(() => import('./_header-C9l9CAXd.mjs').then((m) => m.default || m)),
-  "admin-sidebar": defineAsyncComponent(() => import('./_sidebar-BB6WX2rM.mjs').then((m) => m.default || m)),
-  admin: defineAsyncComponent(() => import('./index-BJNN-Kgk.mjs').then((m) => m.default || m)),
-  "default-footer": defineAsyncComponent(() => import('./_footer-CEe9DRUO.mjs').then((m) => m.default || m)),
-  "default-header": defineAsyncComponent(() => import('./_header-gWoJ1dYC.mjs').then((m) => m.default || m)),
-  "default-sidebar": defineAsyncComponent(() => import('./_sidebar-DUAoSSQY.mjs').then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import('./index-ByXOqpfR.mjs').then((m) => m.default || m)),
+  "admin-header": defineAsyncComponent(() => import('./_header-nJQx58hd.mjs').then((m) => m.default || m)),
+  "admin-sidebar": defineAsyncComponent(() => import('./_sidebar-DiW1mdv0.mjs').then((m) => m.default || m)),
+  admin: defineAsyncComponent(() => import('./index-B1tuoZky.mjs').then((m) => m.default || m)),
+  "default-footer": defineAsyncComponent(() => import('./_footer--CnsrTmu.mjs').then((m) => m.default || m)),
+  "default-header": defineAsyncComponent(() => import('./_header-Df6k0QIr.mjs').then((m) => m.default || m)),
+  "default-sidebar": defineAsyncComponent(() => import('./_sidebar-p_FeEcg1.mjs').then((m) => m.default || m)),
+  default: defineAsyncComponent(() => import('./index-BoDdcJxG.mjs').then((m) => m.default || m)),
   simple: defineAsyncComponent(() => import('./index-pWhHW54B.mjs').then((m) => m.default || m))
 };
 const LayoutLoader = defineComponent({
@@ -1871,6 +1900,9 @@ const usePermissionStore = defineStore("permission", () => {
     fetch
   };
 });
+const paymentMethods = ["PAY_AT_VENUE", "QR"];
+const paymentTypes = ["NATIONAL", "INTERNATIONAL"];
+const paymentStatus = ["PENDING", "COMPLETED", "FAILED"];
 const eventSchema = Y.object({
   name: Y.string().required().label("Name"),
   slug: Y.string().required().label("Slug"),
@@ -1887,15 +1919,12 @@ const stageSchema = Y.object({
   name: Y.string().required().label("Name"),
   excerpt: Y.string().required().label("excerpt"),
   description: Y.string().required().label("Description"),
-  distance: Y.string().required().label("Distance"),
-  difficulty: Y.string().oneOf(["moderate", "easy", "difficult"]).required().label("Difficulty"),
   location: Y.string().required().label("Location"),
-  start: Y.string().required().label("Start"),
-  thumbnail: Y.string().required().label("Thumbnail"),
-  map: Y.string().required().label("Map file")
+  thumbnail: Y.string().required().label("Thumbnail")
 });
 const trailRaceRunner = Y.object({
   stage_id: Y.string().required().label("Stage"),
+  stage_category_id: Y.string().required().label("Stage"),
   first_name: Y.string().required().label("First name"),
   middle_name: Y.string().nullable().label("Middle name"),
   last_name: Y.string().required().label("Last name"),
@@ -1904,10 +1933,17 @@ const trailRaceRunner = Y.object({
   date_of_birth: Y.string().required().label("Date of birth"),
   country_id: Y.string().required().label("Country"),
   gender_id: Y.string().required().label("Gender"),
-  size_id: Y.string().required().label("Shirt size"),
-  age_category_id: Y.string().required().label("Age category"),
+  /* size_id: Y.string().required().label("Shirt size"),
+  age_category_id: Y.string().required().label("Age category"), */
+  payment_type: Y.string().oneOf(paymentTypes).required().label("Payment type"),
+  payment_method: Y.string().oneOf(paymentMethods).required().label("Payment method"),
+  payment_screenshot: Y.string().when("payment_method", {
+    is: "QR",
+    then: (schema) => schema.required(),
+    otherwise: (schema) => schema
+  }).label("Payment screenshot"),
   description: Y.object({
-    club_name: Y.string().required().label("Club name"),
+    club_name: Y.string().label("Club name"),
     emergency_contact_name: Y.string().required().label("Emergency Contact name"),
     emergency_contact_phone: Y.string().required().label("Emergency Contact number"),
     want_lunch: Y.boolean().label("Want lunch")
@@ -1922,8 +1958,8 @@ const trailRaceVolunteer = Y.object({
   date_of_birth: Y.string().required().label("Date of birth"),
   country_id: Y.string().required().label("Country"),
   gender_id: Y.string().required().label("Gender"),
-  size_id: Y.string().required().label("Shirt size"),
-  age_category_id: Y.string().required().label("Age category"),
+  // size_id: Y.string().required().label("Shirt size"),
+  // age_category_id: Y.string().required().label("Age category"),
   description: Y.string().label("Volunteer detail")
 });
 const stageCategorySchema = Y.object({
@@ -1937,6 +1973,29 @@ const stageCategorySchema = Y.object({
   end: Y.string().required().label("End"),
   stage_id: Y.string().required().label("Stage"),
   map: Y.string().required().label("Map file")
+});
+const sponsorSchema = Y.object({
+  event_id: Y.string().required().label("Event"),
+  name: Y.string().required().label("Name"),
+  description: Y.string().required().label("Description"),
+  image: Y.string().required().label("Image"),
+  type: Y.string().required().label("Sponsor type"),
+  url: Y.string().url().required().label("URL")
+});
+const sponsorTypeSchema = Y.object({
+  name: Y.string().required().label("Name"),
+  description: Y.string().required().label("Description")
+});
+const stageCategoryPaymentSchema = Y.object({
+  payment_id: Y.string().optional().label("Payment"),
+  stage_category_id: Y.string().required().label("Stage category"),
+  type: Y.string().oneOf(paymentTypes).required().label("Payment type"),
+  amount: Y.number().required().label("Amount"),
+  image: Y.string().when("payment_id", {
+    is: void 0,
+    then: (schema) => schema.required(),
+    otherwise: (schema) => schema.notRequired()
+  }).label("Image")
 });
 const useEventStore = defineStore("event", () => {
   const events = ref([]);
@@ -2057,20 +2116,13 @@ const _sfc_main$1 = {
   setup(__props) {
     const props = __props;
     const _error = props.error;
-    _error.stack ? _error.stack.split("\n").splice(1).map((line) => {
-      const text = line.replace("webpack:/", "").replace(".vue", ".js").trim();
-      return {
-        text,
-        internal: line.includes("node_modules") && !line.includes(".cache") || line.includes("internal") || line.includes("new Promise")
-      };
-    }).map((i) => `<span class="stack${i.internal ? " internal" : ""}">${i.text}</span>`).join("\n") : "";
     const statusCode = Number(_error.statusCode || 500);
     const is404 = statusCode === 404;
     const statusMessage = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
     const description = _error.message || _error.toString();
     const stack = void 0;
-    const _Error404 = defineAsyncComponent(() => import('./error-404-Lqal7Soh.mjs'));
-    const _Error = defineAsyncComponent(() => import('./error-500-CYVX-nbD.mjs'));
+    const _Error404 = defineAsyncComponent(() => import('./error-404-DJn3ln7e.mjs'));
+    const _Error = defineAsyncComponent(() => import('./error-500-BYc1PlQR.mjs'));
     const ErrorTemplate = is404 ? _Error404 : _Error;
     return (_ctx, _push, _parent, _attrs) => {
       _push(ssrRenderComponent(unref(ErrorTemplate), mergeProps({ statusCode: unref(statusCode), statusMessage: unref(statusMessage), description: unref(description), stack: unref(stack) }, _attrs), null, _parent));
@@ -2094,7 +2146,7 @@ const _sfc_main = {
     const SingleRenderer = false;
     provide(PageRouteSymbol, useRoute());
     nuxtApp.hooks.callHookWith((hooks) => hooks.map((hook) => hook()), "vue:setup");
-    const error = useError();
+    const error = /* @__PURE__ */ useError();
     const abortRender = error.value && !nuxtApp.ssrContext.error;
     onErrorCaptured((err, target, info) => {
       nuxtApp.hooks.callHook("vue:error", err, target, info).catch((hookError) => console.error("[nuxt] Error in `vue:error` hook", hookError));
@@ -2149,7 +2201,7 @@ let entry;
     return vueApp;
   };
 }
-const entry$1 = (ssrContext) => entry(ssrContext);
+const entry_default = (ssrContext) => entry(ssrContext);
 
-export { __nuxt_component_0$1 as _, useAxios as a, useRoute as b, useAuthStore as c, useAppStore as d, entry$1 as default, useModalMeta as e, __nuxt_component_11 as f, getGPXFile as g, stageSchema as h, isObjEq as i, checkpointSchema as j, stageCategorySchema as k, usePermissionStore as l, useRoleStore as m, navigateTo as n, useRuntimeConfig as o, eventSchema as p, useRouter as q, useNuxtApp as r, showImage as s, resolveRouteObject as t, useEventStore as u, nuxtLinkDefaults as v, tryUseNuxtApp as w, trailRaceRunner as x, trailRaceVolunteer as y, defineNuxtRouteMiddleware as z };
+export { trailRaceRunner as A, trailRaceVolunteer as B, eventSchema as C, useRoleStore as D, sponsorTypeSchema as E, defineNuxtRouteMiddleware as F, __nuxt_component_0$1 as _, useAxios as a, useRoute as b, useAuthStore as c, useAppStore as d, entry_default as default, useModalMeta as e, __nuxt_component_11 as f, getGPXFile as g, stageSchema as h, isObjEq as i, stageCategorySchema as j, checkpointSchema as k, stageCategoryPaymentSchema as l, paymentStatus as m, navigateTo as n, paymentMethods as o, paymentTypes as p, sponsorSchema as q, usePermissionStore as r, showImage as s, useRouter as t, useEventStore as u, useNuxtApp as v, resolveRouteObject as w, useRuntimeConfig as x, nuxtLinkDefaults as y, tryUseNuxtApp as z };
 //# sourceMappingURL=server.mjs.map

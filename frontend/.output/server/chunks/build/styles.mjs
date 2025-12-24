@@ -1,13 +1,15 @@
 const interopDefault = r => r.default || r || [];
 const styles = {
-  "node_modules/nuxt/dist/app/entry.js": () => import('./entry-styles.BA7oHG-W.mjs').then(interopDefault),
-  "node_modules/nuxt/dist/app/components/error-404.vue": () => import('./error-404-styles.DYPeZSru.mjs').then(interopDefault),
-  "node_modules/nuxt/dist/app/components/error-500.vue": () => import('./error-500-styles.DH4SuYyS.mjs').then(interopDefault),
-  "node_modules/nuxt/dist/app/components/error-404.vue?vue&type=style&index=0&scoped=06403dcb&lang.css": () => import('./error-404-styles.DFuUZ_1i.mjs').then(interopDefault),
-  "node_modules/nuxt/dist/app/components/error-500.vue?vue&type=style&index=0&scoped=4b6f0a29&lang.css": () => import('./error-500-styles.D5zYv3n5.mjs').then(interopDefault),
-  "app.vue?vue&type=script&setup=true&lang.ts": () => import('./app-styles.DUYqpj7U.mjs').then(interopDefault),
-  "components/TiptapEditor.vue": () => import('./TiptapEditor-styles.TZdS8FMX.mjs').then(interopDefault),
-  "components/TiptapEditor.vue?vue&type=style&index=0&lang.css": () => import('./TiptapEditor-styles.DBuKsdv4.mjs').then(interopDefault)
+  "node_modules/nuxt/dist/app/entry.js": () => import('./entry-styles.BOAG6nZ4.mjs').then(interopDefault),
+  "node_modules/nuxt/dist/app/components/error-404.vue": () => import('./error-404-styles.BM3jSf5-.mjs').then(interopDefault),
+  "node_modules/nuxt/dist/app/components/error-500.vue": () => import('./error-500-styles.BXdWm9Kk.mjs').then(interopDefault),
+  "node_modules/nuxt/dist/app/components/error-404.vue?vue&type=style&index=0&scoped=edacca8d&lang.css": () => import('./error-404-styles.BM3jSf5-.mjs').then(interopDefault),
+  "node_modules/nuxt/dist/app/components/error-500.vue?vue&type=style&index=0&scoped=8ee1d2f9&lang.css": () => import('./error-500-styles.BXdWm9Kk.mjs').then(interopDefault),
+  "app.vue?vue&type=script&setup=true&lang.ts": () => import('./app-styles.D7B5KPeo.mjs').then(interopDefault),
+  "components/Countdown.vue": () => import('./Countdown-styles.Cy-Mn32Y.mjs').then(interopDefault),
+  "components/Countdown.vue?vue&type=style&index=0&scoped=ea4e6f67&lang.css": () => import('./Countdown-styles.Cy-Mn32Y.mjs').then(interopDefault),
+  "components/TiptapEditor.vue": () => import('./TiptapEditor-styles.CAxc_B1y.mjs').then(interopDefault),
+  "components/TiptapEditor.vue?vue&type=style&index=0&lang.css": () => import('./TiptapEditor-styles.CAxc_B1y.mjs').then(interopDefault)
 };
 
 export { styles as default };

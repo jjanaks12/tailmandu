@@ -1,0 +1,1 @@
+import{a as c}from"./C6WeEH23.js";const r=c("chevron-left",[["path",{d:"m15 18-6-6 6-6",key:"1wnfg3"}]]);const i=c("chevron-right",[["path",{d:"m9 18 6-6-6-6",key:"mthhwq"}]]);const t=c("ellipsis",[["circle",{cx:"12",cy:"12",r:"1",key:"41hilf"}],["circle",{cx:"19",cy:"12",r:"1",key:"1wjl8i"}],["circle",{cx:"5",cy:"12",r:"1",key:"1pcz8c"}]]);export{i as C,t as E,r as a};
