@@ -159,7 +159,8 @@ export class RunnerController {
 
             const stageCategoryPayment = await prisma.stageCategoryPayment.findFirst({
                 where: {
-                    stage_category_id: validationData.stage_category_id
+                    stage_category_id: validationData.stage_category_id,
+                    type: validationData.payment_type
                 }
             })
 
@@ -167,9 +168,9 @@ export class RunnerController {
                 data: {
                     ...paymentBody,
                     amount: stageCategoryPayment.amount,
-                    type: validationData.payment_type,
                     stage_category_id: validationData.stage_category_id,
                     runner_id: runner.id,
+                    method: validationData.payment_method
                 }
             }))
         } catch (error) {

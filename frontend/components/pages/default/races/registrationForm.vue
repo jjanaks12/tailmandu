@@ -38,9 +38,11 @@ const availabeStageCategoryList = computed(() => stageList.value.find(stage => s
 // getting price of selected stage category
 const prices = computed(() => availabeStageCategoryList.value?.find(stage_category => stage_category.id === form.value?.values.stage_category_id))
 
-const payment = computed(() => form.value?.values.country_id
-    ? prices.value?.payment.find(payment => payment.type === (form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL')) ?? {} as Payment
-    : null)
+const payment = computed(() => {
+    const type = form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
+    form.value?.setFieldValue('payment_type', type)
+    return prices.value?.payment.find(payment => payment.type === type) ?? {} as Payment
+})
 
 const onSubmit: SubmissionHandler = async (values: any) => {
     try {
@@ -66,7 +68,7 @@ const handleFileChange = (event: Event) => {
         reader.onload = (e) => {
             const result = e.target?.result
             if (result) {
-                form.value?.setFieldValue('payment_type', 'QR')
+                form.value?.setFieldValue('payment_method', 'QR')
                 form.value?.setFieldValue('payment_screenshot', result)
             }
         }
@@ -335,14 +337,13 @@ onMounted(() => {
                     </template>
                 </div>
             </div>
-
             <div class="bg-white text-gray-500 rounded-3xl border border-gray-200 shadow-sm p-8"
-                v-if="mode == 'runner' && payment">
+                v-if="mode == 'runner' && Object.keys(payment).length > 0">
                 <h3 class="text-2xl font-light mb-2">
                     Registration fees for
                     <span class="text-primary font-bold">{{ prices?.name }}</span>
                 </h3>
-                <template v-if="!values.payment_type || values.payment_type == 'QR'">
+                <template v-if="!values.payment_method || values.payment_method == 'QR'">
                     <div class="flex items-center justify-between gap-6 pb-5">
                         <div class="grow space-y-3">
                             <em class="text-gray-600 block not-italic text-2xl">NPR {{ payment?.amount }}</em>
@@ -383,20 +384,20 @@ onMounted(() => {
                                 class="w-full h-auto">
                         </figure>
                     </div>
+                    <ErrorMessage name="payment_method" />
                     <Separator />
                 </template>
-                <template v-if="values.payment_type === 'PAY_AT_VENUE'">
+                <template v-if="values.payment_method === 'PAY_AT_VENUE'">
                     <p>Got it! We will remind you to pay cash when you arrive at the event.</p>
                 </template>
 
                 <div class="text-center flex flex-col justify-center items-center" v-else>
                     <span class="bg-white text-gray-600 text-lg font-bold uppercase -translate-y-1/2 px-2">Or</span>
                     <p>You can also choose to pay in cash when you arrive at the event.</p>
-                    <Button type="button" @click="form?.setFieldValue('payment_type', 'PAY_AT_VENUE')" class="mt-2">
+                    <Button type="button" @click="form?.setFieldValue('payment_method', 'PAY_AT_VENUE')" class="mt-2">
                         Pay at venue
                     </Button>
                 </div>
-                <ErrorMessage name="payment_type" />
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
