@@ -15,29 +15,27 @@ const { assignVolunteerToCheckpoint } = useCheckpointStore()
 const isLoading = ref(false)
 const form = ref<FormContext>()
 
+const selectedStageCategories = computed(() => [...new Set(props.checkpoints
+    .map(checkpoint => (form.value?.values.checkpoints ?? []).includes(checkpoint.id) ? checkpoint.stage_category_id : null)
+    .filter(id => id != null))])
+
 const formSubmit = async (values: any) => {
     isLoading.value = true
-    await assignVolunteerToCheckpoint(props.volunteer.id, values.checkpoint_id)
+    await assignVolunteerToCheckpoint(props.volunteer.id, values)
+
     isLoading.value = false
     emit('update')
 }
 </script>
 
 <template>
-    <Form @submit="formSubmit" class="space-y-4 pt-8">
-        <Field name="checkpoint_id" v-slot="{ value, handleChange }" as="div" class="space-y-2">
-            <label class="inline-block align-top">Choose a checkpoint to assign to <strong>{{
-                volunteer.personal.first_name }}</strong></label>
-            <Select :model-value="value" @update:model-value="handleChange">
-                <SelectTrigger class="w-full h-12">
-                    <SelectValue placeholder="Select a checkpoint" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem v-for="checkpoint in checkpoints" :value="checkpoint.id">
-                        {{ checkpoint.name }}
-                    </SelectItem>
-                </SelectContent>
-            </Select>
+    <Form ref="form" @submit="formSubmit" class="space-y-4 pt-8 max-w-[460px]" v-slot="{ values }">
+        <Field as="div" type="checkbox" name="checkpoints" v-for="checkpoint in checkpoints"
+            v-slot="{ handleChange, value }" :value="checkpoint.id" class="flex gap-2">
+            <Checkbox @update:model-value="handleChange" :id="checkpoint.id"
+                :model-value="value?.includes(checkpoint.id)"
+                :disabled="selectedStageCategories.includes(checkpoint.stage_category_id) && !values.checkpoints.includes(checkpoint.id)" />
+            <Label :for="checkpoint.id">{{ checkpoint.name }}</Label>
         </Field>
         <div class="text-right">
             <Button variant="default" type="submit" class="w-full sm:w-auto px-8 py-3 h-12 text-base font-medium "

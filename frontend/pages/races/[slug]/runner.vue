@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-    import { ArrowBigLeft } from 'lucide-vue-next'
-    import { showImage } from '~/lib/filters'
-    import type { TrailRace } from '~/lib/types'
-    import { useEventStore } from '~/store/event'
+import { ArrowBigLeft } from 'lucide-vue-next'
+import { showImage } from '~/lib/filters'
+import type { TrailRace } from '~/lib/types'
+import { useEventStore } from '~/store/event'
 
-    const route = useRoute()
-    const { getBySlug } = useEventStore()
-    const trailRace = ref<TrailRace | null>(null)
+const route = useRoute()
+const { getBySlug } = useEventStore()
+const trailRace = ref<TrailRace | null>(null)
 
-    onBeforeMount(async () => {
-        trailRace.value = await getBySlug(route.params.slug as string)
+onBeforeMount(async () => {
+    trailRace.value = await getBySlug(route.params.slug as string)
 
-        useTitle(`${trailRace.value.name} - Runner form`)
-    })
+    useTitle(`${trailRace.value.name} - Runner form`)
+})
 
 </script>
 
@@ -23,7 +23,7 @@
                 class="size-full object-cover">
         </figure>
         <div class="container">
-            <div class="bg-white/90 p-12 mt-12 rounded-tl-2xl rounded-tr-2xl">
+            <div class="bg-white/90 p-12 mt-12 rounded-tl-2xl rounded-tr-2xl min-h-[70vh]">
                 <div class="space-y-4 mb-16">
                     <h1 class="text-primary text-3xl">{{ trailRace?.name }}</h1>
                     <p v-text="trailRace.excerpt" />

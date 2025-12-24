@@ -41,10 +41,11 @@ onMounted(() => {
         </div>
         <div class="pb-8 space-y-16" v-if="stageCategories.length > 0">
             <StageCategoryItem v-for="stageCategory in stageCategories" :stage-category="stageCategory"
-                @event_started="emit('update')" @event_ended="emit('update')" @update="fetch()" />
+                @event_started="emit('update')" @event_ended="emit('update')" @update="fetch()"
+                @edit="editCategory = stageCategory; showDialog = true" />
         </div>
     </div>
-    <Dialog :open="showDialog" @update:open="showDialog = false">
+    <Dialog :open="showDialog" @update:open="showDialog = false; editCategory = null">
         <DialogContent class="sm:max-w-[1000px] max-h-full overflow-y-auto">
             <DialogHeader>
                 <DialogTitle>{{ editCategory ? 'Edit ' + editCategory.name : 'Add category' }}</DialogTitle>

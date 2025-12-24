@@ -1,4 +1,4 @@
-import { PaymentType } from '@prisma/client'
+import { PaymentType, PaymentMethod } from '@prisma/client'
 import * as Y from 'yup'
 
 export const eventSchema = Y.object({
@@ -38,8 +38,15 @@ export const trailRaceRunner = Y.object({
     date_of_birth: Y.string().required().label("Date of birth"),
     country_id: Y.string().required().label("Country"),
     gender_id: Y.string().required().label("Gender"),
-    size_id: Y.string().required().label("Shirt size"),
-    age_category_id: Y.string().required().label("Age category"),
+    /* size_id: Y.string().required().label("Shirt size"),
+    age_category_id: Y.string().required().label("Age category"), */
+    payment_type: Y.string().oneOf(Object.values(PaymentType)).required().label("Payment type"),
+    payment_method: Y.string().oneOf(Object.values(PaymentMethod)).required().label("Payment method"),
+    payment_screenshot: Y.string().when('payment_method', {
+        is: 'QR',
+        then: schema => schema.required(),
+        otherwise: schema => schema
+    }).label("Payment screenshot"),
     description: Y.object({
         club_name: Y.string().required().label('Club name'),
         emergency_contact_name: Y.string().required().label('Emergency Contact name'),
@@ -57,9 +64,9 @@ export const trailRaceVolunteer = Y.object({
     date_of_birth: Y.string().required().label("Date of birth"),
     country_id: Y.string().required().label("Country"),
     gender_id: Y.string().required().label("Gender"),
-    size_id: Y.string().required().label("Shirt size"),
+    // size_id: Y.string().required().label("Shirt size"),
     stage_id: Y.string().required().label("Stage"),
-    age_category_id: Y.string().required().label("Age category"),
+    // age_category_id: Y.string().required().label("Age category"),
     event_id: Y.string().required().label("Event"),
     description: Y.string().label("Description")
 })
@@ -95,6 +102,7 @@ export const stageCategoryPaymentSchema = Y.object({
     payment_id: Y.string().optional().label('Payment'),
     stage_category_id: Y.string().required().label('Stage category'),
     amount: Y.number().required().label('Amount'),
+    type: Y.string().oneOf(Object.values(PaymentType)).required().label('Type'),
     image: Y.string().when('payment_id', {
         is: undefined,
         then: schema => schema.required(),

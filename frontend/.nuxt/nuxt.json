@@ -1,9 +1,9 @@
 {
-  "_hash": "WV6UwyOuz0E4D8FjkPR3bWjNBcY7zziuCi2HAX0fhx8",
+  "_hash": "Tqyv6p0mVGS4E_YjteSWc6hNaib8rDAiD4oOe8Axiwc",
   "project": {
     "rootDir": "/Users/janakshrestha/Documents/2025/05 May/trailmandu/frontend"
   },
   "versions": {
-    "nuxt": "3.18.1"
+    "nuxt": "3.20.2"
   }
 }

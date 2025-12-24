@@ -44,10 +44,11 @@ router.delete('/:event_id/galleries/:image_id', [verifyAccessToken], GalleryCont
 
 // VOLUNTEERS
 router.post('/:event_id/volunteer/register', [], VolunteerController.save)
-router.patch('/checkpoints/:checkpoint_id/assign_volunteer/:volunteer_id', [], VolunteerController.assignVolunteer)
+router.patch('/checkpoints/assign_volunteer/:volunteer_id', [], VolunteerController.assignVolunteer)
 
 // RUNNERS
 router.post('/:event_id/runner/register', [], RunnerController.save)
+router.get('/:event_id/:stage_id/runners', [verifyAccessToken], RunnerController.index)
 
 // STAGE_CATEGORIES
 router.get('/:stage_id/stage_categories', [], StageCategoryController.index)
@@ -62,6 +63,8 @@ router.post('/:event_id/sponsors', [verifyAccessToken], SponsorController.create
 router.put('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.update)
 router.delete('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.destroy)
 
+// PAYMENTS
 router.get('/:event_id/payments', [verifyAccessToken], PaymentController.index)
+router.put('/:event_id/payments/:payment_id', [verifyAccessToken], PaymentController.updatePaymentStatus)
 
 export default router

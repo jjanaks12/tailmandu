@@ -28,8 +28,8 @@ export const useCheckpointStore = defineStore('checkpoints', () => {
         await axios.delete(`/events/checkpoints/${checkpointId}`)
     }
 
-    const assignVolunteerToCheckpoint = async (volunteerId: string, checkpointId: string) => {
-        await axios.patch(`events/checkpoints/${checkpointId}/assign_volunteer/${volunteerId}`)
+    const assignVolunteerToCheckpoint = async (volunteerId: string, values: any) => {
+        await axios.patch(`events/checkpoints/assign_volunteer/${volunteerId}`, values)
     }
 
     return {

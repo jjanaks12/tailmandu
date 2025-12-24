@@ -1,59 +1,67 @@
 <script setup lang="ts">
-    import { onMounted, ref } from 'vue'
-    import moment from 'moment'
-    import { pad } from '~/lib/filters'
+import { onMounted, ref } from 'vue'
+import moment from 'moment'
+import { pad } from '~/lib/filters'
 
-    interface CountdownProps {
-        date: moment.Moment
-    }
+interface CountdownProps {
+    date: moment.Moment
+}
 
-    const props = defineProps<CountdownProps>()
-    const slots = useSlots()
+const props = defineProps<CountdownProps>()
+const slots = useSlots()
 
-    const day = ref(0)
-    const hour = ref(0)
-    const minute = ref(0)
-    const second = ref(0)
+const tileCount = ref(0)
 
-    onMounted(() => {
-        const today = moment()
-        const lastDate = props.date
+const day = ref(0)
+const hour = ref(0)
+const minute = ref(0)
+const second = ref(0)
 
-        if (lastDate.diff(today) < 0)
-            return
+onMounted(() => {
+    const today = moment()
+    const lastDate = props.date
 
-        day.value = (today.diff(lastDate, 'days') * -1)
-        setInterval(() => {
-            if (day.value == 0)
-                day.value = 30
+    if (lastDate.diff(today) < 0)
+        return
 
-            day.value--
-        }, (1000 * 60 * 60))
+    day.value = (today.diff(lastDate, 'days') * -1)
+    setInterval(() => {
+        if (day.value == 0)
+            day.value = 30
 
-        hour.value = (today.diff(lastDate, 'hours') * -1) % 24
-        setInterval(() => {
-            if (hour.value == 0)
-                hour.value = 60
+        day.value--
+    }, (1000 * 60 * 60))
 
-            hour.value--
-        }, (1000 * 60 * 60))
+    hour.value = (today.diff(lastDate, 'hours') * -1) % 24
+    setInterval(() => {
+        if (hour.value == 0)
+            hour.value = 60
 
-        minute.value = (today.diff(lastDate, 'minutes') * -1) % 60
-        setInterval(() => {
-            if (minute.value == 0)
-                minute.value = 60
+        hour.value--
+    }, (1000 * 60 * 60))
 
-            minute.value--
-        }, (1000 * 60))
+    minute.value = (today.diff(lastDate, 'minutes') * -1) % 60
+    setInterval(() => {
+        if (minute.value == 0)
+            minute.value = 60
 
-        second.value = (today.diff(lastDate, 'seconds') * -1) % 60
-        setInterval(() => {
-            if (second.value == 0)
-                second.value = 60
+        minute.value--
+    }, (1000 * 60))
 
-            second.value--
-        }, (1000))
-    })
+    second.value = (today.diff(lastDate, 'seconds') * -1) % 60
+    setInterval(() => {
+        if (second.value == 0)
+            second.value = 60
+
+        second.value--
+    }, (1000))
+})
+
+onMounted(() => {
+    const holder = document.querySelectorAll('.countdown__holder .countdown__tile')
+
+    tileCount.value = holder?.length ?? 1
+})
 </script>
 
 <template>
@@ -91,40 +99,44 @@
 </template>
 
 <style scoped>
+em {
+    font-style: normal;
+}
+
+.countdown {
+    width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.countdown__holder {
+    display: flex;
+}
+
+.countdown__tile {
+    flex: calc(100% / v-bind(tileCount));
+    text-align: center;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    +.countdown__tile::before {
+        content: ':';
+        align-self: start;
+        padding-top: 20px;
+    }
+
+    span {
+        flex: calc(50% - 8px) 0 0;
+        font-size: 40px;
+        border: 1px solid #aeaeae;
+        border-radius: 4px;
+    }
+
     em {
-        font-style: normal;
+        flex: 100% 0 0;
     }
-
-    .countdown__holder {
-        width: 350px;
-        display: flex;
-        margin: 0 auto;
-    }
-
-    .countdown__tile {
-        flex: 33.33% 0 0;
-        text-align: center;
-        display: flex;
-        justify-content: end;
-        align-items: end;
-        flex-wrap: wrap;
-        gap: 4px;
-
-        +.countdown__tile::before {
-            content: ':';
-            align-self: start;
-            padding-top: 20px;
-        }
-
-        span {
-            flex: calc(50% - 8px) 0 0;
-            font-size: 40px;
-            border: 1px solid #aeaeae;
-            border-radius: 4px;
-        }
-
-        em {
-            flex: 100% 0 0;
-        }
-    }
+}
 </style>

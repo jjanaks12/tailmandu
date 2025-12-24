@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-    import AppHeader from './_header.vue'
-    import AppSidebar from './_sidebar.vue'
-    import { useAuthStore } from '~/store/auth'
+import AppHeader from './_header.vue'
+import AppSidebar from './_sidebar.vue'
+import { useAuthStore } from '~/store/auth'
 
-    const { isLoading } = storeToRefs(useAuthStore())
-    const { can } = useAuthorization()
-    const route = useRoute()
+const { isLoading } = storeToRefs(useAuthStore())
+const { can } = useAuthorization()
+const route = useRoute()
 </script>
 
 <template>
-    <SidebarProvider v-if="!isLoading">
+    <SidebarProvider v-if="!isLoading" v-slot="{ status }">
         <AppSidebar />
-        <main id="main" class="bg-gray-300 flex-grow relative">
+        <main id="main" :class="{ 'bg-gray-300 flex-grow relative': true, 'max-w-[calc(100vw-250px)]': status }">
             <AppHeader />
             <div class="p-4">
                 <div class="bg-white p-12 rounded-2xl overflow-hidden">

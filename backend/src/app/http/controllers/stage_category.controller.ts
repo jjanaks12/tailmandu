@@ -32,6 +32,8 @@ export class StageCategoryController {
         try {
             const validationData = await stageCategorySchema.validate(request.body, { abortEarly: false })
             const body: any = {}
+            const count = await prisma.stageCategory.count({ where: { stage_id: validationData.stage_id } })
+            body.bib_range = `${count + 1}-${count + 500}`
 
             if (validationData.map) {
                 const file = new FileHandler('gpx')

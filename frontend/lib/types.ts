@@ -7,10 +7,14 @@ type APISort<T> = {
     field: keyof typeof T
 }
 
-export const paymentTypes = ['CASH', 'PAY_AT_VENUE'] as const
+export const paymentMethods = ['PAY_AT_VENUE', 'QR'] as const
+export const paymentTypes = ['NATIONAL', 'INTERNATIONAL'] as const
 type AddressType = 'BILLING' | 'SHIPPING' | 'PERMANENT_ADDRESS'
 type StageDifficulty = 'moderate' | 'easy' | 'difficult'
-type PaymentType = typeof paymentTypes[number]
+export type PaymentMethod = typeof paymentMethods[number]
+export type PaymentType = typeof paymentTypes[number]
+export const paymentStatus = ['PENDING', 'COMPLETED', 'FAILED'] as const
+export type PaymentStatus = typeof paymentStatus[number]
 
 export type APIQuery<T> = {
     s: string
@@ -179,6 +183,10 @@ export type Payment = {
     id: string
     amount: number
     type: PaymentType
+    status: PaymentStatus
+    created_at: string
+    updated_at: string
+    deleted_at: string
     runner_id: string
     runner: EventRunner
     stage_category_id: string
@@ -229,7 +237,7 @@ type Address = {
     city: string
     state: string
     zipCode: string
-    countryId: string
+    country_id: string
     country: Country
     type: AddressType
 }
@@ -287,7 +295,7 @@ export type StageCategory = {
     map_file: Image
     checkpoints: Checkpoint[]
     runners: EventRunner[]
-    payment: StageCategoryPayment
+    payment: StageCategoryPayment[]
     payments: Payment[]
 }
 
@@ -329,6 +337,7 @@ export type SponsorType = {
 export type StageCategoryPayment = {
     id: string
     amount: string
+    type: PaymentType
     created_at: string
     updated_at: string
     deleted_at: string

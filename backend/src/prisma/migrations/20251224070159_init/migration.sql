@@ -6,7 +6,7 @@ CREATE TABLE `addresses` (
     `city` VARCHAR(191) NOT NULL,
     `state` VARCHAR(191) NOT NULL,
     `zipCode` VARCHAR(191) NOT NULL,
-    `countryId` VARCHAR(191) NOT NULL,
+    `country_id` VARCHAR(191) NOT NULL,
     `type` ENUM('BILLING', 'SHIPPING', 'PERMANENT_ADDRESS') NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -87,7 +87,7 @@ CREATE TABLE `event_runners` (
     `event_id` VARCHAR(191) NOT NULL,
     `stage_category_id` VARCHAR(191) NOT NULL,
     `stage_id` VARCHAR(191) NOT NULL,
-    `shirt_id` VARCHAR(191) NOT NULL,
+    `sizeId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `event_runners_bib_key`(`bib`),
     PRIMARY KEY (`id`)
@@ -137,7 +137,7 @@ CREATE TABLE `permissions` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Partners` (
+CREATE TABLE `partners` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` TEXT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE `Partners` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `PartnerCategories` (
+CREATE TABLE `partner_categories` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
@@ -186,10 +186,14 @@ CREATE TABLE `personals` (
 CREATE TABLE `payments` (
     `id` VARCHAR(191) NOT NULL,
     `amount` DECIMAL(65, 30) NOT NULL,
-    `type` ENUM('CASH', 'PAY_AT_VENUE') NOT NULL,
-    `stage_id` VARCHAR(191) NOT NULL,
+    `method` ENUM('QR', 'PAY_AT_VENUE') NOT NULL,
+    `status` ENUM('PENDING', 'COMPLETED', 'FAILED') NOT NULL DEFAULT 'PENDING',
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `stage_category_id` VARCHAR(191) NOT NULL,
     `runner_id` VARCHAR(191) NOT NULL,
-    `image_id` VARCHAR(191) NOT NULL,
+    `image_id` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -220,21 +224,45 @@ CREATE TABLE `sizes` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `sponsors` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `url` VARCHAR(191) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `race_id` VARCHAR(191) NULL,
+    `sponsorTypeId` VARCHAR(191) NULL,
+    `thumbnail_id` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `sponsor_types` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `imageId` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `stages` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `excerpt` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
-    `distance` VARCHAR(191) NULL,
-    `difficulty` VARCHAR(191) NULL,
     `location` VARCHAR(191) NOT NULL,
-    `start` DATETIME(3) NULL,
-    `end` DATETIME(3) NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
     `deleted_at` DATETIME(3) NULL,
     `event_id` VARCHAR(191) NOT NULL,
-    `map_file_id` VARCHAR(191) NULL,
     `image_id` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
@@ -254,6 +282,7 @@ CREATE TABLE `stage_categories` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
     `deleted_at` DATETIME(3) NULL,
+    `bib_range` VARCHAR(191) NOT NULL DEFAULT '0-0',
     `stage_id` VARCHAR(191) NOT NULL,
     `map_file_id` VARCHAR(191) NULL,
 
@@ -274,6 +303,20 @@ CREATE TABLE `events` (
     `deleted_at` DATETIME(3) NULL,
     `image_id` VARCHAR(191) NULL,
     `map_file_id` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `stage_category_payments` (
+    `id` VARCHAR(191) NOT NULL,
+    `amount` DECIMAL(65, 30) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NULL,
+    `deleted_at` DATETIME(3) NULL,
+    `type` ENUM('NATIONAL', 'INTERNATIONAL') NOT NULL,
+    `stage_category_id` VARCHAR(191) NOT NULL,
+    `image_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -371,7 +414,7 @@ CREATE TABLE `_StageToVolunteer` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `addresses` ADD CONSTRAINT `addresses_countryId_fkey` FOREIGN KEY (`countryId`) REFERENCES `countries`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `addresses` ADD CONSTRAINT `addresses_country_id_fkey` FOREIGN KEY (`country_id`) REFERENCES `countries`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `checkpoints` ADD CONSTRAINT `checkpoints_stage_category_id_fkey` FOREIGN KEY (`stage_category_id`) REFERENCES `stage_categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -395,7 +438,7 @@ ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_stage_category_id_fkey
 ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_stage_id_fkey` FOREIGN KEY (`stage_id`) REFERENCES `stages`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_shirt_id_fkey` FOREIGN KEY (`shirt_id`) REFERENCES `sizes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_sizeId_fkey` FOREIGN KEY (`sizeId`) REFERENCES `sizes`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `newsletters` ADD CONSTRAINT `newsletters_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `personals`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -416,19 +459,28 @@ ALTER TABLE `personals` ADD CONSTRAINT `personals_image_id_fkey` FOREIGN KEY (`i
 ALTER TABLE `personals` ADD CONSTRAINT `personals_gender_id_fkey` FOREIGN KEY (`gender_id`) REFERENCES `genders`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `payments` ADD CONSTRAINT `payments_stage_id_fkey` FOREIGN KEY (`stage_id`) REFERENCES `stages`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `payments` ADD CONSTRAINT `payments_stage_category_id_fkey` FOREIGN KEY (`stage_category_id`) REFERENCES `stage_categories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `payments` ADD CONSTRAINT `payments_runner_id_fkey` FOREIGN KEY (`runner_id`) REFERENCES `event_runners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `payments` ADD CONSTRAINT `payments_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `payments` ADD CONSTRAINT `payments_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sponsors` ADD CONSTRAINT `sponsors_race_id_fkey` FOREIGN KEY (`race_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sponsors` ADD CONSTRAINT `sponsors_sponsorTypeId_fkey` FOREIGN KEY (`sponsorTypeId`) REFERENCES `sponsor_types`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sponsors` ADD CONSTRAINT `sponsors_thumbnail_id_fkey` FOREIGN KEY (`thumbnail_id`) REFERENCES `images`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sponsor_types` ADD CONSTRAINT `sponsor_types_imageId_fkey` FOREIGN KEY (`imageId`) REFERENCES `images`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `stages` ADD CONSTRAINT `stages_event_id_fkey` FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `stages` ADD CONSTRAINT `stages_map_file_id_fkey` FOREIGN KEY (`map_file_id`) REFERENCES `images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `stages` ADD CONSTRAINT `stages_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -444,6 +496,12 @@ ALTER TABLE `events` ADD CONSTRAINT `events_image_id_fkey` FOREIGN KEY (`image_i
 
 -- AddForeignKey
 ALTER TABLE `events` ADD CONSTRAINT `events_map_file_id_fkey` FOREIGN KEY (`map_file_id`) REFERENCES `images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `stage_category_payments` ADD CONSTRAINT `stage_category_payments_stage_category_id_fkey` FOREIGN KEY (`stage_category_id`) REFERENCES `stage_categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `stage_category_payments` ADD CONSTRAINT `stage_category_payments_image_id_fkey` FOREIGN KEY (`image_id`) REFERENCES `images`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `users` ADD CONSTRAINT `users_personal_id_fkey` FOREIGN KEY (`personal_id`) REFERENCES `personals`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -491,7 +549,7 @@ ALTER TABLE `_PermissionToRole` ADD CONSTRAINT `_PermissionToRole_A_fkey` FOREIG
 ALTER TABLE `_PermissionToRole` ADD CONSTRAINT `_PermissionToRole_B_fkey` FOREIGN KEY (`B`) REFERENCES `roles`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `_PartnerToTrailRace` ADD CONSTRAINT `_PartnerToTrailRace_A_fkey` FOREIGN KEY (`A`) REFERENCES `Partners`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_PartnerToTrailRace` ADD CONSTRAINT `_PartnerToTrailRace_A_fkey` FOREIGN KEY (`A`) REFERENCES `partners`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_PartnerToTrailRace` ADD CONSTRAINT `_PartnerToTrailRace_B_fkey` FOREIGN KEY (`B`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

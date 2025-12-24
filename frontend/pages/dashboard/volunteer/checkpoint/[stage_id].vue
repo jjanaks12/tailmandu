@@ -73,8 +73,7 @@ onMounted(() => {
     <div class="flex gap-4" v-if="filteredList.length > 0">
         <template v-for="runner in filteredList">
             <PagesDashboardVolunteerRunner :timer="findEntry(runner.id)?.timer"
-                :stage-id="(route.params.stage_id as string)" :runner="runner"
-                v-if="checkpoint?.stage_category_id == runner.stage_category_id" class="w-1/2 md:w-1/3 lg:w-1/4"
+                :stage-id="(route.params.stage_id as string)" :runner="runner" class="w-1/2 md:w-1/3 lg:w-1/4"
                 @update="fetchCheckpointRegister" />
         </template>
     </div>

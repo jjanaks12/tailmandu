@@ -23,8 +23,10 @@ const checkpoints = ref<Checkpoint[]>([])
                         {{ volunteer.personal.last_name }}
                     </strong>
                     <Badge variant="outline">{{volunteer.stages.map(s => s.name).join(', ')}}</Badge>
-                    <p v-if="volunteer?.checkpoints.length > 0">Assigned to: {{volunteer?.checkpoints.map(checkpoint =>
-                        checkpoint.name).join(', ')}}</p>
+                    <p v-if="volunteer?.checkpoints.length > 0">
+                        <span class="font-semibold text-xs uppercase text-gray-300">Assigned to:</span>
+                        {{volunteer?.checkpoints.map(checkpoint => checkpoint.name).join(', ')}}
+                    </p>
                 </div>
                 <Button variant="secondary" modifier="outline" @click="() => {
                     selectedVolunteer = volunteer

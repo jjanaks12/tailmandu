@@ -3,11 +3,12 @@ import { LoaderIcon } from 'lucide-vue-next'
 import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
 import { stageCategoryPaymentSchema } from '@/lib/schema/event.schema'
 import { useAxios } from '~/services/axios'
-import type { StageCategoryPayment } from '~/lib/types'
+import { type StageCategoryPayment, paymentTypes } from '~/lib/types'
 import { showImage } from '~/lib/filters'
 
 interface PaymentFormProps {
     stageCategoryId: string
+    availablePayments: string[]
     payment?: StageCategoryPayment | null
 }
 
@@ -17,6 +18,8 @@ const { axios } = useAxios()
 
 const form = useTemplateRef<FormContext>('form')
 const isLoading = ref(false)
+
+const filteredPaymentTypes = computed(() => paymentTypes.filter(type => !props.availablePayments.includes(type)))
 
 const handleSubmit = async (values: any) => {
     isLoading.value = true
@@ -45,6 +48,7 @@ const fileHandler = (event: Event) => {
 const init = () => {
     if (props.payment) {
         form.value?.setFieldValue('amount', props.payment.amount)
+        form.value?.setFieldValue('type', props.payment.type)
     }
 }
 onMounted(init)
@@ -66,6 +70,20 @@ onMounted(init)
             <label for="pf__amount">Amount</label>
             <Input v-bind="field" id="pf__amount" />
             <ErrorMessage name="amount" />
+        </Field>
+        <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2">
+            <label for="pf__type">Payment Type</label>
+            <Select :model-value="value" id="pf__type" @update:modelValue="handleChange">
+                <SelectTrigger>
+                    <SelectValue placeholder="Select payment type" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem v-for="paymentType in filteredPaymentTypes" :value="paymentType">
+                        {{ paymentType }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
+            <ErrorMessage name="type" />
         </Field>
         <div class="space-y-2">
             <label class="flex justify-center items-center p-3 border border-dashed border-gray-300 rounded-md">

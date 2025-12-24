@@ -181,7 +181,7 @@ form [role=alert] {
 }
 
 .container {
-  @apply mx-auto px-[15px];
+  @apply max-w-[1200px] mx-auto px-[15px];
 }
 
 .content_editor,
@@ -219,7 +219,7 @@ form [role=alert] {
   }
 
   ul {
-    @apply list-disc pl-4;
+    @apply list-disc pl-4 mb-4;
 
     p {
       @apply mb-0;

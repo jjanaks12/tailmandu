@@ -161,18 +161,7 @@
   "exclude": [
     "../dist",
     "../.data",
-    "../node_modules",
     "../../node_modules",
-    "../node_modules/nuxt/node_modules",
-    "../node_modules/@nuxt/fonts/node_modules",
-    "../node_modules/@pinia/nuxt/node_modules",
-    "../node_modules/shadcn-nuxt/node_modules",
-    "../node_modules/@vueuse/nuxt/node_modules",
-    "../node_modules/pinia-plugin-persistedstate/node_modules",
-    "../node_modules/nuxt-charts/node_modules",
-    "../node_modules/nuxt-tiptap-editor/node_modules",
-    "../node_modules/@nuxt/devtools/node_modules",
-    "../node_modules/@nuxt/telemetry/node_modules",
     "../node_modules/runtime/server",
     "../node_modules/dist/runtime/server",
     "dev"

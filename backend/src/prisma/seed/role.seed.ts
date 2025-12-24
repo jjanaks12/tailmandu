@@ -106,7 +106,7 @@ export const roleSeed = async (prisma: PrismaClient) => {
             street: 'a',
             type: 'PERMANENT_ADDRESS',
             zipCode: '00977',
-            countryId: country.id
+            country_id: country.id
         }
     })
 

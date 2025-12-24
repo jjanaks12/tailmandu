@@ -80,9 +80,6 @@ onBeforeMount(() => {
                 <TabsTrigger value="sponsor">
                     Sponsors
                 </TabsTrigger>
-                <TabsTrigger value="payments">
-                    Payments
-                </TabsTrigger>
                 <TabsTrigger value="settings">
                     Settings
                 </TabsTrigger>

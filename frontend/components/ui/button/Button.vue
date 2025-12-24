@@ -1,31 +1,31 @@
 <script setup lang="ts">
-  import type { HTMLAttributes } from 'vue'
-  import { Primitive, type PrimitiveProps } from 'reka-ui'
-  import { cn } from '~/lib/helpers'
-  import { type ButtonVariants, buttonVariants } from '.'
+import type { HTMLAttributes } from 'vue'
+import { Primitive, type PrimitiveProps } from 'reka-ui'
+import { cn } from '~/lib/helpers'
+import { type ButtonVariants, buttonVariants } from '.'
 
-  interface Props extends PrimitiveProps {
-    variant?: ButtonVariants['variant']
-    size?: ButtonVariants['size']
-    class?: HTMLAttributes['class']
-    role?: string
-    permissions?: string | string[]
-    modifier?: ButtonVariants['modifier']
-  }
+interface Props extends PrimitiveProps {
+  variant?: ButtonVariants['variant']
+  size?: ButtonVariants['size']
+  class?: HTMLAttributes['class']
+  role?: string
+  permissions?: string | string[]
+  modifier?: ButtonVariants['modifier']
+}
 
-  const { can } = useAuthorization()
-  const showButton = ref(true)
-  const props = withDefaults(defineProps<Props>(), {
-    as: 'button',
-  })
+const { can } = useAuthorization()
+const showButton = ref(true)
+const props = withDefaults(defineProps<Props>(), {
+  as: 'button',
+})
 
-  onMounted(() => {
-    if (props.role)
-      showButton.value = can('', props.role)
+onMounted(() => {
+  if (props.role)
+    showButton.value = can('', props.role)
 
-    if (props.permissions)
-      showButton.value = can(props.permissions)
-  })
+  if (props.permissions)
+    showButton.value = can(props.permissions)
+})
 </script>
 
 <template>

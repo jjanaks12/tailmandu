@@ -1,19 +1,18 @@
 <script lang="ts" setup>
 import { PencilIcon, TrashIcon } from 'lucide-vue-next'
-import type { StageCategory } from '~/lib/types'
+import type { StageCategory, StageCategoryPayment } from '~/lib/types'
 import CheckpointList from '@/components/pages/dashboard/event/checkpoint/list.vue'
 import moment from 'moment'
 import { useAxios } from '~/services/axios'
-import StageCategoryPaymentForm from '@/components/pages/dashboard/event/payment/form.vue'
+import StageCategoryPaymentList from '@/components/pages/dashboard/event/payment/list.vue'
 
 interface StageCategoryItemProps {
     stageCategory: StageCategory
 }
 const props = defineProps<StageCategoryItemProps>()
-const emit = defineEmits(['event_started', 'event_ended', 'update'])
+const emit = defineEmits(['event_started', 'event_ended', 'update', 'edit', 'delete'])
 const { axios } = useAxios()
 
-const showPaymentDialog = ref(false)
 
 const hasFinished = computed(() => moment().isAfter(moment(props.stageCategory.end, 'YYYY-MM-DDTHH:mm:ss.T').endOf('day')))
 const isToday = computed(() => moment().isBetween(
@@ -42,31 +41,18 @@ const endEvent = async () => {
                 <p class="mb-4" v-text="stageCategory.excerpt" />
             </div>
             <div class="flex gap-2">
-                <Button size="sm" modifier="outline" @click="showPaymentDialog = true">
-                    {{ stageCategory.payment ? 'Edit payment details' : 'Add payment details' }}
-                </Button>
-                <Button variant="secondary" size="icon" modifier="outline">
+                <Button variant="secondary" size="icon" modifier="outline" @click="emit('edit')">
                     <PencilIcon />
                 </Button>
-                <Button variant="destructive" size="icon" modifier="outline">
+                <Button variant="destructive" size="icon" modifier="outline" @click="emit('delete')">
                     <TrashIcon />
                 </Button>
             </div>
         </div>
         <div class="border-t border-dashed pt-4">
+            <StageCategoryPaymentList :stage-category-id="stageCategory.id" :payments="stageCategory.payment"
+                @update="emit('update')" />
             <CheckpointList :stage-category-id="stageCategory.id" />
         </div>
     </div>
-    <Dialog :open="showPaymentDialog" @update:open="showPaymentDialog = false">
-        <DialogContent class="sm:max-w-[600px] max-h-full overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle>Add payment details</DialogTitle>
-                <DialogDescription></DialogDescription>
-            </DialogHeader>
-            <StageCategoryPaymentForm :stage-category-id="stageCategory.id" :payment="stageCategory.payment" @update="async () => {
-                showPaymentDialog = false
-                emit('update')
-            }" />
-        </DialogContent>
-    </Dialog>
 </template>

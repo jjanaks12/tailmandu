@@ -29,9 +29,9 @@ export class VolunteerController {
                         last_name: validationData.last_name,
                         email: validationData.email,
                         phone_number: validationData.phone_number,
-                        age_category_id: validationData.age_category_id,
+                        // age_category_id: validationData.age_category_id,
                         country_id: validationData.country_id,
-                        size_id: validationData.size_id,
+                        // size_id: validationData.size_id,
                         gender_id: validationData.gender_id
                     }
                 })
@@ -92,15 +92,13 @@ export class VolunteerController {
                 }
             })
 
-            response.send(await prisma.checkpoint.update({
+            response.send(await prisma.volunteer.update({
                 where: {
-                    id: request.params.checkpoint_id
+                    id: request.params.volunteer_id
                 },
                 data: {
-                    volunteers: {
-                        connect: {
-                            id: request.params.volunteer_id
-                        }
+                    checkpoints: {
+                        connect: request.body.checkpoints.map((id: string) => ({ id: id }))
                     }
                 }
             }))

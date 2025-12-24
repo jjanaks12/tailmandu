@@ -1,4 +1,4 @@
-import { paymentTypes } from '@/lib/types'
+import { paymentMethods, paymentTypes } from '@/lib/types'
 import * as Y from 'yup'
 
 export const eventSchema = Y.object({
@@ -25,7 +25,7 @@ export const stageSchema = Y.object({
 
 export const trailRaceRunner = Y.object({
     stage_id: Y.string().required().label('Stage'),
-    stage_category_id: Y.string().required().label('Stage category'),
+    stage_category_id: Y.string().required().label('Stage'),
     first_name: Y.string().required().label("First name"),
     middle_name: Y.string().nullable().label("Middle name"),
     last_name: Y.string().required().label("Last name"),
@@ -34,8 +34,15 @@ export const trailRaceRunner = Y.object({
     date_of_birth: Y.string().required().label("Date of birth"),
     country_id: Y.string().required().label("Country"),
     gender_id: Y.string().required().label("Gender"),
-    size_id: Y.string().required().label("Shirt size"),
-    age_category_id: Y.string().required().label("Age category"),
+    /* size_id: Y.string().required().label("Shirt size"),
+    age_category_id: Y.string().required().label("Age category"), */
+    payment_type: Y.string().oneOf(paymentTypes).required().label("Payment type"),
+    payment_method: Y.string().oneOf(paymentMethods).required().label("Payment method"),
+    payment_screenshot: Y.string().when('payment_method', {
+        is: 'QR',
+        then: schema => schema.required(),
+        otherwise: schema => schema
+    }).label("Payment screenshot"),
     description: Y.object({
         club_name: Y.string().required().label('Club name'),
         emergency_contact_name: Y.string().required().label('Emergency Contact name'),
@@ -53,8 +60,8 @@ export const trailRaceVolunteer = Y.object({
     date_of_birth: Y.string().required().label("Date of birth"),
     country_id: Y.string().required().label("Country"),
     gender_id: Y.string().required().label("Gender"),
-    size_id: Y.string().required().label("Shirt size"),
-    age_category_id: Y.string().required().label("Age category"),
+    // size_id: Y.string().required().label("Shirt size"),
+    // age_category_id: Y.string().required().label("Age category"),
     description: Y.string().label("Volunteer detail")
 })
 
@@ -88,6 +95,7 @@ export const sponsorTypeSchema = Y.object({
 export const stageCategoryPaymentSchema = Y.object({
     payment_id: Y.string().optional().label('Payment'),
     stage_category_id: Y.string().required().label('Stage category'),
+    type: Y.string().oneOf(paymentTypes).required().label('Payment type'),
     amount: Y.number().required().label('Amount'),
     image: Y.string().when('payment_id', {
         is: undefined,

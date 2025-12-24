@@ -1,63 +1,68 @@
 <script lang="ts" setup>
-    import { MapIcon } from 'lucide-vue-next'
-    import { showImage } from '~/lib/filters'
-    import type { Stage } from '~/lib/types'
-    import { useAxios } from '~/services/axios'
-    import img01 from '@/assets/images/img01.png'
-    import img02 from '@/assets/images/img02.jpg'
-    import moment from 'moment'
+import { MapIcon } from 'lucide-vue-next'
+import { getGPXFile, showImage } from '~/lib/filters'
+import type { Stage } from '~/lib/types'
+import { useAxios } from '~/services/axios'
+import img01 from '@/assets/images/img01.png'
+import img02 from '@/assets/images/img02.jpg'
+import moment from 'moment'
 
-    const route = useRoute()
-    const { axios } = useAxios()
+const route = useRoute()
+const { axios } = useAxios()
 
-    const stage = ref<Stage | null>(null)
+const stage = ref<Stage | null>(null)
 
-    const init = async () => {
-        const { data } = await axios.get<Stage>(`/events/stages/${route.params.id as string}`)
-        stage.value = data
+const init = async () => {
+    const { data } = await axios.get<Stage>(`/events/stages/${route.params.id as string}`)
+    stage.value = data
 
-        useTitle(data.name)
-        useSeoMeta({
-            title: stage.value.name,
-            ogTitle: stage.value.name,
-            description: stage.value.excerpt,
-            ogDescription: stage.value.excerpt,
-            ogImage: showImage(stage.value.thumbnail?.file_name as string)
-        })
-    }
+    useTitle(data.name)
+    useSeoMeta({
+        title: stage.value.name,
+        ogTitle: stage.value.name,
+        description: stage.value.excerpt,
+        ogDescription: stage.value.excerpt,
+        ogImage: showImage(stage.value.thumbnail?.file_name as string)
+    })
+}
 
-    const starts = computed(() => stage.value?.stage_categories
-        .map(category => category.start)
-        .map(date => moment(date))
-        .sort((a, b) => a.valueOf() - b.valueOf())[0]
-    )
+const starts = computed(() => stage.value?.stage_categories
+    .map(category => category.start)
+    .map(date => moment(date))
+    .sort((a, b) => a.valueOf() - b.valueOf())[0]
+)
 
-    const ends = computed(() => stage.value?.stage_categories
-        .map(category => category.end)
-        .map(date => moment(date).local())
-        .sort((a, b) => b.valueOf() - a.valueOf())[0]
-    )
+const ends = computed(() => stage.value?.stage_categories
+    .map(category => category.end)
+    .map(date => moment(date).local())
+    .sort((a, b) => b.valueOf() - a.valueOf())[0]
+)
 
-    const hasStarted = computed(() => moment().isAfter(starts.value?.startOf('day')))
-    const hasEnded = computed(() => moment().isAfter(ends.value?.endOf('day')))
+const hasStarted = computed(() => moment().isAfter(starts.value?.startOf('day')))
+const hasEnded = computed(() => moment().isAfter(ends.value?.endOf('day')))
 
-    onBeforeMount(init)
+onBeforeMount(init)
 </script>
 
 <template>
     <template v-if="stage">
         <figure class="h-[calc(100vh-82px)] overflow-hidden">
-            <img :src="showImage(stage?.thumbnail.file_name as string)" :alt="stage.name" class="w-full h-full object-cover">
+            <img :src="showImage(stage?.thumbnail.file_name as string)" :alt="stage.name"
+                class="w-full h-full object-cover">
         </figure>
         <div class="text-[#13304a] container py-[80px]">
             <div class="space-y-4 mb-6">
                 <div class="space-y-4" v-for="stageCategory in stage.stage_categories">
                     <strong class="block">Overview: {{ stageCategory.name }}</strong>
-                    <div class="leading-7" v-html="stageCategory.description" />
+                    <div class="leading-7 content_editor" v-html="stageCategory.description" />
                 </div>
             </div>
-            <div class="mb-6 leading-7" v-html="stage.description" />
-            <Button type="button" variant="secondary">Register</Button>
+            <div class="mb-6 leading-7 content_editor" v-html="stage.description" />
+            <NuxtLink
+                :to="{ name: 'races-slug-runner', params: { slug: stage.event.slug }, query: { stage_id: stage.id } }"
+                v-if="!hasEnded" as-child>
+                <Button type="button" variant="secondary">Register for race</Button>
+            </NuxtLink>
         </div>
         <section class="bg-gray-200 relative overflow-hidden z-[1]">
             <!-- <figure class="absolute inset-0 z-[-1]">
@@ -88,11 +93,16 @@
         <div class="container py-[80px]">
             <div class="text-[#13304a] flex gap-4">
                 <div class="w-3/5">
-                    <div class="mb-6 leading-7" v-html="stage.event.description" />
-                    <Button type="button" variant="secondary" class="rounded-full">
-                        <MapIcon />
-                        Download GPX
-                    </Button>
+                    <div class="mb-6 leading-7 content_editor" v-html="stage.event.description" />
+                    <div class="flex items-center gap-1 mb-2" v-for="category of stage.stage_categories">
+                        <strong>{{ category.name }} GPX file: </strong>
+                        <NuxtLink :to="getGPXFile(category.map_file.file_name as string)">
+                            <Button type="button" variant="secondary" class="rounded-full" modifier="outline">
+                                <MapIcon />
+                                Download GPX
+                            </Button>
+                        </NuxtLink>
+                    </div>
                 </div>
                 <div class="w-2/5">
                     <figure class="rounded-sm overflow-hidden mb-5">
@@ -125,8 +135,12 @@
                     <Countdown :date="ends.endOf('day')" v-if="ends && !hasEnded" class="mb-3">
                         <em class="not-italic block">Will end in</em>
                     </Countdown>
-                    <Button type="button" variant="secondary" size="lg" class="w-[200px] rounded-full"
-                        v-if="!hasEnded">Register now</Button>
+                    <NuxtLink
+                        :to="{ name: 'races-slug-runner', params: { slug: stage.event.slug }, query: { stage_id: stage.id } }"
+                        as-child>
+                        <Button type="button" variant="secondary" size="lg" class="w-[200px] rounded-full"
+                            v-if="!hasEnded">Register now</Button>
+                    </NuxtLink>
                     <strong class="font-normal text-5xl" v-if="hasEnded">Registration closed</strong>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import { stageCategoryPaymentSchema } from "@/app/lib/schema/event.schema"
 import { FileHandler } from "@/app/lib/services/File.service"
-import { PrismaClient } from "@prisma/client"
+import { PaymentStatus, PaymentType, PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 
 const prisma = new PrismaClient()
@@ -51,6 +51,7 @@ export class PaymentController {
                 data: {
                     ...body,
                     amount: validationData.amount,
+                    type: validationData.type as PaymentType,
                     stage_category_id: validationData.stage_category_id
                 }
             }))
@@ -82,7 +83,23 @@ export class PaymentController {
                 data: {
                     ...body,
                     amount: validationData.amount,
+                    type: validationData.type as PaymentType,
                     stage_category_id: validationData.stage_category_id
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async updatePaymentStatus(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.payment.update({
+                where: {
+                    id: request.params.payment_id
+                },
+                data: {
+                    status: request.body.status as PaymentStatus
                 }
             }))
         } catch (error) {

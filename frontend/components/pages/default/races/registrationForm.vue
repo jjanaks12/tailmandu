@@ -4,45 +4,88 @@ import { Form, Field, ErrorMessage, type FormContext } from "vee-validate"
 import { parseDate } from "@internationalized/date"
 import { storeToRefs } from "pinia"
 import type { SubmissionHandler } from "vee-validate"
-import { User, Mail, Phone, Calendar, Users, Shirt, Flag, Target, Loader2 } from "lucide-vue-next"
+import { User, Mail, Phone, Calendar, Users, Flag, Target, Loader2, XIcon, InfoIcon } from "lucide-vue-next"
 
 import DatePicker from "@/components/DatePicker.vue"
 import { useAppStore } from "~/store/app"
 import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
-import type { TrailRace } from "~/lib/types"
+import type { Payment, TrailRace } from "~/lib/types"
 import { useEventStore } from "~/store/event"
+import moment from "moment"
+import { showImage } from '@/lib/filters'
 
 interface RegistrationFormProps {
+    eventId: string
     mode: "volunteer" | "runner"
     trailRace: TrailRace
 }
 
 const props = defineProps<RegistrationFormProps>()
-const { countries, genders, age_categories, shirtSizes } = storeToRefs(useAppStore())
+const { countries, genders, company } = storeToRefs(useAppStore())
 const { saveVoluteer, saveRunner } = useEventStore()
 const route = useRoute()
 
 const form = ref<FormContext<any> | null>(null)
 const isLoading = ref(false)
 
-const stageList = computed(() => props.trailRace.stages)
-const availabelStageCategoryList = computed(() => stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories)
+// getting list of available stages
+const stageList = computed(() => props.trailRace.stages
+    .map(stage => stage.stage_categories
+        .filter(stage_category => moment(stage_category.end as string).isAfter(moment())).length > 0 ? stage : null)
+    .filter(stage => stage !== null))
+// getting stage categories of selected stage
+const availabeStageCategoryList = computed(() => stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories)
+// getting price of selected stage category
+const prices = computed(() => availabeStageCategoryList.value?.find(stage_category => stage_category.id === form.value?.values.stage_category_id))
+
+const payment = computed(() => form.value?.values.country_id
+    ? prices.value?.payment.find(payment => payment.type === (form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL')) ?? {} as Payment
+    : null)
 
 const onSubmit: SubmissionHandler = async (values: any) => {
-    isLoading.value = true
-    if (props.mode == 'volunteer')
-        await saveVoluteer(values, props.trailRace.id)
-    else
-        await saveRunner(values, props.trailRace.id)
-    isLoading.value = false
-    navigateTo(`/races/${route.params.slug as string}`)
+    try {
+        isLoading.value = true
+        if (props.mode == 'volunteer')
+            await saveVoluteer(values, props.trailRace.id)
+        else
+            await saveRunner(values, props.trailRace.id)
+
+        navigateTo(`/races/${route.params.slug as string}`)
+    } catch (error) {
+        console.log(error)
+    } finally {
+        isLoading.value = false
+    }
 }
+
+const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
+    if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            const result = e.target?.result
+            if (result) {
+                form.value?.setFieldValue('payment_type', 'QR')
+                form.value?.setFieldValue('payment_screenshot', result)
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+}
+
+onMounted(() => {
+    setTimeout(() => {
+        if (route.query.stage_id)
+            form.value?.setFieldValue('stage_id', route.query.stage_id)
+    }, 1000)
+})
 </script>
 
 <template>
-    <section class="max-w-4xl mx-auto p-6 space-y-8">
+    <section class="max-w-4xl mx-auto p-6 space-y-8" v-if="stageList.length > 0">
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            @submit="onSubmit">
+            v-slot="{ values }" @submit="onSubmit">
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
@@ -124,20 +167,19 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                             </Label>
                             <DatePicker Label="Select your birth date"
                                 :model-value="field.value ? parseDate(field.value as string) : undefined"
-                                @update:model-value="d => field.onChange(d ? d.toString() : '')" />
+                                @update:model-value="$event ? field.onChange($event.toString()) : undefined" />
                             <ErrorMessage name="date_of_birth" />
                         </Field>
                     </div>
 
                     <!-- Demographics -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <Field name="country_id" as="div" v-slot="{ field }" class="space-y-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Field name="country_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Flag :size="16" class="text-gray-400" />
                                 Country
                             </Label>
-                            <Select :model-value="String(field.value ?? '')"
-                                @update:model-value="v => field.onChange(v)">
+                            <Select :model-value="String(value ?? '')" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12">
                                     <SelectValue placeholder="Select country" />
                                 </SelectTrigger>
@@ -151,13 +193,12 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                             <ErrorMessage name="country_id" />
                         </Field>
 
-                        <Field name="gender_id" as="div" v-slot="{ field }" class="space-y-2">
+                        <Field name="gender_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Users :size="16" class="text-gray-400" />
                                 Gender
                             </Label>
-                            <Select :model-value="String(field.value ?? '')"
-                                @update:model-value="v => field.onChange(v)">
+                            <Select :model-value="value" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12">
                                     <SelectValue placeholder="Select gender" />
                                 </SelectTrigger>
@@ -170,13 +211,12 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                             <ErrorMessage name="gender_id" />
                         </Field>
 
-                        <Field name="size_id" as="div" v-slot="{ field }" class="space-y-2">
+                        <!-- <Field name="size_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Shirt :size="16" class="text-gray-400" />
                                 Shirt size
                             </Label>
-                            <Select :model-value="String(field.value ?? '')"
-                                @update:model-value="v => field.onChange(v)">
+                            <Select :model-value="String(value ?? '')" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12">
                                     <SelectValue placeholder="Size" />
                                 </SelectTrigger>
@@ -187,15 +227,14 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                                 </SelectContent>
                             </Select>
                             <ErrorMessage name="size_id" />
-                        </Field>
+                        </Field> -->
 
-                        <Field name="age_category_id" as="div" v-slot="{ field }" class="space-y-2">
+                        <!-- <Field name="age_category_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Users :size="16" class="text-gray-400" />
                                 Age group
                             </Label>
-                            <Select :model-value="String(field.value ?? '')"
-                                @update:model-value="v => field.onChange(v)">
+                            <Select :model-value="value" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12">
                                     <SelectValue placeholder="Age group" />
                                 </SelectTrigger>
@@ -207,17 +246,16 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                                 </SelectContent>
                             </Select>
                             <ErrorMessage name="age_category_id" />
-                        </Field>
+                        </Field> -->
                     </div>
                     <div class="flex gap-4">
-                        <Field name="stage_id" as="div" v-slot="{ field }"
+                        <Field name="stage_id" as="div" v-slot="{ value, handleChange }"
                             :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner', 'w-full': mode === 'volunteer' }">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Target :size="16" class="text-gray-400" />
                                 Stage
                             </Label>
-                            <Select :model-value="String(field.value ?? '')"
-                                @update:model-value="v => field.onChange(v)">
+                            <Select :model-value="value" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
                                     <SelectValue placeholder="Choose your stage" />
                                 </SelectTrigger>
@@ -229,20 +267,19 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                             </Select>
                             <ErrorMessage name="stage_id" />
                         </Field>
-                        <Field name="stage_category_id" as="div" v-slot="{ field }" class="w-1/2 space-y-2"
-                            v-if="mode === 'runner'">
+                        <Field name="stage_category_id" as="div" v-slot="{ value, handleChange }"
+                            class="w-1/2 space-y-2" v-if="mode === 'runner'">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Target :size="16" class="text-gray-400" />
                                 Stage Category
                             </Label>
-                            <Select :model-value="String(field.value ?? '')"
-                                @update:model-value="v => field.onChange(v)">
+                            <Select :model-value="value" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
                                     <SelectValue
                                         :placeholder="form?.values?.stage_id ? 'Choose your stage catgeory' : 'Select an stage first'" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem v-for="sc in availabelStageCategoryList" :key="sc.id"
+                                    <SelectItem v-for="sc in availabeStageCategoryList" :key="sc.id"
                                         :value="String(sc.id)">
                                         {{ sc.name }}
                                     </SelectItem>
@@ -299,11 +336,67 @@ const onSubmit: SubmissionHandler = async (values: any) => {
                 </div>
             </div>
 
-            <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8" v-if="mode == 'runner'">
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Registration fees</h3>
-                Season pass
-                or
-                only one race
+            <div class="bg-white text-gray-500 rounded-3xl border border-gray-200 shadow-sm p-8"
+                v-if="mode == 'runner' && payment">
+                <h3 class="text-2xl font-light mb-2">
+                    Registration fees for
+                    <span class="text-primary font-bold">{{ prices?.name }}</span>
+                </h3>
+                <template v-if="!values.payment_type || values.payment_type == 'QR'">
+                    <div class="flex items-center justify-between gap-6 pb-5">
+                        <div class="grow space-y-3">
+                            <em class="text-gray-600 block not-italic text-2xl">NPR {{ payment?.amount }}</em>
+                            <p>Please make payment to this QR code and upload your screenshot. We verify from the
+                                screenshot.
+                                We
+                                will
+                                contact you as soon as possible.</p>
+                            <Alert variant="info">
+                                <InfoIcon />
+                                <AlertTitle>Payment</AlertTitle>
+                                <AlertDescription>If you are international personal, Just upload the
+                                    screenshot of
+                                    the
+                                    conversation. We
+                                    will handle the payment at venue.</AlertDescription>
+                            </Alert>
+                            <label
+                                class="flex items-center gap-2 rounded-lg overflow-hidden border border-gray-200 relative">
+                                <input type="file" @change="handleFileChange" class="hidden" />
+                                <figure v-if="values?.payment_screenshot">
+                                    <img :src="values?.payment_screenshot" alt="Payment screenshot"
+                                        class="w-full h-auto" />
+                                    <Button class="absolute top-2 right-2"
+                                        @click="form?.setFieldValue('payment_screenshot', '')">
+                                        <XIcon class="w-6 h-6" />
+                                    </Button>
+                                </figure>
+                                <div class="w-full flex flex-col gap-2 p-4" v-else>
+                                    <span class="text-sm">You can upload your screenshot here...</span>
+                                    <p class="text-xs">File size should be less than 2MB</p>
+                                </div>
+                            </label>
+                        </div>
+                        <figure class="w-1/2 text-sm space-y-1 border border-gray-200 p-4 rounded-lg">
+                            <figcaption>Here is the payment QR code</figcaption>
+                            <img :src="showImage(payment?.screenshot?.file_name)" alt="Payment screenshot"
+                                class="w-full h-auto">
+                        </figure>
+                    </div>
+                    <Separator />
+                </template>
+                <template v-if="values.payment_type === 'PAY_AT_VENUE'">
+                    <p>Got it! We will remind you to pay cash when you arrive at the event.</p>
+                </template>
+
+                <div class="text-center flex flex-col justify-center items-center" v-else>
+                    <span class="bg-white text-gray-600 text-lg font-bold uppercase -translate-y-1/2 px-2">Or</span>
+                    <p>You can also choose to pay in cash when you arrive at the event.</p>
+                    <Button type="button" @click="form?.setFieldValue('payment_type', 'PAY_AT_VENUE')" class="mt-2">
+                        Pay at venue
+                    </Button>
+                </div>
+                <ErrorMessage name="payment_type" />
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
@@ -331,4 +424,7 @@ const onSubmit: SubmissionHandler = async (values: any) => {
             </div>
         </Form>
     </section>
+    <div class="bg-gray-50 text-gray-600 text-center border border-gray-300 p-8 rounded-xl" v-else>
+        looks like all the stages are completed
+    </div>
 </template>

@@ -97,7 +97,11 @@ export class StageController {
                 },
                 include: {
                     thumbnail: true,
-                    stage_categories: true,
+                    stage_categories: {
+                        include: {
+                            map_file: true
+                        }
+                    },
                     event: true
                 }
             }))

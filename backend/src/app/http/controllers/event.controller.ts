@@ -173,7 +173,15 @@ export class EventController {
                     stages: {
                         include: {
                             thumbnail: true,
-                            stage_categories: true
+                            stage_categories: {
+                                include: {
+                                    payment: {
+                                        include: {
+                                            screenshot: true
+                                        }
+                                    }
+                                }
+                            }
                         },
                         where: {
                             deleted_at: null

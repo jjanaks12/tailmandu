@@ -13,7 +13,26 @@ export const useMenu = () => {
         path: '/about_us',
         slug: 'about_us',
         icon: 'Library',
-        permissions: '*'
+        permissions: '*',
+        subMenu: [{
+            title: 'Our story',
+            path: '/our_story',
+            slug: 'our_story',
+            icon: 'Waypoints',
+            permissions: '*'
+        }, {
+            title: 'Our team',
+            path: '/our_team',
+            slug: 'our_team',
+            icon: 'Waypoints',
+            permissions: '*'
+        }, {
+            title: 'Review',
+            path: '/review',
+            slug: 'review',
+            icon: 'Waypoints',
+            permissions: '*'
+        }]
     }, {
         title: 'Our trails',
         path: '/our_trails',
@@ -41,9 +60,9 @@ export const useMenu = () => {
     }])
 
     const { isLoggedin } = storeToRefs(useAuthStore())
-    
+
     const menuList = computed<Menu[]>(() => !isLoggedin.value
-        ? [...menus.value, {
+        ? [...menus.value/* , {
             title: 'Login',
             path: '/login',
             slug: 'login',
@@ -55,14 +74,14 @@ export const useMenu = () => {
             slug: 'register',
             icon: 'FilePlus',
             permissions: '*'
-        }]
-        : [...menus.value, {
+        } */]
+        : [...menus.value/* , {
             title: 'Dashboard',
             path: '/dashboard',
             slug: 'dashboard',
             icon: 'LayoutDashboard',
             permissions: '*'
-        }]
+        } */]
     )
 
     return { menuList }

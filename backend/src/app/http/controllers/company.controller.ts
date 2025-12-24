@@ -34,7 +34,7 @@ export class CompanyController {
                     state: validationData.address.state,
                     city: validationData.address.city,
                     zipCode: validationData.address.zipCode,
-                    countryId: validationData.address.countryId,
+                    country_id: validationData.address.countryId,
                     type: 'PERMANENT_ADDRESS'
                 }
             })
@@ -85,7 +85,7 @@ export class CompanyController {
                         state: validationData.address.state,
                         city: validationData.address.city,
                         zipCode: validationData.address.zipCode,
-                        countryId: validationData.address.countryId,
+                        country_id: validationData.address.countryId,
                     }
                 })
             else {
@@ -96,7 +96,7 @@ export class CompanyController {
                         state: validationData.address.state,
                         city: validationData.address.city,
                         zipCode: validationData.address.zipCode,
-                        countryId: validationData.address.countryId,
+                        country_id: validationData.address.countryId,
                         type: 'PERMANENT_ADDRESS'
                     }
                 })
