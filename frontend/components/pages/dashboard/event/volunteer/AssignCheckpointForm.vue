@@ -33,8 +33,8 @@ const formSubmit = async (values: any) => {
         <Field as="div" type="checkbox" name="checkpoints" v-for="checkpoint in checkpoints"
             v-slot="{ handleChange, value }" :value="checkpoint.id" class="flex gap-2">
             <Checkbox @update:model-value="handleChange" :id="checkpoint.id"
-                :model-value="value?.includes(checkpoint.id)"
-                :disabled="selectedStageCategories.includes(checkpoint.stage_category_id) && !values.checkpoints.includes(checkpoint.id)" />
+                :model-value="value?.includes(checkpoint.id)" />
+            <!-- :disabled="selectedStageCategories.includes(checkpoint.stage_category_id) && !values.checkpoints.includes(checkpoint.id)" -->
             <Label :for="checkpoint.id">{{ checkpoint.name }}</Label>
         </Field>
         <div class="text-right">
