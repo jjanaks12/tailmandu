@@ -1,1 +1,0 @@
-import{r as o,s as t,A as u,E as n}from"./CQTPwDMt.js";const a=()=>{const e=o([{title:"Home",path:"/",icon:"Home",slug:"home",permissions:"*"}]),{isLoggedin:s}=t(u());return{menuList:n(()=>s.value?[...e.value]:[...e.value])}};export{a as u};

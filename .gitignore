@@ -6,3 +6,5 @@ dist
 
 backend/src/resources/uploads/images/
 backend/src/resources/uploads/gpx/
+frontend/.nuxt
+frontend/.output
