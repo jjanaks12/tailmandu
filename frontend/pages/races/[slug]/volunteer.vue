@@ -1,18 +1,25 @@
 <script lang="ts" setup>
-    import { ArrowBigLeft } from 'lucide-vue-next'
-    import { showImage } from '~/lib/filters'
-    import type { TrailRace } from '~/lib/types'
-    import { useEventStore } from '~/store/event'
+import { ArrowBigLeft } from 'lucide-vue-next'
+import { showImage } from '~/lib/filters'
+import type { TrailRace } from '~/lib/types'
+import { useEventStore } from '~/store/event'
 
-    const route = useRoute()
-    const { getBySlug } = useEventStore()
-    const trailRace = ref<TrailRace | null>(null)
+const route = useRoute()
+const { getBySlug } = useEventStore()
+const trailRace = ref<TrailRace | null>(null)
 
-    onBeforeMount(async () => {
-        trailRace.value = await getBySlug(route.params.slug as string)
+onBeforeMount(async () => {
+    trailRace.value = await getBySlug(route.params.slug as string)
 
-        useTitle(`${trailRace.value.name} - Volunteer form`)
+    useTitle(`${trailRace.value.name} - Volunteer form`)
+    useSeoMeta({
+        title: trailRace.value.name,
+        ogTitle: trailRace.value.name,
+        description: trailRace.value.excerpt,
+        ogDescription: trailRace.value.excerpt,
+        ogImage: showImage(trailRace.value.thumbnail?.file_name as string)
     })
+})
 
 </script>
 

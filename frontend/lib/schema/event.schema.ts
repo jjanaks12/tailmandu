@@ -66,6 +66,7 @@ export const trailRaceVolunteer = Y.object({
 })
 
 export const stageCategorySchema = Y.object({
+    id: Y.string().optional().label('Id'),
     name: Y.string().required().label('Name'),
     excerpt: Y.string().required().label('Excerpt'),
     description: Y.string().required().label('Short description'),
@@ -75,7 +76,11 @@ export const stageCategorySchema = Y.object({
     start: Y.string().required().label('Start'),
     end: Y.string().required().label('End'),
     stage_id: Y.string().required().label('Stage'),
-    map: Y.string().required().label('Map file')
+    map: Y.string().when('id', {
+        is: undefined,
+        then: schema => schema.required(),
+        otherwise: schema => schema
+    }).label('Map file'),
 })
 
 export const sponsorSchema = Y.object({

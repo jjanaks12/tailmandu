@@ -205,8 +205,8 @@ export class RunnerController {
                 stage: stageCategory.stage,
                 stageCategory: {
                     ...stageCategory,
-                    start: moment(stageCategory.start).format('DD-MM-YYYY HH:mm a'),
-                    end: moment(stageCategory.end).format('DD-MM-YYYY HH:mm a')
+                    start: moment.utc(stageCategory.start).format('DD-MM-YYYY hh:mm a'),
+                    end: moment.utc(stageCategory.end).format('DD-MM-YYYY hh:mm a')
                 }
             }, {
                 recipients: [{

@@ -1,34 +1,35 @@
 <script setup lang="ts">
-    import { type DateValue, getLocalTimeZone, today } from '@internationalized/date'
-    import { useVModel } from '@vueuse/core'
-    import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFormatter, useForwardPropsEmits } from 'reka-ui'
-    import { createDecade, createYear, toDate } from 'reka-ui/date'
-    import { computed, type HTMLAttributes, type Ref } from 'vue'
-    import { cn } from '~/lib/helpers'
+import { type DateValue, getLocalTimeZone, today } from '@internationalized/date'
+import { useVModel } from '@vueuse/core'
+import { CalendarIcon } from 'lucide-vue-next'
+import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFormatter, useForwardPropsEmits } from 'reka-ui'
+import { createDecade, createYear, toDate } from 'reka-ui/date'
+import { computed, type HTMLAttributes, type Ref } from 'vue'
+import { cn } from '~/lib/helpers'
 
-    const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
-        modelValue: undefined,
-        placeholder() {
-            return today(getLocalTimeZone())
-        },
-        weekdayFormat: 'short',
-    })
-    const emits = defineEmits<CalendarRootEmits>()
+const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
+    modelValue: undefined,
+    placeholder() {
+        return today(getLocalTimeZone())
+    },
+    weekdayFormat: 'short',
+})
+const emits = defineEmits<CalendarRootEmits>()
 
-    const delegatedProps = computed(() => {
-        const { class: _, placeholder: __, ...delegated } = props
+const delegatedProps = computed(() => {
+    const { class: _, placeholder: __, ...delegated } = props
 
-        return delegated
-    })
+    return delegated
+})
 
-    const placeholder = useVModel(props, 'modelValue', emits, {
-        passive: true,
-        defaultValue: today(getLocalTimeZone()),
-    }) as Ref<DateValue>
+const placeholder = useVModel(props, 'modelValue', emits, {
+    passive: true,
+    defaultValue: today(getLocalTimeZone()),
+}) as Ref<DateValue>
 
-    const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
-    const formatter = useDateFormatter('en')
+const formatter = useDateFormatter('en')
 </script>
 
 <template>
@@ -37,6 +38,7 @@
             <Button variant="muted" modifier="outline"
                 :class="cn('w-full justify-start text-left font-normal h-12', !placeholder && 'text-muted-foreground')">
                 {{ placeholder }}
+                <CalendarIcon />
             </Button>
         </PopoverTrigger>
         <PopoverContent class="w-[250px] p-0">

@@ -112,9 +112,6 @@ onBeforeMount(() => {
             <TabsContent value="sponsor">
                 <TrailRaceSponsorList :event-id="(route.params.id as string)" />
             </TabsContent>
-            <TabsContent value="payments">
-                <TrailRacePaymentList :event-id="(route.params.id as string)" />
-            </TabsContent>
             <TabsContent value="settings">
                 <TrailRaceSettings :event-id="(route.params.id as string)" />
             </TabsContent>

@@ -1,80 +1,78 @@
 <script lang="ts" setup>
-    import { LoaderIcon } from 'lucide-vue-next'
-    import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
-    import { abbr, showImage } from '~/lib/filters'
-    import { companySchema } from '~/lib/schema/account.schema'
-    import { useAppStore } from '~/store/app'
+import { LoaderIcon } from 'lucide-vue-next'
+import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
+import { abbr, showImage } from '~/lib/filters'
+import { companySchema } from '~/lib/schema/account.schema'
+import { useAppStore } from '~/store/app'
 
-    useHead({
-        title: 'Change company details'
-    })
+useHead({
+    title: 'Change company details'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: '*',
-        role: 'Admin'
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: '*',
+    role: 'Admin'
+})
 
-    const form = ref<FormContext | null>(null)
-    const isLoading = ref(false)
-    const { company, countries } = storeToRefs(useAppStore())
-    const { saveCompany } = useAppStore()
+const form = ref<FormContext | null>(null)
+const isLoading = ref(false)
+const { company, countries } = storeToRefs(useAppStore())
+const { saveCompany } = useAppStore()
 
-    const avatar = computed(() => showImage(company.value?.logo?.file_name as string))
+const avatar = computed(() => showImage(company.value?.logo?.file_name as string))
 
-    const submitHandler = async (values: any) => {
-        isLoading.value = true
-        await saveCompany(values)
-        isLoading.value = false
+const submitHandler = async (values: any) => {
+    isLoading.value = true
+    await saveCompany(values)
+    isLoading.value = false
+}
+
+const fileInputHandler = (event: Event) => {
+    const files = (event.target as HTMLInputElement).files
+    if (!files)
+        return
+
+    const reader = new FileReader()
+    if (files[0]) {
+        reader.readAsDataURL(files[0])
+        reader.onload = () => {
+            form.value?.setFieldValue('image', reader.result)
+        }
     }
+}
 
-    const fileInputHandler = (event: Event) => {
-        const files = (event.target as HTMLInputElement).files
-        if (!files)
-            return
+const init = () => {
+    if (form.value) {
+        if (company.value) {
+            form.value.setFieldValue('id', company.value.id)
+            form.value.setFieldValue('short_name', company.value.short_name)
+            form.value.setFieldValue('name', company.value.name)
+            form.value.setFieldValue('email', company.value.email)
+            form.value.setFieldValue('phone', company.value.phone)
+            form.value.setFieldValue('vat_no', company.value.vat_no)
+            form.value.setFieldValue('pan_no', company.value.pan_no)
+            form.value.setFieldValue('vat_registered', company.value.vat_registered ?? false)
 
-        const reader = new FileReader()
-        if (files[0]) {
-            reader.readAsDataURL(files[0])
-            reader.onload = () => {
-                form.value?.setFieldValue('image', reader.result)
+            if (company.value?.address) {
+                form.value.setFieldValue('address.address', company.value.address.address)
+                form.value.setFieldValue('address.street', company.value.address.street)
+                form.value.setFieldValue('address.state', company.value.address.state)
+                form.value.setFieldValue('address.city', company.value.address.city)
+                form.value.setFieldValue('address.zipCode', company.value.address.zipCode)
+                form.value.setFieldValue('address.countryId', company.value.address.country_id)
             }
         }
     }
+}
 
-    const init = () => {
-        if (form.value) {
-            if (company.value) {
-                form.value.setFieldValue('id', company.value.id)
-                form.value.setFieldValue('short_name', company.value.short_name)
-                form.value.setFieldValue('name', company.value.name)
-                form.value.setFieldValue('email', company.value.email)
-                form.value.setFieldValue('phone', company.value.phone)
-                form.value.setFieldValue('vat_no', company.value.vat_no)
-                form.value.setFieldValue('pan_no', company.value.pan_no)
-                form.value.setFieldValue('vat_registered', company.value.vat_registered ?? false)
-
-                if (company.value?.address) {
-                    form.value.setFieldValue('address.address', company.value.address.address)
-                    form.value.setFieldValue('address.street', company.value.address.street)
-                    form.value.setFieldValue('address.state', company.value.address.state)
-                    form.value.setFieldValue('address.city', company.value.address.city)
-                    form.value.setFieldValue('address.zipCode', company.value.address.zipCode)
-                    form.value.setFieldValue('address.countryId', company.value.address.countryId)
-                }
-            }
-        }
-    }
-
-    watchEffect(() => {
-        if (company.value)
-            init()
-    })
-
-    onMounted(() => {
+watchEffect(() => {
+    if (company.value)
         init()
-    })
+})
+
+onMounted(init)
 </script>
 
 <template>

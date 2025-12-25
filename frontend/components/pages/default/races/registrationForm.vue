@@ -85,7 +85,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <section class="max-w-4xl mx-auto p-6 space-y-8" v-if="stageList.length > 0">
+    <section class="max-w-4xl mx-auto md:p-6 space-y-8" v-if="stageList.length > 0">
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
             v-slot="{ values }" @submit="onSubmit">
             <div
@@ -104,7 +104,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="p-8 space-y-6">
+                <div class="p-4 md:p-8 space-y-6">
                     <!-- Name Fields -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <Field name="first_name" as="div" v-slot="{ field }" class="space-y-2">
@@ -250,7 +250,7 @@ onMounted(() => {
                             <ErrorMessage name="age_category_id" />
                         </Field> -->
                     </div>
-                    <div class="flex gap-4">
+                    <div class="flex gap-2 md:gap-4">
                         <Field name="stage_id" as="div" v-slot="{ value, handleChange }"
                             :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner', 'w-full': mode === 'volunteer' }">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -337,37 +337,59 @@ onMounted(() => {
                     </template>
                 </div>
             </div>
-            <div class="bg-white text-gray-500 rounded-3xl border border-gray-200 shadow-sm p-8"
+            <div class="bg-white text-gray-500 rounded-3xl border border-gray-200 shadow-sm p-4 md:p-8"
                 v-if="mode == 'runner' && Object.keys(payment).length > 0">
                 <h3 class="text-2xl font-light mb-2">
                     Registration fees for
                     <span class="text-primary font-bold">{{ prices?.name }}</span>
                 </h3>
                 <template v-if="!values.payment_method || values.payment_method == 'QR'">
-                    <div class="flex items-center justify-between gap-6 pb-5">
+                    <div class="md:flex items-center justify-between space-y-6 md:space-y-0 md:gap-6 pb-5">
                         <div class="grow space-y-3">
-                            <em class="text-gray-600 block not-italic text-2xl">NPR {{ payment?.amount }}</em>
-                            <p>Please make payment to this QR code and upload your screenshot. We verify from the
-                                screenshot.
-                                We
-                                will
-                                contact you as soon as possible.</p>
-                            <Alert variant="info">
-                                <InfoIcon />
-                                <AlertTitle>Payment</AlertTitle>
-                                <AlertDescription>If you are international personal, Just upload the
-                                    screenshot of
-                                    the
-                                    conversation. We
-                                    will handle the payment at venue.</AlertDescription>
-                            </Alert>
+                            <em class="text-gray-600 block not-italic text-2xl">
+                                NPR
+                                {{ values.description.want_lunch ? Number(payment?.amount) + 480 : payment?.amount }}
+                            </em>
+                            <template v-if="values.country_id !== company?.address.country_id">
+                                <p>Since your our international runner, you can pay at venue. But do upload the
+                                    screenshot of the conversation between us.</p>
+                            </template>
+                            <template v-else>
+                                <div class="md:flex gap-4">
+                                    <div class="grow mb-4 md:mb-0">
+                                        <p class="mb-4">Please make payment to this QR code and upload your screenshot.
+                                            We verify
+                                            from the
+                                            screenshot.
+                                            We
+                                            will
+                                            contact you as soon as possible.</p>
+                                        <Alert variant="info">
+                                            <InfoIcon />
+                                            <AlertTitle>Payment</AlertTitle>
+                                            <AlertDescription>If you are international personal, Just upload the
+                                                screenshot of
+                                                the
+                                                conversation. We
+                                                will handle the payment at venue.</AlertDescription>
+                                        </Alert>
+                                    </div>
+                                    <div class="md:w-1/3">
+                                        <figure class="text-sm space-y-1 border border-gray-200 p-4 rounded-lg">
+                                            <figcaption>Here is the payment QR code</figcaption>
+                                            <img :src="showImage(payment?.screenshot?.file_name)"
+                                                alt="Payment screenshot" class="w-full h-auto">
+                                        </figure>
+                                    </div>
+                                </div>
+                            </template>
                             <label
                                 class="flex items-center gap-2 rounded-lg overflow-hidden border border-gray-200 relative">
                                 <input type="file" @change="handleFileChange" class="hidden" />
                                 <figure v-if="values?.payment_screenshot">
                                     <img :src="values?.payment_screenshot" alt="Payment screenshot"
-                                        class="w-full h-auto" />
-                                    <Button class="absolute top-2 right-2"
+                                        class="max-w-full h-auto" />
+                                    <Button type="button" class="absolute top-2 right-2"
                                         @click="form?.setFieldValue('payment_screenshot', '')">
                                         <XIcon class="w-6 h-6" />
                                     </Button>
@@ -378,37 +400,43 @@ onMounted(() => {
                                 </div>
                             </label>
                         </div>
-                        <figure class="w-1/2 text-sm space-y-1 border border-gray-200 p-4 rounded-lg">
-                            <figcaption>Here is the payment QR code</figcaption>
-                            <img :src="showImage(payment?.screenshot?.file_name)" alt="Payment screenshot"
-                                class="w-full h-auto">
-                        </figure>
                     </div>
                     <ErrorMessage name="payment_method" />
-                    <Separator />
                 </template>
-                <template v-if="values.payment_method === 'PAY_AT_VENUE'">
-                    <p>Got it! We will remind you to pay cash when you arrive at the event.</p>
-                </template>
-
-                <div class="text-center flex flex-col justify-center items-center" v-else>
-                    <span class="bg-white text-gray-600 text-lg font-bold uppercase -translate-y-1/2 px-2">Or</span>
-                    <p>You can also choose to pay in cash when you arrive at the event.</p>
-                    <Button type="button" @click="form?.setFieldValue('payment_method', 'PAY_AT_VENUE')" class="mt-2">
-                        Pay at venue
-                    </Button>
-                </div>
+                <!-- <template v-if="values.country_id !== company?.address.country_id">
+                    <template v-if="values.payment_method === 'PAY_AT_VENUE'">
+                        <p>Got it! We will remind you to pay cash when you arrive at the event.</p>
+                    </template>
+                    <div class="text-center flex flex-col justify-center items-center" v-else>
+                        <span class="bg-white text-gray-600 text-lg font-bold uppercase -translate-y-1/2 px-2">Or</span>
+                        <p>You can also choose to pay in cash when you arrive at the event.</p>
+                        <Button type="button" @click="form?.setFieldValue('payment_method', 'PAY_AT_VENUE')"
+                            class="mt-2">
+                            Pay at venue
+                        </Button>
+                    </div>
+                </template> -->
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div class="text-center sm:text-left">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Ready to register?</h3>
-                        <p class="text-gray-600 text-sm">
+                        <p class="text-gray-600 text-sm mb-6">
                             {{ props.mode === 'volunteer'
                                 ? 'Complete your volunteer registration and join our team!'
                                 : 'Submit your registration and get ready for the race!'
                             }}
+                        </p>
+                        <p>
+                            By clicking on register, you agree to our
+                            <NuxtLink class="underline text-primary" to="/terms_and_conditions" target="_blank">
+                                terms and conditions
+                            </NuxtLink>
+                            and
+                            <NuxtLink class="underline text-primary" to="/privacy_policy" target="_blank">
+                                privacy policy.
+                            </NuxtLink>
                         </p>
                     </div>
 

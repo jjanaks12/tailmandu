@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import moment from 'moment'
+import momentTZ from 'moment-timezone'
 import { pad } from '~/lib/filters'
 
 interface CountdownProps {
-    date: moment.Moment
+    date: string
 }
 
 const props = defineProps<CountdownProps>()
@@ -19,41 +20,52 @@ const second = ref(0)
 
 onMounted(() => {
     const today = moment()
-    const lastDate = props.date
+    const lastDate = momentTZ.tz(props.date, momentTZ.tz.guess())
 
-    if (lastDate.diff(today) < 0)
+    if (lastDate.diff(today, 'seconds') <= 0)
         return
 
-    day.value = (today.diff(lastDate, 'days') * -1)
-    setInterval(() => {
+    day.value = lastDate.diff(today, 'days')
+    let dayTimer = setInterval(() => {
         if (day.value == 0)
             day.value = 30
 
         day.value--
+        if (day.value == 0 && hour.value == 0 && minute.value == 0 && second.value == 0)
+            clearInterval(dayTimer)
     }, (1000 * 60 * 60))
 
-    hour.value = (today.diff(lastDate, 'hours') * -1) % 24
-    setInterval(() => {
+    const h = lastDate.diff(today, 'hours')
+    hour.value = h > 0 ? h % 24 : 0
+    let hourTimer = setInterval(() => {
         if (hour.value == 0)
             hour.value = 60
 
         hour.value--
+        if (day.value == 0 && hour.value == 0 && minute.value == 0 && second.value == 0)
+            clearInterval(hourTimer)
     }, (1000 * 60 * 60))
 
-    minute.value = (today.diff(lastDate, 'minutes') * -1) % 60
-    setInterval(() => {
+    const m = lastDate.diff(today, 'minutes')
+    minute.value = m > 0 ? m % 60 : 0
+    let minuteTimer = setInterval(() => {
         if (minute.value == 0)
             minute.value = 60
 
         minute.value--
+        if (day.value == 0 && hour.value == 0 && minute.value == 0 && second.value == 0)
+            clearInterval(minuteTimer)
     }, (1000 * 60))
 
-    second.value = (today.diff(lastDate, 'seconds') * -1) % 60
-    setInterval(() => {
+    const s = lastDate.diff(today, 'seconds')
+    second.value = s > 0 ? s % 60 : 0
+    let secondTimer = setInterval(() => {
         if (second.value == 0)
             second.value = 60
 
         second.value--
+        if (day.value == 0 && hour.value == 0 && minute.value == 0 && second.value == 0)
+            clearInterval(secondTimer)
     }, (1000))
 })
 
@@ -104,7 +116,7 @@ em {
 }
 
 .countdown {
-    width: 500px;
+    max-width: 500px;
     margin-left: auto;
     margin-right: auto;
 }

@@ -42,10 +42,10 @@ export class StageCategoryController {
             }
 
             if (validationData.start)
-                body.start = moment(validationData.start, 'YYYY-MM-DD').startOf('day').toISOString()
+                body.start = validationData.end
 
             if (validationData.end)
-                body.end = moment(validationData.end, 'YYYY-MM-DD').startOf('day').toISOString()
+                body.end = moment.utc(validationData.end, 'YYYY-MM-DD').endOf('day').toISOString()
 
             response.send(await prisma.stageCategory.create({
                 data: {
@@ -76,10 +76,10 @@ export class StageCategoryController {
             }
 
             if (validationData.start)
-                body.start = moment(validationData.start, 'YYYY-MM-DD').startOf('day').toISOString()
+                body.start = validationData.start
 
             if (validationData.end)
-                body.end = moment(validationData.end, 'YYYY-MM-DD').startOf('day').toISOString()
+                body.end = moment.utc(validationData.end, 'YYYY-MM-DD').endOf('day').toISOString()
 
             response.send(await prisma.stageCategory.update({
                 where: {

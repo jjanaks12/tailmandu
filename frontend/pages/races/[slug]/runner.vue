@@ -12,6 +12,13 @@ onBeforeMount(async () => {
     trailRace.value = await getBySlug(route.params.slug as string)
 
     useTitle(`${trailRace.value.name} - Runner form`)
+    useSeoMeta({
+        title: trailRace.value.name,
+        ogTitle: trailRace.value.name,
+        description: trailRace.value.excerpt,
+        ogDescription: trailRace.value.excerpt,
+        ogImage: showImage(trailRace.value.thumbnail?.file_name as string)
+    })
 })
 
 </script>
@@ -23,7 +30,7 @@ onBeforeMount(async () => {
                 class="size-full object-cover">
         </figure>
         <div class="container">
-            <div class="bg-white/90 p-12 mt-12 rounded-tl-2xl rounded-tr-2xl min-h-[70vh]">
+            <div class="bg-white/90 p-4 md:p-12 -mx-[15px] md:mx-0 mt-12 rounded-tl-2xl rounded-tr-2xl min-h-[70vh]">
                 <div class="space-y-4 mb-16">
                     <h1 class="text-primary text-3xl">{{ trailRace?.name }}</h1>
                     <p v-text="trailRace.excerpt" />

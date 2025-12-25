@@ -32,21 +32,21 @@ onBeforeMount(async () => {
                 class="w-full h-auto">
         </figure>
         <div class="bg-white container -mt-6 pb-6 rounded-t-md relative z-[2]">
-            <header class="py-8 px-12">
+            <header class="py-4 md:py-5 md:px-6 lg:px-12">
                 <h1 class="text-gray-600 text-4xl">{{ trailRace?.name }}</h1>
                 <em class="not-italic">
                     Starts {{ formatDate(trailRace.start) }} until {{ formatDate(trailRace.end) }}
                 </em>
             </header>
-            <div class="flex gap-4">
-                <div class="w-2/3">
-                    <div class="px-14">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="grow lg:w-2/3 order-2 md:order-1">
+                    <div class="md:px-5 lg:px-14">
                         <h2 class="text-gray-400 uppercase text-sm mb-4">Event description</h2>
                         <div class="text-gray-500 text__holder content_editor" v-html="trailRace.description" />
                     </div>
                 </div>
-                <div class="w-1/3">
-                    <div class="flex gap-2" v-if="!isFinished">
+                <div class="md:w-1/3 order-1 md:order-2">
+                    <div class="flex flex-col lg:flex-row gap-2" v-if="!isFinished">
                         <NuxtLink :to="{ name: 'races-slug-volunteer', params: { slug: trailRace.slug } }" as-child>
                             <Button variant="volunteer">Apply for volunteers</Button>
                         </NuxtLink>
@@ -59,11 +59,11 @@ onBeforeMount(async () => {
         </div>
         <section class="relative overflow-hidden z-[1]">
             <figure class="absolute inset-0 z-[-1]">
-                <img :src="bg01" />
+                <img :src="bg01" class="w-full h-full object-cover" />
             </figure>
             <div class="container text-[#13304a] py-[100px]">
                 <ul
-                    class="flex gap-12 [&>li>strong]:block [&>li>strong]:text-[25px] [&>li>em]:not-italic [&>li>em]:text-[40px]">
+                    class="flex flex-col md:flex-row gap-4 lg:gap-12 [&>li>strong]:block [&>li>strong]:text-[25px] [&>li>em]:not-italic [&>li>em]:text-[25px] md:[&>li>em]:text-[40px]">
                     <li>
                         <strong>Total Distance</strong>
                         <em>100KM +</em>
@@ -86,9 +86,10 @@ onBeforeMount(async () => {
         <section class="bg-white py-12 relative z-[2]" v-if="trailRace.stages.length > 0">
             <div class="container">
                 <h2 class="text-2xl mb-7">Stages</h2>
-                <div class="flex gap-4">
-                    <StageCard class="w-1/3" v-for="(stage, index) in trailRace.stages" :race-slug="trailRace.slug"
-                        :stage="stage" :race-name="`${trailRace.name} ${index + 1}`" />
+                <div class="flex flex-wrap gap-4">
+                    <StageCard class="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)]"
+                        v-for="(stage, index) in trailRace.stages" :race-slug="trailRace.slug" :stage="stage"
+                        :race-name="`${trailRace.name} ${index + 1}`" />
                 </div>
             </div>
         </section>

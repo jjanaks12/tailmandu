@@ -1,29 +1,29 @@
 <script lang="ts" setup>
-    import { MapIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
+import { MapIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
 
-    import TrailMapStageForm from '@/components/pages/dashboard/event/stages/form.vue'
-    import CategoryList from '@/components/pages/dashboard/event/category/List.vue'
+import TrailMapStageForm from '@/components/pages/dashboard/event/stages/form.vue'
+import CategoryList from '@/components/pages/dashboard/event/category/List.vue'
 
-    import { useStageStore } from '~/store/stage'
-    import type { Stage } from '~/lib/types'
-    import { getGPXFile } from '~/lib/filters'
+import { useStageStore } from '~/store/stage'
+import type { Stage } from '~/lib/types'
+import { getGPXFile } from '~/lib/filters'
 
-    interface TrailRaceStageListProps {
-        eventId: string
-    }
+interface TrailRaceStageListProps {
+    eventId: string
+}
 
-    const emit = defineEmits(['update'])
-    const props = defineProps<TrailRaceStageListProps>()
-    const { fetch, destory } = useStageStore()
-    const { stages } = storeToRefs(useStageStore())
+const emit = defineEmits(['update'])
+const props = defineProps<TrailRaceStageListProps>()
+const { fetch, destory } = useStageStore()
+const { stages } = storeToRefs(useStageStore())
 
-    const showDialog = ref(false)
-    const trailRaceStage = ref<Stage | null>(null)
-    const editStage = ref<Stage | null>(null)
+const showDialog = ref(false)
+const trailRaceStage = ref<Stage | null>(null)
+const editStage = ref<Stage | null>(null)
 
-    onMounted(async () => {
-        await fetch(props.eventId)
-    })
+onMounted(async () => {
+    await fetch(props.eventId)
+})
 </script>
 
 <template>

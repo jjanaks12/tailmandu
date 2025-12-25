@@ -1,4 +1,5 @@
 import moment from "moment"
+import momentTZ from "moment-timezone"
 
 export const humanize = (str: string) => str
     .replace(/^[\s_]+|[\s_]+$/g, '')
@@ -21,3 +22,16 @@ export const slugify = (text: string) => text.toLowerCase().trim()
     .replace(/[^a-z0-9\s-]/g, ' ').trim()
     .replace(/[\s-]+/g, '-')
     .replace(/^-+|-+$/g, '')
+
+export const fixDateTime = (date: string, time: string) => {
+    const [year, month, day] = date.split('-').map(Number)
+    const [hour, minute] = time.split(':').map(Number)
+
+    return momentTZ.utc()
+        .set('year', year)
+        .set('month', month - 1)
+        .set('date', day)
+        .set('hour', hour)
+        .set('minute', minute)
+        .toISOString()
+}

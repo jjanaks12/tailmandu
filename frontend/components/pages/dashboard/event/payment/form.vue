@@ -71,7 +71,7 @@ onMounted(init)
             <Input v-bind="field" id="pf__amount" />
             <ErrorMessage name="amount" />
         </Field>
-        <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2">
+        <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2" v-if="!payment">
             <label for="pf__type">Payment Type</label>
             <Select :model-value="value" id="pf__type" @update:modelValue="handleChange">
                 <SelectTrigger>
