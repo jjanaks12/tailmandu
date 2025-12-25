@@ -240,8 +240,8 @@ interface _GlobalComponents {
   'NuxtRouteAnnouncer': typeof import("../../node_modules/nuxt/dist/app/components/nuxt-route-announcer").default
   'NuxtImg': typeof import("../../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtImg
   'NuxtPicture': typeof import("../../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtPicture
-  'ComboboxCancel': typeof import("../../components/ui/combobox/index").ComboboxCancel
   'DropdownMenuPortal': typeof import("../../components/ui/dropdown-menu/index").DropdownMenuPortal
+  'ComboboxCancel': typeof import("../../components/ui/combobox/index").ComboboxCancel
   'Toaster': typeof import("../../components/ui/sonner/index").Toaster
   'AreaChart': typeof import("../../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaChart
   'AreaStackedChart': typeof import("../../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaStackedChart
@@ -488,8 +488,8 @@ interface _GlobalComponents {
   'LazyNuxtRouteAnnouncer': LazyComponent<typeof import("../../node_modules/nuxt/dist/app/components/nuxt-route-announcer").default>
   'LazyNuxtImg': LazyComponent<typeof import("../../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtImg>
   'LazyNuxtPicture': LazyComponent<typeof import("../../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtPicture>
-  'LazyComboboxCancel': LazyComponent<typeof import("../../components/ui/combobox/index").ComboboxCancel>
   'LazyDropdownMenuPortal': LazyComponent<typeof import("../../components/ui/dropdown-menu/index").DropdownMenuPortal>
+  'LazyComboboxCancel': LazyComponent<typeof import("../../components/ui/combobox/index").ComboboxCancel>
   'LazyToaster': LazyComponent<typeof import("../../components/ui/sonner/index").Toaster>
   'LazyAreaChart': LazyComponent<typeof import("../../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaChart>
   'LazyAreaStackedChart': LazyComponent<typeof import("../../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaStackedChart>

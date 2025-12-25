@@ -107,7 +107,12 @@ export class RunnerController {
                 }
             })
 
-            let personal = await prisma.personal.findFirst({ where: { email: validationData.email }, include: { gender: true } })
+            let personal = await prisma.personal.findFirst({
+                where: { email: validationData.email }, include: {
+                    gender: true,
+                    country: true
+                }
+            })
             if (!personal)
                 personal = await prisma.personal.create({
                     data: {
@@ -123,7 +128,8 @@ export class RunnerController {
                         gender_id: validationData.gender_id
                     },
                     include: {
-                        gender: true
+                        gender: true,
+                        country: true
                     }
                 })
 
@@ -189,6 +195,7 @@ export class RunnerController {
                     name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
                     email: validationData.email,
                     bib: runner.bib,
+                    country: personal.country.name,
                     gender: personal.gender.name,
                     contact_no: personal.phone_number,
                     dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
@@ -198,8 +205,8 @@ export class RunnerController {
                 stage: stageCategory.stage,
                 stageCategory: {
                     ...stageCategory,
-                    start: moment(stageCategory.start).format('DD-MM-YYYY'),
-                    end: moment(stageCategory.end).format('DD-MM-YYYY')
+                    start: moment(stageCategory.start).format('DD-MM-YYYY HH:mm a'),
+                    end: moment(stageCategory.end).format('DD-MM-YYYY HH:mm a')
                 }
             }, {
                 recipients: [{

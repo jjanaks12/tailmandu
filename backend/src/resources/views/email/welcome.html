@@ -14,14 +14,18 @@
         <thead>
             <tr>
                 <th colspan="2">
-                    <h1>Welcome to Trailmandu, <br />{{ user.name }}.</h1>
+                    <h1>Welcome to Trailmandu, <br />{{user.name}}.</h1>
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td colspan="2" style="text-align: center;">
-                    <p style="margin-bottom: 30px;">{{stage.excerpt}}</p>
+                    <p style="display: block; margin-bottom: 30px;">
+                        Congratulation, you have now <strong style="font-weight: 900;">registered</strong> for KVR
+                        Summit Challenge, Chandragiri
+                        Peak.
+                    </p>
                 </td>
             </tr>
             <tr>
@@ -54,6 +58,10 @@
                             <tr>
                                 <td style="width: 100px; font-weight: 500; vertical-align: top;">Date of birth:</td>
                                 <td>{{ user.dob }}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 100px; font-weight: 500; vertical-align: top;">Country:</td>
+                                <td>{{ user.country }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -99,7 +107,15 @@
                             </tr>
                             <tr>
                                 <td style="width: 100px; font-weight: 500; vertical-align: top;">Starts at:</td>
-                                <td>{{ stageCategory.start }} 7:00am</td>
+                                <td>{{ stageCategory.start }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <p>Please keep your BIB number with you on the day of the event. It helps us to
+                                        identify you.</p>
+                                    <p>If there has been anything change about the event, we will update our website.
+                                    </p>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -134,6 +150,13 @@
                                     </span>
                                 </td>
                             </tr>
+                            <tr>
+                                <td colspan="2" style="line-height: 1.5;">
+                                    <p>Please check your details carefully. If anything is incorrect, login with
+                                        the details
+                                        provided and update your profile.</p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </td>
@@ -144,8 +167,9 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="background: #fff; font-size: 12px; padding: 10px 20px; border-radius: 5px;">
-                    <p style="margin: 0;">You need to collect your BIB no at Race venue on the day of the event.</p>
+                <td colspan="2"
+                    style="background: #fff; font-weight: normal; text-align: center; padding: 10px 20px; border-radius: 5px;">
+                    <p style="margin: 0;">You need to collect your BIB number at Race venue on the day of the event.</p>
                 </td>
             </tr>
         </tbody>
@@ -153,6 +177,9 @@
             <tr>
                 <td colspan="2">
                     <p>Thank you for signing up to our event. We are excited to have you on board.</p>
+                    <p>For more information, please visit our website
+                        <a href="https://trailmandu.com">trailmandu.com</a>.
+                    </p>
                     <p>Best regards, <br>Trailmandu Team</p>
                 </td>
             </tr>

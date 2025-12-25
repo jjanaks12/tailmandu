@@ -8,7 +8,7 @@ export const useMenu = () => {
         icon: 'Home',
         slug: 'home',
         permissions: '*'
-    }, {
+    }/* , {
         title: 'About us',
         path: '/about_us',
         slug: 'about_us',
@@ -57,7 +57,7 @@ export const useMenu = () => {
         slug: 'contact_us',
         icon: 'Contact',
         permissions: '*'
-    }])
+    } */])
 
     const { isLoggedin } = storeToRefs(useAuthStore())
 

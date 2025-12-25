@@ -1,0 +1,1 @@
+import{_ as n}from"./DlAUqK2U.js";import{c as o,a as e,o as t}from"./CQTPwDMt.js";const a={},r={class:""};function c(i,s){return t(),o("div",r,[...s[0]||(s[0]=[e("div",{class:"container"},[e("h1",null,"Review"),e("em",null,"Talent wins games, but teamwork win championships")],-1)])])}const _=n(a,[["render",c]]);export{_ as default};

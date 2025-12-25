@@ -26,7 +26,7 @@ export default defineNuxtConfig({
       tailwindcss()
     ],
     server: {
-      allowedHosts: ['trailmandu.janak.click']
+      allowedHosts: process.env.NUXT_ALLOWED_HOSTS
     }
   },
 

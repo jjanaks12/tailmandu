@@ -326,7 +326,7 @@ onMounted(() => {
                                 <Checkbox :model-value="value" @update:model-value="handleChange"
                                     :default-value="false" />
                                 <div class="grow flex flex-col gap-2">
-                                    <span class="font-medium text-gray-700">I want to order After Race Lunch.</span>
+                                    <span class="font-medium text-gray-700">I want to order lunch after race.</span>
                                     <em class="text-sm font-light not-italic">Please Note*: Lunch is only provided to
                                         those who pre- ordered and pre-paid which is 480 per person and not included in
                                         registration fee.</em>

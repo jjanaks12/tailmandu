@@ -240,8 +240,8 @@ export const NuxtTime: typeof import("../node_modules/nuxt/dist/app/components/n
 export const NuxtRouteAnnouncer: typeof import("../node_modules/nuxt/dist/app/components/nuxt-route-announcer").default
 export const NuxtImg: typeof import("../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtImg
 export const NuxtPicture: typeof import("../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtPicture
-export const ComboboxCancel: typeof import("../components/ui/combobox/index").ComboboxCancel
 export const DropdownMenuPortal: typeof import("../components/ui/dropdown-menu/index").DropdownMenuPortal
+export const ComboboxCancel: typeof import("../components/ui/combobox/index").ComboboxCancel
 export const Toaster: typeof import("../components/ui/sonner/index").Toaster
 export const AreaChart: typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaChart
 export const AreaStackedChart: typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaStackedChart
@@ -488,8 +488,8 @@ export const LazyNuxtTime: LazyComponent<typeof import("../node_modules/nuxt/dis
 export const LazyNuxtRouteAnnouncer: LazyComponent<typeof import("../node_modules/nuxt/dist/app/components/nuxt-route-announcer").default>
 export const LazyNuxtImg: LazyComponent<typeof import("../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtImg>
 export const LazyNuxtPicture: LazyComponent<typeof import("../node_modules/nuxt/dist/app/components/nuxt-stubs").NuxtPicture>
-export const LazyComboboxCancel: LazyComponent<typeof import("../components/ui/combobox/index").ComboboxCancel>
 export const LazyDropdownMenuPortal: LazyComponent<typeof import("../components/ui/dropdown-menu/index").DropdownMenuPortal>
+export const LazyComboboxCancel: LazyComponent<typeof import("../components/ui/combobox/index").ComboboxCancel>
 export const LazyToaster: LazyComponent<typeof import("../components/ui/sonner/index").Toaster>
 export const LazyAreaChart: LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaChart>
 export const LazyAreaStackedChart: LazyComponent<typeof import("../node_modules/nuxt-charts/dist/runtime/vue-chrts").AreaStackedChart>

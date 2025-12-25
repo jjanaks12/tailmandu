@@ -1,0 +1,1 @@
+import{e as t,l as o,p as s,c,o as n}from"./CQTPwDMt.js";import{u as l}from"./C7UDQdGM.js";const m=t({__name:"health_check",setup(i){l({title:"Health check"});const{axios:a}=o();return s(async()=>{const{data:e}=await a.get("/image_health_check");console.log(e)}),(e,r)=>(n(),c("h1",null,"unlinked images"))}});export{m as default};

@@ -645,7 +645,7 @@ const _routes = [
   {
     name: "races-slug-runner",
     path: "/races/:slug()/runner",
-    component: () => import('./runner-Do14S1TD.mjs')
+    component: () => import('./runner-OC5rqjWL.mjs')
   },
   {
     name: "dashboard-newsletter",
@@ -709,7 +709,7 @@ const _routes = [
   {
     name: "races-slug-volunteer",
     path: "/races/:slug()/volunteer",
-    component: () => import('./volunteer-CvKFLLMy.mjs')
+    component: () => import('./volunteer-CsHLREIV.mjs')
   },
   {
     name: "dashboard-events-stages",
@@ -1378,9 +1378,9 @@ const layouts = {
   "admin-sidebar": defineAsyncComponent(() => import('./_sidebar-DiW1mdv0.mjs').then((m) => m.default || m)),
   admin: defineAsyncComponent(() => import('./index-B1tuoZky.mjs').then((m) => m.default || m)),
   "default-footer": defineAsyncComponent(() => import('./_footer--CnsrTmu.mjs').then((m) => m.default || m)),
-  "default-header": defineAsyncComponent(() => import('./_header-Df6k0QIr.mjs').then((m) => m.default || m)),
-  "default-sidebar": defineAsyncComponent(() => import('./_sidebar-p_FeEcg1.mjs').then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import('./index-BoDdcJxG.mjs').then((m) => m.default || m)),
+  "default-header": defineAsyncComponent(() => import('./_header-C-CzN-g8.mjs').then((m) => m.default || m)),
+  "default-sidebar": defineAsyncComponent(() => import('./_sidebar-BVNTnXI1.mjs').then((m) => m.default || m)),
+  default: defineAsyncComponent(() => import('./index-Dqsvlz9n.mjs').then((m) => m.default || m)),
   simple: defineAsyncComponent(() => import('./index-pWhHW54B.mjs').then((m) => m.default || m))
 };
 const LayoutLoader = defineComponent({
