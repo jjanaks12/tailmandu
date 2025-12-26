@@ -30,10 +30,10 @@ const hasPayment = computed(() => props.runner.payments.length > 0)
         <TableCell>
             {{ runner.payments[0]?.status }}
         </TableCell>
-        <TableCell>{{ runner.payments[0]?.type }}</TableCell>
+        <TableCell>{{ runner.payments[0]?.method }}</TableCell>
         <TableCell class="text-center">
             <div class="block">
-                <span :class="{ 'flag': true, ['flag-' + runner.personal.country.abbr]: true }"></span>
+                <span :class="{ 'flag': true, ['flag-' + runner.personal.country.abbr]: true }" />
             </div>
             {{ runner.personal?.country?.name }}
         </TableCell>

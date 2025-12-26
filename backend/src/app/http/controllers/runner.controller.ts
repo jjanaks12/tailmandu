@@ -69,7 +69,9 @@ export class RunnerController {
                         orderBy: {
                             created_at: 'desc'
                         }
-                    }
+                    },
+                    stage: true,
+                    stage_category: true
                 }
             })
 

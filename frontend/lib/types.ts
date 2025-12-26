@@ -182,7 +182,7 @@ export type EventRunner = {
 export type Payment = {
     id: string
     amount: number
-    type: PaymentType
+    method: PaymentMethod
     status: PaymentStatus
     created_at: string
     updated_at: string

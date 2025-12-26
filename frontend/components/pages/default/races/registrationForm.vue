@@ -374,7 +374,7 @@ onMounted(() => {
                                                 will handle the payment at venue.</AlertDescription>
                                         </Alert>
                                     </div>
-                                    <div class="md:w-1/3">
+                                    <div class="md:w-2/5 shrink-0">
                                         <figure class="text-sm space-y-1 border border-gray-200 p-4 rounded-lg">
                                             <figcaption>Here is the payment QR code</figcaption>
                                             <img :src="showImage(payment?.screenshot?.file_name)"
