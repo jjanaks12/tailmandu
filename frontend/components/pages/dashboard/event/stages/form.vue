@@ -1,102 +1,102 @@
 <script lang="ts" setup>
-    import { parseDate } from '@internationalized/date'
-    import { LoaderIcon, SaveIcon, XIcon } from 'lucide-vue-next'
-    import moment from 'moment'
-    import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
-    
-    import { showImage } from '~/lib/filters'
-    import { stageSchema } from '~/lib/schema/event.schema'
-    import type { Stage } from '~/lib/types'
-    import { useStageStore } from '~/store/stage'
+import { parseDate } from '@internationalized/date'
+import { LoaderIcon, SaveIcon, XIcon } from 'lucide-vue-next'
+import moment from 'moment'
+import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
 
-    interface StageFormProps {
-        eventId: string
-        stage?: Stage | null
-    }
+import { showImage } from '~/lib/filters'
+import { stageSchema } from '~/lib/schema/event.schema'
+import type { Stage } from '~/lib/types'
+import { useStageStore } from '~/store/stage'
 
-    const props = defineProps<StageFormProps>()
-    const emit = defineEmits(['update'])
-    const { save } = useStageStore()
+interface StageFormProps {
+    eventId: string
+    stage?: Stage | null
+}
 
-    const isLoading = ref(false)
-    const thumbnailFile = ref('')
-    const form = ref<FormContext | null>(null)
-    const startDate = ref()
-    const endDate = ref()
-    const showFile = ref({
-        thumbnail: false
-    })
+const props = defineProps<StageFormProps>()
+const emit = defineEmits(['update'])
+const { save } = useStageStore()
 
-    const formSubmit = async (values: any) => {
-        isLoading.value = true
-        await save(props.eventId, values)
-        isLoading.value = false
-        emit('update')
-    }
+const isLoading = ref(false)
+const thumbnailFile = ref('')
+const form = ref<FormContext | null>(null)
+const startDate = ref()
+const endDate = ref()
+const showFile = ref({
+    thumbnail: false
+})
 
-    const imageFileHandler = (event: Event, fieldName: string) => {
-        const files = (event.target as HTMLInputElement).files ?? []
+const formSubmit = async (values: any) => {
+    isLoading.value = true
+    await save(props.eventId, values)
+    isLoading.value = false
+    emit('update')
+}
 
-        if (files?.length == 0)
-            return
+const imageFileHandler = (event: Event, fieldName: string) => {
+    const files = (event.target as HTMLInputElement).files ?? []
 
-        const reader = new FileReader()
-        const file = files[0]
-        reader.onload = () => {
-            thumbnailFile.value = file.name
+    if (files?.length == 0)
+        return
 
-            if (form.value)
-                form.value.setFieldValue(fieldName, reader.result as string)
-        }
-        if (file)
-            reader.readAsDataURL(file)
-    }
+    const reader = new FileReader()
+    const file = files[0]
+    reader.onload = () => {
+        thumbnailFile.value = file.name
 
-    const removeFile = (fieldName: string) => {
-        if (form.value) {
-            form.value.resetField(fieldName)
-        }
-    }
-
-    const init = () => {
-        if (form.value) {
-            form.value.setFieldValue('event_id', props.eventId)
-
-            if (props.stage) {
-                form.value.setValues({
-                    id: props.stage.id,
-                    name: props.stage.name,
-                    excerpt: props.stage.excerpt,
-                    description: props.stage.description,
-                    location: props.stage.location,
-                    difficulty: props.stage.difficulty,
-                    distance: props.stage.distance,
-                    thumbnail: props.stage.thumbnail.file_name,
-                })
-
-                if (props.stage.thumbnail.file_name)
-                    showFile.value.thumbnail = true
-            }
-        }
-    }
-
-    watch(startDate, () => {
         if (form.value)
-            form.value.setFieldValue('start', `${startDate.value.year}-${startDate.value.month}-${startDate.value.day}`)
-    })
-    watch(endDate, () => {
-        if (form.value)
-            form.value.setFieldValue('end', `${endDate.value.year}-${endDate.value.month}-${endDate.value.day}`)
-    })
+            form.value.setFieldValue(fieldName, reader.result as string)
+    }
+    if (file)
+        reader.readAsDataURL(file)
+}
 
-    watch(form, () => {
+const removeFile = (fieldName: string) => {
+    if (form.value) {
+        form.value.resetField(fieldName)
+    }
+}
+
+const init = () => {
+    if (form.value) {
+        form.value.setFieldValue('event_id', props.eventId)
+
+        if (props.stage) {
+            form.value.setValues({
+                id: props.stage.id,
+                name: props.stage.name,
+                excerpt: props.stage.excerpt,
+                description: props.stage.description,
+                location: props.stage.location,
+                difficulty: props.stage.difficulty,
+                distance: props.stage.distance,
+                thumbnail: props.stage.thumbnail.file_name,
+            })
+
+            if (props.stage.thumbnail.file_name)
+                showFile.value.thumbnail = true
+        }
+    }
+}
+
+watch(startDate, () => {
+    if (form.value)
+        form.value.setFieldValue('start', `${startDate.value.year}-${startDate.value.month}-${startDate.value.day}`)
+})
+watch(endDate, () => {
+    if (form.value)
+        form.value.setFieldValue('end', `${endDate.value.year}-${endDate.value.month}-${endDate.value.day}`)
+})
+
+watch(form, () => {
+    init()
+})
+
+onBeforeMount(() => {
+    if (form.value)
         init()
-    })
-
-    onBeforeMount(() => {
-        if (form.value)
-            init()
-    })
+})
 </script>
 
 <template>

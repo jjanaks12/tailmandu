@@ -54,7 +54,7 @@ const fetch = async () => {
                 s: searchText.value,
                 payment_status: paymentStatusOpt.value,
                 stage_category: stageCategoryID.value,
-                payment_type: paymentTypeOpt.value,
+                payment_method: paymentTypeOpt.value,
             }
         })
         runners.value = data
@@ -88,14 +88,17 @@ const downloadCSV = async () => {
 
     let CSVContent = "data:text/csv;charset=utf-8,"
 
-    CSVContent += "Name,BIB,email,phone,gender,age,category,stage,country\n"
+    CSVContent += "Name,BIB,email,phone,gender,age,category,stage,country,emergency contact,emergency contact no,want lunch, paid\n"
 
     runners.value.forEach((runner) => {
         const age = moment().diff(runner.personal.date_of_birth, 'years')
-        CSVContent += `${[runner.personal.first_name, runner.personal.middle_name, runner.personal.last_name].join(" ")},${runner.bib},${runner.personal.email},${runner.personal.phone_number},${runner.personal.gender.name},${age},${runner?.stage_category?.name ?? ''},${runner?.stage?.name ?? ''},${runner?.personal?.country?.name ?? ''}\n`
+        CSVContent += `${[runner.personal.first_name, runner.personal.middle_name, runner.personal.last_name].join(" ")},${runner.bib},${runner.personal.email},${runner.personal.phone_number},${runner.personal.gender.name},${age},${runner?.stage_category?.name ?? ''},${runner?.stage?.name ?? ''},${runner?.personal?.country?.name ?? ''},${runner?.emergency_contact_name},${runner?.emergency_contact_no},${runner.want_lunch},${runner.payments[0]?.status ?? ''},\n`
     })
 
-    window.open(encodeURI(CSVContent))
+    const link = document.createElement('a')
+    link.setAttribute('href', encodeURI(CSVContent))
+    link.setAttribute('download', 'runners.csv')
+    link.click()
 }
 
 watch([paymentStatusOpt, stageID, stageCategoryID, paymentTypeOpt], fetch)
@@ -299,25 +302,25 @@ onMounted(fetch)
                 <div class="divide-y divide-gray-200 text-sm [&_div]:py-2">
                     <div class="flex justify-between">
                         <strong>Method</strong>
-                        <span>{{ selectedRunner?.payments[0].method }}</span>
+                        <span>{{ selectedRunner?.payments[0]?.method }}</span>
                     </div>
                     <div class="flex justify-between">
                         <strong>Status</strong>
-                        <span>{{ selectedRunner?.payments[0].status }}</span>
+                        <span>{{ selectedRunner?.payments[0]?.status }}</span>
                     </div>
                     <div class="flex justify-between">
                         <strong>Amount</strong>
-                        <span>{{ selectedRunner?.payments[0].amount }}</span>
+                        <span>{{ selectedRunner?.payments[0]?.amount }}</span>
                     </div>
                     <div class="flex justify-between">
                         <strong>Date</strong>
                         <span>
-                            {{ moment(selectedRunner?.payments[0].created_at).fromNow() }}
+                            {{ moment(selectedRunner?.payments[0]?.created_at).fromNow() }}
                         </span>
                     </div>
-                    <figure class="text-xs border p-1 rounded-sm" v-if="selectedRunner?.payments[0].screenshot">
+                    <figure class="text-xs border p-1 rounded-sm" v-if="selectedRunner?.payments[0]?.screenshot">
                         <figcaption>Screenshot of payment</figcaption>
-                        <img :src="showImage(selectedRunner?.payments[0].screenshot?.file_name)">
+                        <img :src="showImage(selectedRunner?.payments[0]?.screenshot?.file_name)">
                     </figure>
                 </div>
             </div>

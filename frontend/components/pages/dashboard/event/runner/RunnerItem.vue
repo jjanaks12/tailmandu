@@ -49,23 +49,25 @@ const hasPayment = computed(() => props.runner.payments.length > 0)
                     <DropdownMenuItem class="text-gray-500" @click="emit('show:runner')">
                         See runner details
                     </DropdownMenuItem>
-                    <DropdownMenuItem class="text-gray-500" @click="emit('show:payment')" v-if="hasPayment">
-                        See payment details
-                    </DropdownMenuItem>
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem class="text-green-500"
-                        @click="emit('updated:payment', 'COMPLETED', runner.payments[0].id)">
-                        Completed
-                    </DropdownMenuItem>
-                    <DropdownMenuItem class="text-yellow-500"
-                        @click="emit('updated:payment', 'PENDING', runner.payments[0].id)">
-                        Pending
-                    </DropdownMenuItem>
-                    <DropdownMenuItem class="text-red-500"
-                        @click="emit('updated:payment', 'FAILED', runner.payments[0].id)">
-                        Failed
-                    </DropdownMenuItem>
+                    <template v-if="runner.payments.length > 0">
+                        <DropdownMenuItem class="text-gray-500" @click="emit('show:payment')" v-if="hasPayment">
+                            See payment details
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem class="text-green-500"
+                            @click="emit('updated:payment', 'COMPLETED', runner.payments[0].id)">
+                            Completed
+                        </DropdownMenuItem>
+                        <DropdownMenuItem class="text-yellow-500"
+                            @click="emit('updated:payment', 'PENDING', runner.payments[0].id)">
+                            Pending
+                        </DropdownMenuItem>
+                        <DropdownMenuItem class="text-red-500"
+                            @click="emit('updated:payment', 'FAILED', runner.payments[0].id)">
+                            Failed
+                        </DropdownMenuItem>
+                    </template>
                 </DropdownMenuContent>
             </DropdownMenu>
         </TableCell>

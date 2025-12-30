@@ -175,6 +175,7 @@ export class EventController {
                             thumbnail: true,
                             stage_categories: {
                                 include: {
+                                    checkpoints: true,
                                     payment: {
                                         include: {
                                             screenshot: true

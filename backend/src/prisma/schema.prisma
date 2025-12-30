@@ -126,11 +126,14 @@ model Club {
 }
 
 model EventRunner {
-  id         String    @id @default(cuid())
-  bib        String    @unique
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-  deleted_at DateTime?
+  id                     String    @id @default(cuid())
+  bib                    String    @unique
+  created_at             DateTime  @default(now())
+  updated_at             DateTime?
+  deleted_at             DateTime?
+  emergency_contact_name String    @default("")
+  emergency_contact_no   String    @default("")
+  want_lunch             Boolean   @default(false)
 
   personal_id       String
   personal          Personal      @relation(fields: [personal_id], references: [id], onDelete: Cascade)

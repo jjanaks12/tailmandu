@@ -1,4 +1,4 @@
-import { Checkpoint, PaymentStatus, PaymentType, PrismaClient } from "@prisma/client"
+import { Checkpoint, PaymentMethod, PaymentStatus, PaymentType, PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import Bcrypt from 'bcrypt'
 
@@ -11,12 +11,12 @@ const prisma = new PrismaClient()
 export class RunnerController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
-            let paymentFilter: Record<string, any> | undefined = request.query.payment_status || request.query.payment_type ? { some: {} } : undefined
+            let paymentFilter: Record<string, any> | undefined = request.query.payment_status || request.query.payment_method ? { some: {} } : undefined
             if (request.query.payment_status)
                 paymentFilter.some.status = request.query.payment_status as PaymentStatus
 
-            if (request.query.payment_type)
-                paymentFilter.some.type = request.query.payment_type as PaymentType
+            if (request.query.payment_method)
+                paymentFilter.some.method = request.query.payment_method as PaymentMethod
 
             const runners = await prisma.eventRunner.findMany({
                 where: {
@@ -164,6 +164,9 @@ export class RunnerController {
                     personal_id: personal.id,
                     stage_id: validationData.stage_id,
                     stage_category_id: validationData.stage_category_id,
+                    want_lunch: validationData.description.want_lunch ?? false,
+                    emergency_contact_name: validationData.description.emergency_contact_name,
+                    emergency_contact_no: validationData.description.emergency_contact_phone,
                     // shirt_id: validationData.size_id
                 }
             })
@@ -191,32 +194,33 @@ export class RunnerController {
                 }
             })
 
-            await sendEmail('welcome', {
-                title: 'Thank you for signing up for race',
-                user: {
-                    name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
-                    email: validationData.email,
-                    bib: runner.bib,
-                    country: personal.country.name,
-                    gender: personal.gender.name,
-                    contact_no: personal.phone_number,
-                    dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
-                    emergency_contact: validationData.description.emergency_contact_name,
-                    emergency_contact_no: validationData.description.emergency_contact_phone,
-                },
-                stage: stageCategory.stage,
-                stageCategory: {
-                    ...stageCategory,
-                    start: moment.utc(stageCategory.start).format('DD-MM-YYYY hh:mm a'),
-                    end: moment.utc(stageCategory.end).format('DD-MM-YYYY hh:mm a')
-                }
-            }, {
-                recipients: [{
-                    email: validationData.email,
-                    name: validationData.first_name,
-                }],
-                subject: 'Welcome to Trailmandu'
-            })
+            if (process.env.NODE_ENV === 'production')
+                await sendEmail('welcome', {
+                    title: 'Thank you for signing up for race',
+                    user: {
+                        name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
+                        email: validationData.email,
+                        bib: runner.bib,
+                        country: personal.country.name,
+                        gender: personal.gender.name,
+                        contact_no: personal.phone_number,
+                        dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
+                        emergency_contact: validationData.description.emergency_contact_name,
+                        emergency_contact_no: validationData.description.emergency_contact_phone,
+                    },
+                    stage: stageCategory.stage,
+                    stageCategory: {
+                        ...stageCategory,
+                        start: moment.utc(stageCategory.start).format('DD-MM-YYYY hh:mm a'),
+                        end: moment.utc(stageCategory.end).format('DD-MM-YYYY hh:mm a')
+                    }
+                }, {
+                    recipients: [{
+                        email: validationData.email,
+                        name: validationData.first_name,
+                    }],
+                    subject: 'Welcome to Trailmandu'
+                })
 
             response.send(payment)
         } catch (error) {

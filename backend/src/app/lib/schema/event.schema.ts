@@ -82,6 +82,7 @@ export const stageCategorySchema = Y.object({
     start: Y.string().required().label('Start'),
     end: Y.string().required().label('End'),
     stage_id: Y.string().required().label('Stage'),
+    bib_range: Y.string().label('Bib range'),
     map: Y.string().when('id', {
         is: undefined,
         then: schema => schema.required(),

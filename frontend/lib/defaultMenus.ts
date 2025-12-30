@@ -8,7 +8,7 @@ export const useMenu = () => {
         icon: 'Home',
         slug: 'home',
         permissions: '*'
-    }/* , {
+    }, {
         title: 'About us',
         path: '/about_us',
         slug: 'about_us',
@@ -33,7 +33,7 @@ export const useMenu = () => {
             icon: 'Waypoints',
             permissions: '*'
         }]
-    }, {
+    },/*  {
         title: 'Our trails',
         path: '/our_trails',
         slug: 'our_trails',
@@ -51,13 +51,13 @@ export const useMenu = () => {
         slug: 'tm_clicks',
         icon: 'Images',
         permissions: '*'
-    }, {
+    },  */{
         title: 'Contact us',
         path: '/contact_us',
         slug: 'contact_us',
         icon: 'Contact',
         permissions: '*'
-    } */])
+    }])
 
     const { isLoggedin } = storeToRefs(useAuthStore())
 

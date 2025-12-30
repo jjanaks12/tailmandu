@@ -1,54 +1,54 @@
 <script lang="ts" setup>
-    import { LoaderIcon, MapIcon, SaveIcon } from 'lucide-vue-next'
-    import { getGPXFile } from '~/lib/filters'
+import { LoaderIcon, MapIcon, SaveIcon } from 'lucide-vue-next'
+import { getGPXFile } from '~/lib/filters'
 
-    import type { TrailRace } from '~/lib/types'
-    import { useAxios } from '~/services/axios'
+import type { TrailRace } from '~/lib/types'
+import { useAxios } from '~/services/axios'
 
-    interface TrailRaceImageUploadProps {
-        trailRace: TrailRace
+interface TrailRaceImageUploadProps {
+    trailRace: TrailRace
+}
+
+const props = defineProps<TrailRaceImageUploadProps>()
+const { axios } = useAxios()
+const emit = defineEmits(['update'])
+
+const showMap = ref(false)
+const saving = ref(false)
+const editImage = ref(false)
+const fileToUpload = ref('')
+const fileName = ref<string | null>(null)
+
+const fileHandler = (event: Event) => {
+    const files = (event.target as HTMLInputElement).files ?? []
+
+    if (files?.length == 0)
+        return
+
+    const reader = new FileReader()
+    const file = files[0]
+    reader.onload = () => {
+        fileName.value = file.name
+        fileToUpload.value = reader.result as string
     }
+    if (file)
+        reader.readAsDataURL(file)
+}
 
-    const props = defineProps<TrailRaceImageUploadProps>()
-    const { axios } = useAxios()
-    const emit = defineEmits(['update'])
+const saveFile = async () => {
+    saving.value = true
 
-    const showMap = ref(false)
-    const saving = ref(false)
-    const editImage = ref(false)
-    const fileToUpload = ref('')
-    const fileName = ref<string | null>(null)
-
-    const fileHandler = (event: Event) => {
-        const files = (event.target as HTMLInputElement).files ?? []
-
-        if (files?.length == 0)
-            return
-
-        const reader = new FileReader()
-        const file = files[0]
-        reader.onload = () => {
-            fileName.value = file.name
-            fileToUpload.value = reader.result as string
-        }
-        if (file)
-            reader.readAsDataURL(file)
-    }
-
-    const saveFile = async () => {
-        saving.value = true
-
-        await axios.put(`/events/${props.trailRace.id}/upload_map_file`, {
-            file: fileToUpload.value
-        })
-        saving.value = false
-        emit('update')
-    }
-
-    onMounted(() => {
-        if (!props.trailRace.image_id)
-            editImage.value = true
+    await axios.put(`/events/${props.trailRace.id}/upload_map_file`, {
+        file: fileToUpload.value
     })
+    saving.value = false
+    emit('update')
+}
+
+onMounted(() => {
+    if (!props.trailRace.image_id)
+        editImage.value = true
+})
 </script>
 
 <template>
@@ -65,8 +65,8 @@
                 <MapIcon />
             </Button>
         </div>
-        <label class="w-full text-center block p-3 border border-dashed rounded-md">
-            <input type="file" @change="fileHandler" class="hidden" accept=".gpx">
+        <label class="w-full text-center block p-3 border border-dashed rounded-md focus-within:bg-gray-300 relative">
+            <input type="file" @change="fileHandler" class="absolute inset-0 opacity-0" accept=".gpx">
             <span>{{ fileName ?? "Upload .gpx file" }}</span>
         </label>
     </div>

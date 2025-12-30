@@ -42,7 +42,7 @@ export class StageCategoryController {
             }
 
             if (validationData.start)
-                body.start = validationData.end
+                body.start = validationData.start
 
             if (validationData.end)
                 body.end = moment.utc(validationData.end, 'YYYY-MM-DD').endOf('day').toISOString()
@@ -93,7 +93,8 @@ export class StageCategoryController {
                     stage_id: validationData.stage_id,
                     location: validationData.location,
                     difficulty: validationData.difficulty,
-                    distance: validationData.distance
+                    distance: validationData.distance,
+                    bib_range: validationData.bib_range
                 }
             }))
         } catch (error) {

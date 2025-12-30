@@ -48,7 +48,15 @@ export const trailRaceRunner = Y.object({
         emergency_contact_name: Y.string().required().label('Emergency Contact name'),
         emergency_contact_phone: Y.string().required().label('Emergency Contact number'),
         want_lunch: Y.boolean().label('Want lunch'),
-    }).required().label('Description')
+    }).required().label('Description'),
+    liabilities: Y.boolean()
+        .required('You must agree and make sure to read the liabilities carefully')
+        .oneOf([true], 'You must agree and make sure to read the liabilities carefully')
+        .label('Liabilities'),
+    policies: Y.boolean()
+        .required('You must agree and make sure to read the policies carefully')
+        .oneOf([true], 'You must agree and make sure to read the policies carefully')
+        .label('Policies')
 })
 
 export const trailRaceVolunteer = Y.object({
@@ -76,6 +84,7 @@ export const stageCategorySchema = Y.object({
     start: Y.string().required().label('Start'),
     end: Y.string().required().label('End'),
     stage_id: Y.string().required().label('Stage'),
+    bib_range: Y.string().label('Bib range'),
     map: Y.string().when('id', {
         is: undefined,
         then: schema => schema.required(),

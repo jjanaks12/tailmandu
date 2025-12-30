@@ -37,7 +37,12 @@ const endEvent = async () => {
         <Button @click="endEvent" v-if="hasStarted && !hasFinished">End</Button>
         <div class="flex gap-2">
             <div class="grow">
-                <strong>{{ stageCategory.name }}</strong>
+                <strong>
+                    {{ stageCategory.name }}
+                    <span class="text-xs text-gray-500 font-normal">
+                        BIB range: ({{ stageCategory.bib_range }})
+                    </span>
+                </strong>
                 <p class="mb-4" v-text="stageCategory.excerpt" />
             </div>
             <div class="flex gap-2">

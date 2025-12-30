@@ -403,22 +403,33 @@ onMounted(() => {
                     </div>
                     <ErrorMessage name="payment_method" />
                 </template>
-                <!-- <template v-if="values.country_id !== company?.address.country_id">
-                    <template v-if="values.payment_method === 'PAY_AT_VENUE'">
-                        <p>Got it! We will remind you to pay cash when you arrive at the event.</p>
-                    </template>
-                    <div class="text-center flex flex-col justify-center items-center" v-else>
-                        <span class="bg-white text-gray-600 text-lg font-bold uppercase -translate-y-1/2 px-2">Or</span>
-                        <p>You can also choose to pay in cash when you arrive at the event.</p>
-                        <Button type="button" @click="form?.setFieldValue('payment_method', 'PAY_AT_VENUE')"
-                            class="mt-2">
-                            Pay at venue
-                        </Button>
-                    </div>
-                </template> -->
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+                <div class="flex flex-col mb-4">
+                    <Field name="liabilities" as="div" v-slot="{ value, handleChange }">
+                        <Checkbox :model-value="value" @update:model-value="handleChange" :default-value="false"
+                            id="rf__liabilities" />
+                        <label for="rf__liabilities">
+                            I agree to all the
+                            <NuxtLink to="/liabilities" target="_blank" class="underline text-primary">
+                                liability
+                            </NuxtLink>
+                        </label>
+                        <ErrorMessage name="liabilities" />
+                    </Field>
+                    <Field name="policies" as="div" v-slot="{ value, handleChange }">
+                        <Checkbox :model-value="value" @update:model-value="handleChange" :default-value="false"
+                            id="rf__policies" />
+                        <label for="rf__policies">
+                            I agree to all the
+                            <NuxtLink to="/privacy_policy" target="_blank" class="underline text-primary">
+                                policies
+                            </NuxtLink>
+                        </label>
+                        <ErrorMessage name="policies" />
+                    </Field>
+                </div>
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div class="text-center sm:text-left">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Ready to register?</h3>
@@ -427,16 +438,6 @@ onMounted(() => {
                                 ? 'Complete your volunteer registration and join our team!'
                                 : 'Submit your registration and get ready for the race!'
                             }}
-                        </p>
-                        <p>
-                            By clicking on register, you agree to our
-                            <NuxtLink class="underline text-primary" to="/terms_and_conditions" target="_blank">
-                                terms and conditions
-                            </NuxtLink>
-                            and
-                            <NuxtLink class="underline text-primary" to="/privacy_policy" target="_blank">
-                                privacy policy.
-                            </NuxtLink>
                         </p>
                     </div>
 

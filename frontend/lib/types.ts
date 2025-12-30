@@ -166,6 +166,9 @@ export type EventRunner = {
     created_at: string
     updated_at: string
     deleted_at: string
+    emergency_contact_name: string
+    emergency_contact_no: string
+    want_lunch: boolean
     personal_id: string
     personal: Personal
     event: TrailRace
@@ -286,6 +289,7 @@ export type StageCategory = {
     location: string
     start: string
     end: string
+    bib_range: string
     created_at: string
     updated_at: string
     deleted_at: string

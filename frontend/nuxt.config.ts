@@ -14,7 +14,7 @@ export default defineNuxtConfig({
     'nuxt-tiptap-editor'
   ],
 
-  css: ['@/assets/css/main.css'],
+  css: ['@/assets/css/main.css', 'swiper/css'],
 
   shadcn: {
     prefix: '',

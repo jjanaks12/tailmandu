@@ -1,5 +1,6 @@
 <script lang="js" setup>
-import moment from 'moment';
+import moment from 'moment'
+import img01 from '@/assets/images/our-story-img01.jpg'
 
 definePageMeta({
     layout: 'default'
@@ -33,18 +34,27 @@ const stories = [{
 </script>
 
 <template>
-    <div class="bg-gray-600 uppercase py-20 border-b">
-        <div class="container">
-            <h1 class="text-4xl font-bold">Our Story</h1>
-            <em class="text-xl not-italic">Talent wins games, but teamwork win championships</em>
-        </div>
-    </div>
+    <PageHeader title="Our Story" :pageImage="img01" subtitle="Talent wins games, but teamwork win championships" />
     <section class="py-12">
-        <div class="container">
-            <div v-for="story in stories">
-                <strong>{{ story.title }}</strong>
-                <p>{{ story.text }}</p>
-                <time :datetime="story.date">{{ moment(story.date).format('YYYY') }}</time>
+        <div class="container space-y-[50px] md:space-y-[0]">
+            <div :class="{
+                'md:flex md:[&>div]:p-[30px] hover:[&>div>time]:text-secondary last:[&>div]:border-b-0': true,
+                'flex-row-reverse': index % 2 === 0
+            }" v-for="(story, index) in stories">
+                <div :class="{
+                    'bg-white md:basis-[238px] shrink-0 -mt-[1px] mb-5 md:mb-0': true,
+                    'md:border-l': index % 2 === 0,
+                    'md:border-r': index % 2 !== 0
+                }">
+                    <time :datetime="story.date" class="text-gray-700 text-[25px] font-bold">
+                        {{ moment(story.date).format('YYYY') }}
+                    </time>
+                    <strong class="block text-sm">{{ story.title }}</strong>
+                </div>
+                <div class="grow md:border-b">
+                    <em class="text-gray-700 block not-italic text-lg font-bold mb-2">{{ story.subtitle }}</em>
+                    <p class="text-primary">{{ story.text }}</p>
+                </div>
             </div>
         </div>
     </section>

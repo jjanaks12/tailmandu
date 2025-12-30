@@ -34,7 +34,6 @@ const formSubmitted = async (formData: any) => {
     const method = formData.id ? 'put' : 'post'
     const url = formData.id ? `/events/${props.stageId}/stage_categories/${formData.id}` : `/events/${props.stageId}/stage_categories`
 
-    console.log(fixDateTime(formData.start, startTime.value))
     await axios[method](url, {
         ...formData,
         start: fixDateTime(formData.start, startTime.value)
@@ -91,7 +90,8 @@ onMounted(() => {
                 difficulty: props.category.difficulty,
                 location: props.category.location,
                 start: props.category.start,
-                end: props.category.end
+                end: props.category.end,
+                bib_range: props.category.bib_range
             })
 
             if (props.category.start) {
@@ -168,6 +168,11 @@ onMounted(() => {
                 <Label for="ef__distance">Distance</Label>
                 <Input v-bind="field" id="ef__distance" />
                 <ErrorMessage name="distance" />
+            </Field>
+            <Field name="bib_range" v-slot="{ field }" as="div" class="w-2/4 flex flex-col gap-2">
+                <Label for="ef__bib_range">BIB Range</Label>
+                <Input v-bind="field" id="ef__bib_range" />
+                <ErrorMessage name="bib_range" />
             </Field>
         </div>
         <Field name="location" as="div" class="flex flex-col gap-1" v-slot="{ field }">
