@@ -29,7 +29,7 @@ const logTimer = async () => {
     <div class="text-center space-y-2">
         <Avatar
             :class="{ 'size-[120px] mx-auto border-4': true, 'border-primary': timer == undefined, 'border-secondary': timer !== undefined }"
-            @click="logTimer">
+            @dblclick="logTimer">
             <AvatarImage :src="showImage(runner.personal?.avatar?.file_name)" :alt="runner.personal.first_name" />
             <AvatarFallback>{{ abbr(fullName) }}</AvatarFallback>
         </Avatar>

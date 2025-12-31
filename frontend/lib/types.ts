@@ -170,6 +170,7 @@ export type EventRunner = {
     emergency_contact_no: string
     want_lunch: boolean
     personal_id: string
+    club_name: string
     personal: Personal
     event: TrailRace
     stage_id: string

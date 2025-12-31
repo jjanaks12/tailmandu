@@ -7,6 +7,7 @@ import roleRouter from '@/routes/api/role.router'
 import eventRouter from '@/routes/api/event.router'
 import CompanyRouter from '@/routes/api/company.router'
 import VolunteerRouter from '@/routes/api/volunteer.router'
+import RunnerRouter from '@/routes/api/runner.router'
 
 const router = Router()
 
@@ -17,5 +18,6 @@ router.use('/roles', roleRouter)
 router.use('/events', eventRouter)
 router.use('/companies', CompanyRouter)
 router.use('/volunteers', VolunteerRouter)
+router.use('/runners', RunnerRouter)
 
 export default router

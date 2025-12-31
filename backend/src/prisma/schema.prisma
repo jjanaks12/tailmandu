@@ -131,6 +131,7 @@ model EventRunner {
   created_at             DateTime  @default(now())
   updated_at             DateTime?
   deleted_at             DateTime?
+  club_name              String    @default("")
   emergency_contact_name String    @default("")
   emergency_contact_no   String    @default("")
   want_lunch             Boolean   @default(false)

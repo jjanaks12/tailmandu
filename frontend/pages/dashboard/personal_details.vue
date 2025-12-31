@@ -1,77 +1,77 @@
 <script lang="ts" setup>
-    import { parseDate } from '@internationalized/date'
-    import { Baby, Calendar, Flag, IdCard, Loader, Mail, Phone, VenusAndMars } from 'lucide-vue-next'
-    import moment from 'moment'
-    import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
-    import { abbr, showImage } from '~/lib/filters'
+import { parseDate } from '@internationalized/date'
+import { Baby, Calendar, Flag, IdCard, Loader, Mail, Phone, VenusAndMars } from 'lucide-vue-next'
+import moment from 'moment'
+import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
+import { abbr, showImage } from '~/lib/filters'
 
-    import { userDetailSchema } from '~/lib/schema/user.schema'
-    import { useAppStore } from '~/store/app'
-    import { useAuthStore } from '~/store/auth'
+import { userDetailSchema } from '~/lib/schema/user.schema'
+import { useAppStore } from '~/store/app'
+import { useAuthStore } from '~/store/auth'
 
-    useHead({
-        title: 'Personal details'
-    })
+useHead({
+    title: 'Personal details'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: ['*']
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['*']
+})
 
-    const { updateDetail } = useAuthStore()
-    const { isLoading, user, fullName } = storeToRefs(useAuthStore())
-    const { genders, countries, age_categories } = storeToRefs(useAppStore())
-    const form = ref<FormContext | null>(null)
-    const dateOfBirth = ref()
+const { updateDetail } = useAuthStore()
+const { isLoading, user, fullName } = storeToRefs(useAuthStore())
+const { genders, countries, age_categories } = storeToRefs(useAppStore())
+const form = ref<FormContext | null>(null)
+const dateOfBirth = ref()
 
-    const avatar = computed(() => showImage(user.value?.personal?.avatar?.file_name as string))
+const avatar = computed(() => showImage(user.value?.personal?.avatar?.file_name as string))
 
-    const init = () => {
-        if (form.value !== null && user.value !== null) {
-            form.value.setFieldValue('first_name', user.value.personal.first_name)
-            form.value.setFieldValue('middle_name', user.value.personal.middle_name || '')
-            form.value.setFieldValue('last_name', user.value.personal.last_name)
-            form.value.setFieldValue('email', user.value.personal.email)
-            form.value.setFieldValue('gender_id', user.value.personal.gender_id)
-            form.value.setFieldValue('country_id', user.value.personal.country_id)
-            form.value.setFieldValue('age_category_id', user.value.personal.age_category_id)
-            form.value.setFieldValue('phone_number', user.value.personal.phone_number)
-            form.value.setFieldValue('image_id', user.value.personal?.image_id)
+const init = () => {
+    if (form.value !== null && user.value !== null) {
+        form.value.setFieldValue('first_name', user.value.personal.first_name)
+        form.value.setFieldValue('middle_name', user.value.personal.middle_name || '')
+        form.value.setFieldValue('last_name', user.value.personal.last_name)
+        form.value.setFieldValue('email', user.value.personal.email)
+        form.value.setFieldValue('gender_id', user.value.personal.gender_id)
+        form.value.setFieldValue('country_id', user.value.personal.country_id)
+        form.value.setFieldValue('age_category_id', user.value.personal.age_category_id)
+        form.value.setFieldValue('phone_number', user.value.personal.phone_number)
+        form.value.setFieldValue('image_id', user.value.personal?.image_id)
 
-            if (user.value.personal.date_of_birth) {
-                form.value.setFieldValue('date_of_birth', user.value.personal.date_of_birth)
-                dateOfBirth.value = parseDate(moment(user.value.personal.date_of_birth).format('YYYY-MM-DD'))
-            }
+        if (user.value.personal.date_of_birth) {
+            form.value.setFieldValue('date_of_birth', user.value.personal.date_of_birth)
+            dateOfBirth.value = parseDate(moment(user.value.personal.date_of_birth).format('YYYY-MM-DD'))
         }
     }
+}
 
-    const fileInputHandler = (event: Event) => {
-        const files = (event.target as HTMLInputElement).files
-        if (!files)
-            return
+const fileInputHandler = (event: Event) => {
+    const files = (event.target as HTMLInputElement).files
+    if (!files)
+        return
 
-        const reader = new FileReader()
-        if (files[0]) {
-            reader.readAsDataURL(files[0])
-            reader.onload = () => {
-                form.value?.setFieldValue('image', reader.result)
-            }
+    const reader = new FileReader()
+    if (files[0]) {
+        reader.readAsDataURL(files[0])
+        reader.onload = () => {
+            form.value?.setFieldValue('image', reader.result)
         }
     }
+}
 
-    watch(dateOfBirth, () => {
-        if (form.value)
-            form.value.setFieldValue('date_of_birth', `${dateOfBirth.value.year}-${dateOfBirth.value.month}-${dateOfBirth.value.day}`)
-    })
+watch(dateOfBirth, () => {
+    if (form.value)
+        form.value.setFieldValue('date_of_birth', `${dateOfBirth.value.year}-${dateOfBirth.value.month}-${dateOfBirth.value.day}`)
+})
 
-    watch(user, () => {
-        init()
-    })
+watch(user, () => {
+    init()
+})
 
-    onMounted(() => {
-        init()
-    })
+onMounted(() => {
+    init()
+})
 </script>
 
 <template>
@@ -210,7 +210,7 @@
                     </div>
                 </Field>
             </div>
-            <div class="w-1/3">
+            <!-- <div class="w-1/3">
                 <Field name="age_category_id" v-slot="{ field }">
                     <label class="sr-only" for="lf__age_category_id">Age category</label>
                     <div class="flex gap-2">
@@ -231,7 +231,7 @@
                         </div>
                     </div>
                 </Field>
-            </div>
+            </div> -->
         </div>
         <div class="text-right">
             <Button variant="secondary" type="submit" class="w-[180px]" :disabled="isLoading">

@@ -165,6 +165,7 @@ export class RunnerController {
                     stage_id: validationData.stage_id,
                     stage_category_id: validationData.stage_category_id,
                     want_lunch: validationData.description.want_lunch ?? false,
+                    club_name: validationData.description.club_name,
                     emergency_contact_name: validationData.description.emergency_contact_name,
                     emergency_contact_no: validationData.description.emergency_contact_phone,
                     // shirt_id: validationData.size_id
@@ -228,6 +229,25 @@ export class RunnerController {
         }
     }
 
+    public static async update(request: Request, response: Response, next: NextFunction) {
+        try {
+            const runner = await prisma.eventRunner.update({
+                where: {
+                    id: request.params.runner_id
+                },
+                data: {
+                    want_lunch: request.body.description.want_lunch ?? false,
+                    club_name: request.body.description.club_name,
+                    emergency_contact_name: request.body.description.emergency_contact_name,
+                    emergency_contact_no: request.body.description.emergency_contact_phone,
+                }
+            })
+            response.send(runner)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async logTimer(request: Request, response: Response, next: NextFunction) {
         try {
             let foundCheckpoint: Checkpoint
@@ -274,6 +294,50 @@ export class RunnerController {
                     checkpoint_id: foundCheckpoint.id
                 }
             }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async stageCategoryList(request: Request, response: Response, next: NextFunction) {
+        try {
+            const personal = await prisma.personal.findFirst({
+                where: {
+                    id: request.body.auth_user.personal_id
+                },
+                include: {
+                    runners: {
+                        include: {
+                            stage_category: true,
+                            stage: true
+                        }
+                    }
+                }
+            })
+            response.send(personal.runners)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async get(request: Request, response: Response, next: NextFunction) {
+        try {
+            const runner = await prisma.eventRunner.findFirst({
+                where: {
+                    id: request.params.runner_id
+                },
+                include: {
+                    personal: true,
+                    stage_category: true,
+                    stage: true,
+                    payments: {
+                        include: {
+                            screenshot: true
+                        }
+                    }
+                }
+            })
+            response.send(runner)
         } catch (error) {
             next(error)
         }

@@ -49,6 +49,10 @@ const fetch = async () => {
     fetchCheckpointRegister()
 }
 
+const availableCheckpoints = computed(() => {
+    return stageCategories.value.filter(category => category.runners.length > 0)
+})
+
 const findEntry = (runner_id: string) => entryList.value.find(entry => entry.runner_id === runner_id) ?? null
 
 const filteredList = computed(() => runners.value.filter(runner => runner.bib.includes(searchText.value)))
@@ -59,6 +63,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <pre>{{ availableCheckpoints }}</pre>
     <div class="flex justify-end items-center gap-4 pb-4 mb-14 border-b">
         <Badge v-for="category in stageCategories" :key="category.id" variant="outline">
             {{ category.name }}
@@ -70,7 +75,7 @@ onMounted(() => {
             <RefreshCwIcon />
         </Button>
     </div>
-    <div class="flex gap-4" v-if="filteredList.length > 0">
+    <div class="flex flex-wrap gap-8" v-if="filteredList.length > 0">
         <template v-for="runner in filteredList">
             <PagesDashboardVolunteerRunner :timer="findEntry(runner.id)?.timer"
                 :stage-id="(route.params.stage_id as string)" :runner="runner" class="w-1/2 md:w-1/3 lg:w-1/4"

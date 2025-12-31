@@ -25,7 +25,7 @@ export const stageSchema = Y.object({
 
 export const trailRaceRunner = Y.object({
     stage_id: Y.string().required().label('Stage'),
-    stage_category_id: Y.string().required().label('Stage'),
+    stage_category_id: Y.string().required().label('Stage category'),
     first_name: Y.string().required().label("First name"),
     middle_name: Y.string().nullable().label("Middle name"),
     last_name: Y.string().required().label("Last name"),
