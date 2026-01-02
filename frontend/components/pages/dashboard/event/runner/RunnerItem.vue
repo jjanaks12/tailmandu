@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { EllipsisVerticalIcon } from 'lucide-vue-next';
-import moment from 'moment';
-import type { EventRunner } from '~/lib/types';
+import { CheckIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
+import moment from 'moment'
+import type { EventRunner } from '~/lib/types'
 
 interface RunnerItemProps {
     runner: EventRunner
@@ -11,6 +11,8 @@ const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment'])
 const props = defineProps<RunnerItemProps>()
 
 const hasPayment = computed(() => props.runner.payments.length > 0)
+
+const { copy, copied } = useClipboard()
 </script>
 
 <template>
@@ -22,10 +24,23 @@ const hasPayment = computed(() => props.runner.payments.length > 0)
                 {{ runner.personal.middle_name }}
                 {{ runner.personal.last_name }}
             </strong>
-            <Badge>
-                {{ moment().diff(moment(runner.personal.date_of_birth), 'years') }}
-                {{ runner.personal?.gender?.name.charAt(0).toUpperCase() }}
-            </Badge>
+            <em>
+                {{ runner.personal.email }}
+                <Button size="icon" modifier="outline" @click="copy(runner.personal.email)">
+                    <CopyIcon class="size-4" v-if="!copied" />
+                    <CheckIcon class="size-4" v-else />
+                </Button>
+            </em>
+            <div class="flex gap-2">
+                <Badge>
+                    {{ moment().diff(moment(runner.personal.date_of_birth), 'years') }}
+                    {{ runner.personal?.gender?.name.charAt(0).toUpperCase() }}
+                </Badge>
+                <Badge variant="outline">
+                    <span class="font-normal text-gray-400">Stage Category:</span>
+                    {{ runner.stage_category.name }}
+                </Badge>
+            </div>
         </TableCell>
         <TableCell>
             {{ runner.payments[0]?.status }}

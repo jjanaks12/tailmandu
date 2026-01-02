@@ -44,19 +44,27 @@ export const useEventStore = defineStore('event', () => {
     }
 
     const saveDescription = async (id: string, description: string) => {
-        await axios.put(`/events/${id}/update_description`, { description })
+        const { status } = await axios.put(`/events/${id}/update_description`, { description })
+
+        return status === 200
     }
 
     const saveMap = async (id: string, description: string) => {
-        await axios.put(`/events/${id}/upload_map_file`, { description })
+        const { status } = await axios.put(`/events/${id}/upload_map_file`, { description })
+
+        return status === 200
     }
 
     const saveRunner = async (formData: InferType<typeof trailRaceRunner>, eventId: string) => {
-        await axios.post(`/events/${eventId}/runner/register`, formData)
+        const { status } = await axios.post(`/events/${eventId}/runner/register`, formData)
+
+        return status === 200
     }
 
     const saveVoluteer = async (values: InferType<typeof trailRaceVolunteer>, eventId: string) => {
-        await axios.post(`/events/${eventId}/volunteer/register`, { ...values, event_id: eventId })
+        const { status } = await axios.post(`/events/${eventId}/volunteer/register`, { ...values, event_id: eventId })
+
+        return status === 200
     }
 
     return {

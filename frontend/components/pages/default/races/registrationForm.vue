@@ -27,6 +27,7 @@ const route = useRoute()
 
 const form = ref<FormContext<any> | null>(null)
 const isLoading = ref(false)
+const showThankyouDialog = ref(false)
 
 // getting list of available stages
 const stageList = computed(() => props.trailRace.stages
@@ -37,7 +38,6 @@ const stageList = computed(() => props.trailRace.stages
 const availabeStageCategoryList = computed(() => stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories)
 // getting price of selected stage category
 const prices = computed(() => availabeStageCategoryList.value?.find(stage_category => stage_category.id === form.value?.values.stage_category_id))
-
 const payment = computed(() => {
     const type = form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
     form.value?.setFieldValue('payment_type', type)
@@ -48,11 +48,9 @@ const onSubmit: SubmissionHandler = async (values: any) => {
     try {
         isLoading.value = true
         if (props.mode == 'volunteer')
-            await saveVoluteer(values, props.trailRace.id)
+            showThankyouDialog.value = await saveVoluteer(values, props.trailRace.id)
         else
-            await saveRunner(values, props.trailRace.id)
-
-        navigateTo(`/races/${route.params.slug as string}`)
+            showThankyouDialog.value = await saveRunner(values, props.trailRace.id)
     } catch (error) {
         console.log(error)
     } finally {
@@ -87,7 +85,7 @@ onMounted(() => {
 <template>
     <section class="max-w-4xl mx-auto md:p-6 space-y-8" v-if="stageList.length > 0">
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values }" @submit="onSubmit">
+            v-slot="{ values, setFieldValue }" @submit="onSubmit">
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
@@ -181,7 +179,11 @@ onMounted(() => {
                                 <Flag :size="16" class="text-gray-400" />
                                 Country
                             </Label>
-                            <Select :model-value="String(value ?? '')" @update:model-value="handleChange">
+                            <Select :model-value="String(value ?? '')" @update:model-value="(e) => {
+                                handleChange(e)
+                                const isInternational = e == company?.address.country_id
+                                setFieldValue('payment_method', isInternational ? 'PAY_AT_VENUE' : 'QR')
+                            }">
                                 <SelectTrigger class="w-full h-12">
                                     <SelectValue placeholder="Select country" />
                                 </SelectTrigger>
@@ -406,7 +408,7 @@ onMounted(() => {
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-                <div class="flex flex-col mb-4">
+                <div class="flex flex-col mb-4" v-if="mode == 'runner'">
                     <Field name="liabilities" as="div" v-slot="{ value, handleChange }">
                         <Checkbox :model-value="value" @update:model-value="handleChange" :default-value="false"
                             id="rf__liabilities" />
@@ -457,4 +459,23 @@ onMounted(() => {
     <div class="bg-gray-50 text-gray-600 text-center border border-gray-300 p-8 rounded-xl" v-else>
         looks like all the stages are completed
     </div>
+    <Dialog :open="showThankyouDialog" @update:open="showThankyouDialog = false">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Thank you for registering!</DialogTitle>
+                <DialogDescription>
+                    You have successfully registered as a {{ mode }}.
+                </DialogDescription>
+            </DialogHeader>
+            <p>Do not forget to check your email for the confirmation email. And if have any issues, please contact us
+                at
+                <a href="mailto:info@trailmandu.com" class="underline text-primary">info@trailmandu.com</a>
+            </p>
+            <DialogFooter>
+                <Button type="button" as-child @click="showThankyouDialog = false">
+                    <NuxtLink :to="`/races/${route.params.slug as string}`">Ok!</NuxtLink>
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>

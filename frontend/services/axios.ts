@@ -21,35 +21,31 @@ export const useAxios = () => {
 
     // Response interceptor
     instance.interceptors.response.use(response => response, async error => {
-        const { status } = error.response || {}
         const { token } = storeToRefs(useAuthStore())
         const { refreshToken } = useAuthStore()
         const currentRoute = null
 
-        if ([401, 403].indexOf(status) !== -1) {
-            if (error.response.data.error.message == 'jwt expired') {
-                const originalRequest = error.config
-                originalRequest._retry = true
+        if (error.response.data.error.message == 'jwt expired') {
+            const originalRequest = error.config
+            originalRequest._retry = true
 
-                await refreshToken()
-                    .then(async () => {
-                        reloadNuxtApp({
-                            force: true
-                        })
-                        if (currentRoute)
-                            navigateTo({ name: currentRoute })
-                        else
-                            navigateTo('/')
+            await refreshToken()
+                .then(async () => {
+                    reloadNuxtApp({
+                        force: true
                     })
-            }
+                    if (currentRoute)
+                        navigateTo({ name: currentRoute })
+                    else
+                        navigateTo('/')
+                })
+        }
 
-            if (error.response.data.error.message == 'Unauthorized') {
-                token.value = null
-            }
+        if (error.response.data.error.message == 'Unauthorized') {
+            token.value = null
         }
 
         toast.error(error.response?.data?.error?.message)
-
         return error
     })
 

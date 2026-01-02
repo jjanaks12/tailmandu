@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { CheckIcon, CopyIcon } from 'lucide-vue-next'
 import type { Checkpoint, Stage, Volunteer } from '~/lib/types'
 
 interface VolunteerListProps {
@@ -10,6 +11,8 @@ defineProps<VolunteerListProps>()
 
 const selectedVolunteer = ref<Volunteer | null>(null)
 const checkpoints = ref<Checkpoint[]>([])
+
+const { copy, copied } = useClipboard()
 </script>
 
 <template>
@@ -22,6 +25,13 @@ const checkpoints = ref<Checkpoint[]>([])
                         {{ volunteer.personal.middle_name }}
                         {{ volunteer.personal.last_name }}
                     </strong>
+                    <em>
+                        {{ volunteer.personal.email }}
+                        <Button size="icon" modifier="outline" @click="copy(volunteer.personal.email)">
+                            <CopyIcon class="size-4" v-if="!copied" />
+                            <CheckIcon class="size-4" v-else />
+                        </Button>
+                    </em> <br />
                     <Badge variant="outline">{{volunteer.stages.map(s => s.name).join(', ')}}</Badge>
                     <p v-if="volunteer?.checkpoints.length > 0">
                         <span class="font-semibold text-xs uppercase text-gray-300">Assigned to:</span>

@@ -1,24 +1,5 @@
 <script setup lang="ts">
 import bg01 from '@/assets/images/bg-01.png'
-import type { TrailRace } from '~/lib/types'
-import { toWords } from 'number-to-words'
-
-interface Props {
-    race: TrailRace
-}
-
-const props = defineProps<Props>()
-
-const totalDistance = computed(() => props.race.stages
-    .map((stage) => stage.stage_categories.map((category) => parseInt(category.distance)))
-    .flat()
-    .reduce((a, b) => a + b, 0) / 1000)
-
-const checkpoints = computed(() => props.race.stages
-    .map((stage) => stage.stage_categories.map(category => category.checkpoints.length))
-    .flat()
-    .reduce((a, b) => a + b, 0)
-)
 </script>
 
 <template>
@@ -31,14 +12,14 @@ const checkpoints = computed(() => props.race.stages
                 class="flex flex-col md:flex-row justify-between gap-4 lg:gap-12 [&>li>strong]:block [&>li>strong]:text-[25px] [&>li>em]:not-italic [&>li>em]:text-[25px] md:[&>li>em]:text-[40px]">
                 <li>
                     <strong>Total Distance</strong>
-                    <em>{{ totalDistance }}KM +</em>
+                    <em>100KM +</em>
                 </li>
                 <li>
-                    <strong class="capitalize">{{ toWords(race.stages.length) }} Different</strong>
+                    <strong class="capitalize">Five Different</strong>
                     <em>Places</em>
                 </li>
                 <li>
-                    <strong class="capitalize">{{ toWords(checkpoints) }} Different</strong>
+                    <strong class="capitalize">Five Different</strong>
                     <em>Summits</em>
                 </li>
                 <li>

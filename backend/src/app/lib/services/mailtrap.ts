@@ -12,7 +12,7 @@ export const useMailTrap = () => {
         token: process.env.MAILTRAP_TOKEN,
     })
 
-    const sendEmail = async (fileName: string, replacements: Record<string, any>, props: SendEmailProps) => {
+    const sendEmail = async (fileName: string, replacements: Record<string, any>, props: SendEmailProps, senderEmail?: string) => {
         const filePath = `${process.cwd()}/src/resources/views/email/${fileName}.html`
         const source = await fs.readFile(filePath, 'utf-8')
         const template = Handlebars.compile(source)
@@ -21,7 +21,7 @@ export const useMailTrap = () => {
         try {
             await mailtrap.send({
                 from: {
-                    email: process.env.MAIL_ADMIN,
+                    email: senderEmail || process.env.MAIL_ADMIN,
                     name: 'Trailmandu',
                 },
                 to: props.recipients,

@@ -63,7 +63,7 @@ onBeforeMount(async () => {
                 <div class="flex flex-wrap gap-4">
                     <StageCard class="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)]"
                         v-for="(stage, index) in trailRace.stages" :race-slug="trailRace.slug" :stage="stage"
-                        :race-name="`${trailRace.name} ${index + 1}`" />
+                        :race-name="`${trailRace.name} #${index + 1}`" />
                 </div>
             </div>
         </section>

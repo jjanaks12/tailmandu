@@ -14,7 +14,6 @@ import VolunteerList from '@/components/pages/dashboard/event/volunteer/list.vue
 import RunnerList from '@/components/pages/dashboard/event/runner/list.vue'
 import TrailRaceSponsorList from '@/components/pages/dashboard/event/sponsor/list.vue'
 import TrailRaceSettings from '@/components/pages/dashboard/event/settings/list.vue'
-import TrailRacePaymentList from '@/components/pages/dashboard/event/payment/list.vue'
 
 useHead({
     title: 'Events'

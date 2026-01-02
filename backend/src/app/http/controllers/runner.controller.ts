@@ -6,6 +6,7 @@ import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
+import createHttpError from "http-errors"
 
 const prisma = new PrismaClient()
 export class RunnerController {
@@ -110,7 +111,8 @@ export class RunnerController {
             })
 
             let personal = await prisma.personal.findFirst({
-                where: { email: validationData.email }, include: {
+                where: { email: validationData.email },
+                include: {
                     gender: true,
                     country: true
                 }
@@ -154,10 +156,22 @@ export class RunnerController {
                 })
             }
 
+            let runner = await prisma.eventRunner.findFirst({
+                where: {
+                    event_id: eventId,
+                    stage_id: validationData.stage_id,
+                    stage_category_id: validationData.stage_category_id,
+                    personal_id: personal.id
+                }
+            })
+
+            /* if (runner)
+                throw createHttpError(409, `Runner with email: ${personal.email} already exists`) */
+
             const [min] = stageCategory.bib_range.split('-')
             const bib = (Number(min) + (event.runners.length + 1)).toString().padStart(3, '0')
 
-            const runner = await prisma.eventRunner.create({
+            runner = await prisma.eventRunner.create({
                 data: {
                     bib,
                     event_id: eventId,
@@ -221,7 +235,7 @@ export class RunnerController {
                         name: validationData.first_name,
                     }],
                     subject: 'Welcome to Trailmandu'
-                })
+                }, 'info@trailmandu.com')
 
             response.send(payment)
         } catch (error) {

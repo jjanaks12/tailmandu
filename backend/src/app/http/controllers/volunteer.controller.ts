@@ -4,6 +4,7 @@ import Bcrypt from 'bcrypt'
 
 import { trailRaceVolunteer } from "@/app/lib/schema/event.schema"
 import moment from "moment"
+import createHttpError from "http-errors"
 
 const prisma = new PrismaClient()
 export class VolunteerController {
@@ -54,6 +55,20 @@ export class VolunteerController {
                     }
                 })
             }
+
+            const volunteer = await prisma.volunteer.findFirst({
+                where: {
+                    personal_id: personal.id,
+                    stages: {
+                        some: {
+                            id: validationData.stage_id
+                        }
+                    }
+                }
+            })
+
+            if (volunteer)
+                throw createHttpError(409, `Volunteer with email: ${personal.email} already exists`)
 
             response.send(await prisma.volunteer.create({
                 data: {

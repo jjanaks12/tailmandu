@@ -66,36 +66,40 @@ onMounted(init)
         <Field name="payment_id" type="hidden" v-slot="{ field }" :value="payment?.id">
             <input type="hidden" v-bind="field" />
         </Field>
-        <Field name="amount" v-slot="{ field }" as="div" class="space-y-2">
-            <label for="pf__amount">Amount</label>
-            <Input v-bind="field" id="pf__amount" />
-            <ErrorMessage name="amount" />
-        </Field>
-        <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2" v-if="!payment">
-            <label for="pf__type">Payment Type</label>
-            <Select :model-value="value" id="pf__type" @update:modelValue="handleChange">
-                <SelectTrigger>
-                    <SelectValue placeholder="Select payment type" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem v-for="paymentType in filteredPaymentTypes" :value="paymentType">
-                        {{ paymentType }}
-                    </SelectItem>
-                </SelectContent>
-            </Select>
-            <ErrorMessage name="type" />
-        </Field>
-        <div class="space-y-2">
-            <label class="flex justify-center items-center p-3 border border-dashed border-gray-300 rounded-md">
-                <input type="file" accept="image/*" @change="fileHandler" class="sr-only" />
-                <img v-if="payment?.screenshot || values.image"
-                    :src="payment?.screenshot ? showImage(payment?.screenshot.file_name as string) : values.image"
-                    alt="Image" class="w-24 h-24 object-contain" />
-                <div class="text-center" v-else>
-                    <strong class="text-lg block">Upload image</strong>
-                </div>
-            </label>
-            <ErrorMessage name="image" />
+        <div class="flex gap-2">
+            <div class="w-1/2">
+                <Field name="amount" v-slot="{ field }" as="div" class="space-y-2">
+                    <label for="pf__amount">Amount</label>
+                    <Input v-bind="field" id="pf__amount" />
+                    <ErrorMessage name="amount" />
+                </Field>
+                <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2" v-if="!payment">
+                    <label for="pf__type">Payment Type</label>
+                    <Select :model-value="value" id="pf__type" @update:modelValue="handleChange">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select payment type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="paymentType in filteredPaymentTypes" :value="paymentType">
+                                {{ paymentType }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <ErrorMessage name="type" />
+                </Field>
+            </div>
+            <div class="w-1/2">
+                <label class="flex justify-center items-center p-3 border border-dashed border-gray-300 rounded-md">
+                    <input type="file" accept="image/*" @change="fileHandler" class="sr-only" />
+                    <img v-if="payment?.screenshot || values.image"
+                        :src="values.image ?? showImage(payment?.screenshot.file_name as string)" alt="Image"
+                        class="w-full h-auto object-contain" />
+                    <div class="text-center" v-else>
+                        <strong class="text-lg block">Upload image</strong>
+                    </div>
+                </label>
+                <ErrorMessage name="image" />
+            </div>
         </div>
         <div class="text-right">
             <Button type="submit" :loading="isLoading">

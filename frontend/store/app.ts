@@ -16,23 +16,31 @@ export const useAppStore = defineStore('app', () => {
     const { axios } = useAxios()
 
     const fetchGender = async () => {
-        const { data } = await axios.get<Gender[]>('/genders')
-        genders.value = data
+        if (genders.value.length == 0) {
+            const { data } = await axios.get<Gender[]>('/genders')
+            genders.value = data
+        }
     }
 
     const fetchCountries = async () => {
-        const { data } = await axios.get<Country[]>('/countries')
-        countries.value = data
+        if (countries.value.length == 0) {
+            const { data } = await axios.get<Country[]>('/countries')
+            countries.value = data
+        }
     }
 
     const fetchPermission = async () => {
-        const { data } = await axios.get<Permission[]>('/permissions')
-        permissions.value = data
+        if (permissions.value.length == 0) {
+            const { data } = await axios.get<Permission[]>('/permissions')
+            permissions.value = data
+        }
     }
 
     const fetchAgeCategory = async () => {
-        const { data } = await axios.get<AgeCategory[]>('/age_categories')
-        age_categories.value = data
+        if (age_categories.value.length == 0) {
+            const { data } = await axios.get<AgeCategory[]>('/age_categories')
+            age_categories.value = data
+        }
     }
 
     const fetchCompany = async () => {
@@ -59,5 +67,9 @@ export const useAppStore = defineStore('app', () => {
     return {
         breakpoints, genders, countries, permissions, age_categories, company, shirtSizes,
         fetchGender, fetchCountries, fetchPermission, fetchAgeCategory, fetchCompany, fetchShirtSizes, saveCompany
+    }
+}, {
+    persist: {
+        pick: ['genders', 'countries', 'permissions', 'age_categories', 'shirtSizes']
     }
 })

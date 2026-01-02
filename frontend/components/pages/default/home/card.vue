@@ -37,11 +37,11 @@ const distance = computed(() => props.stage?.stage_categories
                     <strong>Distance</strong>
                 </li>
                 <li>
-                    <em>{{ stage.difficulty }}</em>
+                    <em>Moderate</em>
                     <strong>Difficulty</strong>
                 </li>
             </ul>
-            <em class="text-[#13304a] text-3xl not-italic block">{{ raceName }}</em>
+            <em class="text-[#13304a] text-2xl not-italic block">{{ raceName }}</em>
             <h3 class="text-primary">{{ stage.name }}</h3>
             <address class="not-italic flex items-center gap-2">
                 <MapIcon />
