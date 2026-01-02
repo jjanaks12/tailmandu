@@ -136,8 +136,8 @@ onMounted(() => {
                     <div class="flex gap-2">
                         <Mail class="mt-3" />
                         <div class="flex-grow">
-                            <Input type="email" v-bind="field" placeholder="Email" id="lf__email" autocomplete="email"
-                                disabled />
+                            <Input type="email" v-bind="field" placeholder="Email" id="lf__email"
+                                autocomplete="email" />
                             <ErrorMessage name="email" />
                         </div>
                     </div>

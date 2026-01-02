@@ -345,66 +345,67 @@ onMounted(() => {
                     Registration fees for
                     <span class="text-primary font-bold">{{ prices?.name }}</span>
                 </h3>
-                <template v-if="!values.payment_method || values.payment_method == 'QR'">
-                    <div class="md:flex items-center justify-between space-y-6 md:space-y-0 md:gap-6 pb-5">
-                        <div class="grow space-y-3">
-                            <em class="text-gray-600 block not-italic text-2xl">
-                                NPR
-                                {{ values.description.want_lunch ? Number(payment?.amount) + 480 : payment?.amount }}
-                            </em>
-                            <template v-if="values.country_id !== company?.address.country_id">
-                                <p>Since your our international runner, you can pay at venue. But do upload the
-                                    screenshot of the conversation between us.</p>
-                            </template>
-                            <template v-else>
-                                <div class="md:flex gap-4">
-                                    <div class="grow mb-4 md:mb-0">
-                                        <p class="mb-4">Please make payment to this QR code and upload your screenshot.
-                                            We verify
-                                            from the
-                                            screenshot.
-                                            We
-                                            will
-                                            contact you as soon as possible.</p>
-                                        <Alert variant="info">
-                                            <InfoIcon />
-                                            <AlertTitle>Payment</AlertTitle>
-                                            <AlertDescription>If you are international personal, Just upload the
-                                                screenshot of
-                                                the
-                                                conversation. We
-                                                will handle the payment at venue.</AlertDescription>
-                                        </Alert>
-                                    </div>
-                                    <div class="md:w-2/5 shrink-0">
-                                        <figure class="text-sm space-y-1 border border-gray-200 p-4 rounded-lg">
-                                            <figcaption>Here is the payment QR code</figcaption>
-                                            <img :src="showImage(payment?.screenshot?.file_name)"
-                                                alt="Payment screenshot" class="w-full h-auto">
-                                        </figure>
-                                    </div>
-                                </div>
-                            </template>
-                            <label
-                                class="flex items-center gap-2 rounded-lg overflow-hidden border border-gray-200 relative">
-                                <input type="file" @change="handleFileChange" class="hidden" />
-                                <figure v-if="values?.payment_screenshot">
-                                    <img :src="values?.payment_screenshot" alt="Payment screenshot"
-                                        class="max-w-full h-auto" />
-                                    <Button type="button" class="absolute top-2 right-2"
-                                        @click="form?.setFieldValue('payment_screenshot', '')">
-                                        <XIcon class="w-6 h-6" />
-                                    </Button>
+                <div class="md:flex items-center justify-between space-y-6 md:space-y-0 md:gap-6 pb-5">
+                    <div class="grow space-y-3">
+                        <em class="text-gray-600 block not-italic text-2xl">
+                            NPR
+                            {{ values.description.want_lunch ? Number(payment?.amount) + 480 : payment?.amount }}
+                        </em>
+                        <div class="md:flex gap-4">
+                            <div class="grow mb-4 md:mb-0">
+                                <p class="mb-4">Please make payment to this QR code and upload your screenshot.
+                                    We verify
+                                    from the
+                                    screenshot.
+                                    We
+                                    will
+                                    contact you as soon as possible.</p>
+                                <Alert variant="info">
+                                    <InfoIcon />
+                                    <AlertTitle>If you are having issue with QR code, you can use the following
+                                        information to make payment.</AlertTitle>
+                                    <AlertDescription>
+                                        <dl
+                                            class="pt-4 [&>dd]:pl-4 [&>dt]:uppercase [&>dt]:text-gray-300 [&>dd]:text-gray-600 [&>dd]:mb-2">
+                                            <dt>Company name</dt>
+                                            <dd>Trailmandu Nepal Pvt.Ltd</dd>
+                                            <dt>Address</dt>
+                                            <dd>Ranibon, Nagarjun 03</dd>
+                                            <dt>Account Number</dt>
+                                            <dd>2814150093363002</dd>
+                                            <dt>Swift Code</dt>
+                                            <dd>NICENPKA</dd>
+                                        </dl>
+                                    </AlertDescription>
+                                </Alert>
+                            </div>
+                            <div class="md:w-2/5 shrink-0">
+                                <figure class="text-sm space-y-1 border border-gray-200 p-4 rounded-lg">
+                                    <figcaption>Here is the payment QR code</figcaption>
+                                    <img :src="showImage(payment?.screenshot?.file_name)" alt="Payment screenshot"
+                                        class="w-full h-auto">
                                 </figure>
-                                <div class="w-full flex flex-col gap-2 p-4" v-else>
-                                    <span class="text-sm">You can upload your screenshot here...</span>
-                                    <p class="text-xs">File size should be less than 2MB</p>
-                                </div>
-                            </label>
+                            </div>
                         </div>
+                        <label
+                            class="flex items-center gap-2 rounded-lg overflow-hidden border border-gray-200 relative">
+                            <input type="file" @change="handleFileChange" class="hidden" />
+                            <figure v-if="values?.payment_screenshot">
+                                <img :src="values?.payment_screenshot" alt="Payment screenshot"
+                                    class="max-w-full h-auto" />
+                                <Button type="button" class="absolute top-2 right-2"
+                                    @click="form?.setFieldValue('payment_screenshot', '')">
+                                    <XIcon class="w-6 h-6" />
+                                </Button>
+                            </figure>
+                            <div class="w-full flex flex-col gap-2 p-4" v-else>
+                                <span class="text-sm">You can upload your screenshot here...</span>
+                                <p class="text-xs">File size should be less than 2MB</p>
+                            </div>
+                        </label>
                     </div>
-                    <ErrorMessage name="payment_method" />
-                </template>
+                </div>
+                <ErrorMessage name="payment_method" />
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">

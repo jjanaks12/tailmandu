@@ -29,6 +29,8 @@ export class AuthController {
             if (!personalDetail)
                 throw createHttpError.NotFound(`${result.email} has not been registered`)
             const user = await prisma.user.findFirst({ where: { personal_id: personalDetail.id } })
+            if (!user)
+                throw createHttpError.NotFound(`${result.email} has not been registered`)
 
             const isMatch = await Bcrypt.compare(request.body.password, user.password)
             if (!isMatch)

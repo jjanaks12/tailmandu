@@ -22,6 +22,8 @@ export class PersonalController {
                 body.first_name = request.body.first_name
             if (request.body.last_name)
                 body.last_name = request.body.last_name
+            if (request.body.email)
+                body.email = request.body.email
             body.middle_name = request.body.middle_name
             if (request.body.phone_number)
                 body.phone_number = request.body.phone_number
