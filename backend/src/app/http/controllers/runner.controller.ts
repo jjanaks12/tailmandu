@@ -209,33 +209,33 @@ export class RunnerController {
                 }
             })
 
-            if (process.env.NODE_ENV === 'production')
-                await sendEmail('welcome', {
-                    title: 'Thank you for signing up for race',
-                    user: {
-                        name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
-                        email: validationData.email,
-                        bib: runner.bib,
-                        country: personal.country.name,
-                        gender: personal.gender.name,
-                        contact_no: personal.phone_number,
-                        dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
-                        emergency_contact: validationData.description.emergency_contact_name,
-                        emergency_contact_no: validationData.description.emergency_contact_phone,
-                    },
-                    stage: stageCategory.stage,
-                    stageCategory: {
-                        ...stageCategory,
-                        start: moment.utc(stageCategory.start).format('DD-MM-YYYY hh:mm a'),
-                        end: moment.utc(stageCategory.end).format('DD-MM-YYYY hh:mm a')
-                    }
-                }, {
-                    recipients: [{
-                        email: validationData.email,
-                        name: validationData.first_name,
-                    }],
-                    subject: 'Welcome to Trailmandu'
-                }, 'info@trailmandu.com')
+            // if (process.env.NODE_ENV === 'production')
+            await sendEmail('welcome', {
+                title: 'Thank you for signing up for race',
+                user: {
+                    name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
+                    email: validationData.email,
+                    bib: runner.bib,
+                    country: personal.country.name,
+                    gender: personal.gender.name,
+                    contact_no: personal.phone_number,
+                    dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
+                    emergency_contact: validationData.description.emergency_contact_name,
+                    emergency_contact_no: validationData.description.emergency_contact_phone,
+                },
+                stage: stageCategory.stage,
+                stageCategory: {
+                    ...stageCategory,
+                    start: moment.utc(stageCategory.start).format('DD-MM-YYYY hh:mm a'),
+                    end: moment.utc(stageCategory.end).format('DD-MM-YYYY hh:mm a')
+                }
+            }, {
+                recipients: [{
+                    email: validationData.email,
+                    name: validationData.first_name,
+                }],
+                subject: 'Welcome to Trailmandu'
+            }, 'info@trailmandu.com')
 
             response.send(payment)
         } catch (error) {
