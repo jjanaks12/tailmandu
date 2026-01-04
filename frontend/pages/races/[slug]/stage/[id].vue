@@ -130,7 +130,7 @@ onBeforeMount(init)
             </figure>
             <div class="text-white text-center grid place-items-center min-h-[620px] z-[1] relative">
                 <div class="container">
-                    <template v-if="starts && !hasStarted">
+                    <template v-if="starts && hasStarted">
                         <Countdown :date="starts?.[0]?.toISOString()" class="mb-3">
                             <em class="not-italic block">Registration opened</em>
                         </Countdown>

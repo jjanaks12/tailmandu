@@ -7,7 +7,7 @@ const { company } = storeToRefs(useAppStore())
 <template>
     <footer id="footer" class="bg-black p-4" v-if="company">
         <div class="footer__navigation py-12">
-            <div class="container flex gap-8">
+            <div class="container flex flex-col md:flex-row gap-8">
                 <Brand class="grayscale brightness-200 mb-8" />
                 <div class="">
                     <ul>
@@ -35,7 +35,7 @@ const { company } = storeToRefs(useAppStore())
                         </li>
                     </ul>
                 </div>
-                <div class="grow flex justify-end gap-4">
+                <div class="grow flex md:justify-end gap-4">
                     <nav>
                         <h3 class="text-xl mb-4">Useful links</h3>
                         <ul>
@@ -53,7 +53,7 @@ const { company } = storeToRefs(useAppStore())
                 </div>
             </div>
         </div>
-        <div class="container flex justify-between">
+        <div class="container text-center md:text-left flex flex-col md:flex-row md:justify-between">
             <span class="copyright">
                 copyright &copy;
                 <NuxtLink to="/" class="underline">{{ company?.name }}</NuxtLink>.
