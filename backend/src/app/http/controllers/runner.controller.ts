@@ -6,7 +6,6 @@ import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
-import createHttpError from "http-errors"
 
 const prisma = new PrismaClient()
 export class RunnerController {
@@ -352,6 +351,44 @@ export class RunnerController {
                 }
             })
             response.send(runner)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async delete(request: Request, response: Response, next: NextFunction) {
+        try {
+            await prisma.$transaction(async (prisma) => {
+                const runner = await prisma.eventRunner.findFirst({
+                    where: {
+                        id: request.params.runner_id
+                    },
+                    include: {
+                        payments: true
+                    }
+                })
+
+                if (runner.payments)
+                    for (const payment of runner.payments) {
+                        await prisma.payment.delete({
+                            where: {
+                                id: payment.id
+                            }
+                        })
+
+                        if (payment.image_id) {
+                            const fileHandler = new FileHandler('images')
+                            fileHandler.deleteFile(payment.image_id)
+                        }
+                    }
+
+                await prisma.eventRunner.delete({
+                    where: {
+                        id: request.params.runner_id
+                    }
+                })
+            })
+            response.send('ok')
         } catch (error) {
             next(error)
         }

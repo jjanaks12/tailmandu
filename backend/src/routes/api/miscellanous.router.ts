@@ -21,7 +21,12 @@ router.get('/countries', [], CountryController.index)
 
 router.get('/roles', [verifyAccessToken], RoleController.index)
 
+// Permission
 router.get('/permissions', [verifyAccessToken], PermissionController.index)
+router.post('/permissions', [verifyAccessToken], PermissionController.save)
+router.put('/permissions/:permission_id', [verifyAccessToken], PermissionController.update)
+router.delete('/permissions/:permission_id', [verifyAccessToken], PermissionController.destroy)
+
 router.get('/image_health_check', [verifyAccessToken, hasAdminAccess], MediaController.index)
 
 router.get('/age_categories', [], AgeCategoryController.index)

@@ -2,17 +2,27 @@
 import { CheckIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import moment from 'moment'
 import type { EventRunner } from '~/lib/types'
+import { useAxios } from '~/services/axios'
 
 interface RunnerItemProps {
     runner: EventRunner
 }
 
-const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment'])
+const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment', 'fetch'])
 const props = defineProps<RunnerItemProps>()
+const showDeleteModal = ref(false)
+const { axios } = useAxios()
+const { can } = useAuthorization()
 
 const hasPayment = computed(() => props.runner.payments.length > 0)
 
 const { copy, copied } = useClipboard()
+
+const deleteRunner = async () => {
+    await axios.delete(`/runners/${props.runner.id}`)
+    emit('fetch')
+    showDeleteModal.value = false
+}
 </script>
 
 <template>
@@ -69,7 +79,7 @@ const { copy, copied } = useClipboard()
                             See payment details
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Payment Actions</DropdownMenuLabel>
                         <DropdownMenuItem class="text-green-500"
                             @click="emit('updated:payment', 'COMPLETED', runner.payments[0].id)">
                             Completed
@@ -81,6 +91,13 @@ const { copy, copied } = useClipboard()
                         <DropdownMenuItem class="text-red-500"
                             @click="emit('updated:payment', 'FAILED', runner.payments[0].id)">
                             Failed
+                        </DropdownMenuItem>
+                    </template>
+                    <template v-if="can('runner_delete')">
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Runner Actions</DropdownMenuLabel>
+                        <DropdownMenuItem class="text-red-500" @click="showDeleteModal = true">
+                            Delete
                         </DropdownMenuItem>
                     </template>
                 </DropdownMenuContent>
@@ -111,4 +128,18 @@ const { copy, copied } = useClipboard()
             </TableBody>
         </TableCell>
     </TableRow>
+    <Dialog :open="showDeleteModal" @update:open="showDeleteModal = false">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Are you sure you want to delete this runner?</DialogTitle>
+                <DialogDescription>
+                    This action cannot be undone.
+                </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+                <Button @click="showDeleteModal = false">Cancel</Button>
+                <Button @click="deleteRunner">Delete</Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>

@@ -24,6 +24,7 @@ const props = defineProps<RegistrationFormProps>()
 const { countries, genders, company } = storeToRefs(useAppStore())
 const { saveVoluteer, saveRunner } = useEventStore()
 const route = useRoute()
+const { can } = useAuthorization()
 
 const form = ref<FormContext<any> | null>(null)
 const isLoading = ref(false)
@@ -80,6 +81,12 @@ onMounted(() => {
     setTimeout(() => {
         if (route.query.stage_id)
             form.value?.setFieldValue('stage_id', route.query.stage_id)
+
+        if (can('_', 'Admin')) {
+            form.value?.setFieldValue('liabilities', true)
+            form.value?.setFieldValue('policies', true)
+            form.value?.setFieldValue('payment_method', 'PAY_AT_VENUE')
+        }
     }, 1000)
 })
 </script>
@@ -87,7 +94,8 @@ onMounted(() => {
 <template>
     <section class="max-w-4xl mx-auto md:p-6 space-y-8" v-if="stageList.length > 0">
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values, setFieldValue }" @submit="onSubmit">
+            v-slot="{ values, setFieldValue, errors }" @submit="onSubmit">
+            <pre>{{ errors }}</pre>
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
@@ -259,7 +267,7 @@ onMounted(() => {
                             :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner', 'w-full': mode === 'volunteer' }">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Target :size="16" class="text-gray-400" />
-                                Stage
+                                Races
                             </Label>
                             <Select :model-value="value" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -342,7 +350,7 @@ onMounted(() => {
                 </div>
             </div>
             <div class="bg-white text-gray-500 rounded-3xl border border-gray-200 shadow-sm p-4 md:p-8"
-                v-if="mode == 'runner' && Object.keys(payment).length > 0">
+                v-if="mode == 'runner' && Object.keys(payment).length > 0 && !can('_', 'Admin')">
                 <h3 class="text-2xl font-light mb-2">
                     Registration fees for
                     <span class="text-primary font-bold">{{ prices?.name }}</span>
@@ -411,7 +419,7 @@ onMounted(() => {
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-                <div class="flex flex-col mb-4" v-if="mode == 'runner'">
+                <div class="flex flex-col mb-4" v-if="mode == 'runner' && !can('_', 'Admin')">
                     <Field name="liabilities" as="div" v-slot="{ value, handleChange }">
                         <Checkbox :model-value="value"
                             @update:model-value="handleChange($event); if (!value) showLiabilitiesDialog = true;"

@@ -232,6 +232,10 @@ export type Role = {
 export type Permission = {
     id: string
     name: string
+    description: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
 }
 
 type Address = {

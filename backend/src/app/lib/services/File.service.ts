@@ -27,7 +27,6 @@ export class FileHandler {
         const decodedBase64 = base64STR.split('base64,')[1]
         const buffer = Buffer.from(decodedBase64, 'base64')
         const type = base64STR.split(';')[0].split('/')[1]
-        console.log(type);
         let fileName = generateUUID() + Date.now().toString() + '.' + (ext ?? type)
         const filePath = path.join(this.uploadPath, fileName)
 

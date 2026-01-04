@@ -189,7 +189,7 @@ onMounted(fetch)
             <RunnerItem v-for="runner in runners" :runner="runner"
                 @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                 @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
-                @updated:payment="updatePaymentStatus" />
+                @updated:payment="updatePaymentStatus" @fetch="fetch" />
             <TableRow v-if="runners.length === 0">
                 <TableCell colspan="6">
                     <span class="text-center block p-3 text-gray-500 bg-accent rounded">
