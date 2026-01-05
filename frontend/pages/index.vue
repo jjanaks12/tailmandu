@@ -1,21 +1,30 @@
 <script lang="ts" setup>
-    import HomeBanner from '@/components/pages/default/home/banner.vue'
-    import Newsletter from '@/components/pages/default/newsletter.vue'
+import HomeBanner from '@/components/pages/default/home/banner.vue'
+import Newsletter from '@/components/pages/default/newsletter.vue'
+import img01 from '@/assets/images/review-img01.jpg'
 
-    definePageMeta({
-        layout: 'default'
-    })
+definePageMeta({
+    layout: 'default'
+})
 
-    useHead({
-        meta: [{
-            name: 'description',
-            content: 'This is a description of my awesome page.'
-        }]
-    })
+useHead({
+    meta: [{
+        name: 'description',
+        content: "From the City to the Peaks: Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes"
+    }]
+})
 
-    onMounted(() => {
-        useTitle('Trailmandu - From The City To The Mountains')
-    })
+useSeoMeta({
+    title: 'Trailmandu - From The City To The Mountains',
+    description: "From the City to the Peaks: Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes",
+    ogTitle: 'Trailmandu - From The City To The Mountains',
+    ogDescription: "From the City to the Peaks: Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes",
+    ogImage: img01
+})
+
+onMounted(() => {
+    useTitle('Trailmandu - From The City To The Mountains')
+})
 </script>
 
 <template>

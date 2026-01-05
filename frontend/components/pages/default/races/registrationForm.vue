@@ -48,6 +48,9 @@ const payment = computed(() => {
 })
 
 const onSubmit: SubmissionHandler = async (values: any) => {
+    if (!can('runner_create'))
+        return
+
     try {
         isLoading.value = true
         if (props.mode == 'volunteer')
@@ -81,12 +84,6 @@ onMounted(() => {
     setTimeout(() => {
         if (route.query.stage_id)
             form.value?.setFieldValue('stage_id', route.query.stage_id)
-
-        if (can('_', 'Admin')) {
-            form.value?.setFieldValue('liabilities', true)
-            form.value?.setFieldValue('policies', true)
-            form.value?.setFieldValue('payment_method', 'PAY_AT_VENUE')
-        }
     }, 1000)
 })
 </script>
@@ -94,8 +91,7 @@ onMounted(() => {
 <template>
     <section class="max-w-4xl mx-auto md:p-6 space-y-8" v-if="stageList.length > 0">
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values, setFieldValue, errors }" @submit="onSubmit">
-            <pre>{{ errors }}</pre>
+            v-slot="{ values, setFieldValue }" @submit="onSubmit">
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
@@ -350,7 +346,7 @@ onMounted(() => {
                 </div>
             </div>
             <div class="bg-white text-gray-500 rounded-3xl border border-gray-200 shadow-sm p-4 md:p-8"
-                v-if="mode == 'runner' && Object.keys(payment).length > 0 && !can('_', 'Admin')">
+                v-if="mode == 'runner' && Object.keys(payment).length > 0">
                 <h3 class="text-2xl font-light mb-2">
                     Registration fees for
                     <span class="text-primary font-bold">{{ prices?.name }}</span>
@@ -419,7 +415,7 @@ onMounted(() => {
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-                <div class="flex flex-col mb-4" v-if="mode == 'runner' && !can('_', 'Admin')">
+                <div class="flex flex-col mb-4" v-if="mode == 'runner'">
                     <Field name="liabilities" as="div" v-slot="{ value, handleChange }">
                         <Checkbox :model-value="value"
                             @update:model-value="handleChange($event); if (!value) showLiabilitiesDialog = true;"

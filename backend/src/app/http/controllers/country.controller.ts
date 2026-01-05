@@ -5,7 +5,11 @@ const prisma = new PrismaClient()
 export class CountryController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send(await prisma.country.findMany())
+            response.send(await prisma.country.findMany({
+                orderBy: {
+                    name: 'asc'
+                }
+            }))
         } catch (error) {
             next(error)
         }
