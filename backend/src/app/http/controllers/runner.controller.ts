@@ -60,6 +60,9 @@ export class RunnerController {
                     volunteer_on_checkpoints: {
                         include: {
                             checkpoint: true
+                        },
+                        orderBy: {
+                            timer: 'desc'
                         }
                     },
                     payments: {
@@ -74,7 +77,6 @@ export class RunnerController {
                     stage_category: true
                 }
             })
-
             response.send(runners)
         } catch (error) {
             next(error)
@@ -263,48 +265,17 @@ export class RunnerController {
 
     public static async logTimer(request: Request, response: Response, next: NextFunction) {
         try {
-            let foundCheckpoint: Checkpoint
-            const stageCategory = await prisma.stageCategory.findFirst({
-                where: {
-                    id: request.params.stage_category_id
-                },
-                include: {
-                    checkpoints: {
-                        include: {
-                            volunteers: {
-                                include: {
-                                    personal: true
-                                }
-                            }
-                        }
-                    }
-                }
-            })
-
-            for (const checkpoint of stageCategory.checkpoints) {
-                let isFound = false
-                for (const volunteer of checkpoint.volunteers) {
-                    if (volunteer.personal_id == request.body.auth_user.personal_id) {
-                        foundCheckpoint = checkpoint
-                        isFound = true
-                        break
-                    }
-                }
-
-                if (isFound)
-                    break
-            }
-
             const volunteer = await prisma.volunteer.findFirst({
                 where: {
                     personal_id: request.body.auth_user.personal_id
                 }
             })
+
             response.send(await prisma.volunteerCheckpoint.create({
                 data: {
                     volunteer_id: volunteer.id,
                     runner_id: request.params.runner_id,
-                    checkpoint_id: foundCheckpoint.id
+                    checkpoint_id: request.params.checkpoint_id
                 }
             }))
         } catch (error) {
@@ -381,6 +352,12 @@ export class RunnerController {
                             fileHandler.deleteFile(payment.image_id)
                         }
                     }
+
+                await prisma.volunteerCheckpoint.deleteMany({
+                    where: {
+                        runner_id: runner.id
+                    }
+                })
 
                 await prisma.eventRunner.delete({
                     where: {

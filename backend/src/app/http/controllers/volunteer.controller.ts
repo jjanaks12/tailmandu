@@ -143,13 +143,56 @@ export class VolunteerController {
         }
     }
 
+    public static async checkpoints(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.volunteer.findFirst({
+                where: {
+                    personal_id: request.body.auth_user.personal_id
+                },
+                include: {
+                    checkpoints: {
+                        include: {
+                            stage_category: true
+                        }
+                    }
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async checkpointEntry(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.volunteerCheckpoint.findMany({
                 where: {
                     checkpoint_id: request.params.checkpoint_id
+                },
+                include: {
+                    runner: true,
+                    checkpoint: true
                 }
             }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async delete(request: Request, response: Response, next: NextFunction) {
+        try {
+            await prisma.$transaction(async (prisma) => {
+                await prisma.volunteerCheckpoint.deleteMany({
+                    where: {
+                        volunteer_id: request.params.volunteer_id
+                    }
+                })
+                await prisma.volunteer.delete({
+                    where: {
+                        id: request.params.volunteer_id
+                    }
+                })
+            })
+            response.send('ok')
         } catch (error) {
             next(error)
         }

@@ -124,6 +124,8 @@ export type TrailRace = {
 export type Checkpoint = {
     id: string
     name: string
+    is_start: boolean
+    is_end: boolean
     created_at: string
     updated_at: string
     deleted_at: string

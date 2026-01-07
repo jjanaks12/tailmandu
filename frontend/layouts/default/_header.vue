@@ -4,11 +4,13 @@ import { MenuIcon } from 'lucide-vue-next'
 import { useSidebar } from '~/components/ui/sidebar'
 import { useMenu } from '../../lib/defaultMenus'
 import { useAppStore } from '~/store/app'
+import { useAuthStore } from '~/store/auth'
 
 const { menuList: menus } = useMenu()
 
 const { breakpoints } = storeToRefs(useAppStore())
 const { toggleSidebar } = useSidebar()
+const { user, isLoggedin } = storeToRefs(useAuthStore())
 </script>
 
 <template>
@@ -44,6 +46,16 @@ const { toggleSidebar } = useSidebar()
                     <MenuIcon />
                 </Button>
             </ClientOnly>
+            <div class="bg-blue-200 max-w-[200px] p-2 rounded-[0_0_10px_10px] absolute top-full right-0"
+                v-if="isLoggedin">
+                <AuthUser size="sm">
+                    <div class="flex gap-2">
+                        <Button variant="secondary" modifier="link" size="sm" as-child>
+                            <NuxtLink to="/dashboard">Dashboard</NuxtLink>
+                        </Button>
+                    </div>
+                </AuthUser>
+            </div>
         </div>
     </header>
 </template>

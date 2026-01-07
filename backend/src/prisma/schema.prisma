@@ -70,6 +70,8 @@ model Checkpoint {
   created_at DateTime  @default(now())
   updated_at DateTime?
   deleted_at DateTime?
+  is_start   Boolean   @default(false)
+  is_end     Boolean   @default(false)
 
   stage_category_id String
   stage_category    StageCategory @relation(fields: [stage_category_id], references: [id], onDelete: Cascade)

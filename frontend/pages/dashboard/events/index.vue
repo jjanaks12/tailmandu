@@ -1,28 +1,28 @@
 <script lang="ts" setup>
-    import { CalendarIcon, EllipsisVertical, Eye, Pencil, Search, SlidersVertical, Trash } from 'lucide-vue-next'
-    import { Form, Field } from 'vee-validate'
+import { CalendarIcon, EllipsisVertical, Eye, Pencil, Search, SlidersVertical, Trash } from 'lucide-vue-next'
+import { Form, Field } from 'vee-validate'
 
-    import EventForm from './form.vue'
-    import { formatDate } from '@/lib/filters'
-    import { useEventStore } from '~/store/event'
-    import type { TrailRace } from '~/lib/types'
+import EventForm from './form.vue'
+import { formatDate } from '@/lib/filters'
+import { useEventStore } from '~/store/event'
+import type { TrailRace } from '~/lib/types'
 
-    useHead({
-        title: 'Events'
-    })
+useHead({
+    title: 'Events'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: ['event_create', 'event_update', 'event_view', 'event_delete']
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['event_create', 'event_update', 'event_view', 'event_delete']
+})
 
-    const statuses = ['completed', 'ongoing', 'coming soon']
-    const { events, isLoading, params } = storeToRefs(useEventStore())
-    const { fetch } = useEventStore()
+const statuses = ['completed', 'ongoing', 'coming soon']
+const { events, isLoading, params } = storeToRefs(useEventStore())
+const { fetch } = useEventStore()
 
-    const showForm = ref(false)
-    const trailRace = ref<TrailRace | null>(null)
+const showForm = ref(false)
+const trailRace = ref<TrailRace | null>(null)
 </script>
 <template>
     <div class="flex items-center justify-between mb-12">
@@ -82,7 +82,7 @@
                 <TableCell class="text-right">
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                            <Button variant="outline">
+                            <Button modifier="outline">
                                 <EllipsisVertical />
                             </Button>
                         </DropdownMenuTrigger>

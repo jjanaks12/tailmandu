@@ -6,14 +6,17 @@ export const humanize = (str: string) => str
     .replace(/[_\s]+/g, ' ')
     .replace(/^[a-z]/, (m) => m.toUpperCase())
 
-export const formatDate = (str: string, format = "YYYY-MM-DD") => {
+export const formatDate = (str: string, format?: string) => {
     const date = moment.utc(str).local()
     const hours = date.diff(moment(), 'hours')
+
+    if (format)
+        return date.format(format)
 
     if (hours <= 24)
         return date.fromNow()
 
-    return date.format(format)
+    return date.format(format ?? 'YYYY-MM-DD')
 }
 
 export const slugify = (text: string) => text.toLowerCase().trim()

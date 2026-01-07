@@ -18,16 +18,18 @@ export const buttonVariants = cva(
         volunteer: 'border border-[#4487a0] text-[#4487a0] cursor-pointer [--i-c-btn-color:#4487a0]',
         runner: 'bg-[#4487a0] text-white cursor-pointer [--i-c-btn-color:#4487a0]',
         muted: "bg-[var(--i-c-btn-color)] text-white shadow-xs hover:bg-secondary/80 [--i-c-btn-color:var(--color-input)]",
+        light: "bg-white text-primary shadow-xs hover:bg-white/80 [--i-c-btn-color:var(--white)]",
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-xs',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
         icon: 'size-9',
+        iconsm: 'size-5',
       },
       modifier: {
         outline: 'bg-transparent text-[var(--i-c-btn-color)] border border-[var(--i-c-btn-color)] hover:bg-[var(--i-c-btn-color)] hover:text-white',
-        link: "bg-transparent text-[var(--i-c-btn-color)] h-auto underline-offset-4 hover:bg-transparent hover:underline p-0  shadow-none border-none"
+        link: "bg-transparent text-[var(--i-c-btn-color)] underline h-auto underline-offset-4 hover:bg-transparent hover:underline p-0  shadow-none border-none"
       }
     },
     defaultVariants: {

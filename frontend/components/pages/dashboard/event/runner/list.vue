@@ -44,6 +44,17 @@ const stageCategoryList = computed(() => {
     return props.stages.find((stage) => stage.id === stageID.value)?.stage_categories || []
 })
 
+const rankRunner = (runners: EventRunner[]): EventRunner[] => {
+    return runners.sort((a, b) => {
+        if (a.volunteer_on_checkpoints.length === 0 || b.volunteer_on_checkpoints.length === 0) return 0
+
+        const alastCheckpoint = a.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
+        const blastCheckpoint = b.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
+
+        return moment(blastCheckpoint?.timer).isAfter(moment(alastCheckpoint?.timer)) ? -1 : 1
+    })
+}
+
 const fetch = async () => {
     const event_id = route.params.id
     if (event_id && stageID.value) {
@@ -54,10 +65,10 @@ const fetch = async () => {
                 s: searchText.value,
                 payment_status: paymentStatusOpt.value,
                 stage_category: stageCategoryID.value,
-                payment_method: paymentTypeOpt.value,
+                payment_method: paymentTypeOpt.value
             }
         })
-        runners.value = data
+        runners.value = rankRunner(data)
         isLoading.value = false
     }
 }
@@ -159,7 +170,7 @@ onMounted(fetch)
                     <CommandIcon /> + /
                 </InputGroupAddon>
             </InputGroup>
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-2 sticky top-[83px]">
                 <Button variant="secondary" class="rounded-full" @click="downloadCSV">
                     <DownloadIcon />
                     Download CSV
@@ -177,6 +188,7 @@ onMounted(fetch)
     <Table>
         <TableHeader>
             <TableRow>
+                <TableHead>Rank</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Payment</TableHead>
                 <TableHead>Payment Type</TableHead>
@@ -186,10 +198,10 @@ onMounted(fetch)
             </TableRow>
         </TableHeader>
         <TableBody>
-            <RunnerItem v-for="runner in runners" :runner="runner"
+            <RunnerItem v-for="(runner, index) in runners" :runner="runner"
                 @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                 @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
-                @updated:payment="updatePaymentStatus" @fetch="fetch" />
+                @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="index + 1" />
             <TableRow v-if="runners.length === 0">
                 <TableCell colspan="6">
                     <span class="text-center block p-3 text-gray-500 bg-accent rounded">

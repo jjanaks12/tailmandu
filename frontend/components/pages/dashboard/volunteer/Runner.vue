@@ -7,7 +7,7 @@ import { useAxios } from '~/services/axios'
 interface VolunteerRunnerProps {
     runner: EventRunner
     timer?: string
-    stageId: string
+    checkpointId: string
 }
 
 const emit = defineEmits(['update'])
@@ -18,7 +18,7 @@ const fullName = computed(() => [props.runner.personal.first_name, props.runner.
 
 const logTimer = async () => {
     if (props.timer == undefined) {
-        await axios.post(`/volunteers/${props.runner.stage_category_id}/log_timer/${props.runner.id}`)
+        await axios.post(`/volunteers/${props.checkpointId}/log_timer/${props.runner.id}`)
         emit('update')
     }
 }
@@ -31,7 +31,7 @@ const logTimer = async () => {
             :class="{ 'size-[120px] mx-auto border-4': true, 'border-primary': timer == undefined, 'border-secondary': timer !== undefined }"
             @dblclick="logTimer">
             <AvatarImage :src="showImage(runner.personal?.avatar?.file_name)" :alt="runner.personal.first_name" />
-            <AvatarFallback>{{ abbr(fullName) }}</AvatarFallback>
+            <AvatarFallback>{{ abbr(fullName.toUpperCase()) }}</AvatarFallback>
         </Avatar>
         <strong class="block">{{ fullName }}</strong>
         <em class="not-italic text-3xl text-black block">{{ runner.bib }}</em>

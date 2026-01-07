@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { CheckIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
+import { CheckIcon, ChevronUpIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import moment from 'moment'
+import { formatDate } from '~/lib/filters'
 import type { EventRunner } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
 interface RunnerItemProps {
+    rank: number
     runner: EventRunner
 }
 
 const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment', 'fetch'])
 const props = defineProps<RunnerItemProps>()
 const showDeleteModal = ref(false)
+const showTiming = ref(false)
 const { axios } = useAxios()
 const { can } = useAuthorization()
 
@@ -27,6 +30,11 @@ const deleteRunner = async () => {
 
 <template>
     <TableRow>
+        <TableCell>
+            <ChevronUpIcon class="inline-block vertical-align-middle" @click="showTiming = !showTiming"
+                v-if="runner.volunteer_on_checkpoints?.length > 0" />
+            {{ rank }}
+        </TableCell>
         <TableCell>
             <em class="no-italic block">{{ runner.bib }}</em>
             <strong class="block">
@@ -104,28 +112,22 @@ const deleteRunner = async () => {
             </DropdownMenu>
         </TableCell>
     </TableRow>
-    <TableRow v-if="runner.volunteer_on_checkpoints?.length">
-        <TableCell colspan="6">
-            <TableBody>
-                <TableRow v-for="record in runner.volunteer_on_checkpoints">
-                    <TableCell colspan="6">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableCell>Checkpoint</TableCell>
-                                    <TableCell>Time</TableCell>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>{{ record?.checkpoint?.name }}</TableCell>
-                                    <TableCell>{{ record?.timer }}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableCell>
-                </TableRow>
-            </TableBody>
+    <TableRow v-if="runner.volunteer_on_checkpoints?.length && showTiming" class="bg-primary/5">
+        <TableCell colspan="7">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableCell>Checkpoint</TableCell>
+                        <TableCell>Time</TableCell>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    <TableRow v-for="record in runner.volunteer_on_checkpoints">
+                        <TableCell>{{ record.id }} {{ record?.checkpoint?.name }}</TableCell>
+                        <TableCell>{{ formatDate(record?.timer, 'YYYY-MM-DD HH:mm:ss') }}</TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
         </TableCell>
     </TableRow>
     <Dialog :open="showDeleteModal" @update:open="showDeleteModal = false">

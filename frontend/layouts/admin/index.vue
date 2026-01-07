@@ -14,7 +14,7 @@ const route = useRoute()
         <main id="main" :class="{ 'bg-gray-300 flex-grow relative': true, 'max-w-[calc(100vw-250px)]': status }">
             <AppHeader />
             <div class="p-4">
-                <div class="bg-white p-12 rounded-2xl overflow-hidden">
+                <div class="bg-white p-12 rounded-2xl relative">
                     <ClientOnly>
                         <slot v-if="can(route.meta?.authorization as string, route.meta?.role as string)" />
                         <p v-else>You do not have access to see this page</p>
