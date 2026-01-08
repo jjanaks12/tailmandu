@@ -48,9 +48,6 @@ const payment = computed(() => {
 })
 
 const onSubmit: SubmissionHandler = async (values: any) => {
-    if (!can('runner_create'))
-        return
-
     try {
         isLoading.value = true
         if (props.mode == 'volunteer')

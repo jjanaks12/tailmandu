@@ -135,6 +135,11 @@ export class StageController {
                     stage_categories: {
                         include: {
                             runners: {
+                                where: {
+                                    bib: {
+                                        contains: request.query.bib as string
+                                    }
+                                },
                                 include: {
                                     personal: {
                                         include: {

@@ -119,7 +119,11 @@ export class EventController {
                             thumbnail: true,
                             stage_categories: {
                                 include: {
-                                    checkpoints: true,
+                                    checkpoints: {
+                                        where: {
+                                            deleted_at: null
+                                        }
+                                    },
                                     runners: {
                                         include: {
                                             personal: {
