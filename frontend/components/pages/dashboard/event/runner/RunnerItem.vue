@@ -26,6 +26,13 @@ const deleteRunner = async () => {
     emit('fetch')
     showDeleteModal.value = false
 }
+
+const getDuration = (time: string, started_time: string) => {
+    const diff = moment.utc(time).diff(moment.utc(started_time))
+    const duration = moment.duration(diff)
+
+    return moment.utc(duration.asMilliseconds()).format("HH:mm:ss")
+}
 </script>
 
 <template>
@@ -119,12 +126,17 @@ const deleteRunner = async () => {
                     <TableRow>
                         <TableCell>Checkpoint</TableCell>
                         <TableCell>Time</TableCell>
+                        <TableCell>Duration</TableCell>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="record in runner.volunteer_on_checkpoints">
-                        <TableCell>{{ record.id }} {{ record?.checkpoint?.name }}</TableCell>
+                        <TableCell>{{ record?.checkpoint?.name }}</TableCell>
                         <TableCell>{{ formatDate(record?.timer, 'YYYY-MM-DD HH:mm:ss') }}</TableCell>
+                        <TableCell>
+                            {{ runner.stage_category.id }}
+                            {{ getDuration(record?.timer, runner.stage_category.start) }}
+                        </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

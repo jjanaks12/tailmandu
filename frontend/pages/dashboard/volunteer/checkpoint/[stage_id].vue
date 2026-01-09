@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { CommandIcon, SearchIcon, XIcon } from 'lucide-vue-next'
-import type { Checkpoint, EventRunner, StageCategory, Volunteer, VolunteerCheckpoint } from '~/lib/types'
+import { CommandIcon, XIcon } from 'lucide-vue-next'
+import moment from 'moment'
+import type { Checkpoint, StageCategory, Volunteer, VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
 definePageMeta({
@@ -24,6 +25,7 @@ const volunteer = ref<Volunteer | null>(null)
 const runners = computed(() => stageCategories.value.find(category => category.id === selectedCheckpoint.value?.stage_category_id)?.runners ?? [])
 const filteredList = computed(() => runners.value.filter(runner => runner.bib.includes(searchText.value)))
 const remainingRunners = computed(() => runners.value.length - entryList.value.length)
+const hasEventStarted = computed(() => stageCategories.value[0]?.start ? moment().isAfter(moment.utc(stageCategories.value[0]?.start)) : false)
 
 const getVolunteerCheckpoints = async () => {
     const { data } = await axios.get(`/volunteers/checkpoints`)
@@ -57,12 +59,15 @@ onKeyStroke(['command', '/'], () => {
 onMounted(() => {
     Promise.all([
         fetch(),
-        getVolunteerCheckpoints()
+        getVolunteerCheckpoints(),
     ])
 })
 </script>
 
 <template>
+    {{ moment() }}
+    {{ moment.utc(stageCategories[0]?.start) }}
+    {{ hasEventStarted }}
     <div class="space-y-8 relative">
         <div class="bg-white py-3 space-y-2 sticky top-[83px] z-10">
             <h2>Filters:</h2>
@@ -98,7 +103,7 @@ onMounted(() => {
             v-if="filteredList.length > 0 && selectedCheckpoint">
             <PagesDashboardVolunteerRunner v-for="runner in filteredList" :key="runner.id"
                 :timer="findEntry(runner.id)?.timer" :runner="runner" :checkpoint-id="selectedCheckpoint.id"
-                @update="fetchCheckpointRegister" />
+                @update="fetchCheckpointRegister" :enabled="hasEventStarted" />
         </div>
     </div>
 </template>
