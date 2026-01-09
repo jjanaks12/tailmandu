@@ -184,6 +184,7 @@ model Image {
   sponsort_types          SponsorType[]
   sponsors                Sponsor[]
   stage_category_payments StageCategoryPayment[]
+  stage_category_bibs     StageCategory[]        @relation("stage_category_bib")
 
   @@map("images")
 }
@@ -391,6 +392,8 @@ model StageCategory {
   stage       Stage   @relation(fields: [stage_id], references: [id], onDelete: Cascade)
   map_file_id String?
   map_file    Image?  @relation("gpx_file", fields: [map_file_id], references: [id], onDelete: Cascade)
+  image_id    String?
+  bib_image   Image?  @relation("stage_category_bib", fields: [image_id], references: [id], onDelete: Cascade)
 
   checkpoints Checkpoint[]
   runners     EventRunner[]

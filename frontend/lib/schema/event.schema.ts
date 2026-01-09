@@ -11,6 +11,8 @@ export const eventSchema = Y.object({
 
 export const checkpointSchema = Y.object({
     stage_category_id: Y.string().required().label('Stage'),
+    is_start: Y.boolean().label('Is start'),
+    is_end: Y.boolean().label('Is end'),
     name: Y.string().required().label('Name'),
 })
 

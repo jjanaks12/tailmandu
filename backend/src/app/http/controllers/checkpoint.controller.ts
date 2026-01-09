@@ -29,7 +29,9 @@ export class CheckpointController {
             response.send(await prisma.checkpoint.create({
                 data: {
                     name: validationData.name,
-                    stage_category_id: validationData.stage_category_id
+                    stage_category_id: validationData.stage_category_id,
+                    is_start: validationData.is_start,
+                    is_end: validationData.is_end
                 }
             }))
         } catch (error) {
@@ -40,14 +42,16 @@ export class CheckpointController {
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
             const validationData = await checkpointSchema.validate(request.body, { abortEarly: false })
-            const stage = await prisma.checkpoint.findFirst({where: {id: request.params.checkpoint_id}})
-            
+            const stage = await prisma.checkpoint.findFirst({ where: { id: request.params.checkpoint_id } })
+
             response.send(await prisma.checkpoint.update({
                 where: {
                     id: request.params.checkpoint_id
                 },
                 data: {
                     name: validationData.name ?? stage.name,
+                    is_start: validationData.is_start ?? stage.is_start,
+                    is_end: validationData.is_end ?? stage.is_end,
                     updated_at: moment.utc().toISOString()
                 }
             }))

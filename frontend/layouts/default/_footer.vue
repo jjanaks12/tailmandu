@@ -48,6 +48,9 @@ const { company } = storeToRefs(useAppStore())
                             <li>
                                 <NuxtLink target="_blank" to="/liabilities">Liability disclaimer</NuxtLink>
                             </li>
+                            <li>
+                                <NuxtLink target="_blank" to="/dashboard">My account</NuxtLink>
+                            </li>
                         </ul>
                     </nav>
                 </div>

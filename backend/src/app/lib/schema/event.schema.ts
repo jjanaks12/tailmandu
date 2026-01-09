@@ -20,7 +20,9 @@ export const stageSchema = Y.object({
 
 export const checkpointSchema = Y.object({
     stage_category_id: Y.string().required().label('Stage'),
-    name: Y.string().required().label('Name')
+    is_start: Y.boolean().label('Is start'),
+    is_end: Y.boolean().label('Is end'),
+    name: Y.string().required().label('Name'),
 })
 
 export const gallerySchema = Y.object({

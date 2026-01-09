@@ -170,15 +170,15 @@ onMounted(fetch)
                     <CommandIcon /> + /
                 </InputGroupAddon>
             </InputGroup>
-            <div class="flex justify-end gap-2 sticky top-[83px]">
+            <div class="flex justify-end gap-2 sticky top-[83px]" v-if="stageID">
                 <Button variant="secondary" class="rounded-full" @click="downloadCSV">
                     <DownloadIcon />
                     Download CSV
                 </Button>
-                <!-- <Button variant="destructive" class="rounded-full" @click="printDialog = true">
+                <Button variant="destructive" class="rounded-full" @click="printDialog = true">
                     <DownloadIcon />
                     Download BIB PDF
-                </Button> -->
+                </Button>
                 <Button variant="secondary" size="sm" modifier="link" @click="fetch">reload</Button>
                 <Button size="sm" modifier="link" @click="reset" :disabled="isLoading">reset all</Button>
             </div>
@@ -203,7 +203,7 @@ onMounted(fetch)
                 @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
                 @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="index + 1" />
             <TableRow v-if="runners.length === 0">
-                <TableCell colspan="6">
+                <TableCell colspan="7">
                     <span class="text-center block p-3 text-gray-500 bg-accent rounded">
                         No runners found
                     </span>
@@ -338,26 +338,7 @@ onMounted(fetch)
             </div>
         </DialogContent>
     </Dialog>
-    <Dialog :open="printDialog" @update:open="printDialog = false">
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Prepare runner BIB card</DialogTitle>
-                <DialogDescription>
-                    Generate runner BIB card for printing.
-                </DialogDescription>
-            </DialogHeader>
-            <div class="space-y-6">
-                <bibCard :runner="runner" v-for="runner in runners" v-if="runners.length > 0" />
-                <Alert v-else>
-                    <AlertTitle>No runners found</AlertTitle>
-                    <AlertDescription>
-                        {{ stageID ? 'No runners found for this stage' : 'First select a stage' }}
-                    </AlertDescription>
-                </Alert>
-            </div>
-            <div class="flex flex-end">
-                <Button>Download</Button>
-            </div>
-        </DialogContent>
-    </Dialog>
+    <ClientOnly>
+        <bibCard v-model:show="printDialog" :stageID="stageID" :runners="runners" />
+    </ClientOnly>
 </template>
