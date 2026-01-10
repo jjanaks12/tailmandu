@@ -211,7 +211,7 @@ export class RunnerController {
             })
 
             // if (process.env.NODE_ENV === 'production')
-            await sendEmail('welcome', {
+            /* await sendEmail('welcome', {
                 title: 'Thank you for signing up for race',
                 user: {
                     name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
@@ -239,7 +239,7 @@ export class RunnerController {
                     name: validationData.first_name,
                 }],
                 subject: 'Welcome to Trailmandu'
-            }, 'info@trailmandu.com')
+            }, 'info@trailmandu.com') */
 
             response.send(payment)
         } catch (error) {

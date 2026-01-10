@@ -43,8 +43,7 @@ onMounted(fetch)
                         {{ formatDate(runner.stage_category.start) }}
                     </time>
                 </div>
-                <Button variant="secondary" v-if="moment.utc(runner.stage_category.start).isBefore(moment())"
-                    modifier="link" as-child>
+                <Button variant="secondary" modifier="link" as-child>
                     <NuxtLink :to="`/dashboard/runner/${runner.id}/${runner.stage.event_id}/${runner.stage_id}`">
                         edit your details
                     </NuxtLink>
