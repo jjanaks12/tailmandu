@@ -44,6 +44,7 @@ const getDuration = (time: string, started_time: string) => {
         </TableCell>
         <TableCell>
             <em class="no-italic block">{{ runner.bib }}</em>
+            {{ runner.id }}
             <strong class="block">
                 {{ runner.personal.first_name }}
                 {{ runner.personal.middle_name }}

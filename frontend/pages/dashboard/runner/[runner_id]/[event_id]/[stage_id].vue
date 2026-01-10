@@ -89,7 +89,9 @@ onMounted(init)
 
 <template>
     <div class="flex gap-8">
-        <Form :validation-schema="trailRaceRunner" @submit="handleSubmit" ref="form" class="w-2/3 space-y-8">
+        <Form :validation-schema="trailRaceRunner" @submit="handleSubmit" ref="form" class="w-2/3 space-y-8"
+            v-slot="{ errors }">
+            <pre>{{ errors }}</pre>
             <span class="text-xl font-medium text-gray-700 block">Your BIB no: {{ runner?.bib }}</span>
             <Separator />
             <Field name="stage_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">

@@ -254,6 +254,7 @@ export class RunnerController {
                     id: request.params.runner_id
                 },
                 data: {
+                    stage_category_id: String(request.body.stage_category_id),
                     want_lunch: request.body.description.want_lunch ?? false,
                     club_name: request.body.description.club_name,
                     emergency_contact_name: request.body.description.emergency_contact_name,
