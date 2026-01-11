@@ -73,7 +73,7 @@ const fetch = async () => {
                 payment_status: paymentStatusOpt.value,
                 stage_category: stageCategoryID.value,
                 payment_method: paymentTypeOpt.value,
-                gender: genderOpt.value
+                gender: genderOpt.value?.id
             }
         })
         runners.value = data
