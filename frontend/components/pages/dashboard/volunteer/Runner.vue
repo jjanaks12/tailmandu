@@ -18,7 +18,7 @@ const { axios } = useAxios()
 const fullName = computed(() => [props.runner.personal.first_name, props.runner.personal.middle_name, props.runner.personal.last_name].join(' '))
 
 const logTimer = async () => {
-    if (props.timer == undefined && props.enabled) {
+    if (props.timer == undefined) {
         await axios.post(`/volunteers/${props.checkpointId}/log_timer/${props.runner.id}`)
         emit('update')
     }
@@ -29,7 +29,7 @@ const logTimer = async () => {
 <template>
     <div class="text-center space-y-2">
         <Avatar
-            :class="{ 'size-[120px] mx-auto border-4': true, 'border-primary': timer == undefined && enabled, 'border-secondary': timer !== undefined }"
+            :class="{ 'size-[120px] mx-auto border-4': true, 'border-primary': timer == undefined, 'border-secondary': timer !== undefined }"
             @dblclick="logTimer">
             <AvatarImage :src="showImage(runner.personal?.avatar?.file_name)" :alt="runner.personal.first_name" />
             <AvatarFallback>{{ abbr(fullName.toUpperCase()) }}</AvatarFallback>

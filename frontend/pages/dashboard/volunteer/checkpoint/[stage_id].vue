@@ -24,7 +24,8 @@ const volunteer = ref<Volunteer | null>(null)
 
 const runners = computed(() => stageCategories.value.find(category => category.id === selectedCheckpoint.value?.stage_category_id)?.runners ?? [])
 const filteredList = computed(() => runners.value.filter(runner => runner.bib.includes(searchText.value)))
-const remainingRunners = computed(() => runners.value.length - entryList.value.length)
+const recordedRunner = computed(() => entryList.value.filter(entry => entry.timer).length)
+const remainingRunners = computed(() => Math.max(0, runners.value.length - recordedRunner.value))
 const hasEventStarted = computed(() => stageCategories.value[0]?.start ? moment().isAfter(moment.utc(stageCategories.value[0]?.start)) : false)
 
 const getVolunteerCheckpoints = async () => {
@@ -65,15 +66,13 @@ onMounted(() => {
 </script>
 
 <template>
-    {{ moment() }}
-    {{ moment.utc(stageCategories[0]?.start) }}
-    {{ hasEventStarted }}
     <div class="space-y-8 relative">
         <div class="bg-white py-3 space-y-2 sticky top-[83px] z-10">
             <h2>Filters:</h2>
             <Badge variant="outline" v-if="selectedCheckpoint">
                 {{ selectedCheckpoint.name }}
                 (total: {{ runners.length }})
+                (recorded: {{ recordedRunner }})
                 (remaining: {{ remainingRunners }})
             </Badge>
             <div class="flex flex-col md:flex-row items-end gap-3">

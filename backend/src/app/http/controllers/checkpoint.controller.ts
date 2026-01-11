@@ -74,4 +74,16 @@ export class CheckpointController {
             next(error)
         }
     }
+
+    public static async deleteCheckpointEntryData(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.volunteerCheckpoint.delete({
+                where: {
+                    id: request.params.delete_checkpoint_data_id
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
 }

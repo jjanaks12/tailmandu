@@ -142,7 +142,15 @@ onBeforeMount(init)
                             </Button>
                         </NuxtLink>
                     </template>
-                    <strong class="font-normal text-5xl" v-else>Registration closed</strong>
+                    <div class="space-y-4" v-else>
+                        <strong class="font-normal text-5xl block">Registration closed</strong>
+                        <Button as-child>
+                            <NuxtLink
+                                :to="{ name: 'races-id-stage-stage_id-result', params: { id: stage.event.id, stage_id: stage.id } }">
+                                view results
+                            </NuxtLink>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </section>

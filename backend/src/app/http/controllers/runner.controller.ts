@@ -47,6 +47,9 @@ export class RunnerController {
                             }
                         },
                     ],
+                    personal: {
+                        gender_id: request.query.gender as string
+                    },
                     payments: paymentFilter
                 },
                 include: {

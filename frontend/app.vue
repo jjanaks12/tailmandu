@@ -1,46 +1,47 @@
 <script lang="ts" setup>
-  import { useAuthStore } from '~/store/auth'
-  import { useAppStore } from '~/store/app'
-  import Jobs from '~/lib/jobs'
-  import { useRoleStore } from './store/role'
-  import { usePermissionStore } from './store/permission'
-  import { useEventStore } from './store/event'
-  
-  import 'vue-sonner/style.css'
+import { useAuthStore } from '~/store/auth'
+import { useAppStore } from '~/store/app'
+import Jobs from '~/lib/jobs'
+import { useRoleStore } from './store/role'
+import { usePermissionStore } from './store/permission'
+import { useEventStore } from './store/event'
 
-  const { isLoggedin } = storeToRefs(useAuthStore())
-  const { fetch } = useAuthStore()
-  const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany, fetchShirtSizes } = useAppStore()
-  const { fetch: fetchRole } = useRoleStore()
-  const { fetch: fetchPermission } = usePermissionStore()
-  const { fetch: fetchEvents } = useEventStore()
+import 'vue-sonner/style.css'
 
-  const isLoading = ref(true)
-  const job = new Jobs()
+const { isLoggedin } = storeToRefs(useAuthStore())
+const { fetch } = useAuthStore()
+const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany, fetchShirtSizes } = useAppStore()
+const { fetch: fetchRole } = useRoleStore()
+const { fetch: fetchPermission } = usePermissionStore()
+const { fetch: fetchEvents } = useEventStore()
 
-  const initPage = async () => {
-    const jobList: Function[] = [fetchCompany, fetchEvents, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes]
+const isLoading = ref(true)
+const job = new Jobs()
 
-    if (isLoggedin.value)
-      jobList.push(fetch, fetchPermission, fetchRole)
+const initPage = async () => {
+  const jobList: Function[] = [fetchCompany, fetchEvents, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes]
 
-    job.add(jobList)
-    await job.run()
-      .finally(() => {
-        isLoading.value = false
-      })
-  }
+  if (isLoggedin.value)
+    jobList.push(fetch, fetchPermission, fetchRole)
 
-  watch(isLoggedin, () => {
-    initPage()
-  })
+  job.add(jobList)
+  await job.run()
+    .finally(() => {
+      isLoading.value = false
+    })
+}
 
-  onBeforeMount(() => {
-    initPage()
-  })
+watch(isLoggedin, () => {
+  initPage()
+})
+
+onBeforeMount(() => {
+  initPage()
+})
 </script>
 
 <template>
+  <NuxtLoadingIndicator />
   <NuxtLayout>
     <NuxtPage :key="$route.fullPath" />
   </NuxtLayout>
