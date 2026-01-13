@@ -20,6 +20,7 @@ const emit = defineEmits(['update'])
 const { axios } = useAxios()
 const route = useRoute()
 const props = defineProps<RunnerListProps>()
+let interval: NodeJS.Timeout
 
 const isLoading = ref(false)
 const runnerDetailDialog = ref(false)
@@ -47,21 +48,6 @@ const stageCategoryList = computed(() => {
     return props.stages.find((stage) => stage.id === stageID.value)?.stage_categories || []
 })
 
-const updatedRunners = computed(() => {
-    return runners.value.sort((a, b) => {
-        const alastCheckpoint = a.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
-        const blastCheckpoint = b.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
-
-        if (alastCheckpoint && blastCheckpoint)
-            return moment(alastCheckpoint.timer).diff(moment(blastCheckpoint.timer))
-
-        if (alastCheckpoint && !blastCheckpoint)
-            return -1
-
-        return 1
-    })
-})
-
 const fetch = async () => {
     const event_id = route.params.id
     if (event_id && stageID.value) {
@@ -73,7 +59,8 @@ const fetch = async () => {
                 payment_status: paymentStatusOpt.value,
                 stage_category: stageCategoryID.value,
                 payment_method: paymentTypeOpt.value,
-                gender: genderOpt.value?.id
+                gender: genderOpt.value?.id,
+                show_all: true
             }
         })
         runners.value = data
@@ -122,9 +109,12 @@ const downloadCSV = async () => {
 watch([paymentStatusOpt, stageID, stageCategoryID, paymentTypeOpt, genderOpt], fetch)
 watchDebounced(searchText, fetch, { debounce: 1000 })
 onMounted(() => {
-    setInterval(() => {
+    interval = setInterval(() => {
         fetch()
     }, 10000)
+})
+onUnmounted(() => {
+    clearInterval(interval)
 })
 </script>
 
@@ -218,19 +208,18 @@ onMounted(() => {
                     <TableRow>
                         <TableHead>Rank</TableHead>
                         <TableHead>Name</TableHead>
-                        <TableHead>Payment</TableHead>
-                        <TableHead>Payment Type</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead>Lunch</TableHead>
                         <TableHead class="text-right">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <RunnerItem v-for="(runner, index) in updatedRunners" :runner="runner"
+                    <RunnerItem v-for="runner in runners" :runner="runner"
                         @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                         @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
-                        @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="index + 1" />
+                        @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="runner.rank?.position" />
                     <TableRow v-if="runners.length === 0">
-                        <TableCell colspan="6">
+                        <TableCell colspan="5">
                             <span class="text-center block p-3 text-gray-500 bg-accent rounded">
                                 No runners found
                             </span>
@@ -338,6 +327,14 @@ onMounted(() => {
                     <div class="flex justify-between">
                         <strong>Stage category</strong>
                         <span>{{ selectedRunner?.stage_category?.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <strong>Emergency contact</strong>
+                        <span>{{ selectedRunner?.emergency_contact_name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <strong>Emergency contact</strong>
+                        <span>{{ selectedRunner?.emergency_contact_no }}</span>
                     </div>
                 </div>
                 <strong class="text-gray-300 uppercase tracking-widest font-medium">Payment Information</strong>

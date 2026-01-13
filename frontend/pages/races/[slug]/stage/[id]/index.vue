@@ -121,6 +121,12 @@ onBeforeMount(init)
                     <strong class="tracking-wide text-xl block mb-5">
                         #3 Result will be updated here after the race.
                     </strong>
+                    <Button as-child v-if="hasEnded" class="rounded-full">
+                        <NuxtLink
+                            :to="{ name: 'races-id-stage-stage_id-result', params: { id: stage.event.id, stage_id: stage.id } }">
+                            view results
+                        </NuxtLink>
+                    </Button>
                 </div>
             </div>
         </div>

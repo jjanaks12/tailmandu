@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronUpIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import moment from 'moment'
-import { formatDate } from '~/lib/filters'
+import { formatDate, humanize } from '~/lib/filters'
 import type { EventRunner } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
 interface RunnerItemProps {
-    rank: number
+    rank?: number
     runner: EventRunner
 }
 
@@ -22,11 +22,13 @@ const showDisqualificationModal = ref<boolean>(false)
 const showDidNotFinishModal = ref<boolean>(false)
 
 const hasPayment = computed(() => props.runner.payments.length > 0)
-const classList = computed(() => ({
-    'bg-primary/50 hover:bg-primary/50': props.rank == 1,
-    'bg-primary/30 hover:bg-primary/30': props.rank == 2,
-    'bg-primary/10 hover:bg-primary/10': props.rank == 3
-}))
+const classList = computed(() => (props.rank
+    ? {
+        'bg-primary/50 hover:bg-primary/50': props.rank == 1,
+        'bg-primary/30 hover:bg-primary/30': props.rank == 2,
+        'bg-primary/10 hover:bg-primary/10': props.rank == 3
+    }
+    : {}))
 
 const { copy, copied } = useClipboard()
 
@@ -52,11 +54,13 @@ const getDuration = (time: string, started_time: string) => {
 
     // @ts-expect-error
     const diff = now - started
-    return `${((diff / (1000 * 60 * 60)) % 60).toFixed(0)}:${((diff / (1000 * 60)) % 60).toFixed(0)}:${(diff / 1000).toFixed(0)}`
+    return `${((diff / (1000 * 60 * 60)) % 60).toFixed(0)}:${((diff / (1000 * 60)) % 60).toFixed(0)}:${((diff / 1000) % 60).toFixed(0)}`
 }
 
-const deleteCheckpointEntryData = async (id: string) => {
-    await axios.delete(`/checkpoints/${id}`)
+const deleteCheckpointEntryData = async () => {
+    if (!deleteCheckpointDataID.value)
+        return
+    await axios.delete(`/checkpoints/${deleteCheckpointDataID.value}`)
     emit('fetch')
     deleteCheckpointDataID.value = null
 }
@@ -68,7 +72,9 @@ const disqualifyRunner = async () => {
 }
 
 const didNotFinishRunner = async () => {
-    await axios.put(`/runners/${props.runner.id}/did-not-finish`)
+    await axios.put(`/runners/${props.runner.id}/did-not-finish`, {
+        checkpoint_id: props.runner.volunteer_on_checkpoints[0].checkpoint_id
+    })
     emit('fetch')
     showDidNotFinishModal.value = false
 }
@@ -111,10 +117,25 @@ const didNotFinishRunner = async () => {
             </div>
         </TableCell>
         <TableCell>
-            {{ runner.payments[0]?.status }}
+            <ul class="text-gray-500 text-xs flex flex-col gap-1">
+                <li>
+                    Payment method:
+                    <Badge variant="info">{{ humanize(runner.payments[0]?.method) }}</Badge>
+                </li>
+                <li>
+                    Payment status:
+                    <Badge variant="info">{{ humanize(runner.payments[0]?.status) }}</Badge>
+                </li>
+                <li v-if="runner.status">
+                    Status:
+                    <Badge variant="destructive">{{ humanize(runner.status.status) }}</Badge>
+                </li>
+            </ul>
         </TableCell>
-        <TableCell>{{ runner.payments[0]?.method }}</TableCell>
-        <TableCell>{{ runner.want_lunch ? 'Yes' : 'No' }}</TableCell>
+        <TableCell>
+            <Badge variant="success" v-if="runner.want_lunch">Yes</Badge>
+            <Badge variant="destructive" v-else>No</Badge>
+        </TableCell>
         <TableCell class="text-right">
             <DropdownMenu>
                 <DropdownMenuTrigger as-child>
@@ -126,7 +147,7 @@ const didNotFinishRunner = async () => {
                     <DropdownMenuItem class="text-gray-500" @click="emit('show:runner')">
                         See runner details
                     </DropdownMenuItem>
-                    <template v-if="runner.payments.length > 0">
+                    <template v-if="runner.payments.length > 0 && runner.payments[0].status != 'COMPLETED'">
                         <DropdownMenuItem class="text-gray-500" @click="emit('show:payment')" v-if="hasPayment">
                             See payment details
                         </DropdownMenuItem>
@@ -148,10 +169,14 @@ const didNotFinishRunner = async () => {
                     <template v-if="can('runner_delete')">
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Runner Actions</DropdownMenuLabel>
-                        <DropdownMenuItem class="text-red-500" @click="showDidNotFinishModal = true">Did not finished
-                        </DropdownMenuItem>
-                        <DropdownMenuItem class="text-red-500" @click="showDisqualificationModal = true">Disqualified
-                        </DropdownMenuItem>
+                        <template v-if="!runner.status">
+                            <DropdownMenuItem class="text-red-500" @click="showDidNotFinishModal = true">
+                                Did not finished
+                            </DropdownMenuItem>
+                            <DropdownMenuItem class="text-red-500" @click="showDisqualificationModal = true">
+                                Disqualified
+                            </DropdownMenuItem>
+                        </template>
                         <DropdownMenuItem class="text-red-500" @click="showDeleteModal = true">
                             Delete
                         </DropdownMenuItem>
@@ -203,7 +228,7 @@ const didNotFinishRunner = async () => {
             </DialogFooter>
         </DialogContent>
     </Dialog>
-    <AlertDialog :open="deleteCheckpointDataID != null" @update:open="deleteCheckpointDataID = null">
+    <AlertDialog :open="deleteCheckpointDataID != null">
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure you want to delete this checkpoint entry?</AlertDialogTitle>
@@ -212,7 +237,7 @@ const didNotFinishRunner = async () => {
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel @click="deleteCheckpointDataID = null">Cancel</AlertDialogCancel>
                 <AlertDialogAction @click="deleteCheckpointEntryData">Delete</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
@@ -226,7 +251,7 @@ const didNotFinishRunner = async () => {
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel @click="showDisqualificationModal = false">Cancel</AlertDialogCancel>
                 <AlertDialogAction @click="disqualifyRunner">Yes, disqualify</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
@@ -240,7 +265,7 @@ const didNotFinishRunner = async () => {
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel @click="showDidNotFinishModal = false">Cancel</AlertDialogCancel>
                 <AlertDialogAction @click="didNotFinishRunner">Yes, mark as did not finish</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>

@@ -16,6 +16,9 @@ export type PaymentType = typeof paymentTypes[number]
 export const paymentStatus = ['PENDING', 'COMPLETED', 'FAILED'] as const
 export type PaymentStatus = typeof paymentStatus[number]
 
+export const runnerStatus = ['DID_NOT_FINISH', 'DISQUALIFIED', 'ACTIVE'] as const
+export type RunnerStatus = typeof runnerStatus[number]
+
 export type APIQuery<T> = {
     s: string
     sort?: APISort<T>
@@ -183,6 +186,8 @@ export type EventRunner = {
     volunteer_on_checkpoints: VolunteerCheckpoint[]
     stage_category_id: string
     stage_category: StageCategory
+    rank: Rank
+    status: EventRunnerStatus
 }
 
 export type Payment = {
@@ -356,4 +361,18 @@ export type StageCategoryPayment = {
     stage_category: StageCategory
     image_id: string
     screenshot: Image
+}
+
+export type EventRunnerStatus = {
+    id: string
+    status: RunnerStatus
+    runner_id: string
+    runner: EventRunner
+}
+
+export type Rank = {
+    id: string
+    position: number
+    runner_id: string
+    runner: EventRunner
 }

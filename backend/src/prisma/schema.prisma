@@ -166,9 +166,11 @@ model EventRunner {
 }
 
 model Gender {
-  id       String     @id @default(cuid())
-  name     String
+  id   String @id @default(cuid())
+  name String
+
   personal Personal[]
+  ranks    Rank[]
 
   @@map("genders")
 }
@@ -408,6 +410,7 @@ model StageCategory {
   runners     EventRunner[]
   payment     StageCategoryPayment[]
   payments    Payment[]
+  ranks       Rank[]
 
   @@map("stage_categories")
 }
@@ -503,19 +506,26 @@ model VolunteerCheckpoint {
 }
 
 model EventRunnerStatus {
-  id        String       @id @default(cuid())
-  status    RunnerStatus @default(ACTIVE)
-  runner_id String       @unique
-  runner    EventRunner  @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+  id         String       @id @default(cuid())
+  status     RunnerStatus @default(ACTIVE)
+  runner_id  String       @unique
+  runner     EventRunner  @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+  created_at DateTime     @default(now())
 
   @@map("event_runner_status")
 }
 
 model Rank {
-  id        String      @id @default(cuid())
-  position  Int
-  runner_id String      @unique
-  runner    EventRunner @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+  id                String        @id @default(cuid())
+  position          Int
+  runner_id         String        @unique
+  runner            EventRunner   @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+  stage_category_id String
+  stage_category    StageCategory @relation(fields: [stage_category_id], references: [id], onDelete: Cascade)
+  gender_id         String?
+  gender            Gender?       @relation(fields: [gender_id], references: [id], onDelete: Cascade)
+  created_at        DateTime      @default(now())
 
+  @@unique([position, stage_category_id, gender_id])
   @@map("ranks")
 }

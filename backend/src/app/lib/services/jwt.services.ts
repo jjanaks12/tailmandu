@@ -9,7 +9,7 @@ export class JWT {
             const payload = {}
             const secret = process.env.ACCESS_TOKEN_SECRET
             const options: SignOptions = {
-                expiresIn: '1h',
+                expiresIn: '6h',
                 // expiresIn: '3s',
                 issuer: process.env.APP_NAME,
                 audience: userId

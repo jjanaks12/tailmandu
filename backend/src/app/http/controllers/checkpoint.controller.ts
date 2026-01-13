@@ -77,11 +77,31 @@ export class CheckpointController {
 
     public static async deleteCheckpointEntryData(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send(await prisma.volunteerCheckpoint.delete({
-                where: {
-                    id: request.params.delete_checkpoint_data_id
-                }
-            }))
+            await prisma.$transaction(async (prisma) => {
+                const volunteerCheckpoint = await prisma.volunteerCheckpoint.delete({
+                    where: {
+                        id: request.params.delete_checkpoint_data_id
+                    }
+                })
+
+                const stageCategory = await prisma.stageCategory.findFirst({
+                    where: {
+                        checkpoints: {
+                            some: {
+                                id: request.params.checkpoint_id
+                            }
+                        }
+                    }
+                })
+
+                await prisma.rank.delete({
+                    where: {
+                        runner_id: volunteerCheckpoint.runner_id,
+                        stage_category_id: stageCategory?.id
+                    }
+                })
+            })
+            response.send('ok')
         } catch (error) {
             next(error)
         }

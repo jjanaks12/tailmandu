@@ -67,6 +67,7 @@ onMounted(() => {
 
 <template>
     <div class="space-y-8 relative">
+        <Button @click="fetch">fetch</Button>
         <div class="bg-white py-3 space-y-2 sticky top-[83px] z-10">
             <h2>Filters:</h2>
             <Badge variant="outline" v-if="selectedCheckpoint">
@@ -102,7 +103,7 @@ onMounted(() => {
             v-if="filteredList.length > 0 && selectedCheckpoint">
             <PagesDashboardVolunteerRunner v-for="runner in filteredList" :key="runner.id"
                 :timer="findEntry(runner.id)?.timer" :runner="runner" :checkpoint-id="selectedCheckpoint.id"
-                @update="fetchCheckpointRegister" :enabled="hasEventStarted" />
+                @update="fetchCheckpointRegister" :enabled="hasEventStarted" @fetch="fetch" />
         </div>
     </div>
 </template>

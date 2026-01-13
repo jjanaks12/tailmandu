@@ -68,6 +68,25 @@ const fetchRunnerList = async () => {
     })
     runners.value = data
 }
+const adjustDateForTimezone = (date: Date) => {
+    // Get the timezone offset in minutes for the *current* system
+    const timezoneOffsetInMinutes = date.getTimezoneOffset();
+
+    // Create a new Date object (or modify the existing one) by adding the offset
+    // Using setMinutes() is a clean way to adjust the time.
+    date.setMinutes(date.getMinutes() + timezoneOffsetInMinutes);
+
+    return date;
+}
+
+const getDuration = (time: string, started_time: string) => {
+    const started = adjustDateForTimezone(new Date(started_time))
+    const now = new Date(moment.utc(time).local().toISOString())
+
+    // @ts-expect-error
+    const diff = now - started
+    return `${((diff / (1000 * 60 * 60)) % 60).toFixed(0)}:${((diff / (1000 * 60)) % 60).toFixed(0)}:${((diff / 1000) % 60).toFixed(0)}`
+}
 
 watch([selectGender, selectStage], fetchRunnerList)
 onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
@@ -111,7 +130,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                 <div class="flex justify-center gap-4 mb-4">
                     <Select v-model="selectStage">
                         <SelectTrigger>
-                            Stage:
+                            Distance:
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -132,6 +151,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
             </div>
         </header>
         <div class="container">
+            <Button @click="fetchRunnerList">fetch</Button>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -140,11 +160,12 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                         <TableHead>Name</TableHead>
                         <TableHead>Gender</TableHead>
                         <TableHead>Country</TableHead>
+                        <TableHead>Timing</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="(runner, index) in updatedRunners" :key="runner.id">
-                        <TableCell>{{ index + 1 }}</TableCell>
+                    <TableRow v-for="runner in updatedRunners" :key="runner.id">
+                        <TableCell>{{ runner.rank.position }}</TableCell>
                         <TableCell>{{ runner.bib }}</TableCell>
                         <TableCell>
                             {{ runner.personal.first_name }}
@@ -153,6 +174,9 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                         </TableCell>
                         <TableCell>{{ runner.personal.gender.name }}</TableCell>
                         <TableCell>{{ runner.personal.country.name }}</TableCell>
+                        <TableCell>
+                            {{ getDuration(runner.volunteer_on_checkpoints[0].timer, selectStage?.start as string) }}
+                        </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

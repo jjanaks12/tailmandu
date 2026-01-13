@@ -138,7 +138,8 @@ export class StageController {
                                 where: {
                                     bib: {
                                         contains: request.query.bib as string
-                                    }
+                                    },
+                                    status: null
                                 },
                                 include: {
                                     personal: {

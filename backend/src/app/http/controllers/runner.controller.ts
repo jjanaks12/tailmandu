@@ -1,4 +1,4 @@
-import { Checkpoint, PaymentMethod, PaymentStatus, PaymentType, PrismaClient } from "@prisma/client"
+import { PaymentMethod, PaymentStatus, PrismaClient, RunnerStatus } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import Bcrypt from 'bcrypt'
 
@@ -6,17 +6,23 @@ import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
+import createHttpError from "http-errors"
 
 const prisma = new PrismaClient()
 export class RunnerController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
             let paymentFilter: Record<string, any> | undefined = request.query.payment_status || request.query.payment_method ? { some: {} } : undefined
+            // let statusFilter: Record<string, any> | undefined = request.query.show_all ? undefined : { status: RunnerStatus.ACTIVE }
+
             if (request.query.payment_status)
                 paymentFilter.some.status = request.query.payment_status as PaymentStatus
 
             if (request.query.payment_method)
                 paymentFilter.some.method = request.query.payment_method as PaymentMethod
+
+            /* if (!request.query.show_all)
+                statusFilter.some.status = RunnerStatus.ACTIVE */
 
             const runners = await prisma.eventRunner.findMany({
                 where: {
@@ -50,7 +56,8 @@ export class RunnerController {
                     personal: {
                         gender_id: request.query.gender as string
                     },
-                    payments: paymentFilter
+                    payments: paymentFilter,
+                    status: request.query.show_all ? undefined : null
                 },
                 include: {
                     personal: {
@@ -77,8 +84,15 @@ export class RunnerController {
                         }
                     },
                     stage: true,
-                    stage_category: true
-                }
+                    stage_category: true,
+                    status: true,
+                    rank: true
+                },
+                orderBy: [{
+                    rank: {
+                        position: 'asc'
+                    }
+                }]
             })
             response.send(runners)
         } catch (error) {
@@ -271,11 +285,55 @@ export class RunnerController {
 
     public static async logTimer(request: Request, response: Response, next: NextFunction) {
         try {
+            const checkpoint = await prisma.checkpoint.findFirst({
+                where: {
+                    id: request.params.checkpoint_id
+                }
+            })
             const volunteer = await prisma.volunteer.findFirst({
                 where: {
                     personal_id: request.body.auth_user.personal_id
                 }
             })
+            if (!volunteer)
+                throw createHttpError.NotFound('Volunteer not found')
+
+            const hasAlreadyBeenAdded = await prisma.volunteerCheckpoint.findFirst({
+                where: {
+                    runner_id: request.params.runner_id,
+                    checkpoint_id: request.params.checkpoint_id,
+                    volunteer_id: volunteer.id
+                }
+            })
+
+            if (hasAlreadyBeenAdded)
+                throw createHttpError.BadRequest('Runner has already been added to this checkpoint')
+
+            const runner = await prisma.eventRunner.findFirst({
+                where: {
+                    id: request.params.runner_id
+                },
+                include: {
+                    personal: true
+                }
+            })
+
+            const rank = await prisma.rank.count({
+                where: {
+                    stage_category_id: request.body.stage_category_id as string,
+                    gender_id: runner.personal.gender_id
+                }
+            })
+
+            if (checkpoint.is_end)
+                await prisma.rank.create({
+                    data: {
+                        runner_id: request.params.runner_id,
+                        position: rank + 1,
+                        gender_id: runner.personal.gender_id,
+                        stage_category_id: request.body.stage_category_id as string
+                    }
+                })
 
             response.send(await prisma.volunteerCheckpoint.create({
                 data: {
@@ -379,7 +437,12 @@ export class RunnerController {
 
     public static async disqualify(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send()
+            response.send(await prisma.eventRunnerStatus.create({
+                data: {
+                    runner_id: request.params.runner_id,
+                    status: 'DISQUALIFIED'
+                }
+            }))
         } catch (error) {
             next(error)
         }
@@ -387,7 +450,44 @@ export class RunnerController {
 
     public static async didNotFinished(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send()
+            await prisma.$transaction(async (prisma) => {
+                await prisma.eventRunnerStatus.create({
+                    data: {
+                        runner_id: request.params.runner_id,
+                        status: 'DID_NOT_FINISH'
+                    }
+                })
+
+                const stage = await prisma.stageCategory.findFirst({
+                    where: {
+                        checkpoints: {
+                            some: {
+                                id: request.body.checkpoint_id
+                            }
+                        }
+                    },
+                    include: {
+                        checkpoints: true
+                    }
+                })
+
+                for (const checkpoint of stage.checkpoints) {
+                    await prisma.volunteerCheckpoint.deleteMany({
+                        where: {
+                            runner_id: request.params.runner_id,
+                            checkpoint_id: checkpoint.id
+                        }
+                    })
+                }
+
+                await prisma.rank.deleteMany({
+                    where: {
+                        runner_id: request.params.runner_id,
+                        stage_category_id: stage.id
+                    }
+                })
+            })
+            response.send('success')
         } catch (error) {
             next(error)
         }
