@@ -32,32 +32,28 @@ const endEvent = async () => {
 </script>
 
 <template>
-    <div>
-        <Button @click="startEvent" v-if="!hasFinished && isToday">Start</Button>
-        <Button @click="endEvent" v-if="hasStarted && !hasFinished">End</Button>
+    <div class="flex gap-2">
+        <div class="grow">
+            <strong>
+                {{ stageCategory.name }}
+                <span class="text-xs text-gray-500 font-normal">
+                    BIB range: ({{ stageCategory.bib_range }})
+                </span>
+            </strong>
+            <p class="mb-4" v-text="stageCategory.excerpt" />
+        </div>
         <div class="flex gap-2">
-            <div class="grow">
-                <strong>
-                    {{ stageCategory.name }}
-                    <span class="text-xs text-gray-500 font-normal">
-                        BIB range: ({{ stageCategory.bib_range }})
-                    </span>
-                </strong>
-                <p class="mb-4" v-text="stageCategory.excerpt" />
-            </div>
-            <div class="flex gap-2">
-                <Button variant="secondary" size="icon" modifier="outline" @click="emit('edit')">
-                    <PencilIcon />
-                </Button>
-                <Button variant="destructive" size="icon" modifier="outline" @click="emit('delete')">
-                    <TrashIcon />
-                </Button>
-            </div>
+            <Button variant="secondary" size="icon" modifier="outline" @click="emit('edit')">
+                <PencilIcon />
+            </Button>
+            <Button variant="destructive" size="icon" modifier="outline" @click="emit('delete')">
+                <TrashIcon />
+            </Button>
         </div>
-        <div class="border-t border-dashed pt-4">
-            <StageCategoryPaymentList :stage-category-id="stageCategory.id" :payments="stageCategory.payment"
-                @update="emit('update')" />
-            <CheckpointList :stage-category-id="stageCategory.id" />
-        </div>
+    </div>
+    <div class="border-t border-dashed pt-4">
+        <StageCategoryPaymentList :stage-category-id="stageCategory.id" :payments="stageCategory.payment"
+            @update="emit('update')" />
+        <CheckpointList :stage-category-id="stageCategory.id" />
     </div>
 </template>

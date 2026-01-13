@@ -18,6 +18,8 @@ const { can } = useAuthorization()
 const showDeleteModal = ref(false)
 const showTiming = ref(false)
 const deleteCheckpointDataID = ref<string | null>(null)
+const showDisqualificationModal = ref<boolean>(false)
+const showDidNotFinishModal = ref<boolean>(false)
 
 const hasPayment = computed(() => props.runner.payments.length > 0)
 const classList = computed(() => ({
@@ -57,6 +59,18 @@ const deleteCheckpointEntryData = async (id: string) => {
     await axios.delete(`/checkpoints/${id}`)
     emit('fetch')
     deleteCheckpointDataID.value = null
+}
+
+const disqualifyRunner = async () => {
+    await axios.put(`/runners/${props.runner.id}/disqualify`)
+    emit('fetch')
+    showDisqualificationModal.value = false
+}
+
+const didNotFinishRunner = async () => {
+    await axios.put(`/runners/${props.runner.id}/did-not-finish`)
+    emit('fetch')
+    showDidNotFinishModal.value = false
 }
 </script>
 
@@ -134,6 +148,10 @@ const deleteCheckpointEntryData = async (id: string) => {
                     <template v-if="can('runner_delete')">
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Runner Actions</DropdownMenuLabel>
+                        <DropdownMenuItem class="text-red-500" @click="showDidNotFinishModal = true">Did not finished
+                        </DropdownMenuItem>
+                        <DropdownMenuItem class="text-red-500" @click="showDisqualificationModal = true">Disqualified
+                        </DropdownMenuItem>
                         <DropdownMenuItem class="text-red-500" @click="showDeleteModal = true">
                             Delete
                         </DropdownMenuItem>
@@ -185,18 +203,46 @@ const deleteCheckpointEntryData = async (id: string) => {
             </DialogFooter>
         </DialogContent>
     </Dialog>
-    <Dialog :open="deleteCheckpointDataID != null" @update:open="deleteCheckpointDataID = null">
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Are you sure you want to delete this checkpoint entry?</DialogTitle>
-                <DialogDescription>
-                    This action cannot be undone.
-                </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-                <Button @click="deleteCheckpointDataID = null">Cancel</Button>
-                <Button @click="deleteCheckpointEntryData">Delete</Button>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
+    <AlertDialog :open="deleteCheckpointDataID != null" @update:open="deleteCheckpointDataID = null">
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to delete this checkpoint entry?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    The checkpoint entry of this runner will be deleted.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction @click="deleteCheckpointEntryData">Delete</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    <AlertDialog :open="showDisqualificationModal" @update:open="showDisqualificationModal = false">
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to disqualify this runner?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This runner will be disqualified from the event and will not be listed on result.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction @click="disqualifyRunner">Yes, disqualify</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    <AlertDialog :open="showDidNotFinishModal" @update:open="showDidNotFinishModal = false">
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to mark this runner as did not finish?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This runner will be marked as did not finish from the event and will not be listed on result.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction @click="didNotFinishRunner">Yes, mark as did not finish</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
 </template>

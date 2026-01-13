@@ -35,6 +35,12 @@ enum PaymentMethod {
   PAY_AT_VENUE
 }
 
+enum RunnerStatus {
+  DID_NOT_FINISH
+  DISQUALIFIED
+  ACTIVE
+}
+
 model Address {
   id      String @id @default(cuid())
   street  String
@@ -152,9 +158,10 @@ model EventRunner {
   checkpoints              Checkpoint[]
   payments                 Payment[]
   volunteer_on_checkpoints VolunteerCheckpoint[]
-  size                     Size?                 @relation(fields: [sizeId], references: [id])
-  sizeId                   String?
+  status                   EventRunnerStatus?
+  rank                     Rank?
 
+  @@unique([bib, stage_category_id])
   @@map("event_runners")
 }
 
@@ -312,7 +319,7 @@ model Size {
   deleted_at  DateTime?
 
   Personal Personal[]
-  runners  EventRunner[]
+  // runners  EventRunner[]
 
   @@map("sizes")
 }
@@ -493,4 +500,22 @@ model VolunteerCheckpoint {
   checkpoint    Checkpoint  @relation(fields: [checkpoint_id], references: [id], onDelete: Cascade)
 
   @@map("volunteer_on_checkpoints")
+}
+
+model EventRunnerStatus {
+  id        String       @id @default(cuid())
+  status    RunnerStatus @default(ACTIVE)
+  runner_id String       @unique
+  runner    EventRunner  @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+
+  @@map("event_runner_status")
+}
+
+model Rank {
+  id        String      @id @default(cuid())
+  position  Int
+  runner_id String      @unique
+  runner    EventRunner @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+
+  @@map("ranks")
 }

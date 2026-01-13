@@ -213,8 +213,7 @@ export class RunnerController {
                 }
             })
 
-            // if (process.env.NODE_ENV === 'production')
-            /* await sendEmail('welcome', {
+            await sendEmail('welcome', {
                 title: 'Thank you for signing up for race',
                 user: {
                     name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
@@ -242,7 +241,7 @@ export class RunnerController {
                     name: validationData.first_name,
                 }],
                 subject: 'Welcome to Trailmandu'
-            }, 'info@trailmandu.com') */
+            }, 'info@trailmandu.com')
 
             response.send(payment)
         } catch (error) {
@@ -373,6 +372,22 @@ export class RunnerController {
                 })
             })
             response.send('ok')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async disqualify(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send()
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async didNotFinished(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send()
         } catch (error) {
             next(error)
         }
