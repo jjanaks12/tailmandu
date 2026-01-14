@@ -7,7 +7,6 @@ import { useAppStore } from '~/store/app'
 
 import KVRLogo from '~/assets/images/kvr-summit-logo.png'
 import trailmanduLogo from '~/assets/images/logo.png'
-import cloudImage from '~/assets/images/cloud.png'
 
 definePageMeta({
     layout: 'simple'
@@ -93,23 +92,9 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
 </script>
 
 <template>
-    <section class="bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]">
-        <ClientOnly>
-            <div :style="{
-                backgroundImage: `url(${cloudImage})`,
-                backgroundRepeat: 'repeat',
-                opacity: 0.1,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: -1
-            }" />
-        </ClientOnly>
+    <section class="result__section bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]">
         <header class="py-12 relative">
-            <strong
-                class="block block--left text-lg [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
+            <strong class="block block--left [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
                 v-if="selectStage">
                 {{ selectStage?.name }}
             </strong>
@@ -124,7 +109,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                 class="font-bold block block--right translate-y-full  [--block-bg:var(--color-blue-400)] [--block-color:var(--color-white)]">#KVRSUMMITCHALLENGE</span>
             <div class="container space-y-3">
                 <h1 class="text-4xl uppercase font-bold text-center">Kathmandu's ultimate five summit challenge</h1>
-                <div class="w-[280px] mx-auto">
+                <div class="logo w-[280px] mx-auto">
                     <img :src="KVRLogo" alt="Kathmandu's ultimate five summit challenge">
                 </div>
                 <div class="flex justify-center gap-4 mb-4">
@@ -151,7 +136,6 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
             </div>
         </header>
         <div class="container">
-            <Button @click="fetchRunnerList">fetch</Button>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -164,8 +148,8 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="runner in updatedRunners" :key="runner.id">
-                        <TableCell>{{ runner.rank.position }}</TableCell>
+                    <TableRow v-for="(runner, index) in updatedRunners" :key="runner.id">
+                        <TableCell>{{ index + 1 }}</TableCell>
                         <TableCell>{{ runner.bib }}</TableCell>
                         <TableCell>
                             {{ runner.personal.first_name }}
@@ -190,18 +174,96 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
 </template>
 
 <style scoped>
+@font-face {
+    font-family: 'rockwell_extra_boldregular';
+    src: url('/fonts/rockwell_extra_bold_regular.woff2') format('woff2'),
+        url('/fonts/rockwell_extra_bold_regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.result__section {
+    background: url('@/assets/images/result-bg.png');
+
+    h1 {
+        color: #000;
+        font: 32px/1.1 'rockwell_extra_boldregular', sans-serif;
+        margin-bottom: 90px;
+
+        @media screen and (min-width: 768px) {
+            font-size: 39px;
+        }
+    }
+
+    header {
+        background: url('@/assets/images/result-top-bg.png') repeat-x;
+        background-size: auto 280px;
+
+        @media screen and (min-width: 768px) {
+            background-size: auto 160px;
+        }
+
+        .container {
+            padding-bottom: 40px;
+
+            @media screen and (min-width: 768px) {
+                padding-bottom: 0;
+            }
+        }
+    }
+}
+
+.logo {
+    position: relative;
+
+    &::before,
+    &::after {
+        width: 249px;
+        height: 119px;
+        position: absolute;
+        top: 50%;
+
+        @media screen and (min-width: 768px) {
+            content: '';
+        }
+    }
+
+    &::before {
+        background: url('@/assets/images/result-cloud.png');
+        right: 100%;
+        transform: translateY(-50%) rotateY(180deg);
+    }
+
+    &::after {
+        background: url('@/assets/images/result-cloud.png');
+        left: 100%;
+        transform: translateY(-50%);
+    }
+}
+
 .block {
     background: var(--block-bg);
     color: var(--block-color);
     font-weight: 700;
+    font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 20px;
     min-height: 40px;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: 0;
+    transform: translateY(-100%);
+
+    @media screen and (min-width: 768px) {
+        font-size: 16px;
+    }
+
+    @media screen and (min-width: 1440px) {
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%);
+    }
 
     &::after {
         content: '';

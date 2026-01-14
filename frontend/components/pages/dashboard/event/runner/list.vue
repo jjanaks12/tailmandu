@@ -37,6 +37,21 @@ const stageCategoryID = ref<string | null>(null)
 const selectedRunner = ref<EventRunner | null>(null)
 const { genders } = storeToRefs(useAppStore())
 
+const updatedRunners = computed(() => {
+    return runners.value.sort((a, b) => {
+        const alastCheckpoint = a.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
+        const blastCheckpoint = b.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
+
+        if (alastCheckpoint && blastCheckpoint)
+            return moment(alastCheckpoint.timer).diff(moment(blastCheckpoint.timer))
+
+        if (alastCheckpoint && !blastCheckpoint)
+            return -1
+
+        return 1
+    })
+})
+
 onKeyStroke(['command', '/'], () => {
     nextTick(() => {
         (document.querySelector('.search-input') as HTMLInputElement)?.focus()
@@ -214,10 +229,10 @@ onUnmounted(() => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <RunnerItem v-for="runner in runners" :runner="runner"
+                    <RunnerItem v-for="(runner, index) in updatedRunners" :runner="runner"
                         @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                         @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
-                        @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="runner.rank?.position" />
+                        @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="index + 1" />
                     <TableRow v-if="runners.length === 0">
                         <TableCell colspan="5">
                             <span class="text-center block p-3 text-gray-500 bg-accent rounded">
