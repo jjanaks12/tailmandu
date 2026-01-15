@@ -7,7 +7,7 @@ export const humanize = (str: string) => str
     .replace(/^[a-z]/, (m) => m.toUpperCase())
 
 export const formatDate = (str: string, format?: string) => {
-    const date = moment.utc(str).local()
+    const date = moment.utc(str)
     const hours = date.diff(moment(), 'hours')
 
     if (format)

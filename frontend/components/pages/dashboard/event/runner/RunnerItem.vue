@@ -2,7 +2,7 @@
 import { CheckIcon, ChevronUpIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import moment from 'moment'
 import { formatDate, humanize } from '~/lib/filters'
-import type { EventRunner } from '~/lib/types'
+import type { EventRunner, VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
 interface RunnerItemProps {
@@ -20,7 +20,8 @@ const showTiming = ref(false)
 const deleteCheckpointDataID = ref<string | null>(null)
 const showDisqualificationModal = ref<boolean>(false)
 const showDidNotFinishModal = ref<boolean>(false)
-
+const showEditDialog = ref(false)
+const checkpointData = ref<VolunteerCheckpoint | null>(null)
 const hasPayment = computed(() => props.runner.payments.length > 0)
 const classList = computed(() => (props.rank
     ? {
@@ -51,6 +52,8 @@ const adjustDateForTimezone = (date: Date) => {
 const getDuration = (time: string, started_time: string) => {
     const started = adjustDateForTimezone(new Date(started_time))
     const now = new Date(moment.utc(time).local().toISOString())
+
+    console.log(started, now);
 
     // @ts-expect-error
     const diff = now - started
@@ -205,9 +208,13 @@ const didNotFinishRunner = async () => {
                         <TableCell>
                             {{ getDuration(record?.timer, runner.stage_category.start) }}
                         </TableCell>
-                        <TableCell class="text-right">
-                            <Button @click="deleteCheckpointDataID = record.id" size="sm"
-                                modifier="link">Delete</Button>
+                        <TableCell>
+                            <div class="flex justify-end gap-2">
+                                <Button @click="deleteCheckpointDataID = record.id" size="sm"
+                                    modifier="link">Delete</Button>
+                                <Button variant="secondary"
+                                    @click="checkpointData = record; showEditDialog = true">Edit</Button>
+                            </div>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -270,4 +277,14 @@ const didNotFinishRunner = async () => {
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
+    <Dialog :open="showEditDialog" @update:open="showEditDialog = false; checkpointData = null">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit {{ runner.personal.first_name }}</DialogTitle>
+                <DialogDescription>Edit runner's time entry</DialogDescription>
+            </DialogHeader>
+            <PagesDashboardEventRunnerCheckpointForm :checkpoint="checkpointData"
+                @update="emit('fetch'); showEditDialog = false; checkpointData = null" />
+        </DialogContent>
+    </Dialog>
 </template>

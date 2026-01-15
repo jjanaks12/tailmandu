@@ -106,4 +106,34 @@ export class CheckpointController {
             next(error)
         }
     }
+
+    public static async updateCheckpointEntryData(request: Request, response: Response, next: NextFunction) {
+        try {
+            const volunteerCheckpoint = await prisma.volunteerCheckpoint.findFirst({
+                where: {
+                    id: request.params.checkpoint_id,
+                    runner_id: request.body.runner_id
+                }
+            })
+
+            const [hours, minutes, seconds] = request.body.timer.split(':')
+            const timer = moment.utc(volunteerCheckpoint.timer)
+            timer.set('hour', hours)
+            timer.set('minute', minutes)
+            timer.set('second', seconds)
+
+            console.log(timer.toISOString(), hours, minutes, seconds, request.body.timer);
+
+            response.send(await prisma.volunteerCheckpoint.update({
+                where: {
+                    id: request.params.checkpoint_id
+                },
+                data: {
+                    timer: timer.toISOString()
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
 }

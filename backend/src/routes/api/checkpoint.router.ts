@@ -6,5 +6,6 @@ import { CheckpointController } from '@/app/http/controllers/checkpoint.controll
 const router = Router()
 
 router.delete('/:delete_checkpoint_data_id', [verifyAccessToken], CheckpointController.deleteCheckpointEntryData)
+router.put('/:checkpoint_id', [verifyAccessToken], CheckpointController.updateCheckpointEntryData)
 
 export default router
