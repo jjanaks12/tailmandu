@@ -80,6 +80,7 @@ const fetch = async () => {
         })
         runners.value = data
         isLoading.value = false
+        console.clear();
     }
 }
 
@@ -126,7 +127,7 @@ watchDebounced(searchText, fetch, { debounce: 1000 })
 onMounted(() => {
     interval = setInterval(() => {
         fetch()
-    }, 10000)
+    }, 15000)
 })
 onUnmounted(() => {
     clearInterval(interval)

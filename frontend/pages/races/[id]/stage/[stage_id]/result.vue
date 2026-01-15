@@ -7,6 +7,7 @@ import { useAppStore } from '~/store/app'
 
 import KVRLogo from '~/assets/images/kvr-summit-logo.png'
 import trailmanduLogo from '~/assets/images/logo.png'
+import { LoaderIcon, XIcon } from 'lucide-vue-next'
 
 definePageMeta({
     layout: 'simple'
@@ -21,6 +22,7 @@ const stage = ref<Stage | null>(null)
 const stageCategoryList = ref<StageCategory[]>([])
 const selectGender = ref<string>('')
 const selectStage = ref<StageCategory | null>(null)
+const isLoading = ref(false)
 
 const updatedRunners = computed(() => {
     return runners.value.sort((a, b) => {
@@ -56,16 +58,18 @@ const fetchStage = async () => {
 }
 
 const fetchRunnerList = async () => {
-    if (!selectGender.value && selectStage.value) return
+    if (!selectStage.value) return
 
+    isLoading.value = true
     const { data } = await axios.get(`/events/${route.params.id as string}/${route.params.stage_id as string}/runners`, {
         params: {
             s: '',
-            gender: selectGender.value,
+            gender: selectGender.value ? selectGender.value : undefined,
             stage_category: selectStage.value?.id
         }
     })
     runners.value = data
+    isLoading.value = false
 }
 const adjustDateForTimezone = (date: Date) => {
     // Get the timezone offset in minutes for the *current* system
@@ -112,7 +116,8 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                 <div class="logo w-[280px] mx-auto">
                     <img :src="KVRLogo" alt="Kathmandu's ultimate five summit challenge">
                 </div>
-                <div class="flex justify-center gap-4 mb-4">
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <LoaderIcon class="animate-spin" v-show="isLoading" />
                     <Select v-model="selectStage">
                         <SelectTrigger>
                             Distance:
@@ -132,6 +137,9 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                             <SelectItem v-for="gender in genders" :value="gender.id">{{ gender.name }}</SelectItem>
                         </SelectContent>
                     </Select>
+                    <Button @click="selectGender = ''" modifier="link" size="sm" v-if="selectGender">
+                        <XIcon />
+                    </Button>
                 </div>
             </div>
         </header>
@@ -159,7 +167,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                         <TableCell>{{ runner.personal.gender.name }}</TableCell>
                         <TableCell>{{ runner.personal.country.name }}</TableCell>
                         <TableCell>
-                            {{ getDuration(runner.volunteer_on_checkpoints[0].timer, selectStage?.start as string) }}
+                            {{ getDuration(runner.volunteer_on_checkpoints[0]?.timer, selectStage?.start as string) }}
                         </TableCell>
                     </TableRow>
                 </TableBody>

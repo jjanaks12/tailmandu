@@ -49,15 +49,14 @@ const adjustDateForTimezone = (date: Date) => {
     return date;
 }
 
-const getDuration = (time: string, started_time: string) => {
-    const started = adjustDateForTimezone(new Date(started_time))
-    const now = new Date(moment.utc(time).local().toISOString())
-
-    console.log(started, now);
+const getDuration = (time: string, started_time: string, isUtc = true) => {
+    const started = isUtc ? adjustDateForTimezone(new Date(started_time)) : new Date(started_time)
+    // const started = new Date(isUtc ? moment.utc(started_time).toISOString() : started_time)
+    const now = new Date(isUtc ? moment.utc(time).toISOString() : time)
 
     // @ts-expect-error
     const diff = now - started
-    return `${((diff / (1000 * 60 * 60)) % 60).toFixed(0)}:${((diff / (1000 * 60)) % 60).toFixed(0)}:${((diff / 1000) % 60).toFixed(0)}`
+    return `${(Math.floor(diff / (1000 * 60 * 60))) % 24}:${(Math.floor(diff / (1000 * 60))) % 60}:${(Math.floor(diff / 1000)) % 60}`
 }
 
 const deleteCheckpointEntryData = async () => {
@@ -200,11 +199,17 @@ const didNotFinishRunner = async () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="record in runner.volunteer_on_checkpoints">
+                    <TableRow v-for="(record, index) in runner.volunteer_on_checkpoints">
                         <TableCell>
                             {{ record?.checkpoint?.name }}
                         </TableCell>
-                        <TableCell>{{ formatDate(record?.timer, 'YYYY-MM-DD HH:mm:ss') }}</TableCell>
+                        <TableCell>
+                            {{ getDuration(record?.timer,
+                                index === runner.volunteer_on_checkpoints.length - 1
+                                    ? runner.stage_category.start
+                                    : runner.volunteer_on_checkpoints[index + 1].timer,
+                                index === runner.volunteer_on_checkpoints.length - 1) }}
+                        </TableCell>
                         <TableCell>
                             {{ getDuration(record?.timer, runner.stage_category.start) }}
                         </TableCell>

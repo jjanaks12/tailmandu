@@ -335,6 +335,17 @@ export class RunnerController {
                     }
                 })
 
+            const ifAlreadyAdded = await prisma.volunteerCheckpoint.findFirst({
+                where: {
+                    runner_id: request.params.runner_id,
+                    checkpoint_id: request.params.checkpoint_id,
+                    volunteer_id: volunteer.id
+                }
+            })
+
+            if (ifAlreadyAdded)
+                throw createHttpError.BadRequest('Runner has already been added to this checkpoint')
+
             response.send(await prisma.volunteerCheckpoint.create({
                 data: {
                     volunteer_id: volunteer.id,
