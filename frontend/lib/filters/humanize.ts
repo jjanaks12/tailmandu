@@ -27,14 +27,8 @@ export const slugify = (text: string) => text.toLowerCase().trim()
     .replace(/^-+|-+$/g, '')
 
 export const fixDateTime = (date: string, time: string) => {
-    const [year, month, day] = date.split('-').map(Number)
-    const [hour, minute] = time.split(':').map(Number)
-
-    return momentTZ.utc()
-        .set('year', year)
-        .set('month', month - 1)
-        .set('date', day)
-        .set('hour', hour)
-        .set('minute', minute)
-        .toISOString()
+    return moment
+        .tz(`${date} ${time}`, "YYYY-M-D HH:mm", moment.tz.guess())
+        .utc()
+        .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
 }

@@ -8,6 +8,7 @@ import { useAppStore } from '~/store/app'
 import KVRLogo from '~/assets/images/kvr-summit-logo.png'
 import trailmanduLogo from '~/assets/images/logo.png'
 import { LoaderIcon, XIcon } from 'lucide-vue-next'
+import { getDuration, sortRunner } from '~/lib/filters/runner'
 
 definePageMeta({
     layout: 'simple'
@@ -23,21 +24,14 @@ const stageCategoryList = ref<StageCategory[]>([])
 const selectGender = ref<string>('')
 const selectStage = ref<StageCategory | null>(null)
 const isLoading = ref(false)
+const searchText = ref('')
 
-const updatedRunners = computed(() => {
-    return runners.value.sort((a, b) => {
-        const alastCheckpoint = a.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
-        const blastCheckpoint = b.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
-
-        if (alastCheckpoint && blastCheckpoint)
-            return moment(alastCheckpoint.timer).diff(moment(blastCheckpoint.timer))
-
-        if (alastCheckpoint && !blastCheckpoint)
-            return -1
-
-        return 1
-    })
-})
+const updatedRunners = computed(() => sortRunner(runners.value))
+const filteredRunners = computed(() => updatedRunners.value.filter((runner) =>
+    (runner.personal.first_name || '').toLowerCase().includes(searchText.value.toLowerCase())
+    || (runner.personal.last_name || '').toLowerCase().includes(searchText.value.toLowerCase())
+    || runner.bib.toString().includes(searchText.value))
+)
 
 const fetchStageCategory = async () => {
     const { data } = await axios.get(`/events/${route.params.stage_id as string}/stage_categories`)
@@ -71,25 +65,6 @@ const fetchRunnerList = async () => {
     runners.value = data
     isLoading.value = false
 }
-const adjustDateForTimezone = (date: Date) => {
-    // Get the timezone offset in minutes for the *current* system
-    const timezoneOffsetInMinutes = date.getTimezoneOffset();
-
-    // Create a new Date object (or modify the existing one) by adding the offset
-    // Using setMinutes() is a clean way to adjust the time.
-    date.setMinutes(date.getMinutes() + timezoneOffsetInMinutes);
-
-    return date;
-}
-
-const getDuration = (time: string, started_time: string) => {
-    const started = adjustDateForTimezone(new Date(started_time))
-    const now = new Date(moment.utc(time).local().toISOString())
-
-    // @ts-expect-error
-    const diff = now - started
-    return `${((diff / (1000 * 60 * 60)) % 60).toFixed(0)}:${((diff / (1000 * 60)) % 60).toFixed(0)}:${((diff / 1000) % 60).toFixed(0)}`
-}
 
 watch([selectGender, selectStage], fetchRunnerList)
 onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
@@ -97,7 +72,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
 
 <template>
     <section class="result__section bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]">
-        <header class="py-12 relative">
+        <header class="pt-12 pb-20 relative">
             <strong class="block block--left [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
                 v-if="selectStage">
                 {{ selectStage?.name }}
@@ -118,6 +93,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                 </div>
                 <div class="flex items-center justify-center gap-4 mb-4">
                     <LoaderIcon class="animate-spin" v-show="isLoading" />
+                    <Input v-model="searchText" placeholder="Search" />
                     <Select v-model="selectStage">
                         <SelectTrigger>
                             Distance:
@@ -156,7 +132,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="(runner, index) in updatedRunners" :key="runner.id">
+                    <TableRow v-for="(runner, index) in filteredRunners" :key="runner.id">
                         <TableCell>{{ index + 1 }}</TableCell>
                         <TableCell>{{ runner.bib }}</TableCell>
                         <TableCell>
@@ -167,7 +143,13 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                         <TableCell>{{ runner.personal.gender.name }}</TableCell>
                         <TableCell>{{ runner.personal.country.name }}</TableCell>
                         <TableCell>
-                            {{ getDuration(runner.volunteer_on_checkpoints[0]?.timer, selectStage?.start as string) }}
+                            {{ ['DISQUALIFIED', 'DID_NOT_FINISH'].includes(runner?.status?.status)
+                                ? runner?.status?.status
+                                : runner.volunteer_on_checkpoints.length > 0
+                                    ? runner.volunteer_on_checkpoints[0].checkpoint.is_end
+                                        ? getDuration(runner.volunteer_on_checkpoints[0]?.timer, selectStage?.start as string)
+                                        : ''
+                                    : 'N/A' }}
                         </TableCell>
                     </TableRow>
                 </TableBody>

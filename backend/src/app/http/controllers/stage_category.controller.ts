@@ -76,12 +76,12 @@ export class StageCategoryController {
             }
 
             if (validationData.start)
-                body.start = validationData.start
+                body.start = moment(validationData.start).utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]')
 
             if (validationData.end)
-                body.end = moment.utc(validationData.end, 'YYYY-MM-DD').endOf('day').toISOString()
+                body.end = moment(validationData.end, 'YYYY-MM-DD').endOf('day').utc().format('YYYY-MM-DD[T]HH:mm:ss.SSS[Z]')
 
-            response.send(await prisma.stageCategory.update({
+            const stageCategory = await prisma.stageCategory.update({
                 where: {
                     id: request.params.stage_category_id
                 },
@@ -96,7 +96,10 @@ export class StageCategoryController {
                     distance: validationData.distance,
                     bib_range: validationData.bib_range
                 }
-            }))
+            })
+
+            console.log(body, stageCategory);
+            response.send(stageCategory)
         } catch (error) {
             next(error)
         }

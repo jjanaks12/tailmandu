@@ -8,3 +8,6 @@ backend/src/resources/uploads/images/
 backend/src/resources/uploads/gpx/
 frontend/.nuxt
 frontend/.output
+
+my_database_backup.sql
+doc.md

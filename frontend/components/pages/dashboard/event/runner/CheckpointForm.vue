@@ -2,6 +2,7 @@
 import { LoaderIcon } from 'lucide-vue-next';
 import moment from 'moment';
 import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
+import { fixDateTime } from '~/lib/filters';
 import type { VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios';
 
@@ -17,9 +18,11 @@ const isLoading = ref(false)
 
 const handleSubmit = async (values: any) => {
     isLoading.value = true
+    const timer = fixDateTime(moment(props.checkpoint?.timer).format('YYYY-MM-DD'), values.timer)
+
     await axios.put(`/checkpoints/${props.checkpoint?.id}`, {
         runner_id: props.checkpoint?.runner_id,
-        ...values
+        timer
     })
     isLoading.value = false
     emit('update')
@@ -29,7 +32,7 @@ const init = () => {
     if (!props.checkpoint)
         return
 
-    const timer = moment.utc(props.checkpoint.timer).format('HH:mm:ss')
+    const timer = moment.utc(props.checkpoint.timer).local().format('HH:mm:ss')
 
     if (form.value)
         form.value.setValues({ timer })

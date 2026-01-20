@@ -94,7 +94,7 @@ export class CheckpointController {
                     }
                 })
 
-                await prisma.rank.delete({
+                await prisma.rank.deleteMany({
                     where: {
                         runner_id: volunteerCheckpoint.runner_id,
                         stage_category_id: stageCategory?.id
@@ -109,20 +109,7 @@ export class CheckpointController {
 
     public static async updateCheckpointEntryData(request: Request, response: Response, next: NextFunction) {
         try {
-            const volunteerCheckpoint = await prisma.volunteerCheckpoint.findFirst({
-                where: {
-                    id: request.params.checkpoint_id,
-                    runner_id: request.body.runner_id
-                }
-            })
-
-            const [hours, minutes, seconds] = request.body.timer.split(':')
-            const timer = moment.utc(volunteerCheckpoint.timer)
-            timer.set('hour', hours)
-            timer.set('minute', minutes)
-            timer.set('second', seconds)
-
-            console.log(timer.toISOString(), hours, minutes, seconds, request.body.timer);
+            const timer = moment(request.body.timer)
 
             response.send(await prisma.volunteerCheckpoint.update({
                 where: {

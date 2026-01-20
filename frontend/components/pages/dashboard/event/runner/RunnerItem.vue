@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronUpIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import moment from 'moment'
-import { formatDate, humanize } from '~/lib/filters'
+import { humanize } from '~/lib/filters'
+import { getDuration } from '~/lib/filters/runner'
 import type { EventRunner, VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
@@ -10,7 +11,7 @@ interface RunnerItemProps {
     runner: EventRunner
 }
 
-const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment', 'fetch'])
+const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment', 'fetch', 'edit'])
 const props = defineProps<RunnerItemProps>()
 const { axios } = useAxios()
 const { can } = useAuthorization()
@@ -23,11 +24,12 @@ const showDidNotFinishModal = ref<boolean>(false)
 const showEditDialog = ref(false)
 const checkpointData = ref<VolunteerCheckpoint | null>(null)
 const hasPayment = computed(() => props.runner.payments.length > 0)
+const activeRunner = computed(() => !['DISQUALIFIED', 'DID_NOT_FINISH'].includes(props.runner?.status?.status))
 const classList = computed(() => (props.rank
     ? {
-        'bg-primary/50 hover:bg-primary/50': props.rank == 1,
-        'bg-primary/30 hover:bg-primary/30': props.rank == 2,
-        'bg-primary/10 hover:bg-primary/10': props.rank == 3
+        'bg-primary/50 hover:bg-primary/50': props.rank == 1 && activeRunner.value,
+        'bg-primary/30 hover:bg-primary/30': props.rank == 2 && activeRunner.value,
+        'bg-primary/10 hover:bg-primary/10': props.rank == 3 && activeRunner.value
     }
     : {}))
 
@@ -37,26 +39,6 @@ const deleteRunner = async () => {
     await axios.delete(`/runners/${props.runner.id}`)
     emit('fetch')
     showDeleteModal.value = false
-}
-const adjustDateForTimezone = (date: Date) => {
-    // Get the timezone offset in minutes for the *current* system
-    const timezoneOffsetInMinutes = date.getTimezoneOffset();
-
-    // Create a new Date object (or modify the existing one) by adding the offset
-    // Using setMinutes() is a clean way to adjust the time.
-    date.setMinutes(date.getMinutes() + timezoneOffsetInMinutes);
-
-    return date;
-}
-
-const getDuration = (time: string, started_time: string, isUtc = true) => {
-    const started = isUtc ? adjustDateForTimezone(new Date(started_time)) : new Date(started_time)
-    // const started = new Date(isUtc ? moment.utc(started_time).toISOString() : started_time)
-    const now = new Date(isUtc ? moment.utc(time).toISOString() : time)
-
-    // @ts-expect-error
-    const diff = now - started
-    return `${(Math.floor(diff / (1000 * 60 * 60))) % 24}:${(Math.floor(diff / (1000 * 60))) % 60}:${(Math.floor(diff / 1000)) % 60}`
 }
 
 const deleteCheckpointEntryData = async () => {
@@ -87,7 +69,7 @@ const didNotFinishRunner = async () => {
         <TableCell>
             <ChevronUpIcon class="inline-block vertical-align-middle" @click="showTiming = !showTiming"
                 v-if="runner.volunteer_on_checkpoints?.length > 0" />
-            {{ rank }}
+            {{ activeRunner && rank ? rank : '' }}
         </TableCell>
         <TableCell>
             <em class="not-italic block">#BIB: {{ runner.bib }}</em>
@@ -147,7 +129,10 @@ const didNotFinishRunner = async () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuItem class="text-gray-500" @click="emit('show:runner')">
-                        See runner details
+                        See details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem class="text-yellow-500" @click="emit('edit')">
+                        Edit details
                     </DropdownMenuItem>
                     <template v-if="runner.payments.length > 0 && runner.payments[0].status != 'COMPLETED'">
                         <DropdownMenuItem class="text-gray-500" @click="emit('show:payment')" v-if="hasPayment">
@@ -193,7 +178,7 @@ const didNotFinishRunner = async () => {
                 <TableHeader>
                     <TableRow>
                         <TableCell>Checkpoint</TableCell>
-                        <TableCell>Time</TableCell>
+                        <TableCell>Split time</TableCell>
                         <TableCell>Duration</TableCell>
                         <TableCell class="text-right">Action</TableCell>
                     </TableRow>
@@ -207,8 +192,7 @@ const didNotFinishRunner = async () => {
                             {{ getDuration(record?.timer,
                                 index === runner.volunteer_on_checkpoints.length - 1
                                     ? runner.stage_category.start
-                                    : runner.volunteer_on_checkpoints[index + 1].timer,
-                                index === runner.volunteer_on_checkpoints.length - 1) }}
+                                    : runner.volunteer_on_checkpoints[index + 1].timer) }}
                         </TableCell>
                         <TableCell>
                             {{ getDuration(record?.timer, runner.stage_category.start) }}

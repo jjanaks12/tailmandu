@@ -71,13 +71,14 @@ model AgeCategory {
 }
 
 model Checkpoint {
-  id         String    @id @default(cuid())
-  name       String
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-  deleted_at DateTime?
-  is_start   Boolean   @default(false)
-  is_end     Boolean   @default(false)
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+  is_start    Boolean   @default(false)
+  is_end      Boolean   @default(false)
 
   stage_category_id String
   stage_category    StageCategory @relation(fields: [stage_category_id], references: [id], onDelete: Cascade)
@@ -501,6 +502,7 @@ model VolunteerCheckpoint {
   runner        EventRunner @relation(fields: [runner_id], references: [id], onDelete: Cascade)
   checkpoint_id String
   checkpoint    Checkpoint  @relation(fields: [checkpoint_id], references: [id], onDelete: Cascade)
+  created_at    DateTime    @default(now())
 
   @@map("volunteer_on_checkpoints")
 }

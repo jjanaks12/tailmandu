@@ -56,8 +56,7 @@ export class RunnerController {
                     personal: {
                         gender_id: request.query.gender as string
                     },
-                    payments: paymentFilter,
-                    status: request.query.show_all ? undefined : null
+                    payments: paymentFilter
                 },
                 include: {
                     personal: {
@@ -265,16 +264,50 @@ export class RunnerController {
 
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
+            const personalData: any = {}
+            const runnerData: any = {}
+            const bibExists = await prisma.eventRunner.findFirst({
+                where: {
+                    bib: request.body.bib,
+                    stage_category_id: request.body.stage_category_id
+                }
+            })
+
+            if (bibExists && bibExists.id !== request.params.runner_id)
+                throw createHttpError(409, `Bib: ${request.body.bib} already exists`)
+            else
+                runnerData.bib = request.body.bib
+
             const runner = await prisma.eventRunner.update({
                 where: {
                     id: request.params.runner_id
                 },
                 data: {
+                    ...runnerData,
                     stage_category_id: String(request.body.stage_category_id),
                     want_lunch: request.body.description.want_lunch ?? false,
                     club_name: request.body.description.club_name,
                     emergency_contact_name: request.body.description.emergency_contact_name,
                     emergency_contact_no: request.body.description.emergency_contact_phone,
+                }
+            })
+
+            if (request.body.date_of_birth)
+                personalData.date_of_birth = moment(request.body.date_of_birth, "YYYY-MM-DD").toISOString()
+
+            await prisma.personal.update({
+                where: {
+                    id: runner.personal_id
+                },
+                data: {
+                    ...personalData,
+                    first_name: request.body.first_name,
+                    middle_name: request.body.middle_name,
+                    last_name: request.body.last_name,
+                    phone_number: request.body.phone_number,
+                    gender_id: request.body.gender_id,
+                    country_id: request.body.country_id,
+                    email: request.body.email
                 }
             })
             response.send(runner)

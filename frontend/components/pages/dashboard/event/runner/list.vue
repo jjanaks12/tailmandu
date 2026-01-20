@@ -11,6 +11,7 @@ import { showImage } from '~/lib/filters'
 import { toast } from 'vue-sonner'
 import bibCard from './bibCard.vue'
 import { useAppStore } from '~/store/app'
+import { sortRunner } from '~/lib/filters/runner'
 
 interface RunnerListProps {
     stages: Stage[]
@@ -26,6 +27,8 @@ const isLoading = ref(false)
 const runnerDetailDialog = ref(false)
 const printDialog = ref(false)
 const runnerPaymentDialog = ref(false)
+const showRunnerEdit = ref(false)
+
 const runners = ref<EventRunner[]>([])
 const stageID = ref<string | null>(null)
 const paymentStatusOpt = ref<PaymentStatus | null>(null)
@@ -37,20 +40,7 @@ const stageCategoryID = ref<string | null>(null)
 const selectedRunner = ref<EventRunner | null>(null)
 const { genders } = storeToRefs(useAppStore())
 
-const updatedRunners = computed(() => {
-    return runners.value.sort((a, b) => {
-        const alastCheckpoint = a.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
-        const blastCheckpoint = b.volunteer_on_checkpoints.find(checkpoint => checkpoint.checkpoint.is_end)
-
-        if (alastCheckpoint && blastCheckpoint)
-            return moment(alastCheckpoint.timer).diff(moment(blastCheckpoint.timer))
-
-        if (alastCheckpoint && !blastCheckpoint)
-            return -1
-
-        return 1
-    })
-})
+const updatedRunners = computed(() => sortRunner(runners.value))
 
 onKeyStroke(['command', '/'], () => {
     nextTick(() => {
@@ -80,7 +70,6 @@ const fetch = async () => {
         })
         runners.value = data
         isLoading.value = false
-        console.clear();
     }
 }
 
@@ -233,7 +222,9 @@ onUnmounted(() => {
                     <RunnerItem v-for="(runner, index) in updatedRunners" :runner="runner"
                         @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                         @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
-                        @updated:payment="updatePaymentStatus" @fetch="fetch" :rank="index + 1" />
+                        @updated:payment="updatePaymentStatus" @fetch="fetch"
+                        :rank="runner.volunteer_on_checkpoints.length > 0 ? index + 1 : 0"
+                        @edit="showRunnerEdit = true; selectedRunner = runner" />
                     <TableRow v-if="runners.length === 0">
                         <TableCell colspan="5">
                             <span class="text-center block p-3 text-gray-500 bg-accent rounded">
@@ -384,4 +375,14 @@ onUnmounted(() => {
     <ClientOnly>
         <bibCard v-model:show="printDialog" :stageID="stageID" :runners="runners" />
     </ClientOnly>
+    <Dialog :open="showRunnerEdit" @update:open="showRunnerEdit = false; selectedRunner = null">
+        <DialogContent class="sm:max-w-[900px]">
+            <DialogHeader>
+                <DialogTitle>Edit {{ selectedRunner?.personal.first_name }}</DialogTitle>
+                <DialogDescription>You can change runners detail from here.</DialogDescription>
+            </DialogHeader>
+            <PagesDashboardEventRunnerForm :runner="selectedRunner" :stageList="stages"
+                @updated="fetch(); showRunnerEdit = false; selectedRunner = null" />
+        </DialogContent>
+    </Dialog>
 </template>

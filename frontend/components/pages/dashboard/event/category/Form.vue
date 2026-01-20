@@ -97,14 +97,14 @@ onMounted(() => {
             if (props.category.start) {
                 form.value.setFieldValue('start', props.category.start)
 
-                const start = moment.utc(props.category.start, 'YYYY-MM-DDTHH:mm.Z')
+                const start = moment.utc(props.category.start, 'YYYY-MM-DDTHH:mm.Z').local()
                 startDate.value = parseDate(start.format('YYYY-MM-DD'))
                 startTime.value = start.format('HH:mm')
             }
             if (props.category.end) {
                 form.value.setFieldValue('end', props.category.end)
 
-                const end = moment.utc(props.category.end, 'YYYY-MM-DDTHH:mm.Z')
+                const end = moment.utc(props.category.end, 'YYYY-MM-DDTHH:mm.Z').local()
                 endDate.value = parseDate(end.format('YYYY-MM-DD'))
             }
         }
