@@ -29,7 +29,7 @@ onMounted(() => {
 
 <template>
     <HomeBanner />
-    <Newsletter />
-    <!-- Sponsors -->
-    <!-- footer -->
+    <PagesDefaultHomeRegisterForRunner />
+    <!-- <Newsletter /> -->
+    <!-- <Sponsors /> -->
 </template>

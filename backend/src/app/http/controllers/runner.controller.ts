@@ -435,6 +435,20 @@ export class RunnerController {
         }
     }
 
+    public static async getByEmail(request: Request, response: Response, next: NextFunction) {
+        try {
+            const personal = await prisma.personal.findFirst({
+                where: {
+                    email: request.params.email
+                }
+            })
+
+            response.send(personal)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async delete(request: Request, response: Response, next: NextFunction) {
         try {
             await prisma.$transaction(async (prisma) => {

@@ -13,6 +13,7 @@ import type { Payment, TrailRace } from "~/lib/types"
 import { useEventStore } from "~/store/event"
 import moment from "moment"
 import { showImage } from '@/lib/filters'
+import { useAxios } from "~/services/axios"
 
 interface RegistrationFormProps {
     eventId: string
@@ -24,6 +25,7 @@ const props = defineProps<RegistrationFormProps>()
 const { countries, genders, company } = storeToRefs(useAppStore())
 const { saveVoluteer, saveRunner } = useEventStore()
 const route = useRoute()
+const { axios } = useAxios()
 
 const form = ref<FormContext<any> | null>(null)
 const isLoading = ref(false)
@@ -76,11 +78,18 @@ const handleFileChange = (event: Event) => {
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
     setTimeout(() => {
         if (route.query.stage_id)
             form.value?.setFieldValue('stage_id', route.query.stage_id)
+
     }, 1000)
+
+    if (route.query.email) {
+        const pastRecord = await axios.get(`/runners/get_by_email/${route.query.email}`)
+
+        console.log(pastRecord)
+    }
 })
 </script>
 

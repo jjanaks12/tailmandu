@@ -7,6 +7,7 @@ const router = Router()
 
 router.get('/', [verifyAccessToken], RunnerController.stageCategoryList)
 router.get('/:runner_id', [verifyAccessToken], RunnerController.get)
+router.get('/get_by_email/:email', RunnerController.getByEmail)
 router.put('/:runner_id', [verifyAccessToken], RunnerController.update)
 router.delete('/:runner_id', [verifyAccessToken], RunnerController.delete)
 router.put('/:runner_id/disqualify', [verifyAccessToken], RunnerController.disqualify)
