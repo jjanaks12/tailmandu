@@ -32,7 +32,7 @@ const init = () => {
     if (!props.checkpoint)
         return
 
-    const timer = moment.utc(props.checkpoint.timer).local().format('HH:mm:ss')
+    const timer = moment.utc(props.checkpoint.timer).local().add(1, 'seconds').format('HH:mm:ss')
 
     if (form.value)
         form.value.setValues({ timer })

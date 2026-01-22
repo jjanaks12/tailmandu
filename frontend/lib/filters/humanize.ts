@@ -1,5 +1,4 @@
 import moment from "moment"
-import momentTZ from "moment-timezone"
 
 export const humanize = (str: string) => str
     .replace(/^[\s_]+|[\s_]+$/g, '')
@@ -28,7 +27,7 @@ export const slugify = (text: string) => text.toLowerCase().trim()
 
 export const fixDateTime = (date: string, time: string) => {
     return moment
-        .tz(`${date} ${time}`, "YYYY-M-D HH:mm", moment.tz.guess())
+        .tz(`${date} ${time}`, "YYYY-M-D HH:mm:ss", moment.tz.guess())
         .utc()
         .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
 }
