@@ -9,7 +9,7 @@ import { User, Mail, Phone, Calendar, Users, Flag, Target, Loader2, XIcon, InfoI
 import DatePicker from "@/components/DatePicker.vue"
 import { useAppStore } from "~/store/app"
 import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
-import type { Payment, TrailRace } from "~/lib/types"
+import type { Payment, Personal, TrailRace } from "~/lib/types"
 import { useEventStore } from "~/store/event"
 import moment from "moment"
 import { showImage } from '@/lib/filters'
@@ -86,9 +86,18 @@ onMounted(async () => {
     }, 1000)
 
     if (route.query.email) {
-        const pastRecord = await axios.get(`/runners/get_by_email/${route.query.email}`)
+        const { data: pastRecord } = await axios.get<Personal>(`/runners/get_by_email/${route.query.email}`)
 
-        console.log(pastRecord)
+        if (pastRecord) {
+            form.value?.setValues({
+                first_name: pastRecord.first_name,
+                last_name: pastRecord.last_name,
+                email: pastRecord.email,
+                phone_number: pastRecord.phone_number,
+                gender_id: pastRecord.gender_id,
+                country_id: pastRecord.country_id,
+            })
+        }
     }
 })
 </script>

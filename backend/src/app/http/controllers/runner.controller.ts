@@ -440,6 +440,9 @@ export class RunnerController {
             const personal = await prisma.personal.findFirst({
                 where: {
                     email: request.params.email
+                },
+                include: {
+                    runners: true
                 }
             })
 
