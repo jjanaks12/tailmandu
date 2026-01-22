@@ -242,8 +242,8 @@ export class RunnerController {
                 stage: stageCategory.stage,
                 stageCategory: {
                     ...stageCategory,
-                    start: moment.utc(stageCategory.start).format('DD-MM-YYYY hh:mm a'),
-                    end: moment.utc(stageCategory.end).format('DD-MM-YYYY hh:mm a')
+                    start: moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a'),
+                    end: moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
                 },
                 links: {
                     event: 'http://race.trailmandu.com'

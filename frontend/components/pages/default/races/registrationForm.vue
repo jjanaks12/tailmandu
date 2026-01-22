@@ -4,7 +4,8 @@ import { Form, Field, ErrorMessage, type FormContext } from "vee-validate"
 import { parseDate } from "@internationalized/date"
 import { storeToRefs } from "pinia"
 import type { SubmissionHandler } from "vee-validate"
-import { User, Mail, Phone, Calendar, Users, Flag, Target, Loader2, XIcon, InfoIcon } from "lucide-vue-next"
+import { User, Mail, Phone, Calendar, Users, Flag, Target, Loader2, XIcon, InfoIcon, LoaderIcon } from "lucide-vue-next"
+import * as Y from 'yup'
 
 import DatePicker from "@/components/DatePicker.vue"
 import { useAppStore } from "~/store/app"
@@ -26,9 +27,12 @@ const { countries, genders, company } = storeToRefs(useAppStore())
 const { saveVoluteer, saveRunner } = useEventStore()
 const route = useRoute()
 const { axios } = useAxios()
+const pastRecord = ref<Personal | null>(null)
 
+const hasEnteredEmail = ref(false)
 const form = ref<FormContext<any> | null>(null)
 const isLoading = ref(false)
+const isLoadingCheckEmail = ref(false)
 const showThankyouDialog = ref(false)
 const showLiabilitiesDialog = ref(false)
 const showPoliciesDialog = ref(false)
@@ -78,34 +82,85 @@ const handleFileChange = (event: Event) => {
     }
 }
 
-onMounted(async () => {
-    setTimeout(() => {
+const checkEmail = async (email: string) => {
+    isLoadingCheckEmail.value = true
+    const { data } = await axios.get<Personal>(`/runners/get_by_email/${email}`)
+    pastRecord.value = data
+
+    if (!data) {
+        nextTick(() => {
+            form.value?.setFieldValue('email', email)
+        })
+    }
+    isLoadingCheckEmail.value = false
+}
+
+const formSubmitEmailCheck = (values: any) => {
+    checkEmail(values.email)
+}
+
+watch(pastRecord, () => {
+    if (pastRecord.value) {
+        setTimeout(() => {
+            form.value?.setFieldValue('date_of_birth', moment(pastRecord.value?.date_of_birth).format('YYYY-MM-DD'))
+
+            form.value?.setValues({
+                first_name: pastRecord.value?.first_name,
+                last_name: pastRecord.value?.last_name,
+                email: pastRecord.value?.email,
+                phone_number: pastRecord.value?.phone_number,
+                gender_id: pastRecord.value?.gender_id,
+                country_id: pastRecord.value?.country_id,
+                description: {
+                    club_name: pastRecord.value?.runners[0]?.club_name,
+                    emergency_contact_name: pastRecord.value?.runners[0]?.emergency_contact_name,
+                    emergency_contact_phone: pastRecord.value?.runners[0]?.emergency_contact_no,
+                }
+            })
+        }, 1000)
+    }
+
+    hasEnteredEmail.value = true
+})
+
+onMounted(() => {
+    nextTick(() => {
         if (route.query.stage_id)
             form.value?.setFieldValue('stage_id', route.query.stage_id)
 
-    }, 1000)
-
-    if (route.query.email) {
-        const { data: pastRecord } = await axios.get<Personal>(`/runners/get_by_email/${route.query.email}`)
-
-        if (pastRecord) {
-            form.value?.setValues({
-                first_name: pastRecord.first_name,
-                last_name: pastRecord.last_name,
-                email: pastRecord.email,
-                phone_number: pastRecord.phone_number,
-                gender_id: pastRecord.gender_id,
-                country_id: pastRecord.country_id,
-            })
+        if (route.query.email) {
+            checkEmail(route.query.email as string)
         }
-    }
+    })
 })
 </script>
 
 <template>
     <section class="max-w-4xl mx-auto md:p-6 space-y-8" v-if="stageList.length > 0">
+        <div v-if="pastRecord">
+            <h2 class="text-2xl font-semibold">Hi {{ pastRecord?.first_name }},</h2>
+            <p>Welcome back, I hope you had good experience with last race. I hope you would enjoy this one as well.</p>
+        </div>
+        <Form v-else-if="!pastRecord && !hasEnteredEmail && !route.query.email"
+            :validation-schema="Y.object({ email: Y.string().email().required() })" @submit="formSubmitEmailCheck"
+            class="bg-white px-8 py-6 rounded-3xl border border-gray-200 shadow-sm space-y-8">
+            <div>
+                <h2>Hello there,</h2>
+                <p>First we would like to have your email</p>
+            </div>
+            <Field name="email" v-slot="{ field }" as="div">
+                <Input type="email" v-bind="field" placeholder="Enter your email" />
+                <ErrorMessage name="email" />
+            </Field>
+            <div class="text-right">
+                <Button type="submit" :disabled="isLoadingCheckEmail">
+                    <LoaderIcon class="animate-spin" v-if="isLoadingCheckEmail" />
+                    Check email
+                </Button>
+            </div>
+        </Form>
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values, setFieldValue }" @submit="onSubmit">
+            v-slot="{ values, setFieldValue }" @submit="onSubmit" v-if="hasEnteredEmail">
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
