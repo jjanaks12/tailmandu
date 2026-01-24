@@ -7,6 +7,7 @@ import moment from "moment"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
 import createHttpError from "http-errors"
+import ical, { ICalCalendarMethod } from "ical-generator"
 
 const prisma = new PrismaClient()
 export class RunnerController {
@@ -177,13 +178,12 @@ export class RunnerController {
                 where: {
                     event_id: eventId,
                     stage_id: validationData.stage_id,
-                    stage_category_id: validationData.stage_category_id,
                     personal_id: personal.id
                 }
             })
 
-            /* if (runner)
-                throw createHttpError(409, `Runner with email: ${personal.email} already exists`) */
+            if (runner)
+                throw createHttpError(409, `You have already registered for this event`)
 
             const [min] = stageCategory.bib_range.split('-')
             const bib = (Number(min) + (event.runners.length + 1)).toString().padStart(3, '0')
@@ -225,6 +225,19 @@ export class RunnerController {
                     method: validationData.payment_method
                 }
             })
+            const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
+            const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
+
+            const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
+            calendar.method(ICalCalendarMethod.REQUEST)
+            calendar.createEvent({
+                start: new Date(stageCategory.start),
+                end: new Date(stageCategory.end),
+                summary: stageCategory.excerpt,
+                description: stageCategory.description,
+                location: stageCategory.location,
+                url: `http://race.trailmandu.com/races/${event.slug}/stage/${stageCategory.stage.id}`
+            })
 
             await sendEmail('welcome', {
                 title: 'Thank you for signing up for race',
@@ -240,11 +253,7 @@ export class RunnerController {
                     emergency_contact_no: validationData.description.emergency_contact_phone,
                 },
                 stage: stageCategory.stage,
-                stageCategory: {
-                    ...stageCategory,
-                    start: moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a'),
-                    end: moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
-                },
+                stageCategory: { ...stageCategory, start, end },
                 links: {
                     event: 'http://race.trailmandu.com'
                 }
@@ -254,7 +263,12 @@ export class RunnerController {
                     name: validationData.first_name,
                 }],
                 subject: 'Welcome to Trailmandu'
-            }, 'info@trailmandu.com')
+            }, 'info@trailmandu.com', [{
+                content: Buffer.from(calendar.toString()),
+                filename: `${stageCategory.stage.name} - ${stageCategory.name}.ics`,
+                type: "text/calendar; charset=UTF-8; method=REQUEST",
+                disposition: 'attachment'
+            }], 'event')
 
             response.send(payment)
         } catch (error) {

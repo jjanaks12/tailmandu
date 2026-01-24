@@ -1,4 +1,4 @@
-import { Address, MailtrapClient } from "mailtrap"
+import { Address, Attachment, MailtrapClient } from "mailtrap"
 import { promises as fs } from "fs"
 import Handlebars from "handlebars"
 
@@ -12,7 +12,7 @@ export const useMailTrap = () => {
         token: process.env.MAILTRAP_TOKEN,
     })
 
-    const sendEmail = async (fileName: string, replacements: Record<string, any>, props: SendEmailProps, senderEmail?: string) => {
+    const sendEmail = async (fileName: string, replacements: Record<string, any>, props: SendEmailProps, senderEmail?: string, attachments?: Attachment[], category?: string) => {
         const filePath = `${process.cwd()}/src/resources/views/email/${fileName}.html`
         const source = await fs.readFile(filePath, 'utf-8')
         const template = Handlebars.compile(source)
@@ -27,6 +27,8 @@ export const useMailTrap = () => {
                 to: props.recipients,
                 subject: props.subject,
                 html: HTMLToSend,
+                attachments,
+                category
             })
         } catch (error) {
             throw error

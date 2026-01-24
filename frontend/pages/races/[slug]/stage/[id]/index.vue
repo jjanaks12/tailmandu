@@ -55,6 +55,12 @@ onBeforeMount(init)
             <div class="space-y-4 mb-6">
                 <div class="space-y-4" v-for="stageCategory in stage.stage_categories">
                     <strong class="block">Overview: {{ stageCategory.name }}</strong>
+                    <dl class="[&>dt]:font-semibold [&>dd]:text-gray-500 [&>dd]:pl-2">
+                        <dt>Start:</dt>
+                        <dd>{{ moment.utc(stageCategory.start).local().format('DD, MMM YYYY hh:mm a') }}</dd>
+                        <dt>End:</dt>
+                        <dd>{{ moment.utc(stageCategory.end).local().format('DD, MMM YYYY hh:mm a') }}</dd>
+                    </dl>
                     <div class="leading-7 content_editor" v-html="stageCategory.description" />
                 </div>
             </div>
