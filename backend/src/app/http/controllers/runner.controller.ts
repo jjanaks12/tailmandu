@@ -124,7 +124,11 @@ export class RunnerController {
             const stageCategory = await prisma.stageCategory.findFirst({
                 where: { id: validationData.stage_category_id },
                 include: {
-                    stage: true
+                    stage: {
+                        include: {
+                            event: true
+                        }
+                    }
                 }
             })
 
