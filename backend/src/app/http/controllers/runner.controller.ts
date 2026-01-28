@@ -150,7 +150,27 @@ export class RunnerController {
                         phone_number: validationData.phone_number,
                         // age_category_id: validationData.age_category_id,
                         country_id: validationData.country_id,
-                        // size_id: validationData.size_id,
+                        size_id: validationData.size_id,
+                        gender_id: validationData.gender_id
+                    },
+                    include: {
+                        gender: true,
+                        country: true
+                    }
+                })
+            else
+                personal = await prisma.personal.update({
+                    where: { id: personal.id },
+                    data: {
+                        ...body,
+                        first_name: validationData.first_name,
+                        middle_name: validationData.middle_name,
+                        last_name: validationData.last_name,
+                        email: validationData.email,
+                        phone_number: validationData.phone_number,
+                        // age_category_id: validationData.age_category_id,
+                        country_id: validationData.country_id,
+                        size_id: validationData.size_id,
                         gender_id: validationData.gender_id
                     },
                     include: {
@@ -203,7 +223,7 @@ export class RunnerController {
                     club_name: validationData.description.club_name,
                     emergency_contact_name: validationData.description.emergency_contact_name,
                     emergency_contact_no: validationData.description.emergency_contact_phone,
-                    // shirt_id: validationData.size_id
+                    shirt_id: validationData.size_id
                 }
             })
 
@@ -325,7 +345,8 @@ export class RunnerController {
                     phone_number: request.body.phone_number,
                     gender_id: request.body.gender_id,
                     country_id: request.body.country_id,
-                    email: request.body.email
+                    email: request.body.email,
+                    size_id: request.body.size_id
                 }
             })
             response.send(runner)

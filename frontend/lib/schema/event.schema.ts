@@ -36,8 +36,8 @@ export const trailRaceRunner = Y.object({
     date_of_birth: Y.string().required().label("Date of birth"),
     country_id: Y.string().required().label("Country"),
     gender_id: Y.string().required().label("Gender"),
-    /* size_id: Y.string().required().label("Shirt size"),
-    age_category_id: Y.string().required().label("Age category"), */
+    size_id: Y.string().required().label("Shirt size"),
+    /* age_category_id: Y.string().required().label("Age category"), */
     payment_type: Y.string().oneOf(paymentTypes).required().label("Payment type"),
     payment_method: Y.string().oneOf(paymentMethods).required().label("Payment method"),
     payment_screenshot: Y.string()/*.when('payment_method', {

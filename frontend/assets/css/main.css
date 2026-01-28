@@ -176,7 +176,7 @@
   display: none;
 }
 
-form [role=alert] {
+form .error__message {
   @apply text-destructive text-sm;
 }
 

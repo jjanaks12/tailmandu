@@ -23,7 +23,7 @@ interface RegistrationFormProps {
 }
 
 const props = defineProps<RegistrationFormProps>()
-const { countries, genders, company } = storeToRefs(useAppStore())
+const { countries, genders, company, shirtSizes } = storeToRefs(useAppStore())
 const { saveVoluteer, saveRunner } = useEventStore()
 const route = useRoute()
 const { axios } = useAxios()
@@ -150,7 +150,7 @@ onMounted(() => {
             </div>
             <Field name="email" v-slot="{ field }" as="div">
                 <Input type="email" v-bind="field" placeholder="Enter your email" />
-                <ErrorMessage name="email" />
+                <ErrorMessage class="error__message" name="email" />
             </Field>
             <div class="text-right">
                 <Button type="submit" :disabled="isLoadingCheckEmail">
@@ -188,7 +188,7 @@ onMounted(() => {
                             </Label>
                             <Input id="rf__first_name" v-bind="field" placeholder="Enter your first name"
                                 autocomplete="given-name" class="h-12 text-base" />
-                            <ErrorMessage name="first_name" />
+                            <ErrorMessage class="error__message" name="first_name" />
                         </Field>
 
                         <Field name="middle_name" as="div" v-slot="{ field }" class="space-y-2">
@@ -197,7 +197,7 @@ onMounted(() => {
                             </Label>
                             <Input id="rf__middle_name" v-bind="field" placeholder="Middle name"
                                 class="h-12 text-base" />
-                            <ErrorMessage name="middle_name" />
+                            <ErrorMessage class="error__message" name="middle_name" />
                         </Field>
 
                         <Field name="last_name" as="div" v-slot="{ field }" class="space-y-2">
@@ -206,7 +206,7 @@ onMounted(() => {
                             </Label>
                             <Input id="rf__last_name" v-bind="field" placeholder="Enter your last name"
                                 autocomplete="family-name" class="h-12 text-base" />
-                            <ErrorMessage name="last_name" />
+                            <ErrorMessage class="error__message" name="last_name" />
                         </Field>
                     </div>
 
@@ -219,7 +219,7 @@ onMounted(() => {
                             </Label>
                             <Input id="rf__email" type="email" v-bind="field" placeholder="your.email@example.com"
                                 autocomplete="email" class="h-12 text-base" />
-                            <ErrorMessage name="email" />
+                            <ErrorMessage class="error__message" name="email" />
                         </Field>
 
                         <Field name="phone_number" as="div" v-slot="{ field }" class="space-y-2">
@@ -229,7 +229,7 @@ onMounted(() => {
                             </Label>
                             <Input type="tel" v-bind="field" placeholder="xxxxxxxxxx" autocomplete="tel"
                                 class="h-12 text-base" />
-                            <ErrorMessage name="phone_number" />
+                            <ErrorMessage class="error__message" name="phone_number" />
                         </Field>
                     </div>
 
@@ -243,12 +243,12 @@ onMounted(() => {
                             <DatePicker Label="Select your birth date"
                                 :model-value="field.value ? parseDate(field.value as string) : undefined"
                                 @update:model-value="$event ? field.onChange($event.toString()) : undefined" />
-                            <ErrorMessage name="date_of_birth" />
+                            <ErrorMessage class="error__message" name="date_of_birth" />
                         </Field>
                     </div>
 
                     <!-- Demographics -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <Field name="country_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Flag :size="16" class="text-gray-400" />
@@ -269,7 +269,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="country_id" />
+                            <ErrorMessage class="error__message" name="country_id" />
                         </Field>
 
                         <Field name="gender_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
@@ -287,10 +287,10 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="gender_id" />
+                            <ErrorMessage class="error__message" name="gender_id" />
                         </Field>
 
-                        <!-- <Field name="size_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
+                        <Field name="size_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                 <Shirt :size="16" class="text-gray-400" />
                                 Shirt size
@@ -305,8 +305,8 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="size_id" />
-                        </Field> -->
+                            <ErrorMessage class="error__message" name="size_id" />
+                        </Field>
 
                         <!-- <Field name="age_category_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                             <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -324,7 +324,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="age_category_id" />
+                            <ErrorMessage class="error__message" name="age_category_id" />
                         </Field> -->
                     </div>
                     <div class="flex gap-2 md:gap-4">
@@ -344,7 +344,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="stage_id" />
+                            <ErrorMessage class="error__message" name="stage_id" />
                         </Field>
                         <Field name="stage_category_id" as="div" v-slot="{ value, handleChange }"
                             class="w-1/2 space-y-2" v-if="mode === 'runner'">
@@ -364,7 +364,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="stage_category_id" />
+                            <ErrorMessage class="error__message" name="stage_category_id" />
                         </Field>
                     </div>
                     <template v-if="mode == 'runner'">
@@ -375,7 +375,7 @@ onMounted(() => {
                             </Label>
                             <Input v-bind="field" id="rf__description.club_name"
                                 placeholder="Name of club you belong to" />
-                            <ErrorMessage name="description.club_name" />
+                            <ErrorMessage class="error__message" name="description.club_name" />
                         </Field>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <Field name="description.emergency_contact_name" as="div" v-slot="{ field }"
@@ -385,7 +385,7 @@ onMounted(() => {
                                     Emergency contact name
                                 </Label>
                                 <Input v-bind="field" placeholder="In case of emergency" />
-                                <ErrorMessage name="description.emergency_contact_name" />
+                                <ErrorMessage class="error__message" name="description.emergency_contact_name" />
                             </Field>
                             <Field name="description.emergency_contact_phone" as="div" v-slot="{ field }"
                                 class="space-y-2">
@@ -394,7 +394,7 @@ onMounted(() => {
                                     Emergency contact phone
                                 </Label>
                                 <Input v-bind="field" placeholder="In case of emergency" />
-                                <ErrorMessage name="description.emergency_contact_phone" />
+                                <ErrorMessage class="error__message" name="description.emergency_contact_phone" />
                             </Field>
                         </div>
                         <Field name="description.want_lunch" as="div" v-slot="{ value, handleChange }"
@@ -409,7 +409,7 @@ onMounted(() => {
                                         registration fee.</em>
                                 </div>
                             </Label>
-                            <ErrorMessage name="description.want_lunch" />
+                            <ErrorMessage class="error__message" name="description.want_lunch" />
                         </Field>
                     </template>
                 </div>
@@ -463,11 +463,15 @@ onMounted(() => {
                             </div>
                         </div>
                         <label
-                            class="flex items-center gap-2 rounded-lg overflow-hidden border border-gray-200 relative">
-                            <input type="file" @change="handleFileChange" class="hidden" />
+                            class="flex items-center gap-2 rounded-lg overflow-hidden border border-gray-200 relative"
+                            :class="{
+                                'border-red-500 text-red-500': form?.errors?.payment_method,
+                                'border-green-500 text-green-500': !form?.errors?.payment_method
+                            }">
+                            <input type="file" @change="handleFileChange" class="hidden" accept=".jpg,.jpeg,.png" />
                             <figure v-if="values?.payment_screenshot">
                                 <img :src="values?.payment_screenshot" alt="Payment screenshot"
-                                    class="max-w-full h-auto" />
+                                    class="max-w-full h-auto p-2" />
                                 <Button type="button" class="absolute top-2 right-2"
                                     @click="form?.setFieldValue('payment_screenshot', '')">
                                     <XIcon class="w-6 h-6" />
@@ -480,7 +484,7 @@ onMounted(() => {
                         </label>
                     </div>
                 </div>
-                <ErrorMessage name="payment_method" />
+                <ErrorMessage class="error__message" name="payment_method" />
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
@@ -496,7 +500,7 @@ onMounted(() => {
                             </NuxtLink>
                             to my own action.
                         </label>
-                        <ErrorMessage name="liabilities" />
+                        <ErrorMessage class="error__message" name="liabilities" />
                     </Field>
                     <Field name="policies" as="div" v-slot="{ value, handleChange }">
                         <Checkbox :model-value="value"
@@ -509,7 +513,7 @@ onMounted(() => {
                             </NuxtLink>
                             mentioned.
                         </label>
-                        <ErrorMessage name="policies" />
+                        <ErrorMessage class="error__message" name="policies" />
                     </Field>
                 </div>
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-6">

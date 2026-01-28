@@ -126,7 +126,7 @@ onBeforeMount(() => {
                     class="absolute top-1/2 right-2 -translate-y-1/2">
                     <XIcon />
                 </Button>
-                <ErrorMessage name="thumbnail" />
+                <ErrorMessage class="error__message" name="thumbnail" />
             </div>
         </template>
         <Field name="event_id" v-slot="{ field }" as="div" class="flex flex-col gap-2">
@@ -138,17 +138,17 @@ onBeforeMount(() => {
         <Field name="name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Label for="esf__name">Name</Label>
             <Input v-bind="field" id="esf__name" />
-            <ErrorMessage name="name" />
+            <ErrorMessage class="error__message" name="name" />
         </Field>
         <Field name="excerpt" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Label for="esf__excerpt">Excerpt</Label>
             <Textarea v-bind="field" id="esf__excerpt" />
-            <ErrorMessage name="excerpt" />
+            <ErrorMessage class="error__message" name="excerpt" />
         </Field>
         <Field name="location" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Label for="esf__location">Location</Label>
             <Input v-bind="field" id="esf__location" />
-            <ErrorMessage name="location" />
+            <ErrorMessage class="error__message" name="location" />
         </Field>
         <Field name="description" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
             <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange" :disabled="false"

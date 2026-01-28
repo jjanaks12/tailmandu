@@ -8,11 +8,11 @@ import { TShritSizeSeed } from "./t_shirt_sizes.seed"
 
 const prisma = new PrismaClient()
 const main = async () => {
-    await countrySeed(prisma)
+    /* await countrySeed(prisma)
     await roleSeed(prisma)
     await genderSeed(prisma)
     await ageCategorySeed(prisma)
-    await TShritSizeSeed(prisma)
+    await TShritSizeSeed(prisma) */
 }
 
 main()

@@ -1,30 +1,30 @@
 <script lang="ts" setup>
-    import { KeyRound, Loader, User } from 'lucide-vue-next'
-    import { Form, Field, ErrorMessage } from 'vee-validate'
+import { KeyRound, Loader, User } from 'lucide-vue-next'
+import { Form, Field, ErrorMessage } from 'vee-validate'
 
-    import { userLoginSchema } from '~/lib/schema/user.schema'
-    import { useAuthStore } from '~/store/auth'
-    useHead({
-        title: 'Login'
-    })
+import { userLoginSchema } from '~/lib/schema/user.schema'
+import { useAuthStore } from '~/store/auth'
+useHead({
+    title: 'Login'
+})
 
-    definePageMeta({
-        layout: 'simple'
-    })
+definePageMeta({
+    layout: 'simple'
+})
 
-    const route = useRoute()
-    const { login } = useAuthStore()
-    const { isLoggedin, isLoading } = storeToRefs(useAuthStore())
-    const form = ref()
+const route = useRoute()
+const { login } = useAuthStore()
+const { isLoggedin, isLoading } = storeToRefs(useAuthStore())
+const form = ref()
 
-    const signIn = async (formData: any) => {
-        await login(formData, route.query.redirect_from as string)
-    }
+const signIn = async (formData: any) => {
+    await login(formData, route.query.redirect_from as string)
+}
 
-    onMounted(() => {
-        if (isLoggedin.value)
-            navigateTo('/dashboard')
-    })
+onMounted(() => {
+    if (isLoggedin.value)
+        navigateTo('/dashboard')
+})
 </script>
 
 <template>
@@ -42,7 +42,7 @@
                     <User class="mt-3" />
                     <div class="flex-grow">
                         <Input v-bind="field" placeholder="Email" id="lf__email" autocomplete="email" />
-                        <ErrorMessage name="email" />
+                        <ErrorMessage class="error__message" name="email" />
                     </div>
                 </div>
             </Field>
@@ -53,7 +53,7 @@
                     <div class="flex-grow">
                         <Input type="password" v-bind="field" placeholder="Password" id="lf__password"
                             autocomplete="current-password" />
-                        <ErrorMessage name="password" />
+                        <ErrorMessage class="error__message" name="password" />
                     </div>
                 </div>
             </Field>

@@ -3,9 +3,9 @@ import bg01 from '@/assets/images/bg-01.png'
 </script>
 
 <template>
-    <section class="relative overflow-hidden z-[1]">
+    <section class="bg-[#d8d8d8] relative overflow-hidden z-[1]">
         <figure class="absolute inset-0 z-[-1]">
-            <img :src="bg01" class="w-full h-full object-cover filter-[contrast(.5)]" />
+            <!-- <img :src="bg01" class="w-full h-full object-cover filter-[contrast(.5)]" /> -->
         </figure>
         <div class="container text-[#13304a] py-[100px]">
             <ul

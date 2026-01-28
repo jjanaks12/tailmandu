@@ -331,6 +331,10 @@ onUnmounted(() => {
                         <strong>Email</strong>
                         <span>{{ selectedRunner?.personal.email }}</span>
                     </div>
+                    <div class="flex justify-between" v-if="selectedRunner?.personal?.size">
+                        <strong>T-shirt size</strong>
+                        <span>{{ selectedRunner?.personal?.size?.name }}</span>
+                    </div>
                     <div class="flex justify-between">
                         <strong>Stage category</strong>
                         <span>{{ selectedRunner?.stage_category?.name }}</span>

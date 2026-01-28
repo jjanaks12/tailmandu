@@ -1,36 +1,36 @@
 <script lang="ts" setup>
-    import type { AxiosError, AxiosResponse } from 'axios'
-    import { LoaderIcon } from 'lucide-vue-next'
-    import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
-    import { newsletterSchema } from '~/lib/schema/site.schema'
-    import { useAxios } from '~/services/axios'
+import type { AxiosError, AxiosResponse } from 'axios'
+import { LoaderIcon } from 'lucide-vue-next'
+import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
+import { newsletterSchema } from '~/lib/schema/site.schema'
+import { useAxios } from '~/services/axios'
 
-    const { axios } = useAxios()
-    const form = ref<FormContext | null>(null)
+const { axios } = useAxios()
+const form = ref<FormContext | null>(null)
 
-    const isLoading = ref(false)
-    const hasFormSubmitted = ref(false)
-    const message = ref('')
+const isLoading = ref(false)
+const hasFormSubmitted = ref(false)
+const message = ref('')
 
-    const submitHandler = async (values: any) => {
-        isLoading.value = true
-        const { status } = await axios.post('/newsletter', values)
-        isLoading.value = false
+const submitHandler = async (values: any) => {
+    isLoading.value = true
+    const { status } = await axios.post('/newsletter', values)
+    isLoading.value = false
 
-        if (status === 200)
-            hasFormSubmitted.value = true
+    if (status === 200)
+        hasFormSubmitted.value = true
+}
+
+watchEffect(() => {
+    if (hasFormSubmitted.value) {
+        setTimeout(() => {
+            if (form.value)
+                form.value.resetForm()
+
+            hasFormSubmitted.value = false
+        }, 10000)
     }
-
-    watchEffect(() => {
-        if (hasFormSubmitted.value) {
-            setTimeout(() => {
-                if (form.value)
-                    form.value.resetForm()
-
-                hasFormSubmitted.value = false
-            }, 10000)
-        }
-    })
+})
 </script>
 
 <template>
@@ -46,7 +46,7 @@
                     <Field name="email" v-slot="{ field }" as="div" class="relative grow">
                         <Label for="nf__email" class="sr-only">Your email</Label>
                         <Input v-bind="field" id="nf__email" placeholder="Your email: xxx@xxxx.xxx" />
-                        <ErrorMessage name="email" class="absolute top-full left-0" />
+                        <ErrorMessage name="email" class="error__message absolute top-full left-0" />
                     </Field>
                     <Button type="submit" size="lg" :disabled="isLoading">
                         <LoaderIcon v-if="isLoading" />

@@ -45,7 +45,7 @@ onMounted(init)
     <Form @submit="handleSubmit" class="space-y-4" ref="form">
         <Field name="timer" as="div" class="flex flex-col gap-2" v-slot="{ field }">
             <Input v-bind="field" type="time" />
-            <ErrorMessage name="timer" />
+            <ErrorMessage class="error__message" name="timer" />
         </Field>
         <div class="text-right">
             <Button type="submit" :disabled="isLoading">

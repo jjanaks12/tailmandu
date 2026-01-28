@@ -22,15 +22,12 @@ const sizeList = {
 </script>
 
 <template>
-    <div :class="{
-        'flex items-center gap-2 py-[3px]': true,
-        'text-xs': size == 'sm'
-    }">
-        <Avatar :class="`size-[${sizeList[size]}]`">
+    <div class="flex items-center gap-2 py-[3px]" :class="{ 'text-xs': size == 'sm' }">
+        <Avatar class="aspect-square shrink-0" :style="{ 'max-width': sizeList[size] }">
             <AvatarImage :src="avatar" class="object-cover" />
             <AvatarFallback>{{ abbr(fullName) }}</AvatarFallback>
         </Avatar>
-        <div class="max-w-[calc(100%-60px)]">
+        <div :style="{ 'max-width': `calc(100% - ${sizeList[size]})` }">
             <strong class="block truncate">{{ fullName || appName }}</strong>
             <Badge variant="secondary" v-if="size != 'sm'">{{ role || 'user' }}</Badge>
             <slot />

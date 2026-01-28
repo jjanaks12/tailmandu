@@ -95,17 +95,17 @@ onMounted(init)
         <Field name="name" v-slot="{ field }" class="flex flex-col gap-1" as="div">
             <Label for="cf__name">Name of company</Label>
             <Input v-bind="field" id="cf__name" autocomplete="off" />
-            <ErrorMessage name="name" />
+            <ErrorMessage class="error__message" name="name" />
         </Field>
         <Field name="short_name" v-slot="{ field }" class="flex flex-col gap-1" as="div">
             <Label for="cf__short_name">Company short name</Label>
             <Input v-bind="field" id="cf__short_name" autocomplete="off" />
-            <ErrorMessage name="short_name" />
+            <ErrorMessage class="error__message" name="short_name" />
         </Field>
         <Field name="email" v-slot="{ field }" class="flex flex-col gap-1" as="div">
             <Label for="cf__email">Email address</Label>
             <Input type="email" v-bind="field" id="cf__email" autocomplete="off" />
-            <ErrorMessage name="email" />
+            <ErrorMessage class="error__message" name="email" />
         </Field>
         <fieldset class="flex flex-col gap-4">
             <legend>Company Address</legend>
@@ -114,14 +114,14 @@ onMounted(init)
                     <Field as="div" name="address.address" v-slot="{ field }" class="flex flex-col gap-2">
                         <Label for="cf__address">Address</Label>
                         <Input id="cf__address" v-bind="field" max="16" />
-                        <ErrorMessage name="address.address" />
+                        <ErrorMessage class="error__message" name="address.address" />
                     </Field>
                 </div>
                 <div class="w-1/2">
                     <Field as="div" name="address.street" v-slot="{ field }" class="flex flex-col gap-2">
                         <Label for="cf__street">Street name</Label>
                         <Input id="cf__street" v-bind="field" />
-                        <ErrorMessage name="address.street" />
+                        <ErrorMessage class="error__message" name="address.street" />
                     </Field>
                 </div>
             </div>
@@ -130,21 +130,21 @@ onMounted(init)
                     <Field as="div" name="address.city" v-slot="{ field }" class="flex flex-col gap-2">
                         <Label for="cf__city">City</Label>
                         <Input id="cf__city" v-bind="field" max="16" />
-                        <ErrorMessage name="address.city" />
+                        <ErrorMessage class="error__message" name="address.city" />
                     </Field>
                 </div>
                 <div class="w-1/3">
                     <Field as="div" name="address.zipCode" v-slot="{ field }" class="flex flex-col gap-2">
                         <Label for="cf__zipCode">Zip code</Label>
                         <Input id="cf__zipCode" v-bind="field" max="16" />
-                        <ErrorMessage name="address.zipCode" />
+                        <ErrorMessage class="error__message" name="address.zipCode" />
                     </Field>
                 </div>
                 <div class="w-1/3">
                     <Field as="div" name="address.state" v-slot="{ field }" class="flex flex-col gap-2">
                         <Label for="cf__state">State</Label>
                         <Input id="cf__state" v-bind="field" max="16" />
-                        <ErrorMessage name="address.state" />
+                        <ErrorMessage class="error__message" name="address.state" />
                     </Field>
                 </div>
                 <div class="w-1/3">
@@ -161,7 +161,7 @@ onMounted(init)
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <ErrorMessage name="address.countryId" />
+                        <ErrorMessage class="error__message" name="address.countryId" />
                     </Field>
                 </div>
             </div>
@@ -169,28 +169,28 @@ onMounted(init)
         <Field name="phone" v-slot="{ field }" class="flex flex-col gap-1" as="div">
             <Label for="cf__phone">Phone</Label>
             <Input type="text" v-bind="field" id="cf__phone" autocomplete="off" />
-            <ErrorMessage name="phone" />
+            <ErrorMessage class="error__message" name="phone" />
         </Field>
         <Field name="vat_registered" v-slot="{ handleChange, value }">
             <Label class="flex gap-2">
                 <Checkbox :model-value="value" :default-value="false" @update:model-value="handleChange" />
                 <span>Is your company registered on VAT?</span>
             </Label>
-            <ErrorMessage name="vat_registered" />
+            <ErrorMessage class="error__message" name="vat_registered" />
         </Field>
         <div class="flex gap-4">
             <div class="w-1/2">
                 <Field name="vat_no" v-slot="{ field }" class="flex flex-col gap-1" as="div">
                     <Label for="cf__vat">VAT - Value Added Tax</Label>
                     <Input type="text" v-bind="field" id="cf__vat" autocomplete="off" />
-                    <ErrorMessage name="vat_no" />
+                    <ErrorMessage class="error__message" name="vat_no" />
                 </Field>
             </div>
             <div class="w-1/2">
                 <Field name="pan_no" v-slot="{ field }" class="flex flex-col gap-1" as="div">
                     <Label for="cf__pan">PAN - Permanent Address Number</Label>
                     <Input type="text" v-bind="field" id="cf__pan" autocomplete="off" />
-                    <ErrorMessage name="pan_no" />
+                    <ErrorMessage class="error__message" name="pan_no" />
                 </Field>
             </div>
         </div>

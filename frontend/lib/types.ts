@@ -75,6 +75,7 @@ export type Personal = {
     runners: EventRunner[]
     volunteers: Volunteer[]
     checkpoints: Checkpoint[]
+    size: TShirtSize
 }
 
 export type AgeCategory = {

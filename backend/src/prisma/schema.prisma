@@ -153,8 +153,8 @@ model EventRunner {
   stage_category    StageCategory @relation(fields: [stage_category_id], references: [id], onDelete: Cascade)
   stage_id          String
   stage             Stage         @relation(fields: [stage_id], references: [id], onDelete: Cascade)
-  // shirt_id          String
-  // tshirt_size       Size          @relation(fields: [shirt_id], references: [id], onDelete: Cascade)
+  shirt_id          String
+  tshirt_size       Size          @relation(fields: [shirt_id], references: [id], onDelete: Cascade)
 
   checkpoints              Checkpoint[]
   payments                 Payment[]
@@ -322,7 +322,7 @@ model Size {
   deleted_at  DateTime?
 
   Personal Personal[]
-  // runners  EventRunner[]
+  runners  EventRunner[]
 
   @@map("sizes")
 }
@@ -443,12 +443,13 @@ model TrailRace {
 }
 
 model StageCategoryPayment {
-  id         String      @id @default(cuid())
-  amount     Decimal
-  created_at DateTime    @default(now())
-  updated_at DateTime?
-  deleted_at DateTime?
-  type       PaymentType
+  id          String      @id @default(cuid())
+  amount      Decimal
+  created_at  DateTime    @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+  type        PaymentType
+  description String?
 
   stage_category_id String
   stage_category    StageCategory @relation(fields: [stage_category_id], references: [id], onDelete: Cascade)

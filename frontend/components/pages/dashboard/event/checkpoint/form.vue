@@ -64,7 +64,7 @@ onBeforeUnmount(reset)
         <Field name="name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Label for="esf__name">Name</Label>
             <Input v-bind="field" id="esf__name" />
-            <ErrorMessage name="name" />
+            <ErrorMessage class="error__message" name="name" />
         </Field>
         <Field name="is_start" type="checkbox" v-slot="{ handleChange, value }" as="div" class="flex gap-2"
             :unchecked-value="false" :value="true">

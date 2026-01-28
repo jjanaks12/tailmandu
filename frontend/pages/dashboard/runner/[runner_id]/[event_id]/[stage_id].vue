@@ -109,7 +109,7 @@ onMounted(init)
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <ErrorMessage name="stage_id" />
+                <ErrorMessage class="error__message" name="stage_id" />
             </Field>
             <Field name="stage_category_id" as="div" v-slot="{ value, handleChange }" class="space-y-2">
                 <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -127,7 +127,7 @@ onMounted(init)
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <ErrorMessage name="stage_category_id" />
+                <ErrorMessage class="error__message" name="stage_category_id" />
             </Field>
             <Field name="description.club_name" as="div" v-slot="{ field }" class="space-y-2">
                 <Label for="rf__description.club_name"
@@ -135,7 +135,7 @@ onMounted(init)
                     Club name
                 </Label>
                 <Input v-bind="field" id="rf__description.club_name" placeholder="Name of club you belong to" />
-                <ErrorMessage name="description.club_name" />
+                <ErrorMessage class="error__message" name="description.club_name" />
             </Field>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Field name="description.emergency_contact_name" as="div" v-slot="{ field }" class="space-y-2">
@@ -144,7 +144,7 @@ onMounted(init)
                         Emergency contact name
                     </Label>
                     <Input v-bind="field" placeholder="In case of emergency" />
-                    <ErrorMessage name="description.emergency_contact_name" />
+                    <ErrorMessage class="error__message" name="description.emergency_contact_name" />
                 </Field>
                 <Field name="description.emergency_contact_phone" as="div" v-slot="{ field }" class="space-y-2">
                     <Label id="rf__emergency_contact_phone"
@@ -152,7 +152,7 @@ onMounted(init)
                         Emergency contact phone
                     </Label>
                     <Input v-bind="field" placeholder="In case of emergency" />
-                    <ErrorMessage name="description.emergency_contact_phone" />
+                    <ErrorMessage class="error__message" name="description.emergency_contact_phone" />
                 </Field>
             </div>
             <Field name="description.want_lunch" as="div" v-slot="{ value, handleChange }" class="space-y-2">
@@ -165,7 +165,7 @@ onMounted(init)
                             registration fee.</em>
                     </div>
                 </Label>
-                <ErrorMessage name="description.want_lunch" />
+                <ErrorMessage class="error__message" name="description.want_lunch" />
             </Field>
             <div class="text-right">
                 <Button variant="secondary" type="submit" class="w-full sm:w-auto px-8 py-3 h-12 text-base font-medium "

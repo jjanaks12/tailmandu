@@ -123,12 +123,12 @@ onMounted(() => {
         <Field name="name" as="div" class="flex flex-col gap-1" v-slot="{ field }">
             <Label for="scf__name">Name</Label>
             <Input v-bind="field" />
-            <ErrorMessage name="name" />
+            <ErrorMessage class="error__message" name="name" />
         </Field>
         <Field name="excerpt" as="div" class="flex flex-col gap-1" v-slot="{ field }">
             <Label for="scf__excerpt">Short description</Label>
             <Textarea v-bind="field" />
-            <ErrorMessage name="excerpt" />
+            <ErrorMessage class="error__message" name="excerpt" />
         </Field>
         <div class="flex flex-wrap gap-4">
             <div class="w-2/4 flex flex-col gap-2">
@@ -142,13 +142,13 @@ onMounted(() => {
                         <Input name="start_time" type="time" v-model="startTime" />
                     </div>
                 </div>
-                <ErrorMessage name="start" />
+                <ErrorMessage class="error__message" name="start" />
             </div>
             <Field name="end" as="div" class="grow flex flex-col gap-2">
                 <Label>End Date</Label>
                 <DatePicker label="End date" :min-value="startDate" :model-value="endDate"
                     @update:model-value="(end_date) => endDate = end_date" />
-                <ErrorMessage name="end" />
+                <ErrorMessage class="error__message" name="end" />
             </Field>
             <Field name="difficulty" v-slot="{ field }" as="div" class="w-1/4 flex flex-col gap-2">
                 <Label for="ef__difficulty">Difficulty</Label>
@@ -162,28 +162,28 @@ onMounted(() => {
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <ErrorMessage name="difficulty" />
+                <ErrorMessage class="error__message" name="difficulty" />
             </Field>
             <Field name="distance" v-slot="{ field }" as="div" class="w-1/4 flex flex-col gap-2">
                 <Label for="ef__distance">Distance</Label>
                 <Input v-bind="field" id="ef__distance" />
-                <ErrorMessage name="distance" />
+                <ErrorMessage class="error__message" name="distance" />
             </Field>
             <Field name="bib_range" v-slot="{ field }" as="div" class="w-2/4 flex flex-col gap-2">
                 <Label for="ef__bib_range">BIB Range</Label>
                 <Input v-bind="field" id="ef__bib_range" />
-                <ErrorMessage name="bib_range" />
+                <ErrorMessage class="error__message" name="bib_range" />
             </Field>
         </div>
         <Field name="location" as="div" class="flex flex-col gap-1" v-slot="{ field }">
             <Label for="scf__location">Location</Label>
             <Input v-bind="field" />
-            <ErrorMessage name="location" />
+            <ErrorMessage class="error__message" name="location" />
         </Field>
         <Field name="description" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
             <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange" :disabled="false"
                 :timer="1000" />
-            <ErrorMessage name="description" />
+            <ErrorMessage class="error__message" name="description" />
         </Field>
         <div class="flex flex-col gap-2 relative">
             <template v-if="!showFile.map">
@@ -197,7 +197,7 @@ onMounted(() => {
                 }" size="icon" modifier="outline" class="absolute top-1/2 right-2 -translate-y-1/2" v-if="GPXFilename">
                     <XIcon />
                 </Button>
-                <ErrorMessage name="map" />
+                <ErrorMessage class="error__message" name="map" />
             </template>
             <Dialog v-else>
                 <DialogTrigger as-child>

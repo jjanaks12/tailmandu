@@ -1,42 +1,42 @@
 <script lang="ts" setup>
-    import { LoaderIcon } from 'lucide-vue-next'
-    import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
+import { LoaderIcon } from 'lucide-vue-next'
+import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
 
-    import { humanize } from '~/lib/filters'
-    import { roleSchema } from '~/lib/schema/role.schema'
-    import type { Role } from '~/lib/types'
-    import { usePermissionStore } from '~/store/permission'
-    import { useRoleStore } from '~/store/role'
+import { humanize } from '~/lib/filters'
+import { roleSchema } from '~/lib/schema/role.schema'
+import type { Role } from '~/lib/types'
+import { usePermissionStore } from '~/store/permission'
+import { useRoleStore } from '~/store/role'
 
-    interface RoleFormProps {
-        role?: Role | null
+interface RoleFormProps {
+    role?: Role | null
+}
+
+const props = defineProps<RoleFormProps>()
+const { permissions } = storeToRefs(usePermissionStore())
+const { save } = useRoleStore()
+const emit = defineEmits(['update'])
+
+const form = ref<FormContext>()
+const isLoading = ref(false)
+
+const formSubmit = (values: any) => {
+    isLoading.value = true
+    save(values)
+    isLoading.value = false
+    emit('update')
+}
+
+onMounted(() => {
+    if (form.value && props.role) {
+        form.value.setFieldValue('id', props.role?.id)
+        form.value.setFieldValue('name', props.role?.name)
+        form.value.setFieldValue('description', props.role?.description || '')
+
+        if (props.role?.permissions && props.role?.permissions.length > 0)
+            form.value.setFieldValue('permissions', props.role.permissions.map(permission => permission.id))
     }
-
-    const props = defineProps<RoleFormProps>()
-    const { permissions } = storeToRefs(usePermissionStore())
-    const { save } = useRoleStore()
-    const emit = defineEmits(['update'])
-
-    const form = ref<FormContext>()
-    const isLoading = ref(false)
-
-    const formSubmit = (values: any) => {
-        isLoading.value = true
-        save(values)
-        isLoading.value = false
-        emit('update')
-    }
-
-    onMounted(() => {
-        if (form.value && props.role) {
-            form.value.setFieldValue('id', props.role?.id)
-            form.value.setFieldValue('name', props.role?.name)
-            form.value.setFieldValue('description', props.role?.description || '')
-
-            if (props.role?.permissions && props.role?.permissions.length > 0)
-                form.value.setFieldValue('permissions', props.role.permissions.map(permission => permission.id))
-        }
-    })
+})
 </script>
 
 <template>
@@ -46,7 +46,7 @@
             <div class="flex gap-2">
                 <div class="flex-grow">
                     <Input type="text" v-bind="field" placeholder="Name" id="rf__name" />
-                    <ErrorMessage name="name" />
+                    <ErrorMessage class="error__message" name="name" />
                 </div>
             </div>
         </Field>
@@ -55,7 +55,7 @@
             <div class="flex gap-2">
                 <div class="flex-grow">
                     <Textarea type="text" v-bind="field" placeholder="Description" id="rf__description" />
-                    <ErrorMessage name="description" />
+                    <ErrorMessage class="error__message" name="description" />
                 </div>
             </div>
         </Field>
@@ -66,7 +66,7 @@
                     :model-value="value?.includes(permission.id)" />
                 <Label :for="permission.id">{{ humanize(permission.name) }}</Label>
             </Field>
-            <ErrorMessage name="permissions" />
+            <ErrorMessage class="error__message" name="permissions" />
         </div>
         <div class="text-right">
             <Button variant="secondary" type="submit" class="w-[180px]" :disabled="isLoading">

@@ -71,7 +71,7 @@ onMounted(init)
                 <Field name="amount" v-slot="{ field }" as="div" class="space-y-2">
                     <label for="pf__amount">Amount</label>
                     <Input v-bind="field" id="pf__amount" />
-                    <ErrorMessage name="amount" />
+                    <ErrorMessage class="error__message" name="amount" />
                 </Field>
                 <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2" v-if="!payment">
                     <label for="pf__type">Payment Type</label>
@@ -85,7 +85,7 @@ onMounted(init)
                             </SelectItem>
                         </SelectContent>
                     </Select>
-                    <ErrorMessage name="type" />
+                    <ErrorMessage class="error__message" name="type" />
                 </Field>
             </div>
             <div class="w-1/2">
@@ -98,7 +98,7 @@ onMounted(init)
                         <strong class="text-lg block">Upload image</strong>
                     </div>
                 </label>
-                <ErrorMessage name="image" />
+                <ErrorMessage class="error__message" name="image" />
             </div>
         </div>
         <div class="text-right">

@@ -98,7 +98,7 @@ onMounted(() => {
                         <div class="flex-grow">
                             <Input type="text" v-bind="field" placeholder="First name" id="lf__first_name"
                                 autocomplete="given-name" />
-                            <ErrorMessage name="first_name" />
+                            <ErrorMessage class="error__message" name="first_name" />
                         </div>
                     </div>
                 </Field>
@@ -110,7 +110,7 @@ onMounted(() => {
                         <IdCard class="mt-3" />
                         <div class="flex-grow">
                             <Input type="text" v-bind="field" placeholder="Middle name" id="lf__middle_name" />
-                            <ErrorMessage name="middle_name" />
+                            <ErrorMessage class="error__message" name="middle_name" />
                         </div>
                     </div>
                 </Field>
@@ -123,7 +123,7 @@ onMounted(() => {
                         <div class="flex-grow">
                             <Input type="text" v-bind="field" placeholder="Last name" id="lf__last_name"
                                 autocomplete="given-name" />
-                            <ErrorMessage name="last_name" />
+                            <ErrorMessage class="error__message" name="last_name" />
                         </div>
                     </div>
                 </Field>
@@ -138,7 +138,7 @@ onMounted(() => {
                         <div class="flex-grow">
                             <Input type="email" v-bind="field" placeholder="Email" id="lf__email"
                                 autocomplete="email" />
-                            <ErrorMessage name="email" />
+                            <ErrorMessage class="error__message" name="email" />
                         </div>
                     </div>
                 </Field>
@@ -151,7 +151,7 @@ onMounted(() => {
                         <div class="flex-grow">
                             <Input type="text" v-bind="field" placeholder="Phone number" id="lf__phone_number"
                                 autocomplete="mobile" />
-                            <ErrorMessage name="phone_number" />
+                            <ErrorMessage class="error__message" name="phone_number" />
                         </div>
                     </div>
                 </Field>
@@ -164,7 +164,7 @@ onMounted(() => {
                 <div class="flex-grow">
                     <DatePicker label="Date of Birth" :model-value="dateOfBirth"
                         @update:model-value="(dob) => dateOfBirth = dob" />
-                    <ErrorMessage name="date_of_birth" />
+                    <ErrorMessage class="error__message" name="date_of_birth" />
                 </div>
             </div>
         </Field>
@@ -184,7 +184,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="gender_id" />
+                            <ErrorMessage class="error__message" name="gender_id" />
                         </div>
                     </div>
                 </Field>
@@ -205,7 +205,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="country_id" />
+                            <ErrorMessage class="error__message" name="country_id" />
                         </div>
                     </div>
                 </Field>
@@ -227,7 +227,7 @@ onMounted(() => {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
-                            <ErrorMessage name="age_category_id" />
+                            <ErrorMessage class="error__message" name="age_category_id" />
                         </div>
                     </div>
                 </Field>

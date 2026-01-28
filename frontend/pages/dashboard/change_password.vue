@@ -1,22 +1,22 @@
 <script lang="ts" setup>
-    import { KeyRound, Loader } from 'lucide-vue-next'
-    import { Form, Field, ErrorMessage } from 'vee-validate'
+import { KeyRound, Loader } from 'lucide-vue-next'
+import { Form, Field, ErrorMessage } from 'vee-validate'
 
-    import { userChangePasswordSchema } from '~/lib/schema/user.schema'
-    import { useAuthStore } from '~/store/auth'
+import { userChangePasswordSchema } from '~/lib/schema/user.schema'
+import { useAuthStore } from '~/store/auth'
 
-    useHead({
-        title: 'Change password'
-    })
+useHead({
+    title: 'Change password'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: ['*']
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['*']
+})
 
-    const { changePassword } = useAuthStore()
-    const { isLoading } = storeToRefs(useAuthStore())
+const { changePassword } = useAuthStore()
+const { isLoading } = storeToRefs(useAuthStore())
 </script>
 
 <template>
@@ -33,7 +33,7 @@
                 <div class="flex-grow">
                     <Input type="password" v-bind="field" placeholder="Old password" id="lf__old_password"
                         autocomplete="current-password" />
-                    <ErrorMessage name="old_password" />
+                    <ErrorMessage class="error__message" name="old_password" />
                 </div>
             </div>
         </Field>
@@ -44,7 +44,7 @@
                 <div class="flex-grow">
                     <Input type="password" v-bind="field" placeholder="Password" id="lf__password"
                         autocomplete="current-password" />
-                    <ErrorMessage name="password" />
+                    <ErrorMessage class="error__message" name="password" />
                 </div>
             </div>
         </Field>
@@ -55,7 +55,7 @@
                 <div class="flex-grow">
                     <Input type="password" v-bind="field" placeholder="Confirm password" id="lf__confirm_password"
                         autocomplete="current-password" />
-                    <ErrorMessage name="confirm_password" />
+                    <ErrorMessage class="error__message" name="confirm_password" />
                 </div>
             </div>
         </Field>

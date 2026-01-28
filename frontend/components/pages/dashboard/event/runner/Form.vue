@@ -66,23 +66,23 @@ onMounted(init)
         <Field name="bib" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <label for="bib" class="block text-sm font-medium text-gray-700">BIB#</label>
             <Input type="text" id="bib" v-bind="field" />
-            <ErrorMessage name="bib" />
+            <ErrorMessage class="error__message" name="bib" />
         </Field>
         <div class="grid grid-cols-3 gap-4">
             <Field name="first_name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="first_name" class="block text-sm font-medium text-gray-700">First name</label>
                 <Input type="text" id="first_name" v-bind="field" />
-                <ErrorMessage name="first_name" />
+                <ErrorMessage class="error__message" name="first_name" />
             </Field>
             <Field name="middle_name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="middle_name" class="block text-sm font-medium text-gray-700">Middle name</label>
                 <Input type="text" id="middle_name" v-bind="field" />
-                <ErrorMessage name="middle_name" />
+                <ErrorMessage class="error__message" name="middle_name" />
             </Field>
             <Field name="last_name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="last_name" class="block text-sm font-medium text-gray-700">Last name</label>
                 <Input type="text" id="last_name" v-bind="field" />
-                <ErrorMessage name="last_name" />
+                <ErrorMessage class="error__message" name="last_name" />
             </Field>
         </div>
         <div class="grid grid-cols-3 gap-4">
@@ -98,14 +98,14 @@ onMounted(init)
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <ErrorMessage name="gender_id" />
+                <ErrorMessage class="error__message" name="gender_id" />
             </Field>
             <Field name="date_of_birth" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="date_of_birth" class="block text-sm font-medium text-gray-700">Date of birth</label>
                 <DatePicker
                     :model-value="field.value ? parseDate(moment.utc(field.value as string).format('YYYY-MM-DD')) : undefined"
                     @update:model-value="$event ? field.onChange($event.toString()) : undefined" />
-                <ErrorMessage name="date_of_birth" />
+                <ErrorMessage class="error__message" name="date_of_birth" />
             </Field>
             <Field name="country_id" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
                 <label for="country_id" class="block text-sm font-medium text-gray-700">Country</label>
@@ -119,19 +119,19 @@ onMounted(init)
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <ErrorMessage name="country_id" />
+                <ErrorMessage class="error__message" name="country_id" />
             </Field>
         </div>
         <div class="grid grid-cols-2 gap-4">
             <Field name="phone_number" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone number</label>
                 <Input type="text" id="phone_number" v-bind="field" />
-                <ErrorMessage name="phone_number" />
+                <ErrorMessage class="error__message" name="phone_number" />
             </Field>
             <Field name="email" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                 <Input type="email" id="email" v-bind="field" />
-                <ErrorMessage name="email" />
+                <ErrorMessage class="error__message" name="email" />
             </Field>
         </div>
         <Field name="stage_category_id" as="div" v-slot="{ value, handleChange }" class="w-1/2 space-y-2">
@@ -150,25 +150,25 @@ onMounted(init)
                     </SelectItem>
                 </SelectContent>
             </Select>
-            <ErrorMessage name="stage_category_id" />
+            <ErrorMessage class="error__message" name="stage_category_id" />
         </Field>
         <Field name="description.club_name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <label for="description.club_name" class="block text-sm font-medium text-gray-700">Club name</label>
             <Input type="text" id="club_name" v-bind="field" />
-            <ErrorMessage name="description.club_name" />
+            <ErrorMessage class="error__message" name="description.club_name" />
         </Field>
         <div class="grid grid-cols-2 gap-4">
             <Field name="description.emergency_contact_name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="emergency_contact_name" class="block text-sm font-medium text-gray-700">Emergency contact
                     name</label>
                 <Input type="text" id="emergency_contact_name" v-bind="field" />
-                <ErrorMessage name="emergency_contact_name" />
+                <ErrorMessage class="error__message" name="emergency_contact_name" />
             </Field>
             <Field name="description.emergency_contact_phone" v-slot="{ field }" as="div" class="flex flex-col gap-2">
                 <label for="emergency_contact_phone" class="block text-sm font-medium text-gray-700">Emergency contact
                     phone</label>
                 <Input type="text" id="emergency_contact_phone" v-bind="field" />
-                <ErrorMessage name="emergency_contact_phone" />
+                <ErrorMessage class="error__message" name="emergency_contact_phone" />
             </Field>
         </div>
         <Field name="description.want_lunch" as="div" v-slot="{ value, handleChange }" class="space-y-2">
@@ -181,7 +181,7 @@ onMounted(init)
                         registration fee.</em>
                 </div>
             </Label>
-            <ErrorMessage name="description.want_lunch" />
+            <ErrorMessage class="error__message" name="description.want_lunch" />
         </Field>
         <div class="text-right">
             <Button type="submit">

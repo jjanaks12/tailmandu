@@ -23,6 +23,7 @@ const femaleRunners = computed(() => props.runners.filter((runner) => runner.per
                 <strong class="font-normal text-xs uppercase block opacity-35">Total</strong>
                 <em class="text-5xl not-italic">{{ runners.length }}</em>
             </div>
+            <Separator />
             <div class="text-blue-600">
                 <strong class="font-normal text-xs uppercase block opacity-35">National</strong>
                 <em class="text-5xl not-italic">{{ nationalRunners }}</em>
@@ -31,6 +32,7 @@ const femaleRunners = computed(() => props.runners.filter((runner) => runner.per
                 <strong class="font-normal text-xs uppercase block opacity-35">International</strong>
                 <em class="text-5xl not-italic">{{ internationalRunners }}</em>
             </div>
+            <Separator />
             <div class="text-indigo-600">
                 <strong class="font-normal text-xs uppercase block opacity-35">Male</strong>
                 <em class="text-5xl not-italic">{{ maleRunners }}</em>

@@ -71,12 +71,12 @@ onMounted(async () => {
         <Field name="name" v-slot="{ field }" as="div" class="space-y-2">
             <label for="name">Name</label>
             <Input type="text" id="name" v-bind="field" />
-            <ErrorMessage name="name" />
+            <ErrorMessage class="error__message" name="name" />
         </Field>
         <Field name="description" v-slot="{ field }" as="div" class="space-y-2">
             <label for="description">Description</label>
             <Input type="text" id="description" v-bind="field" />
-            <ErrorMessage name="description" />
+            <ErrorMessage class="error__message" name="description" />
         </Field>
         <Field name="type" v-slot="{ value, handleChange }" as="div" class="space-y-2">
             <label for="type">Type</label>
@@ -90,12 +90,12 @@ onMounted(async () => {
                     </SelectItem>
                 </SelectContent>
             </Select>
-            <ErrorMessage name="type" />
+            <ErrorMessage class="error__message" name="type" />
         </Field>
         <Field name="url" v-slot="{ field }" as="div" class="space-y-2">
             <label for="url">URL</label>
             <Input type="text" id="url" v-bind="field" />
-            <ErrorMessage name="url" />
+            <ErrorMessage class="error__message" name="url" />
         </Field>
         <div class="space-y-2">
             <label class="flex justify-center items-center p-3 border border-dashed border-gray-300 rounded-md">
@@ -105,7 +105,7 @@ onMounted(async () => {
                     <strong class="text-lg block">Upload image</strong>
                 </div>
             </label>
-            <ErrorMessage name="image" />
+            <ErrorMessage class="error__message" name="image" />
         </div>
         <div class="text-right">
             <Button variant="secondary" type="submit" :disabled="isLoading">

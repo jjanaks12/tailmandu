@@ -1,28 +1,28 @@
 <script lang="ts" setup>
-    import { KeyRound, Loader, User } from 'lucide-vue-next'
-    import { Form, Field, ErrorMessage } from 'vee-validate'
-    import { userRegisterSchema } from '~/lib/schema/user.schema'
-    import { useAuthStore } from '~/store/auth'
+import { KeyRound, Loader, User } from 'lucide-vue-next'
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import { userRegisterSchema } from '~/lib/schema/user.schema'
+import { useAuthStore } from '~/store/auth'
 
-    useHead({
-        title: 'Register'
-    })
+useHead({
+    title: 'Register'
+})
 
-    definePageMeta({
-        layout: 'simple'
-    })
-    const { register } = useAuthStore()
-    const { isLoggedin, isLoading } = storeToRefs(useAuthStore())
+definePageMeta({
+    layout: 'simple'
+})
+const { register } = useAuthStore()
+const { isLoggedin, isLoading } = storeToRefs(useAuthStore())
 
-    const signup = async (formData: any) => {
-        await register(formData)
-        navigateTo('/login')
-    }
+const signup = async (formData: any) => {
+    await register(formData)
+    navigateTo('/login')
+}
 
-    onMounted(() => {
-        if (isLoggedin.value)
-            navigateTo('/dashboard')
-    })
+onMounted(() => {
+    if (isLoggedin.value)
+        navigateTo('/dashboard')
+})
 </script>
 
 <template>
@@ -39,7 +39,7 @@
                     <User class="mt-3" />
                     <div class="flex-grow">
                         <Input v-bind="field" placeholder="Email" id="lf__email" autocomplete="email" />
-                        <ErrorMessage name="email" />
+                        <ErrorMessage class="error__message" name="email" />
                     </div>
                 </div>
             </Field>
@@ -50,7 +50,7 @@
                     <div class="flex-grow">
                         <Input type="password" v-bind="field" placeholder="Password" id="lf__password"
                             autocomplete="current-password" />
-                        <ErrorMessage name="password" />
+                        <ErrorMessage class="error__message" name="password" />
                     </div>
                 </div>
             </Field>
@@ -61,7 +61,7 @@
                     <div class="flex-grow">
                         <Input type="password" v-bind="field" placeholder="Confirm password" id="lf__confirm_password"
                             autocomplete="current-password" />
-                        <ErrorMessage name="confirm_password" />
+                        <ErrorMessage class="error__message" name="confirm_password" />
                     </div>
                 </div>
             </Field>

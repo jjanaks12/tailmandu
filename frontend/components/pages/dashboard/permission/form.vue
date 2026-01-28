@@ -45,12 +45,12 @@ onMounted(init)
         <Field as="div" name="name" v-slot="{ field }" class="space-y-2">
             <Label for="pf__name">Name</Label>
             <Input v-bind="field" id="pf__name" />
-            <ErrorMessage name="name" />
+            <ErrorMessage class="error__message" name="name" />
         </Field>
         <Field as="div" name="description" v-slot="{ field }" class="space-y-2">
             <Label for="pf__description">Description</Label>
             <Textarea v-bind="field" id="pf__description" />
-            <ErrorMessage name="description" />
+            <ErrorMessage class="error__message" name="description" />
         </Field>
         <div class="text-right">
             <Button variant="secondary" :disabled="isLoading">

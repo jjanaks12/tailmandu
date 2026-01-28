@@ -27,9 +27,12 @@ CREATE TABLE `age_categories` (
 CREATE TABLE `checkpoints` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
     `deleted_at` DATETIME(3) NULL,
+    `is_start` BOOLEAN NOT NULL DEFAULT false,
+    `is_end` BOOLEAN NOT NULL DEFAULT false,
     `stage_category_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -83,13 +86,17 @@ CREATE TABLE `event_runners` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NULL,
     `deleted_at` DATETIME(3) NULL,
+    `club_name` VARCHAR(191) NOT NULL DEFAULT '',
+    `emergency_contact_name` VARCHAR(191) NOT NULL DEFAULT '',
+    `emergency_contact_no` VARCHAR(191) NOT NULL DEFAULT '',
+    `want_lunch` BOOLEAN NOT NULL DEFAULT false,
     `personal_id` VARCHAR(191) NOT NULL,
     `event_id` VARCHAR(191) NOT NULL,
     `stage_category_id` VARCHAR(191) NOT NULL,
     `stage_id` VARCHAR(191) NOT NULL,
-    `sizeId` VARCHAR(191) NULL,
+    `shirt_id` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `event_runners_bib_key`(`bib`),
+    UNIQUE INDEX `event_runners_bib_stage_category_id_key`(`bib`, `stage_category_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -355,7 +362,33 @@ CREATE TABLE `volunteer_on_checkpoints` (
     `volunteer_id` VARCHAR(191) NOT NULL,
     `runner_id` VARCHAR(191) NOT NULL,
     `checkpoint_id` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `event_runner_status` (
+    `id` VARCHAR(191) NOT NULL,
+    `status` ENUM('DID_NOT_FINISH', 'DISQUALIFIED', 'ACTIVE') NOT NULL DEFAULT 'ACTIVE',
+    `runner_id` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `event_runner_status_runner_id_key`(`runner_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ranks` (
+    `id` VARCHAR(191) NOT NULL,
+    `position` INTEGER NOT NULL,
+    `runner_id` VARCHAR(191) NOT NULL,
+    `stage_category_id` VARCHAR(191) NOT NULL,
+    `gender_id` VARCHAR(191) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `ranks_runner_id_key`(`runner_id`),
+    UNIQUE INDEX `ranks_position_stage_category_id_gender_id_key`(`position`, `stage_category_id`, `gender_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -438,7 +471,7 @@ ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_stage_category_id_fkey
 ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_stage_id_fkey` FOREIGN KEY (`stage_id`) REFERENCES `stages`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_sizeId_fkey` FOREIGN KEY (`sizeId`) REFERENCES `sizes`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `event_runners` ADD CONSTRAINT `event_runners_shirt_id_fkey` FOREIGN KEY (`shirt_id`) REFERENCES `sizes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `newsletters` ADD CONSTRAINT `newsletters_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `personals`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -523,6 +556,18 @@ ALTER TABLE `volunteer_on_checkpoints` ADD CONSTRAINT `volunteer_on_checkpoints_
 
 -- AddForeignKey
 ALTER TABLE `volunteer_on_checkpoints` ADD CONSTRAINT `volunteer_on_checkpoints_checkpoint_id_fkey` FOREIGN KEY (`checkpoint_id`) REFERENCES `checkpoints`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `event_runner_status` ADD CONSTRAINT `event_runner_status_runner_id_fkey` FOREIGN KEY (`runner_id`) REFERENCES `event_runners`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ranks` ADD CONSTRAINT `ranks_runner_id_fkey` FOREIGN KEY (`runner_id`) REFERENCES `event_runners`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ranks` ADD CONSTRAINT `ranks_stage_category_id_fkey` FOREIGN KEY (`stage_category_id`) REFERENCES `stage_categories`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ranks` ADD CONSTRAINT `ranks_gender_id_fkey` FOREIGN KEY (`gender_id`) REFERENCES `genders`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_CheckpointToEventRunner` ADD CONSTRAINT `_CheckpointToEventRunner_A_fkey` FOREIGN KEY (`A`) REFERENCES `checkpoints`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
