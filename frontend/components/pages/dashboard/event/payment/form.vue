@@ -49,6 +49,7 @@ const init = () => {
     if (props.payment) {
         form.value?.setFieldValue('amount', props.payment.amount)
         form.value?.setFieldValue('type', props.payment.type)
+        form.value?.setFieldValue('description', props.payment.description)
     }
 }
 onMounted(init)

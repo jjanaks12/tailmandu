@@ -10,7 +10,7 @@ import * as Y from 'yup'
 import DatePicker from "@/components/DatePicker.vue"
 import { useAppStore } from "~/store/app"
 import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
-import type { Payment, Personal, TrailRace } from "~/lib/types"
+import type { Payment, Personal, StageCategoryPayment, TrailRace } from "~/lib/types"
 import { useEventStore } from "~/store/event"
 import moment from "moment"
 import { showImage } from '@/lib/filters'
@@ -49,7 +49,7 @@ const prices = computed(() => availabeStageCategoryList.value?.find(stage_catego
 const payment = computed(() => {
     const type = form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
     form.value?.setFieldValue('payment_type', type)
-    return prices.value?.payment.find(payment => payment.type === type) ?? {} as Payment
+    return prices.value?.payment.find(payment => payment.type === type) ?? {} as StageCategoryPayment
 })
 
 const onSubmit: SubmissionHandler = async (values: any) => {
@@ -435,6 +435,10 @@ onMounted(() => {
                                     We
                                     will
                                     contact you as soon as possible.</p>
+                                <Alert v-if="payment?.description" class="mb-4">
+                                    <InfoIcon />
+                                    <AlertTitle>{{ payment.description }}</AlertTitle>
+                                </Alert>
                                 <Alert variant="info">
                                     <InfoIcon />
                                     <AlertTitle>If you are having issue with QR code, you can use the following

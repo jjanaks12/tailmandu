@@ -355,6 +355,7 @@ export type StageCategoryPayment = {
     id: string
     amount: string
     type: PaymentType
+    description: string
     created_at: string
     updated_at: string
     deleted_at: string
