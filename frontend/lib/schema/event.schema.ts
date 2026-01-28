@@ -113,6 +113,7 @@ export const stageCategoryPaymentSchema = Y.object({
     stage_category_id: Y.string().required().label('Stage category'),
     type: Y.string().oneOf(paymentTypes).required().label('Payment type'),
     amount: Y.number().required().label('Amount'),
+    description: Y.string().label('Description'),
     image: Y.string().when('payment_id', {
         is: undefined,
         then: schema => schema.required(),

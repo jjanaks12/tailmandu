@@ -67,7 +67,7 @@ onMounted(init)
             <input type="hidden" v-bind="field" />
         </Field>
         <div class="flex gap-2">
-            <div class="w-1/2">
+            <div class="w-1/2 space-y-4">
                 <Field name="amount" v-slot="{ field }" as="div" class="space-y-2">
                     <label for="pf__amount">Amount</label>
                     <Input v-bind="field" id="pf__amount" />
@@ -86,6 +86,11 @@ onMounted(init)
                         </SelectContent>
                     </Select>
                     <ErrorMessage class="error__message" name="type" />
+                </Field>
+                <Field name="description" v-slot="{ field }" as="div" class="space-y-2">
+                    <label for="pf__description">Description</label>
+                    <Textarea v-bind="field" id="pf__description" />
+                    <ErrorMessage class="error__message" name="description" />
                 </Field>
             </div>
             <div class="w-1/2">

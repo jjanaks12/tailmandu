@@ -52,6 +52,7 @@ export class PaymentController {
                     ...body,
                     amount: validationData.amount,
                     type: validationData.type as PaymentType,
+                    description: validationData.description,
                     stage_category_id: validationData.stage_category_id
                 }
             }))
@@ -84,6 +85,7 @@ export class PaymentController {
                     ...body,
                     amount: validationData.amount,
                     type: validationData.type as PaymentType,
+                    description: validationData.description,
                     stage_category_id: validationData.stage_category_id
                 }
             }))
