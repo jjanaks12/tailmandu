@@ -181,7 +181,8 @@ export type EventRunner = {
     event: TrailRace
     stage_id: string
     stage: Stage
-    tshirt_size: TShirtSize
+    shirt_id?: string
+    tshirt_size?: TShirtSize
     checkpoints: Checkpoint[]
     payments: Payment[]
     volunteer_on_checkpoints: VolunteerCheckpoint[]

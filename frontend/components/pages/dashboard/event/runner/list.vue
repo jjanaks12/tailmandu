@@ -103,7 +103,7 @@ const downloadCSV = async () => {
     runners.value.forEach((runner) => {
         console.log(runner)
         const age = moment().diff(runner.personal.date_of_birth, 'years')
-        CSVContent += `${[runner.personal.first_name, runner.personal.middle_name, runner.personal.last_name].join(" ")},${runner.bib},${runner.personal.email},${runner.personal.phone_number},${runner.personal.gender.name},${age},${runner?.stage_category?.name ?? ''},${runner?.stage?.name ?? ''},${runner?.personal?.country?.name ?? ''},${runner?.emergency_contact_name},${runner?.emergency_contact_no},${runner.want_lunch},${runner.payments[0]?.status ?? ''},${runner.tshirt_size.name},\n`
+        CSVContent += `${[runner.personal.first_name, runner.personal.middle_name, runner.personal.last_name].join(" ")},${runner.bib},${runner.personal.email},${runner.personal.phone_number},${runner.personal.gender.name},${age},${runner?.stage_category?.name ?? ''},${runner?.stage?.name ?? ''},${runner?.personal?.country?.name ?? ''},${runner?.emergency_contact_name},${runner?.emergency_contact_no},${runner.want_lunch},${runner.payments[0]?.status ?? ''},${runner?.tshirt_size?.name ?? ''},\n`
     })
 
     const link = document.createElement('a')
