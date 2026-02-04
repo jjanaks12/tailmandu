@@ -60,6 +60,7 @@ export class RunnerController {
                     payments: paymentFilter
                 },
                 include: {
+                    tshirt_size: true,
                     personal: {
                         include: {
                             country: true,
