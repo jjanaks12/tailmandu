@@ -90,6 +90,8 @@ export class RunnerController {
                     rank: true
                 },
                 orderBy: [{
+                    bib: 'asc'
+                }, {
                     rank: {
                         position: 'asc'
                     }
@@ -211,11 +213,12 @@ export class RunnerController {
                 throw createHttpError(409, `You have already registered for this event`)
 
             const [min] = stageCategory.bib_range.split('-')
-            const bib = (Number(min) + (event.runners.length + 1)).toString().padStart(3, '0')
+            const bib = (Number(min) + (event.runners.length + 1))
+            const runnerCon = new RunnerController()
 
             runner = await prisma.eventRunner.create({
                 data: {
-                    bib,
+                    bib: (await runnerCon.checkBIB(bib, validationData.stage_category_id)).toString().padStart(3, '0'),
                     event_id: eventId,
                     personal_id: personal.id,
                     stage_id: validationData.stage_id,
@@ -299,6 +302,21 @@ export class RunnerController {
         } catch (error) {
             next(error)
         }
+    }
+
+    private async checkBIB(bib: number, stage_category_id: string) {
+        let newBib = bib
+        const bibExists = await prisma.eventRunner.findFirst({
+            where: {
+                bib: newBib.toString().padStart(3, '0'),
+                stage_category_id
+            }
+        })
+        if (bibExists) {
+            newBib = newBib + 1
+            await this.checkBIB(newBib, stage_category_id)
+        }
+        return newBib
     }
 
     public static async update(request: Request, response: Response, next: NextFunction) {
