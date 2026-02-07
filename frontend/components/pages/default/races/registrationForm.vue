@@ -111,11 +111,11 @@ watch(pastRecord, () => {
                 phone_number: pastRecord.value?.phone_number,
                 gender_id: pastRecord.value?.gender_id,
                 country_id: pastRecord.value?.country_id,
-                description: {
+                description: (pastRecord.value?.runners || []).length > 0 ? {
                     club_name: pastRecord.value?.runners[0]?.club_name,
                     emergency_contact_name: pastRecord.value?.runners[0]?.emergency_contact_name,
                     emergency_contact_phone: pastRecord.value?.runners[0]?.emergency_contact_no,
-                }
+                } : ''
             })
         }, 1000)
     }
@@ -160,7 +160,8 @@ onMounted(() => {
             </div>
         </Form>
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values, setFieldValue }" @submit="onSubmit" v-if="hasEnteredEmail">
+            v-slot="{ values, setFieldValue, errors }" @submit="onSubmit" v-if="hasEnteredEmail">
+            <pre>{{ errors }}</pre>
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">

@@ -13,6 +13,8 @@ const nationalRunners = computed(() => props.runners.filter((runner) => runner.p
 const internationalRunners = computed(() => props.runners.filter((runner) => runner.personal.country.name != company.value?.address?.country.name).length)
 const maleRunners = computed(() => props.runners.filter((runner) => runner.personal.gender.name == 'Male').length)
 const femaleRunners = computed(() => props.runners.filter((runner) => runner.personal.gender.name == 'Female').length)
+const presentRunners = computed(() => props.runners.filter((runner) => runner.runner_attendances.length > 0).length)
+const absentRunners = computed(() => props.runners.filter((runner) => runner.runner_attendances.length == 0).length)
 </script>
 
 <template>
@@ -40,6 +42,15 @@ const femaleRunners = computed(() => props.runners.filter((runner) => runner.per
             <div class="text-pink-600">
                 <strong class="font-normal text-xs uppercase block opacity-35">Female</strong>
                 <em class="text-5xl not-italic">{{ femaleRunners }}</em>
+            </div>
+            <Separator />
+            <div class="text-indigo-600">
+                <strong class="font-normal text-xs uppercase block opacity-35">Present</strong>
+                <em class="text-5xl not-italic">{{ presentRunners }}</em>
+            </div>
+            <div class="text-pink-600">
+                <strong class="font-normal text-xs uppercase block opacity-35">Absent</strong>
+                <em class="text-5xl not-italic">{{ absentRunners }}</em>
             </div>
         </div>
     </div>

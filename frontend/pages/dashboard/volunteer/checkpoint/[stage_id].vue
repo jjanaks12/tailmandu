@@ -29,8 +29,8 @@ const remainingRunners = computed(() => Math.max(0, runners.value.length - recor
 const hasEventStarted = computed(() => stageCategories.value[0]?.start ? moment().isAfter(moment.utc(stageCategories.value[0]?.start)) : false)
 
 const getVolunteerCheckpoints = async () => {
-    const { data } = await axios.get(`/volunteers/checkpoints`)
-    volunteer.value = data
+    const { data } = await axios.get<Volunteer[]>(`/volunteers/checkpoints/${route.params.stage_id}`)
+    volunteer.value = data[0]
 }
 
 const fetchCheckpointRegister = async () => {

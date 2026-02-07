@@ -124,7 +124,7 @@ export class VolunteerController {
 
     public static async eventList(request: Request, response: Response, next: NextFunction) {
         try {
-            const volunteer = await prisma.volunteer.findFirst({
+            const volunteer = await prisma.volunteer.findMany({
                 where: {
                     personal_id: request.body.auth_user.personal_id
                 },
@@ -137,7 +137,8 @@ export class VolunteerController {
                     }
                 }
             })
-            response.send(volunteer.stages)
+            console.log(volunteer)
+            response.send(volunteer.flatMap((v) => v.stages))
         } catch (error) {
             next(error)
         }
@@ -145,9 +146,14 @@ export class VolunteerController {
 
     public static async checkpoints(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send(await prisma.volunteer.findFirst({
+            response.send(await prisma.volunteer.findMany({
                 where: {
-                    personal_id: request.body.auth_user.personal_id
+                    personal_id: request.body.auth_user.personal_id,
+                    stages: {
+                        some: {
+                            id: request.params.stage_id
+                        }
+                    }
                 },
                 include: {
                     checkpoints: {

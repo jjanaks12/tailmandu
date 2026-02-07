@@ -31,13 +31,14 @@ onMounted(fetch)
                 fetch
             </Button>
         </header>
-        <div class="space-y-2">
-            <div v-for="stage of stages">
+        <div class="space-y-4 divide-y divide-primary">
+            <div v-for="stage of stages" class="pb-4">
                 <h2 class="text-xl text-gray-600">
                     <NuxtLink :to="`/dashboard/volunteer/checkpoint/${stage.id}`">
                         {{ stage.event.name }}
                     </NuxtLink>
                 </h2>
+                <Badge>{{ stage.name }}</Badge><br />
                 <em class="not-italic">Starts {{ moment(stage.event.start).fromNow() }}</em>
             </div>
         </div>
