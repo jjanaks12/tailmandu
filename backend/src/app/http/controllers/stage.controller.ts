@@ -143,6 +143,7 @@ export class StageController {
                                 },
                                 include: {
                                     tshirt_size: true,
+                                    runner_attendances: true,
                                     personal: {
                                         include: {
                                             avatar: true,

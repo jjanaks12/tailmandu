@@ -22,7 +22,10 @@ const entryList = ref<VolunteerCheckpoint[]>([])
 const stageCategories = ref<StageCategory[]>([])
 const volunteer = ref<Volunteer | null>(null)
 
-const runners = computed(() => stageCategories.value.find(category => category.id === selectedCheckpoint.value?.stage_category_id)?.runners ?? [])
+const runners = computed(() => (stageCategories.value
+    .find(category => category.id === selectedCheckpoint.value?.stage_category_id)?.runners ?? [])
+    .filter(runner => runner.runner_attendances?.length > 0)
+)
 const filteredList = computed(() => runners.value.filter(runner => runner.bib.includes(searchText.value)))
 const recordedRunner = computed(() => entryList.value.filter(entry => entry.timer).length)
 const remainingRunners = computed(() => Math.max(0, runners.value.length - recordedRunner.value))
