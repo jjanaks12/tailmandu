@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import moment from 'moment'
 import { formatDate, showImage } from '~/lib/filters'
-import type { EventRunner, Stage, StageCategory } from '~/lib/types'
+import type { EventRunner, Stage, StageCategory, VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { useAppStore } from '~/store/app'
 
@@ -66,6 +66,13 @@ const fetchRunnerList = async () => {
     })
     runners.value = data
     isLoading.value = false
+}
+
+const getFinalDuration = (volunteerCheckpoints: VolunteerCheckpoint[]) => {
+    const a = volunteerCheckpoints.find(volunteerCheckpoint => volunteerCheckpoint.checkpoint.is_end)
+
+    if (!a) return ''
+    return getDuration(a.timer, selectStage.value?.start as string)
 }
 
 watch([selectGender, selectStage], fetchRunnerList)
@@ -148,9 +155,7 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                             {{ ['DISQUALIFIED', 'DID_NOT_FINISH'].includes(runner?.status?.status)
                                 ? runner?.status?.status
                                 : runner.volunteer_on_checkpoints.length > 0
-                                    ? runner.volunteer_on_checkpoints[0].checkpoint.is_end
-                                        ? getDuration(runner.volunteer_on_checkpoints[0]?.timer, selectStage?.start as string)
-                                        : ''
+                                    ? getFinalDuration(runner.volunteer_on_checkpoints)
                                     : 'N/A' }}
                         </TableCell>
                     </TableRow>
