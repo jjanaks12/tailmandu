@@ -83,11 +83,13 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
     <section class="result__section bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]">
         <header class="pt-12 pb-20 relative">
             <strong class="block block--left [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
-                v-if="selectStage">
-                {{ selectStage?.name }}
+                v-if="stage">
+                {{ stage?.name }}
             </strong>
             <strong
-                class="block block--left [--block-bg:var(--color-blue-400)] [--block-color:var(--color-white)] translate-y-full">Chandragiri</strong>
+                class="block block--left [--block-bg:var(--color-blue-400)] [--block-color:var(--color-white)] translate-y-full">
+                {{ selectStage?.name }}
+            </strong>
             <time :datetime="selectStage?.start"
                 class="block block--right text-lg [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
                 v-if="selectStage">
