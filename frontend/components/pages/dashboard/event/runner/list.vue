@@ -41,6 +41,7 @@ const selectedRunner = ref<EventRunner | null>(null)
 const { genders } = storeToRefs(useAppStore())
 
 const updatedRunners = computed(() => sortRunner(runners.value))
+const hasStartedRace = computed(() => props.stages.filter(stage => stage.stage_categories).filter(category => moment.utc(category.start).isAfter(moment.utc())))
 
 onKeyStroke(['command', '/'], () => {
     nextTick(() => {
@@ -124,6 +125,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <pre>{{ hasStartedRace }}</pre>
     <div class="flex gap-4 items-start max-w-full relative">
         <div class="grow max-w-[calc(100%-284px)]">
             <div
@@ -224,7 +226,7 @@ onUnmounted(() => {
                         @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
                         @updated:payment="updatePaymentStatus" @fetch="fetch"
                         :rank="runner.volunteer_on_checkpoints.length > 0 ? index + 1 : 0"
-                        @edit="showRunnerEdit = true; selectedRunner = runner" />
+                        @edit="showRunnerEdit = true; selectedRunner = runner" :hasEventStarted="true" />
                     <TableRow v-if="runners.length === 0">
                         <TableCell colspan="5">
                             <span class="text-center block p-3 text-gray-500 bg-accent rounded">

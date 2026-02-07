@@ -61,6 +61,11 @@ export class RunnerController {
                 },
                 include: {
                     tshirt_size: true,
+                    runner_attendances: {
+                        where: {
+                            stage_id: request.params.stage_id
+                        }
+                    },
                     personal: {
                         include: {
                             country: true,
@@ -607,6 +612,28 @@ export class RunnerController {
                 })
             })
             response.send('success')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async attendance(request: Request, response: Response, next: NextFunction) {
+        try {
+            const ifAlreadyPresent = await prisma.runnerAttendance.findFirst({
+                where: {
+                    runner_id: request.params.runner_id,
+                    stage_id: request.body.stage_id
+                }
+            })
+
+            if (ifAlreadyPresent) throw createHttpError.Conflict('Runner is already present')
+
+            response.send(await prisma.runnerAttendance.create({
+                data: {
+                    runner_id: request.params.runner_id,
+                    stage_id: request.params.stage_id
+                }
+            }))
         } catch (error) {
             next(error)
         }

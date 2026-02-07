@@ -190,6 +190,18 @@ export type EventRunner = {
     stage_category: StageCategory
     rank: Rank
     status: EventRunnerStatus
+    runner_attendances: RunnerAttendance[]
+}
+
+export type RunnerAttendance = {
+    id: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    runner_id: string
+    runner: EventRunner
+    stage_id: string
+    stage: Stage
 }
 
 export type Payment = {

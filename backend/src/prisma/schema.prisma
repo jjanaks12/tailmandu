@@ -161,6 +161,7 @@ model EventRunner {
   volunteer_on_checkpoints VolunteerCheckpoint[]
   status                   EventRunnerStatus?
   rank                     Rank?
+  runner_attendances       RunnerAttendance[]
 
   @@unique([bib, stage_category_id])
   @@map("event_runners")
@@ -376,9 +377,10 @@ model Stage {
   image_id  String?
   thumbnail Image?    @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
 
-  runners          EventRunner[]
-  volunteers       Volunteer[]
-  stage_categories StageCategory[]
+  runners            EventRunner[]
+  volunteers         Volunteer[]
+  stage_categories   StageCategory[]
+  runner_attendances RunnerAttendance[]
 
   @@map("stages")
 }
@@ -531,4 +533,18 @@ model Rank {
 
   @@unique([position, stage_category_id, gender_id])
   @@map("ranks")
+}
+
+model RunnerAttendance {
+  id         String   @id @default(cuid())
+  created_at DateTime @default(now())
+
+  runner_id String
+  runner    EventRunner @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+
+  stage_id String
+  stage    Stage  @relation(fields: [stage_id], references: [id], onDelete: Cascade)
+
+  @@unique([runner_id, stage_id])
+  @@map("runner_attendance")
 }

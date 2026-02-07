@@ -27,10 +27,12 @@ const isLoading = ref(false)
 const searchText = ref('')
 
 const updatedRunners = computed(() => sortRunner(runners.value))
-const filteredRunners = computed(() => updatedRunners.value.filter((runner) =>
-    (runner.personal.first_name || '').toLowerCase().includes(searchText.value.toLowerCase())
-    || (runner.personal.last_name || '').toLowerCase().includes(searchText.value.toLowerCase())
-    || runner.bib.toString().includes(searchText.value))
+const filteredRunners = computed(() => updatedRunners.value
+    .filter(runner => runner.runner_attendances.length > 0)
+    .filter((runner) =>
+        (runner.personal.first_name || '').toLowerCase().includes(searchText.value.toLowerCase())
+        || (runner.personal.last_name || '').toLowerCase().includes(searchText.value.toLowerCase())
+        || runner.bib.toString().includes(searchText.value))
 )
 
 const fetchStageCategory = async () => {

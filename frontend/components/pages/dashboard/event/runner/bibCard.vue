@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import PrindD from 'printd'
 import type { EventRunner } from '~/lib/types'
-import BIBBg25kImg from '~/assets/images/bib-25k.jpg'
-import BIBBg10kImg from '~/assets/images/bib-10k.jpg'
+import BIBBg25kImg from '~/assets/images/bib-25k.png'
+import BIBBg10kImg from '~/assets/images/bib-10k.png'
 import FlagData from '~/lib/bin/flag.json'
 import flagImg from '@/assets/images/flags_responsive.png'
 import { DownloadIcon } from 'lucide-vue-next'
@@ -62,7 +62,7 @@ const downloadPDF = () => {
                                         backgroundPosition: (FlagData as Record<string, string>)[runner.personal.country.abbr],
                                     }" />
                             </div>
-                            <em style="color: #fffffe; font: bold 280px/1 Arial, sans-serif;">{{ runner.bib }}</em>
+                            <em style="color: #fffffe; font: bold 180px/1 Arial, sans-serif;">{{ runner.bib }}</em>
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,7 @@ import { useAxios } from '~/services/axios'
 interface RunnerItemProps {
     rank?: number
     runner: EventRunner
+    hasEventStarted?: boolean
 }
 
 const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment', 'fetch', 'edit'])
@@ -61,6 +62,11 @@ const didNotFinishRunner = async () => {
     })
     emit('fetch')
     showDidNotFinishModal.value = false
+}
+
+const doAttendance = async () => {
+    await axios.put(`/runners/${props.runner.id}/${props.runner.stage_category.stage_id}/attendance`)
+    emit('fetch')
 }
 </script>
 
@@ -120,56 +126,60 @@ const didNotFinishRunner = async () => {
             <Badge variant="success" v-if="runner.want_lunch">Yes</Badge>
             <Badge variant="destructive" v-else>No</Badge>
         </TableCell>
-        <TableCell class="text-right">
-            <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                    <Button size="sm" modifier="link">
-                        <EllipsisVerticalIcon />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    <DropdownMenuItem class="text-gray-500" @click="emit('show:runner')">
-                        See details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem class="text-yellow-500" @click="emit('edit')">
-                        Edit details
-                    </DropdownMenuItem>
-                    <template v-if="runner.payments.length > 0 && runner.payments[0].status != 'COMPLETED'">
-                        <DropdownMenuItem class="text-gray-500" @click="emit('show:payment')" v-if="hasPayment">
-                            See payment details
+        <TableCell>
+            <div class="flex gap-2 items-center justify-end">
+                <Button size="sm" @click="doAttendance"
+                    v-if="runner?.runner_attendances?.length === 0 && hasEventStarted">present</Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                        <Button size="sm" modifier="link">
+                            <EllipsisVerticalIcon />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem class="text-gray-500" @click="emit('show:runner')">
+                            See details
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Payment Actions</DropdownMenuLabel>
-                        <DropdownMenuItem class="text-green-500"
-                            @click="emit('updated:payment', 'COMPLETED', runner.payments[0].id)">
-                            Completed
+                        <DropdownMenuItem class="text-yellow-500" @click="emit('edit')">
+                            Edit details
                         </DropdownMenuItem>
-                        <DropdownMenuItem class="text-yellow-500"
-                            @click="emit('updated:payment', 'PENDING', runner.payments[0].id)">
-                            Pending
-                        </DropdownMenuItem>
-                        <DropdownMenuItem class="text-red-500"
-                            @click="emit('updated:payment', 'FAILED', runner.payments[0].id)">
-                            Failed
-                        </DropdownMenuItem>
-                    </template>
-                    <template v-if="can('runner_delete')">
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Runner Actions</DropdownMenuLabel>
-                        <template v-if="!runner.status">
-                            <DropdownMenuItem class="text-red-500" @click="showDidNotFinishModal = true">
-                                Did not finished
+                        <template v-if="runner.payments.length > 0 && runner.payments[0].status != 'COMPLETED'">
+                            <DropdownMenuItem class="text-gray-500" @click="emit('show:payment')" v-if="hasPayment">
+                                See payment details
                             </DropdownMenuItem>
-                            <DropdownMenuItem class="text-red-500" @click="showDisqualificationModal = true">
-                                Disqualified
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Payment Actions</DropdownMenuLabel>
+                            <DropdownMenuItem class="text-green-500"
+                                @click="emit('updated:payment', 'COMPLETED', runner.payments[0].id)">
+                                Completed
+                            </DropdownMenuItem>
+                            <DropdownMenuItem class="text-yellow-500"
+                                @click="emit('updated:payment', 'PENDING', runner.payments[0].id)">
+                                Pending
+                            </DropdownMenuItem>
+                            <DropdownMenuItem class="text-red-500"
+                                @click="emit('updated:payment', 'FAILED', runner.payments[0].id)">
+                                Failed
                             </DropdownMenuItem>
                         </template>
-                        <DropdownMenuItem class="text-red-500" @click="showDeleteModal = true">
-                            Delete
-                        </DropdownMenuItem>
-                    </template>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                        <template v-if="can('runner_delete')">
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Runner Actions</DropdownMenuLabel>
+                            <template v-if="!runner.status">
+                                <DropdownMenuItem class="text-red-500" @click="showDidNotFinishModal = true">
+                                    Did not finished
+                                </DropdownMenuItem>
+                                <DropdownMenuItem class="text-red-500" @click="showDisqualificationModal = true">
+                                    Disqualified
+                                </DropdownMenuItem>
+                            </template>
+                            <DropdownMenuItem class="text-red-500" @click="showDeleteModal = true">
+                                Delete
+                            </DropdownMenuItem>
+                        </template>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
         </TableCell>
     </TableRow>
     <TableRow v-if="runner.volunteer_on_checkpoints?.length && showTiming" :class="classList">
