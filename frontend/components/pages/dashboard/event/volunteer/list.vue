@@ -56,7 +56,7 @@ const deleteVolunteer = async () => {
                             .map(sc => sc.checkpoints)
                             .reduce((acc, curr) => ([...acc, ...curr]), [])
                         showAssignModal = true
-                    }" v-if="volunteer.checkpoints.length == 0">Assign to checkpoint</Button>
+                    }">{{ volunteer.checkpoints.length > 0 ? 'Reassign' : 'Assign to checkpoint' }}</Button>
                     <Button variant="destructive"
                         @click="showDeleteModal = true; selectedVolunteer = volunteer">Delete</Button>
                 </div>

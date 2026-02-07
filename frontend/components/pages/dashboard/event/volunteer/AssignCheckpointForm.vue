@@ -15,10 +15,6 @@ const { assignVolunteerToCheckpoint } = useCheckpointStore()
 const isLoading = ref(false)
 const form = ref<FormContext>()
 
-const selectedStageCategories = computed(() => [...new Set(props.checkpoints
-    .map(checkpoint => (form.value?.values.checkpoints ?? []).includes(checkpoint.id) ? checkpoint.stage_category_id : null)
-    .filter(id => id != null))])
-
 const formSubmit = async (values: any) => {
     isLoading.value = true
     await assignVolunteerToCheckpoint(props.volunteer.id, values)
@@ -26,6 +22,13 @@ const formSubmit = async (values: any) => {
     isLoading.value = false
     emit('update')
 }
+
+const init = () => {
+    if (props.volunteer.checkpoints.length > 0)
+        form.value?.setFieldValue('checkpoints', props.volunteer.checkpoints.map(checkpoint => checkpoint.id))
+}
+
+onMounted(init)
 </script>
 
 <template>
@@ -34,7 +37,6 @@ const formSubmit = async (values: any) => {
             v-slot="{ handleChange, value }" :value="checkpoint.id" class="flex gap-2">
             <Checkbox @update:model-value="handleChange" :id="checkpoint.id"
                 :model-value="value?.includes(checkpoint.id)" />
-            <!-- :disabled="selectedStageCategories.includes(checkpoint.stage_category_id) && !values.checkpoints.includes(checkpoint.id)" -->
             <Label :for="checkpoint.id">{{ checkpoint.name }}</Label>
         </Field>
         <div class="text-right">

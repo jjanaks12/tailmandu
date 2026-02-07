@@ -97,7 +97,12 @@ export class VolunteerController {
                     data: { name: 'Checkpoint Manager' }
                 })
 
-            const volunteer = await prisma.volunteer.findFirst({ where: { id: request.params.volunteer_id } })
+            const volunteer = await prisma.volunteer.findFirst({
+                where: { id: request.params.volunteer_id },
+                include: {
+                    checkpoints: true
+                }
+            })
             await prisma.user.update({
                 where: {
                     personal_id: volunteer.personal_id
@@ -107,13 +112,20 @@ export class VolunteerController {
                 }
             })
 
+            // difference between old and new checkpoints
+            const oldCheckpoints = volunteer.checkpoints.map((checkpoint: any) => checkpoint.id)
+            const newCheckpoints = request.body.checkpoints
+            const newCheckpointsIds = newCheckpoints.filter((id: string) => !oldCheckpoints.includes(id))
+            const oldCheckpointsIds = oldCheckpoints.filter((id: string) => !newCheckpoints.includes(id))
+
             response.send(await prisma.volunteer.update({
                 where: {
                     id: request.params.volunteer_id
                 },
                 data: {
                     checkpoints: {
-                        connect: request.body.checkpoints.map((id: string) => ({ id: id }))
+                        connect: newCheckpointsIds.map((id: string) => ({ id: id })),
+                        disconnect: oldCheckpointsIds.map((id: string) => ({ id: id }))
                     }
                 }
             }))
