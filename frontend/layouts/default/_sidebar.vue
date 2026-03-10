@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { useAppStore } from '~/store/app'
-    import { useMenu } from '../../lib/defaultMenus'
-    const { menuList } = useMenu()
+import { useAppStore } from '~/store/app'
+import { useMenu } from '../../lib/defaultMenus'
+const { menuList } = useMenu()
 
-    const { breakpoints } = storeToRefs(useAppStore())
+const { breakpoints } = storeToRefs(useAppStore())
 </script>
 
 <template>
@@ -12,6 +12,15 @@
             <SidebarContent>
                 <div class="p-4">
                     <Brand />
+                </div>
+                <div class="flex justify-end border-b border-t p-4">
+                    <AuthUser size="sm">
+                        <div class="flex gap-2">
+                            <Button variant="secondary" modifier="link" size="sm" as-child>
+                                <NuxtLink to="/dashboard">{{ $t('header.dashboard_btn') }}</NuxtLink>
+                            </Button>
+                        </div>
+                    </AuthUser>
                 </div>
                 <SidebarGroup class="bg-gray-200">
                     <SidebarGroupContent>

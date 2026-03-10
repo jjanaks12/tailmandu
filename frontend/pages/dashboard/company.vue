@@ -76,15 +76,8 @@ onMounted(init)
 </script>
 
 <template>
-    <div class="text-sm mb-4">
-        <h1 class="text-black text-xl">Company details</h1>
-        <p>Enter your personal details below to update your account information.</p>
-    </div>
-    <Form class="flex flex-col gap-5" @submit="submitHandler" v-slot="{ values }" ref="form"
+    <Form class="flex flex-col gap-20 mb-20" @submit="submitHandler" v-slot="{ values }" ref="form"
         :validation-schema="companySchema">
-        <Field name="id" v-slot="{ field }">
-            <Input type="hidden" v-bind="field" :model-value="company?.id" />
-        </Field>
         <label class="self-center mb-16">
             <Avatar class="w-[180px] h-[180px] bg-gray-300">
                 <AvatarImage :src="values.image || avatar || ''" class="object-contain p-3" />
@@ -92,23 +85,35 @@ onMounted(init)
             </Avatar>
             <input type="file" @change="fileInputHandler" class="sr-only" accept="image/*">
         </label>
-        <Field name="name" v-slot="{ field }" class="flex flex-col gap-1" as="div">
-            <Label for="cf__name">Name of company</Label>
-            <Input v-bind="field" id="cf__name" autocomplete="off" />
-            <ErrorMessage class="error__message" name="name" />
-        </Field>
-        <Field name="short_name" v-slot="{ field }" class="flex flex-col gap-1" as="div">
-            <Label for="cf__short_name">Company short name</Label>
-            <Input v-bind="field" id="cf__short_name" autocomplete="off" />
-            <ErrorMessage class="error__message" name="short_name" />
-        </Field>
-        <Field name="email" v-slot="{ field }" class="flex flex-col gap-1" as="div">
-            <Label for="cf__email">Email address</Label>
-            <Input type="email" v-bind="field" id="cf__email" autocomplete="off" />
-            <ErrorMessage class="error__message" name="email" />
-        </Field>
         <fieldset class="flex flex-col gap-4">
-            <legend>Company Address</legend>
+            <legend class="w-full text-xl font-bold border-b-2 border-gray-200 pb-2 mb-4">Company details</legend>
+            <p>Enter your company details below to update your account information.</p>
+            <Field name="id" v-slot="{ field }">
+                <Input type="hidden" v-bind="field" :model-value="company?.id" />
+            </Field>
+            <Field name="name" v-slot="{ field }" class="flex flex-col gap-1" as="div">
+                <Label for="cf__name">Name of company</Label>
+                <Input v-bind="field" id="cf__name" autocomplete="off" />
+                <ErrorMessage class="error__message" name="name" />
+            </Field>
+            <Field name="short_name" v-slot="{ field }" class="flex flex-col gap-1" as="div">
+                <Label for="cf__short_name">Company short name</Label>
+                <Input v-bind="field" id="cf__short_name" autocomplete="off" />
+                <ErrorMessage class="error__message" name="short_name" />
+            </Field>
+            <Field name="email" v-slot="{ field }" class="flex flex-col gap-1" as="div">
+                <Label for="cf__email">Email address</Label>
+                <Input type="email" v-bind="field" id="cf__email" autocomplete="off" />
+                <ErrorMessage class="error__message" name="email" />
+            </Field>
+            <Field name="phone" v-slot="{ field }" class="flex flex-col gap-1" as="div">
+                <Label for="cf__phone">Phone</Label>
+                <Input type="text" v-bind="field" id="cf__phone" autocomplete="off" />
+                <ErrorMessage class="error__message" name="phone" />
+            </Field>
+        </fieldset>
+        <fieldset class="flex flex-col gap-4">
+            <legend class="w-full text-xl font-bold border-b-2 border-gray-200 pb-2 mb-4">Company Address</legend>
             <div class="flex gap-4">
                 <div class="w-1/2">
                     <Field as="div" name="address.address" v-slot="{ field }" class="flex flex-col gap-2">
@@ -166,39 +171,45 @@ onMounted(init)
                 </div>
             </div>
         </fieldset>
-        <Field name="phone" v-slot="{ field }" class="flex flex-col gap-1" as="div">
-            <Label for="cf__phone">Phone</Label>
-            <Input type="text" v-bind="field" id="cf__phone" autocomplete="off" />
-            <ErrorMessage class="error__message" name="phone" />
-        </Field>
-        <Field name="vat_registered" v-slot="{ handleChange, value }">
-            <Label class="flex gap-2">
-                <Checkbox :model-value="value" :default-value="false" @update:model-value="handleChange" />
-                <span>Is your company registered on VAT?</span>
-            </Label>
-            <ErrorMessage class="error__message" name="vat_registered" />
-        </Field>
-        <div class="flex gap-4">
-            <div class="w-1/2">
-                <Field name="vat_no" v-slot="{ field }" class="flex flex-col gap-1" as="div">
-                    <Label for="cf__vat">VAT - Value Added Tax</Label>
-                    <Input type="text" v-bind="field" id="cf__vat" autocomplete="off" />
-                    <ErrorMessage class="error__message" name="vat_no" />
-                </Field>
+        <fieldset class="flex flex-col gap-4">
+            <legend class="w-full text-xl font-bold border-b-2 border-gray-200 pb-2 mb-4">VAT and PAN</legend>
+            <Field name="vat_registered" v-slot="{ handleChange, value }">
+                <Label class="flex gap-2">
+                    <Checkbox :model-value="value" :default-value="false" @update:model-value="handleChange" />
+                    <span>Is your company registered on VAT?</span>
+                </Label>
+                <ErrorMessage class="error__message" name="vat_registered" />
+            </Field>
+            <div class="flex gap-4">
+                <div class="w-1/2">
+                    <Field name="vat_no" v-slot="{ field }" class="flex flex-col gap-1" as="div">
+                        <Label for="cf__vat">VAT - Value Added Tax</Label>
+                        <Input type="text" v-bind="field" id="cf__vat" autocomplete="off" />
+                        <ErrorMessage class="error__message" name="vat_no" />
+                    </Field>
+                </div>
+                <div class="w-1/2">
+                    <Field name="pan_no" v-slot="{ field }" class="flex flex-col gap-1" as="div">
+                        <Label for="cf__pan">PAN - Permanent Address Number</Label>
+                        <Input type="text" v-bind="field" id="cf__pan" autocomplete="off" />
+                        <ErrorMessage class="error__message" name="pan_no" />
+                    </Field>
+                </div>
             </div>
-            <div class="w-1/2">
-                <Field name="pan_no" v-slot="{ field }" class="flex flex-col gap-1" as="div">
-                    <Label for="cf__pan">PAN - Permanent Address Number</Label>
-                    <Input type="text" v-bind="field" id="cf__pan" autocomplete="off" />
-                    <ErrorMessage class="error__message" name="pan_no" />
-                </Field>
+            <div class="text-right">
+                <Button variant="secondary" type="submit" class="w-[180px]" :disabled="isLoading">
+                    <LoaderIcon class="animate-spin relative" v-if="isLoading" />
+                    Update details
+                </Button>
             </div>
-        </div>
-        <div class="text-right">
-            <Button variant="secondary" type="submit" class="w-[180px]" :disabled="isLoading">
-                <LoaderIcon class="animate-spin relative" v-if="isLoading" />
-                Update details
-            </Button>
-        </div>
+        </fieldset>
     </Form>
+    <div class="flex justify-between items-center py-4 border-b-2 border-gray-200">
+        <h2 class="text-xl font-bold">Social Links</h2>
+        <Button variant="dark">Add Social Links</Button>
+    </div>
+    <PagesDashboardCompanySocialLinkForm />
+    <ul>
+        <li v-for="social in company?.social_links">{{ social.name }} - {{ social.url }}</li>
+    </ul>
 </template>

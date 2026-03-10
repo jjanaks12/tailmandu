@@ -26,3 +26,9 @@ export const companySchema = Y.object({
     }).label('VAT number'),
     image: Y.string().label('Company logo'),
 })
+
+export const socialLinkSchema = Y.object({
+    company_id: Y.string().required().label('Company'),
+    name: Y.string().required().label('Name of link'),
+    url: Y.string().required().label('URL')
+})

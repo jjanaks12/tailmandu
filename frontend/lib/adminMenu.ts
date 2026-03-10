@@ -32,6 +32,12 @@ export const useMenu = () => {
             path: '/dashboard/events',
             permissions: 'manage_event'
         }, {
+            title: 'Media',
+            icon: 'Image',
+            slug: 'media',
+            path: '/dashboard/media',
+            permissions: 'manage_media'
+        }, {
             title: 'Roles',
             icon: 'ShieldCheck',
             slug: 'roles',

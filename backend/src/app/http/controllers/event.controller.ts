@@ -20,6 +20,10 @@ export class EventController {
                     stages: {
                         where: {
                             deleted_at: null
+                        },
+                        include: {
+                            stage_categories: true,
+                            thumbnail: true
                         }
                     },
                     runners: true,

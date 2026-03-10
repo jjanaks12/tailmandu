@@ -12,11 +12,25 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'pinia-plugin-persistedstate',
     'nuxt-charts',
-    'nuxt-tiptap-editor'
+    'nuxt-tiptap-editor',
+    '@nuxtjs/i18n',
+    'nuxt-swiper'
   ],
 
-  css: ['@/assets/css/main.css', 'swiper/css'],
+  css: ['@/assets/css/main.css', 'swiper/css', 'vue-sonner/style.css'],
 
+  i18n: {
+    locales: [{
+      code: 'en',
+      file: 'en.json',
+      name: 'English'
+    }, {
+      code: 'np',
+      file: 'np.json',
+      name: 'Nepali'
+    }],
+    defaultLocale: 'en'
+  },
 
   app: {
     head: {
@@ -47,7 +61,7 @@ export default defineNuxtConfig({
       tailwindcss()
     ],
     server: {
-      allowedHosts: process.env.NUXT_ALLOWED_HOSTS
+      allowedHosts: (process.env.NUXT_ALLOWED_HOSTS ?? []) as string[]
     }
   },
 

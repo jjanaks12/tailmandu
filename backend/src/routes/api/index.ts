@@ -9,6 +9,7 @@ import CompanyRouter from '@/routes/api/company.router'
 import VolunteerRouter from '@/routes/api/volunteer.router'
 import RunnerRouter from '@/routes/api/runner.router'
 import CheckpointRouter from '@/routes/api/checkpoint.router'
+import MediaRouter from '@/routes/api/media.router'
 
 const router = Router()
 
@@ -21,5 +22,6 @@ router.use('/companies', CompanyRouter)
 router.use('/volunteers', VolunteerRouter)
 router.use('/runners', RunnerRouter)
 router.use('/checkpoints', CheckpointRouter)
+router.use('/medias', MediaRouter)
 
 export default router

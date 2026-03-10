@@ -12,6 +12,7 @@ export const useAppStore = defineStore('app', () => {
     const age_categories = ref<AgeCategory[]>([])
     const company = ref<Company | null>(null)
     const shirtSizes = ref<TShirtSize[]>([])
+    const imagePreview = ref<string | null>(null)
 
     const { axios } = useAxios()
 
@@ -52,12 +53,14 @@ export const useAppStore = defineStore('app', () => {
         await fetchCompany()
     }
 
+    const setImageForPreview = (url: string) => imagePreview.value = url
+
     onBeforeMount(() => {
         breakpoints.value = useBreakpoints(breakpointsTailwind)
     })
 
     return {
         breakpoints, genders, countries, permissions, age_categories, company, shirtSizes,
-        fetchGender, fetchCountries, fetchPermission, fetchAgeCategory, fetchCompany, fetchShirtSizes, saveCompany
+        fetchGender, fetchCountries, fetchPermission, fetchAgeCategory, fetchCompany, fetchShirtSizes, saveCompany, imagePreview, setImageForPreview
     }
 })

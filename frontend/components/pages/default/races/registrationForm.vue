@@ -160,8 +160,7 @@ onMounted(() => {
             </div>
         </Form>
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values, setFieldValue, errors }" @submit="onSubmit" v-if="hasEnteredEmail">
-            <pre>{{ errors }}</pre>
+            v-slot="{ values, setFieldValue }" @submit="onSubmit" v-if="hasEnteredEmail">
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
@@ -228,6 +227,7 @@ onMounted(() => {
                                 <Phone :size="16" class="text-gray-400" />
                                 Phone number
                             </Label>
+                            <em class="not-italic text-xs text-gray-500">(Better if it could be whatsapp number.)</em>
                             <Input type="tel" v-bind="field" placeholder="xxxxxxxxxx" autocomplete="tel"
                                 class="h-12 text-base" />
                             <ErrorMessage class="error__message" name="phone_number" />

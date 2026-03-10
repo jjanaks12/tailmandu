@@ -1,27 +1,19 @@
+import { gallerySchema } from "@/app/lib/schema/gallery.schema"
+import { FileHandler } from "@/app/lib/services/File.service"
 import { Image, PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
-
-import { gallerySchema } from "@/app/lib/schema/event.schema"
-import { FileHandler } from "@/app/lib/services/File.service"
 
 const prisma = new PrismaClient()
 export class GalleryController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
-            const event = await prisma.trailRace.findFirst({
-                where: {
-                    id: request.params.event_id
-                },
-                include: {
-                    galleries: true
-                }
-            })
-
-            response.send(event.galleries)
+            const galleries = await prisma.image.findMany()
+            response.send(galleries)
         } catch (error) {
             next(error)
         }
     }
+
     public static async store(request: Request, response: Response, next: NextFunction) {
         try {
             const validationData = await gallerySchema.validate(request.body, { abortEarly: false })
@@ -32,12 +24,21 @@ export class GalleryController {
                 a.push(await fileService.saveFile(image))
             }
 
-            response.send(await prisma.trailRace.update({
-                where: {
-                    id: request.params.event_id
-                },
+            response.send(await prisma.gallery.create({
                 data: {
-                    galleries: {
+                    name: validationData.name,
+                    description: validationData.description,
+                    tags: {
+                        connectOrCreate: validationData.tags.map(tag => ({
+                            where: {
+                                name: tag
+                            },
+                            create: {
+                                name: tag
+                            }
+                        }))
+                    },
+                    images: {
                         connect: a.map(img => ({ id: img.id }))
                     }
                 }
@@ -47,19 +48,35 @@ export class GalleryController {
         }
     }
 
-    public static async destory(request: Request, response: Response, next: NextFunction) {
+    public static async update(request: Request, response: Response, next: NextFunction) {
         try {
-            const fileHandler = new FileHandler('images')
-            await fileHandler.deleteFile(request.params.image_id)
-            response.send(await prisma.trailRace.update({
+            const validationData = await gallerySchema.validate(request.body, { abortEarly: false })
+            const fileService = new FileHandler('images')
+            const a: Image[] = []
+
+            for (const image of validationData.images) {
+                a.push(await fileService.saveFile(image))
+            }
+
+            response.send(await prisma.gallery.update({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.id
                 },
                 data: {
-                    galleries: {
-                        disconnect: {
-                            id: request.params.image_id
-                        }
+                    name: validationData.name,
+                    description: validationData.description,
+                    tags: {
+                        connectOrCreate: validationData.tags.map(tag => ({
+                            where: {
+                                name: tag
+                            },
+                            create: {
+                                name: tag
+                            }
+                        }))
+                    },
+                    images: {
+                        connect: a.map(img => ({ id: img.id }))
                     }
                 }
             }))

@@ -2,7 +2,7 @@
 import { formatDate, showImage } from '~/lib/filters'
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
-import StageCard from '@/components/pages/default/home/card.vue'
+import StageCard from '@/components/pages/default/home/banner/card.vue'
 import moment from 'moment'
 
 const route = useRoute()
@@ -46,10 +46,12 @@ onBeforeMount(async () => {
                 </div>
                 <div class="md:w-1/3 order-1 md:order-2">
                     <div class="flex flex-col lg:flex-row gap-2" v-if="!isFinished">
-                        <NuxtLink :to="{ name: 'races-slug-volunteer', params: { slug: trailRace.slug } }" as-child>
+                        <NuxtLink :to="$localePath({ name: 'races-slug-volunteer', params: { slug: trailRace.slug } })"
+                            as-child>
                             <Button variant="volunteer">Apply for volunteers</Button>
                         </NuxtLink>
-                        <NuxtLink :to="{ name: 'races-slug-runner', params: { slug: trailRace.slug } }" as-child>
+                        <NuxtLink :to="$localePath({ name: 'races-slug-runner', params: { slug: trailRace.slug } })"
+                            as-child>
                             <Button variant="runner">Apply as runners</Button>
                         </NuxtLink>
                     </div>

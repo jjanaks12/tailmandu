@@ -1,6 +1,6 @@
 export { showImage, getGPXFile } from './show_image'
 export { abbr } from './abbr'
-export { humanize, formatDate, slugify, fixDateTime } from './humanize'
+export { humanize, formatDate, slugify, fixDateTime, distanceToKm } from './humanize'
 export { isObjEq } from './isObjectEqual'
 export { debounce } from './debounce'
 

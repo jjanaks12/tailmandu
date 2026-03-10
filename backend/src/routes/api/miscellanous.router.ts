@@ -12,6 +12,7 @@ import { hasAdminAccess } from '@/app/http/middleware/admin_access.middleware'
 import { NewsletterController } from '@/app/http/controllers/newsletter.controller'
 import { SponsorTypeController } from '@/app/http/controllers/sponsor_type.controller'
 import { PaymentController } from '@/app/http/controllers/payment.controller'
+import { HomeController } from '@/app/http/controllers/home.controller'
 
 const router = Router()
 
@@ -45,5 +46,8 @@ router.delete('/sponsor_types/:sponsor_type_id', [], SponsorTypeController.destr
 // PAYMENTS
 router.post('/payments', [verifyAccessToken], PaymentController.store)
 router.put('/payments/:payment_id', [verifyAccessToken], PaymentController.update)
+
+// GALLERY
+router.get('/home/galleries', [], HomeController.gallery)
 
 export default router

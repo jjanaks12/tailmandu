@@ -6,9 +6,12 @@ import { pad } from '~/lib/filters'
 
 interface CountdownProps {
     date: string
+    variant?: 'default' | 'compact'
 }
 
-const props = defineProps<CountdownProps>()
+const props = withDefaults(defineProps<CountdownProps>(), {
+    variant: 'default'
+})
 const slots = useSlots()
 
 const tileCount = ref(0)
@@ -77,7 +80,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="countdown">
+    <div class="countdown" v-if="variant == 'default'">
         <div class="text" v-if="slots.default">
             <slot />
         </div>
@@ -107,6 +110,10 @@ onMounted(() => {
                 <em>sec{{ second > 1 ? 's' : '' }}</em>
             </div>
         </div>
+    </div>
+    <div class="text-2xl font-mono font-bold text-primary" v-if="variant === 'compact'">
+        {{ pad(day.toString(), 2) }}:{{ pad(hour.toString(), 2) }}:{{ pad(minute.toString(), 2) }}:{{
+            pad(second.toString(), 2) }}
     </div>
 </template>
 

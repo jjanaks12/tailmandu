@@ -93,6 +93,16 @@ export type Image = {
     created_at: Date
     updated_at?: Date
     personal: Personal[]
+    tags: Tag[]
+}
+
+export type Tag = {
+    id: string
+    name: string
+    created_at: Date
+    updated_at?: Date
+    images: Image[]
+    events: TrailRace[]
 }
 
 export type Country = {
@@ -123,6 +133,7 @@ export type TrailRace = {
     checkpoints: Checkpoint[]
     stages: Stage[]
     runners: EventRunner[]
+    tags: Tag[]
 }
 
 export type Checkpoint = {
@@ -284,6 +295,20 @@ export type Company = {
     pan_no: string
     vat_no: string
     users: User[]
+    social_links: SocialLink[]
+}
+
+export type SocialLink = {
+    id: string
+    name: string
+    url: string
+    icon: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    company_id: string
+    company: Company[]
+    sponsors: Sponsor[]
 }
 
 export type TShirtSize = {
@@ -352,6 +377,7 @@ export type Sponsor = {
     event: TrailRace
     sponsor_type_id: string
     sponsorType: SponsorType
+    social_link: SocialLink[]
 }
 
 export type SponsorType = {
@@ -390,4 +416,19 @@ export type Rank = {
     position: number
     runner_id: string
     runner: EventRunner
+}
+
+export type Gallery = {
+    id: string
+    name: string
+    description: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    images: Image[]
+    tags: Tag[]
+}
+
+export type WithCount<T> = T & {
+    _count: Record<string, number>
 }

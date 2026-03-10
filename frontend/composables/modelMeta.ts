@@ -1,13 +1,13 @@
 import type { APIParam } from "~/lib/types"
 
-export const useModalMeta = () => {
+export const useModalMeta = (p?: Partial<APIParam>) => {
     const isLoading = ref(false)
-    const params = ref<APIParam>({
+    const params = ref<APIParam>(Object.assign({
         current: 1,
         per_page: 15,
         total: 0,
         total_page: 0
-    })
+    }, p))
 
     const nextPage = () => {
         if ((params.value.current + 1) <= params.value.total_page)

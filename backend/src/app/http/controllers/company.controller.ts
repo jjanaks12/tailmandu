@@ -1,4 +1,4 @@
-import { companySchema } from "@/app/lib/schema/account.schema"
+import { companySchema, socialLinkSchema } from "@/app/lib/schema/account.schema"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
@@ -14,7 +14,8 @@ export class CompanyController {
                             country: true
                         }
                     },
-                    logo: true
+                    logo: true,
+                    social_links: true
                 }
             }))
         } catch (error) {
@@ -116,6 +117,25 @@ export class CompanyController {
                     pan_no: validationData.pan_no ?? company.pan_no,
                     vat_registered: validationData.vat_registered ?? company.vat_registered,
                     ...body
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async socialLink(request: Request, response: Response, next: NextFunction) {
+        try {
+            const validationData = await socialLinkSchema.validate(request.body, { abortEarly: false })
+            response.send(await prisma.socialLink.create({
+                data: {
+                    name: validationData.name,
+                    url: validationData.url,
+                    company: {
+                        connect: {
+                            id: request.params.id
+                        }
+                    }
                 }
             }))
         } catch (error) {

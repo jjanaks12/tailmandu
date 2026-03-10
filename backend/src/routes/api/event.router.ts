@@ -4,7 +4,7 @@ import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.mid
 import { EventController } from '@/app/http/controllers/event.controller'
 import { StageController } from '@/app/http/controllers/stage.controller'
 import { CheckpointController } from '@/app/http/controllers/checkpoint.controller'
-import { GalleryController } from '@/app/http/controllers/gallery.controller'
+import { GalleryController } from '@/app/http/controllers/event_gallery.controller'
 import { VolunteerController } from '@/app/http/controllers/volunteer.controller'
 import { RunnerController } from '@/app/http/controllers/runner.controller'
 import { StageCategoryController } from '@/app/http/controllers/stage_category.controller'

@@ -31,3 +31,17 @@ export const fixDateTime = (date: string, time: string) => {
         .utc()
         .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
 }
+
+/**
+ * function to convert distance to km like 10k, 21k, 100m
+ * @param distance distance in m
+ * @returns distance in km
+ */
+export const distanceToKm = (distance: number | string) => {
+    let distanceInKm = 0
+    if (typeof distance === 'string')
+        distanceInKm = parseInt(distance) / 1000
+    else
+        distanceInKm = distance / 1000
+    return distanceInKm + 'k'
+}

@@ -118,7 +118,8 @@ model Company {
   image_id       String?
   logo           Image?   @relation(fields: [image_id], references: [id], onDelete: Cascade)
 
-  users User[]
+  users        User[]
+  social_links SocialLink[]
 
   @@map("companies")
 }
@@ -196,6 +197,9 @@ model Image {
   sponsors                Sponsor[]
   stage_category_payments StageCategoryPayment[]
   // stage_category_bibs     StageCategory[]        @relation("stage_category_bib")
+  tags                    Tag[]
+  gallery                 Gallery?               @relation(fields: [galleryId], references: [id])
+  galleryId               String?
 
   @@map("images")
 }
@@ -344,6 +348,8 @@ model Sponsor {
   thumbnail_id  String?
   thumbnail     Image?       @relation(fields: [thumbnail_id], references: [id])
 
+  social_links SocialLink[]
+
   @@map("sponsors")
 }
 
@@ -440,6 +446,7 @@ model TrailRace {
   galleries Image[]       @relation("trail_race_gallery")
   partners  Partner[]
   sponsors  Sponsor[]
+  tags      Tag[]
 
   @@map("events")
 }
@@ -547,4 +554,45 @@ model RunnerAttendance {
 
   @@unique([runner_id, stage_id])
   @@map("runner_attendance")
+}
+
+model Tag {
+  id         String      @id @default(cuid())
+  name       String
+  created_at DateTime    @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+  events     TrailRace[]
+  images     Image[]
+  galleries  Gallery[]
+
+  @@map("tags")
+}
+
+model Gallery {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  images Image[]
+  tags   Tag[]
+
+  @@map("galleries")
+}
+
+model SocialLink {
+  id         String    @id @default(cuid())
+  name       String
+  url        String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  company  Company[]
+  sponsors Sponsor[]
+
+  @@map("social_links")
 }

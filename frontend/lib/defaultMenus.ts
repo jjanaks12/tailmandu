@@ -9,6 +9,13 @@ export const useMenu = () => {
         slug: 'home',
         permissions: '*'
     }, {
+        title: 'Fastpacking & Trek',
+        path: '/fastpacking-trek',
+        icon: 'Home',
+        slug: 'fastpacking-trek',
+        permissions: '*'
+
+    }/* , {
         title: 'About us',
         path: '/about_us',
         slug: 'about_us',
@@ -33,13 +40,13 @@ export const useMenu = () => {
             icon: 'Waypoints',
             permissions: '*'
         }]
-    },/*  {
+    } , {
         title: 'Our trails',
         path: '/our_trails',
         slug: 'our_trails',
         icon: 'Waypoints',
         permissions: '*'
-    }, {
+    } */, {
         title: 'Races',
         path: '/races',
         slug: 'races',
@@ -51,13 +58,19 @@ export const useMenu = () => {
         slug: 'tm_clicks',
         icon: 'Images',
         permissions: '*'
-    },  */{
+    }, {
+        title: 'Blogs',
+        path: '/blogs',
+        icon: 'Home',
+        slug: 'blogs',
+        permissions: '*'
+    }/* , {
         title: 'Contact us',
         path: '/contact_us',
         slug: 'contact_us',
         icon: 'Contact',
         permissions: '*'
-    }])
+    } */])
 
     const { isLoggedin } = storeToRefs(useAuthStore())
 

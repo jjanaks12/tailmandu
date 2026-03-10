@@ -18,17 +18,20 @@ export const buttonVariants = cva(
         volunteer: 'border border-[#4487a0] text-[#4487a0] cursor-pointer [--i-c-btn-color:#4487a0]',
         runner: 'bg-[#4487a0] text-white cursor-pointer [--i-c-btn-color:#4487a0]',
         muted: "bg-[var(--i-c-btn-color)] text-white shadow-xs hover:bg-secondary/80 [--i-c-btn-color:var(--color-input)]",
-        light: "bg-white text-primary shadow-xs hover:bg-white/80 [--i-c-btn-color:var(--white)]",
+        light: "bg-white text-black shadow-xs hover:bg-white/50 [--i-c-btn-color:#fff]",
+        dark: "bg-slate-700 text-slate-200 shadow-xs hover:bg-white/50 [--i-c-btn-color:var(--color-slate-700)]",
+        warning: "bg-yellow-500 text-white shadow-xs hover:bg-yellow-600 [--i-c-btn-color:var(--color-yellow-500)]",
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-xs',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        xl: 'h-15 font-bold text-lg rounded-xl px-8 has-[>svg]:px-6 py-4',
         icon: 'size-9',
         iconsm: 'size-5 rounded-sm',
       },
       modifier: {
-        outline: 'bg-transparent text-[var(--i-c-btn-color)] border border-[var(--i-c-btn-color)] hover:bg-[var(--i-c-btn-color)] hover:text-white',
+        outline: ['bg-transparent text-[var(--i-c-btn-color)] border border-[var(--i-c-btn-color)] hover:bg-[var(--i-c-btn-color)]', 'hover:text-black'],
         link: "bg-transparent text-[var(--i-c-btn-color)] underline h-auto underline-offset-4 hover:bg-transparent hover:underline p-0  shadow-none border-none"
       }
     },
