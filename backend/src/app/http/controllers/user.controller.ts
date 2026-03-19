@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express-serve-static-core"
-import { PrismaClient } from "@prisma/client"
 
 import { assignRoleSchema } from "@/app/lib/schema/role.schema"
 import { APIQuery } from "@/app/lib/types"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class UserController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {

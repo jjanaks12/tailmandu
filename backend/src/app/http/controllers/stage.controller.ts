@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
@@ -6,7 +5,7 @@ import { stageSchema } from "@/app/lib/schema/event.schema"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { isBase64 } from "@/app/lib/plugins"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class StageController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

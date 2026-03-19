@@ -1,15 +1,15 @@
-import { Image, PrismaClient } from "@prisma/client"
 import path from 'node:path'
 import fs from 'node:fs'
 import createHttpError from "http-errors"
+import { prisma } from '@/prisma/client'
 
 import { generateUUID } from "@/app/lib/plugins"
 import { __basedir } from "@/index"
 import moment from "moment"
+import { Image } from '@prisma/client/index-browser'
 
 type AvailableFolders = 'images' | 'vidoes' | 'gpx'
 
-const prisma = new PrismaClient()
 export class FileHandler {
     uploadPath = path.join(__basedir, '/uploads/')
 

@@ -1,10 +1,9 @@
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
 import { FileHandler } from "@/app/lib/services/File.service"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class PersonalController {
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {

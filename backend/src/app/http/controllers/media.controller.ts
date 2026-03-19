@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
@@ -6,7 +5,7 @@ import { gallerySchema } from "@/app/lib/schema/gallery.schema"
 import { FileHandler } from "@/app/lib/services/File.service"
 import { APIQuery } from "@/app/lib/types"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class MediaController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 
 import { APIQuery } from "@/app/lib/types"
@@ -6,7 +5,7 @@ import { eventSchema } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/File.service"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class EventController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {

@@ -1,4 +1,3 @@
-import { PaymentMethod, PaymentStatus, PrismaClient, RunnerStatus } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import Bcrypt from 'bcrypt'
 
@@ -9,7 +8,8 @@ import { useMailTrap } from "@/app/lib/services/mailtrap"
 import createHttpError from "http-errors"
 import ical, { ICalCalendarMethod } from "ical-generator"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
+import { PaymentMethod, PaymentStatus } from "@prisma/client/index-browser"
 export class RunnerController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

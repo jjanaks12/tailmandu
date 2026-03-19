@@ -1,8 +1,7 @@
 import { socialLinkSchema } from "@/app/lib/schema/account.schema"
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class SocialLinkController {
     static async store(req: Request, res: Response, next: NextFunction) {
         try {

@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class ShirtSizeController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

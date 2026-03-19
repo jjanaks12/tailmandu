@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/prisma/client'
 import { NextFunction, Request, Response } from 'express-serve-static-core'
 import createHttpError from 'http-errors'
 import Bcrypt from 'bcrypt'
@@ -17,7 +17,6 @@ type UserLoginRequest = {
     password: string
 }
 
-const prisma = new PrismaClient()
 export class AuthController {
     static JWT_SERVICE = new JWT()
 

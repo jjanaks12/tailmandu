@@ -1,9 +1,9 @@
 import { gallerySchema } from "@/app/lib/schema/gallery.schema"
 import { FileHandler } from "@/app/lib/services/File.service"
-import { Image, PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
+import { Image } from "@prisma/client/index-browser"
 export class GalleryController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

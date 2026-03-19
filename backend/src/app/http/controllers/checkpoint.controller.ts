@@ -1,9 +1,8 @@
 import { checkpointSchema } from "@/app/lib/schema/event.schema"
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class CheckpointController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

@@ -1,4 +1,4 @@
-import { PaymentType, PaymentMethod } from '@prisma/client'
+import { PaymentType, PaymentMethod } from '@prisma/client/index-browser'
 import * as Y from 'yup'
 
 export const eventSchema = Y.object({

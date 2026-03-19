@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client'
 import { Request, Response, NextFunction } from 'express'
 import { permissionSchema } from '@/app/lib/schema/permission.schema'
 import createHttpError from 'http-errors'
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class PermissionController {
     public static async save(request: Request, response: Response, next: NextFunction) {
         try {

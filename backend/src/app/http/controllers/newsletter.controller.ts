@@ -1,10 +1,9 @@
 import { userNewsletterSchema } from "@/app/lib/schema/user.schema"
 import { APIQuery } from "@/app/lib/types"
-import { PrismaClient } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import createHttpError from "http-errors"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 export class NewsletterController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {

@@ -4,5 +4,6 @@ export const gallerySchema = yup.object({
     id: yup.string().optional(),
     name: yup.string().required(),
     description: yup.string(),
-    tags: yup.array().of(yup.string()).required()
+    tags: yup.array().of(yup.string()).required(),
+    images: yup.array().of(yup.string()).required()
 })

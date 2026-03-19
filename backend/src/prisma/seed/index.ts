@@ -6,7 +6,7 @@ import { genderSeed } from "./gender.seed"
 import { ageCategorySeed } from './age_category.seed'
 import { TShritSizeSeed } from "./t_shirt_sizes.seed"
 
-const prisma = new PrismaClient()
+import { prisma } from '@/prisma/client'
 const main = async () => {
     /* await countrySeed(prisma)
     await roleSeed(prisma)
