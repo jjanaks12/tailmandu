@@ -65,5 +65,14 @@
                 "description": "Edit gallery"
             }
         }
+    },
+    "tm_clicks": {
+        "title": "Gallery",
+        "menus": {
+            "home": "Home",
+            "gallery": "Gallery",
+            "races": "Races",
+            "about": "About"
+        }
     }
 }

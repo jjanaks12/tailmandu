@@ -8,6 +8,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -200,6 +204,7 @@ model Image {
   tags                    Tag[]
   gallery                 Gallery?               @relation(fields: [galleryId], references: [id])
   galleryId               String?
+  treks                   Trek[]
 
   @@map("images")
 }
@@ -579,6 +584,7 @@ model Gallery {
 
   images Image[]
   tags   Tag[]
+  treks  Trek[]
 
   @@map("galleries")
 }
@@ -595,4 +601,24 @@ model SocialLink {
   sponsors Sponsor[]
 
   @@map("social_links")
+}
+
+model Trek {
+  id           String    @id @default(cuid())
+  name         String
+  excerpt      String?
+  description  String?   @db.Text
+  /// TrekDetail
+  details      Json?
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
+
+  image_id   String?
+  thumbnail  Image?   @relation(fields: [image_id], references: [id], onDelete: Cascade)
+  gallery_id String?
+  gallery    Gallery? @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
+
+  @@map("treks")
 }

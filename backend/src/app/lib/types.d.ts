@@ -15,7 +15,7 @@ export type APIErrorResponse = {
 
 export type APIResponse<T> = APISuccessResponse<T> | APIErrorResponse
 
-export interface QueryParams {}
+export interface QueryParams { }
 
 export type APISort = {
     order: 'asc' | 'desc'
@@ -28,4 +28,17 @@ export type APIQuery = {
     s: string
     sort?: APISort
     filter: Record<string, string>
+}
+
+type TrekStats = {
+    distance: string
+    duration: string
+    elevation: string
+    grade: string
+}
+
+declare global {
+    namespace PrismaJson {
+        type TrekDetail = TrekStats | Record<string, Record<string, string>[]>
+    }
 }
