@@ -18,13 +18,14 @@ const tags = ref<string[]>([])
 const handleSubmit = async (values: any) => {
     const method = props.gallery ? 'put' : 'post'
     const url = props.gallery ? `/medias/${props.gallery.id}` : '/medias'
-    await axios[method](url, values)
-    emit('fetch')
+    const { data } = await axios[method](url, values)
+    emit('fetch', data)
     form.value?.resetForm()
 }
 
 const init = () => {
     form.value?.setFieldValue('tags', [])
+    form.value?.setFieldValue('images', [])
     if (props.gallery) {
         form.value?.setFieldValue('id', props.gallery.id)
         form.value?.setFieldValue('name', props.gallery.name)

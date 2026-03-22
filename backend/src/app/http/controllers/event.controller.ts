@@ -34,7 +34,7 @@ export class EventController {
                 orderBy: [{ created_at: 'desc' }],
             })
 
-            const total = await prisma.user.count()
+            const total = await prisma.trailRace.count()
 
             response.send({
                 per_page: Number(per_page),

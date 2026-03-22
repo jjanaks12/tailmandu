@@ -197,14 +197,32 @@ export class MediaController {
 
     public static async deleteGallery(request: Request, response: Response, next: NextFunction) {
         try {
-            await prisma.gallery.update({
+            const gallery = await prisma.gallery.update({
                 data: {
                     deleted_at: moment().toISOString()
                 },
                 where: {
                     id: request.params.id
+                },
+                include: {
+                    treks: true
                 }
             })
+
+            for (const trek of gallery.treks) {
+                await prisma.trek.update({
+                    where: {
+                        id: trek.id
+                    },
+                    data: {
+                        gallery: {
+                            disconnect: {
+                                id: request.params.id
+                            }
+                        }
+                    }
+                })
+            }
             response.send('Deleted')
         } catch (error) {
             next(error)
@@ -213,6 +231,17 @@ export class MediaController {
 
     public static async deleteImage(request: Request, response: Response, next: NextFunction) {
         try {
+            await prisma.gallery.update({
+                where: {
+                    id: request.params.id
+                },
+                data: {
+                    images: {
+                        disconnect: request.body.images.map((image: string) => ({ id: image }))
+                    }
+                }
+            })
+
             for (const imageId of request.body.images) {
                 const fileHandler = new FileHandler('images')
                 await fileHandler.deleteFile(imageId)

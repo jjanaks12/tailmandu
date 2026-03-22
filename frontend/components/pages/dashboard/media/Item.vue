@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { DotIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
+import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
 import type { Gallery } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
+interface MediaItemProps {
+    gallery: Gallery
+    showActions?: boolean
+}
+
 const { axios } = useAxios()
-const props = defineProps<{ gallery: Gallery }>()
+const props = defineProps<MediaItemProps>()
 
 const images = ref<string[]>([])
 const selectedImages = ref<string[] | null[]>([])
@@ -42,7 +47,7 @@ const saveImages = async () => {
 }
 
 const deleteImage = async () => {
-    await axios.delete('/medias/images', {
+    await axios.delete(`/medias/${props.gallery.id}/images`, {
         data: {
             images: selectedImages.value
         }
@@ -82,12 +87,14 @@ onMounted(init)
                 <Button type="button" variant="warning" modifier="outline" v-if="images.length > 0" @click="resetImage">
                     cancel
                 </Button>
-                <Button type="button" variant="warning" size="icon" @click="emit('edit')">
-                    <PencilIcon class="w-4 h-4" />
-                </Button>
-                <Button type="button" variant="destructive" size="icon" @click="emit('delete')">
-                    <TrashIcon class="w-4 h-4" />
-                </Button>
+                <template v-if="showActions">
+                    <Button type="button" variant="warning" size="icon" @click="emit('edit')">
+                        <PencilIcon class="w-4 h-4" />
+                    </Button>
+                    <Button type="button" variant="destructive" size="icon" @click="emit('delete')">
+                        <TrashIcon class="w-4 h-4" />
+                    </Button>
+                </template>
                 <DropdownMenu :open="selectedImages.filter(id => id != null).length > 0">
                     <DropdownMenuTrigger>
                         <Button size="icon">

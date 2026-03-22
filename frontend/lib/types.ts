@@ -432,3 +432,33 @@ export type Gallery = {
 export type WithCount<T> = T & {
     _count: Record<string, number>
 }
+
+
+type TrekStats = {
+    distance: string
+    duration: string
+    elevation: string
+    grade: string
+}
+
+export type TrekDetailTitles = 'Trip highlights' | 'Best time to visit' | 'Accommodation' | 'Food' | 'Gear' | string
+
+type TrekDetail = TrekStats | Record<TrekDetailTitles, Record<'key' | 'value', string | number>[]>
+
+export type Trek = {
+    id: string
+    name: string
+    excerpt: string
+    description: string
+    price: string
+    details: TrekDetail
+    published_at?: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+    image_id?: string
+    thumbnail?: Image
+    gallery_id?: string
+    gallery?: Gallery
+    tags: Tag[]
+}

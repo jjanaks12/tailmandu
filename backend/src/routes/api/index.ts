@@ -10,6 +10,7 @@ import VolunteerRouter from '@/routes/api/volunteer.router'
 import RunnerRouter from '@/routes/api/runner.router'
 import CheckpointRouter from '@/routes/api/checkpoint.router'
 import MediaRouter from '@/routes/api/media.router'
+import trekRouter from '@/routes/api/trek.router'
 
 const router = Router()
 
@@ -23,5 +24,6 @@ router.use('/volunteers', VolunteerRouter)
 router.use('/runners', RunnerRouter)
 router.use('/checkpoints', CheckpointRouter)
 router.use('/medias', MediaRouter)
+router.use('/treks', trekRouter)
 
 export default router

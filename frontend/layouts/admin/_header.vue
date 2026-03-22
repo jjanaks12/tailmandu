@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-    import { ArrowLeftToLine, MenuIcon } from 'lucide-vue-next'
-    import { useSidebar } from '~/components/ui/sidebar'
+import { ArrowLeftToLine, MenuIcon } from 'lucide-vue-next'
+import { useSidebar } from '~/components/ui/sidebar'
 
-    const { toggleSidebar } = useSidebar()
+const { toggleSidebar } = useSidebar()
 </script>
 
 <template>
@@ -12,9 +12,9 @@
         </Button>
         <Brand />
         <div class="flex justify-center items-center gap-4">
-            <Button @click="navigateTo('/')" variant="secondary" size="icon">
-                <span class="sr-only">Back to site</span>
-                <ArrowLeftToLine />
+            <Button @click="navigateTo('/')" variant="secondary" modifier="link">
+                <ArrowLeftToLine class="size-4" />
+                <span>Back to site</span>
             </Button>
         </div>
     </header>

@@ -61,10 +61,10 @@ const tagMapping: Record<string, string> = {
                 {{ item.excerpt }}
             </p>
             <div class="flex gap-2 mt-auto">
-                <button
+                <NuxtLink :to="`/fastpacking-trek/${item.slug}`"
                     class="flex-1 border border-slate-300 dark:border-slate-700 hover:border-primary hover:text-primary transition-all text-xs font-bold py-2 rounded-lg">
                     Details
-                </button>
+                </NuxtLink>
                 <button
                     class="flex-[1.5] bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 rounded-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-1.5 transition-all">
                     <span class="material-symbols-outlined text-sm">call</span> Book Call

@@ -569,6 +569,7 @@ model Tag {
   events     TrailRace[]
   images     Image[]
   galleries  Gallery[]
+  treks      Trek[]
 
   @@map("tags")
 }
@@ -605,8 +606,10 @@ model SocialLink {
 model Trek {
   id           String    @id @default(cuid())
   name         String
+  slug         String?   @unique
   excerpt      String?
   description  String?   @db.Text
+  price        String
   /// TrekDetail
   details      Json?
   published_at DateTime?
@@ -618,6 +621,8 @@ model Trek {
   thumbnail  Image?   @relation(fields: [image_id], references: [id], onDelete: Cascade)
   gallery_id String?
   gallery    Gallery? @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
+
+  tags Tag[]
 
   @@map("treks")
 }

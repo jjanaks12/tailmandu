@@ -15,7 +15,7 @@ export const useMenu = () => {
             permissions: '*'
         }]
     }, {
-        title: 'Users',
+        title: '',
         path: '',
         slug: 'users',
         permissions: [],
@@ -49,6 +49,12 @@ export const useMenu = () => {
             slug: 'permissions',
             path: '/dashboard/permissions',
             permissions: 'manage_permission'
+        }, {
+            title: 'Treks',
+            icon: 'Mountain',
+            slug: 'treks',
+            path: '/dashboard/treks',
+            permissions: 'manage_trek'
         }]
     }, {
         title: 'Miscellanous',

@@ -4,7 +4,9 @@
     },
     "header": {
         "register_btn": "Register",
-        "dashboard_btn": "Dashboard"
+        "dashboard_btn": "Dashboard",
+        "search_placeholder": "Search {name}...",
+        "filter_title": "Filters"
     },
     "home": {
         "banner": {
@@ -63,6 +65,52 @@
             "edit": {
                 "title": "Edit gallery",
                 "description": "Edit gallery"
+            }
+        },
+        "treks": {
+            "title": "Treks",
+            "add_btn": "Add new Trek",
+            "header": {
+                "filter_title": "Filters"
+            },
+            "form": {
+                "name": "Trek Name",
+                "name_placeholder": "Enter trek name",
+                "excerpt": "Excerpt",
+                "excerpt_placeholder": "Enter trek excerpt",
+                "description": "Description",
+                "description_placeholder": "Enter trek description",
+                "tags": "Tags",
+                "tags_placeholder": "Enter tags for trek",
+                "submit": "Save trek"
+            },
+            "listing": {
+                "table": {
+                    "name": "Name",
+                    "sn": "SN",
+                    "price": "Price",
+                    "status": "Status",
+                    "action": "Action",
+                    "edit": "Edit",
+                    "delete": "Delete",
+                    "publish": "Publish"
+                }
+            },
+            "modal": {
+                "add": {
+                    "title": "Add Trek",
+                    "description": "Add a new trek"
+                },
+                "edit": {
+                    "title": "Edit Trek",
+                    "description": "Edit trek"
+                },
+                "delete": {
+                    "title": "Are you sure?",
+                    "description": "This action cannot be undone. This will permanently delete your trek and remove it from the server.",
+                    "cancel": "No, cancel",
+                    "confirm": "Yes, delete"
+                }
             }
         }
     },

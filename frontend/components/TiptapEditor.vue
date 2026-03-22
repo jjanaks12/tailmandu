@@ -1,7 +1,20 @@
 <script lang="ts" setup>
+import TiptapDocument from '@tiptap/extension-document'
+import TiptapParagraph from '@tiptap/extension-paragraph'
+import TiptapText from '@tiptap/extension-text'
+import TiptapBold from '@tiptap/extension-bold'
+import TiptapItalic from '@tiptap/extension-italic'
+import TiptapStrike from '@tiptap/extension-strike'
+import TiptapBlockquote from '@tiptap/extension-blockquote'
+import TiptapBulletList from '@tiptap/extension-bullet-list'
+import TiptapHeading from '@tiptap/extension-heading'
+import TiptapListItem from '@tiptap/extension-list-item'
+import TiptapHistory from '@tiptap/extension-history'
+import TiptapOrderedList from '@tiptap/extension-ordered-list'
 import Underline from '@tiptap/extension-underline'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
-import { BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon, Heading4Icon, Heading5Icon, Heading6Icon, ItalicIcon, ListIcon, ListOrderedIcon, LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon, RotateCcwIcon, StrikethroughIcon, UnderlineIcon, UndoIcon, WrapTextIcon, XIcon } from 'lucide-vue-next'
+import Link from '@tiptap/extension-link'
+import { BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon, Heading4Icon, Heading5Icon, Heading6Icon, ItalicIcon, LinkIcon, ListIcon, ListOrderedIcon, LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon, RotateCcwIcon, StrikethroughIcon, UnderlineIcon, UndoIcon, UnlinkIcon, WrapTextIcon, XIcon } from 'lucide-vue-next'
 
 import { debounce } from '~/lib/filters'
 
@@ -19,7 +32,13 @@ const isChanged = ref(false)
 
 const editor = useEditor({
   content: props.modelValue,
-  extensions: [TiptapDocument, TiptapParagraph, TiptapText, TiptapBold, TiptapItalic, TiptapStrike, TiptapBlockquote, TiptapBulletList, TiptapHeading, TiptapListItem, TiptapHistory, TiptapOrderedList, Underline, HorizontalRule],
+  extensions: [
+    TiptapDocument, TiptapParagraph, TiptapText, TiptapBold, TiptapItalic, TiptapStrike, TiptapBlockquote, TiptapBulletList, TiptapHeading, TiptapListItem, TiptapHistory, TiptapOrderedList, Underline, HorizontalRule,
+    Link.configure({
+      openOnClick: false,
+      defaultProtocol: 'https',
+    })
+  ],
   onUpdate: ({ editor }) => {
     isChanged.value = true
     debounce(() => {
@@ -28,6 +47,22 @@ const editor = useEditor({
     }, props.timer)
   },
 })
+
+const setLink = () => {
+  const previousUrl = editor.value?.getAttributes('link').href
+  const url = window.prompt('URL', previousUrl || '')
+
+  if (url === null) {
+    return
+  }
+
+  if (url === '') {
+    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+    return
+  }
+
+  editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+}
 
 onBeforeUnmount(() => {
   // @ts-expect-error
@@ -77,6 +112,16 @@ onMounted(() => {
           :disabled="!editor.can().chain().focus().toggleStrike().run()"
           :class="{ 'is-active': editor.isActive('strike') }">
           <StrikethroughIcon :size="18" />
+        </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost"
+          @click="setLink"
+          :class="{ 'is-active': editor.isActive('link') }">
+          <LinkIcon :size="18" />
+        </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost"
+          @click="editor.chain().focus().unsetLink().run()"
+          :disabled="!editor.isActive('link')">
+          <UnlinkIcon :size="18" />
         </Button>
       </div>
       <!-- <Button  tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleCode().run()"
