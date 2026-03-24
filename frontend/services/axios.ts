@@ -45,6 +45,8 @@ export const useAxios = () => {
             token.value = null
         }
 
+        console.log(error.response?.data?.error?.message);
+
         toast.error(error.response?.data?.error?.message)
         return error
     })

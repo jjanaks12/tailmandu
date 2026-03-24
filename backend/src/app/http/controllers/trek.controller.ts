@@ -1,7 +1,9 @@
 import { trekSchema } from "@/app/lib/schema/treks.schema"
 import { APIQuery } from "@/app/lib/types"
 import { prisma } from "@/prisma/client"
+import { Prisma } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
+import createHttpError from "http-errors"
 import moment from "moment"
 
 export class TrekController {
@@ -9,6 +11,16 @@ export class TrekController {
         try {
             const { per_page = 10, current = 1, s = '', sort } = request.query
             const skip = (current - 1) * per_page
+
+            const whereQuery: Prisma.TrekWhereInput = {
+                deleted_at: null,
+            }
+
+            if (request.query.show_draft === 'false')
+                whereQuery.NOT = {
+                    published_at: null
+                }
+
             const treks = await prisma.trek.findMany({
                 skip,
                 take: parseInt(per_page.toString()),
@@ -17,9 +29,7 @@ export class TrekController {
                 } : {
                     created_at: 'desc'
                 },
-                where: {
-                    deleted_at: null
-                },
+                where: whereQuery,
                 include: {
                     tags: true,
                     gallery: {
@@ -72,11 +82,13 @@ export class TrekController {
                     }
                 }
 
+            const slug = validationData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
             response.send(await prisma.trek.create({
                 data: {
                     name: validationData.name,
                     excerpt: validationData.excerpt,
+                    slug,
                     price: validationData.price ?? '',
                     description: validationData.description,
                     image_id: validationData.image,
@@ -94,7 +106,6 @@ export class TrekController {
 
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
-            const validationData = await trekSchema.validate(request.body, { abortEarly: false })
             const tags = []
             let deletedTags = []
 
@@ -107,9 +118,12 @@ export class TrekController {
                 }
             })
 
-            if (validationData.tags) {
-                const differentTags = validationData.tags.filter(tag => !existingTrek.tags.some(t => t.name === tag))
-                deletedTags = existingTrek.tags.filter(tag => !validationData.tags.some(t => t === tag.name)).map(tag => ({ id: tag.id }))
+            if (!existingTrek)
+                throw createHttpError(404, 'Trek not found')
+
+            if (request.body.tags) {
+                const differentTags = request.body.tags.filter(tag => !existingTrek.tags.some(t => t.name === tag))
+                deletedTags = existingTrek.tags.filter(tag => !request.body.tags.some(t => t === tag.name)).map(tag => ({ id: tag.id }))
 
                 for (const tag of differentTags) {
                     const existingTag = await prisma.tag.findFirst({
@@ -135,13 +149,13 @@ export class TrekController {
                     id: request.params.id
                 },
                 data: {
-                    name: validationData.name,
-                    excerpt: validationData.excerpt,
-                    description: validationData.description,
-                    image_id: validationData.image,
-                    details: validationData.details,
-                    gallery_id: validationData.gallery_id,
-                    price: validationData.price,
+                    name: request.body.name ?? existingTrek.name,
+                    excerpt: request.body.excerpt ?? existingTrek.excerpt,
+                    description: request.body.description ?? existingTrek.description,
+                    image_id: request.body.image_id ?? existingTrek.image_id,
+                    details: request.body.details ?? existingTrek.details,
+                    gallery_id: request.body.gallery_id ?? existingTrek.gallery_id,
+                    price: request.body.price ?? existingTrek.price,
                     tags: {
                         connect: tags,
                         disconnect: deletedTags

@@ -88,7 +88,7 @@ onMounted(() => {
 
 <template>
   <div class="editor" v-if="editor">
-    <div class="flex items-center gap-0.5 rounded-sm mb-2" v-if="!disabled">
+    <div class="flex flex-wrap items-center gap-0.5 rounded-sm mb-2" v-if="!disabled">
       <div class="bg-gray-300 p-0.5 rounded">
         <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleBold().run()"
           :disabled="!editor.can().chain().focus().toggleBold().run()"
@@ -113,13 +113,11 @@ onMounted(() => {
           :class="{ 'is-active': editor.isActive('strike') }">
           <StrikethroughIcon :size="18" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="setLink"
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="setLink"
           :class="{ 'is-active': editor.isActive('link') }">
           <LinkIcon :size="18" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().unsetLink().run()"
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().unsetLink().run()"
           :disabled="!editor.isActive('link')">
           <UnlinkIcon :size="18" />
         </Button>

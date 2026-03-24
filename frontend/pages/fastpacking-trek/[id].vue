@@ -16,7 +16,7 @@ const trek = ref<Trek | null>({
     updated_at: undefined,
     deleted_at: undefined,
     published_at: undefined,
-    detail: {
+    details: {
     },
     gallery_id: undefined,
     image_id: undefined,

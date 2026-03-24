@@ -13,6 +13,7 @@ export const useAppStore = defineStore('app', () => {
     const company = ref<Company | null>(null)
     const shirtSizes = ref<TShirtSize[]>([])
     const imagePreview = ref<string | null>(null)
+    const mediaCenterDialog = ref(false)
 
     const { axios } = useAxios()
 
@@ -60,7 +61,7 @@ export const useAppStore = defineStore('app', () => {
     })
 
     return {
-        breakpoints, genders, countries, permissions, age_categories, company, shirtSizes,
+        breakpoints, genders, countries, permissions, age_categories, company, shirtSizes, mediaCenterDialog,
         fetchGender, fetchCountries, fetchPermission, fetchAgeCategory, fetchCompany, fetchShirtSizes, saveCompany, imagePreview, setImageForPreview
     }
 })

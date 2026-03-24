@@ -21,7 +21,7 @@ const showForm = ref(false)
 const showDeleteDialog = ref(false)
 const selectedTrek = ref<Trek | null>(null)
 
-onMounted(fetchTreks)
+onMounted(() => fetchTreks(true))
 </script>
 
 
@@ -33,7 +33,7 @@ onMounted(fetchTreks)
                 <PlusIcon />
                 {{ $t('dashboard.treks.add_btn') }}
             </Button>
-            <Button @click="fetchTreks" :disabled="isLoading" modifier="link">
+            <Button @click="fetchTreks(true)" :disabled="isLoading" modifier="link">
                 <RefreshCwIcon />
             </Button>
         </div>
@@ -116,7 +116,7 @@ onMounted(fetchTreks)
                 </DialogDescription>
             </DialogHeader>
             <PagesDashboardTreksForm :trek="selectedTrek"
-                @fetch="() => { fetchTreks(); selectedTrek = null; showForm = false }" />
+                @fetch="() => { fetchTreks(true); selectedTrek = null; showForm = false }" />
         </DialogContent>
     </Dialog>
     <Dialog :open="showDeleteDialog" @update:open="showDeleteDialog = $event">

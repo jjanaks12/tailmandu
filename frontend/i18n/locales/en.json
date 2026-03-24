@@ -122,5 +122,12 @@
             "races": "Races",
             "about": "About"
         }
+    },
+    "media": {
+        "tittle": "Media center",
+        "description": "Manage your media assets",
+        "selected_item": "{count} items selected",
+        "cancel_btn": "Cancel",
+        "insert_btn": "Insert Selected ({count})"
     }
 }

@@ -263,10 +263,7 @@ export class MediaController {
                     }
                 },
                 where: {
-                    deleted_at: null,
-                    images: {
-                        some: {}
-                    }
+                    deleted_at: null
                 },
                 orderBy: [{ created_at: 'desc' }],
             }))

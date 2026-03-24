@@ -427,6 +427,7 @@ export type Gallery = {
     deleted_at: string
     images: Image[]
     tags: Tag[]
+    _count: Record<string, number>
 }
 
 export type WithCount<T> = T & {
@@ -443,11 +444,13 @@ type TrekStats = {
 
 export type TrekDetailTitles = 'Trip highlights' | 'Best time to visit' | 'Accommodation' | 'Food' | 'Gear' | string
 
-type TrekDetail = TrekStats | Record<TrekDetailTitles, Record<'key' | 'value', string | number>[]>
+// type TrekDetail = TrekStats | Record<TrekDetailTitles, Record<'key' | 'value', string | number>[]>
+type TrekDetail = any
 
 export type Trek = {
     id: string
     name: string
+    slug: string
     excerpt: string
     description: string
     price: string
@@ -461,4 +464,15 @@ export type Trek = {
     gallery_id?: string
     gallery?: Gallery
     tags: Tag[]
+}
+type MediaMode = "image" | "gallery"
+
+export type MediaState = {
+    show: boolean
+    mode: MediaMode
+    isMultiple: boolean
+    selectedImages: string[]
+    selectedGalleries: string[]
+    selectedGallery: Gallery | null,
+    action?: Function
 }

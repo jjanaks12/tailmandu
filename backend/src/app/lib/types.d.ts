@@ -28,6 +28,7 @@ export type APIQuery = {
     s: string
     sort?: APISort
     filter: Record<string, string>
+    show_draft?: string
 }
 
 type TrekStats = {

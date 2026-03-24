@@ -49,7 +49,7 @@ const saveImages = async () => {
 const deleteImage = async () => {
     await axios.delete(`/medias/${props.gallery.id}/images`, {
         data: {
-            images: selectedImages.value
+            images: selectedImages.value.filter(id => id != null)
         }
     })
 
@@ -123,7 +123,8 @@ onMounted(init)
                     </Button>
                 </div>
             </template>
-            <label class="relative aspect-square border rounded-md overflow-hidden flex items-center justify-center">
+            <label
+                class="relative aspect-square border rounded-md overflow-hidden flex items-center justify-center text-center">
                 <input type="file" multiple @change="handleImageChange" class="invisible absolute" />
                 <div class="">
                     <span>Click here to upload images</span>

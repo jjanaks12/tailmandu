@@ -6,9 +6,9 @@ export const useTrekStore = defineStore('trek', () => {
     const treks = ref<Trek[]>([])
     const { axios } = useAxios()
 
-    const fetchTreks = async () => {
+    const fetchTreks = async (showDraft = false) => {
         isLoading.value = true
-        const { data: { data, ...p } } = await axios.get('/treks')
+        const { data: { data, ...p } } = await axios.get('/treks', { params: { ...params.value, show_draft: showDraft } })
         treks.value = data
         params.value = p
         isLoading.value = false

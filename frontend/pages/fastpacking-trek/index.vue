@@ -1,68 +1,26 @@
 <script setup lang="ts">
-export type Item = {
-    id: string
-    title: string
-    slug: string
-    excerpt: string
-    description: string
-    tags: string[]
-    price: number
-    elevation: number
-    duration: number
-}
+import { useTrekStore } from '~/store/trek'
 
-const items: Item[] = [{
-    id: "",
-    title: "Everest Base Camp",
-    slug: "everest-base-camp",
-    excerpt: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    description: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    tags: ["featured", "Optimized Acclimatization"],
-    price: 2450,
-    elevation: 5364,
-    duration: 14
-}, {
-    id: "",
-    title: "Annapurna Base Camp",
-    slug: "annapurna-base-camp",
-    excerpt: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    description: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    tags: ["limited slots", "cultural immersion"],
-    price: 2450,
-    elevation: 5364,
-    duration: 14
-}, {
-    id: "",
-    title: "Manaslu Circuit",
-    slug: "manaslu-circuit",
-    excerpt: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    description: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    tags: ["off-beat", "samll group"],
-    price: 2450,
-    elevation: 5364,
-    duration: 14
-}, {
-    id: "",
-    title: "Langtang valley",
-    slug: "langtang-valley",
-    excerpt: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    description: "Experience the ultimate Himalayan adventure with our proprietary expert-led strategy. We focus on slow altitude gain and premium lodge stays to ensure maximum safety and success rates for our climbers.",
-    tags: ["easy access", "short trail"],
-    price: 2450,
-    elevation: 5364,
-    duration: 14
-}]
+useTitle('Fastpacking Trek')
+
+const { treks } = storeToRefs(useTrekStore())
+const { fetchTreks, isLoading, params } = useTrekStore()
+
+onMounted(() => {
+    fetchTreks()
+})
 </script>
 
 <template>
     <div class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen pt-[80px]">
         <div class="relative flex flex-col w-full overflow-x-hidden">
             <main class="max-w-7xl mx-auto w-full px-6 lg:px-20 py-10">
+                <Button @click="fetchTreks()">fetch</Button>
                 <div class="mb-8 space-y-4">
                     <PagesDefaultFastpackingTrekFilter />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <PagesDefaultFastpackingTrekCard v-for="item in items" :item="item" />
+                    <PagesDefaultFastpackingTrekCard v-for="item in treks" :item="item" />
                 </div>
                 <div class="mt-12 flex flex-col items-center gap-4">
                     <p class="text-slate-500 text-sm font-medium">Showing 4 of 28 available premium treks</p>

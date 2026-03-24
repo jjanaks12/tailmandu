@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { CalendarDaysIcon, MountainIcon } from 'lucide-vue-next';
-import type { Item } from '~/pages/fastpacking-trek.vue'
+import { CalendarDaysIcon, MountainIcon } from 'lucide-vue-next'
+import type { Trek } from '~/lib/types'
 
 interface FastpackingCardProps {
-    item: Item
+    item: Trek
 }
 
 const props = defineProps<FastpackingCardProps>()
@@ -18,6 +18,9 @@ const tagMapping: Record<string, string> = {
     'easy access': 'bg-indigo-600',
     'short trail': 'bg-primary'
 }
+
+const startingPrice = computed(() => 2500)
+
 </script>
 
 <template>
@@ -32,25 +35,28 @@ const tagMapping: Record<string, string> = {
             <div class="absolute top-3 left-3 z-20 flex flex-col gap-1.5">
                 <span
                     class="text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm w-fit"
-                    v-for="tag in item.tags" :class="tagMapping[tag]">{{ tag }}</span>
+                    v-for="tag in item.tags" :class="tagMapping[tag.name] || 'bg-slate-800'">{{ tag.name }}</span>
             </div>
             <div
                 class="absolute top-3 right-3 z-20 bg-primary px-2.5 py-1 rounded-lg text-white font-bold text-sm shadow-lg">
-                $2,450
+                {{ startingPrice }}
             </div>
             <div class="absolute bottom-4 left-4 right-4 z-20">
-                <h3 class="text-xl font-extrabold text-white tracking-tight leading-tight mb-2">Everest
-                    Base Camp</h3>
+                <h3 class="text-xl font-extrabold text-white tracking-tight leading-tight mb-2">
+                    {{ item.name }}
+                </h3>
                 <div class="flex flex-wrap gap-2">
                     <div
                         class="flex items-center gap-1 text-white/90 text-[10px] font-medium bg-black/40 backdrop-blur-md px-2 py-1 rounded-md">
                         <MountainIcon class="size-3" />
-                        {{ $n(item.elevation, 'meter') }}
+                        <!-- {{ $n(item.elevation, 'meter') }} -->
+                        122
                     </div>
                     <div
                         class="flex items-center gap-1 text-white/90 text-[10px] font-medium bg-black/40 backdrop-blur-md px-2 py-1 rounded-md">
                         <CalendarDaysIcon class="size-3" />
-                        {{ $n(item.duration, 'day') }}
+                        1234
+                        <!-- {{ $n(item.duration, 'day') }} -->
                     </div>
                 </div>
             </div>
@@ -61,14 +67,14 @@ const tagMapping: Record<string, string> = {
                 {{ item.excerpt }}
             </p>
             <div class="flex gap-2 mt-auto">
-                <NuxtLink :to="`/fastpacking-trek/${item.slug}`"
-                    class="flex-1 border border-slate-300 dark:border-slate-700 hover:border-primary hover:text-primary transition-all text-xs font-bold py-2 rounded-lg">
-                    Details
-                </NuxtLink>
-                <button
-                    class="flex-[1.5] bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 rounded-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-1.5 transition-all">
+                <Button as-child modifier="outline">
+                    <NuxtLink :to="`/fastpacking-trek/${item.slug}`">
+                        Details
+                    </NuxtLink>
+                </Button>
+                <Button class="flex-[1.5]">
                     <span class="material-symbols-outlined text-sm">call</span> Book Call
-                </button>
+                </Button>
             </div>
         </div>
     </div>
