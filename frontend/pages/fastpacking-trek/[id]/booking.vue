@@ -1,0 +1,3 @@
+<template>
+    booking page
+</template>

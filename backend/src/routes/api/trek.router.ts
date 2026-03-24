@@ -12,5 +12,6 @@ router.delete('/:id', [verifyAccessToken], TrekController.delete)
 router.post('/:id/publish', [verifyAccessToken], TrekController.publish)
 router.put('/:id/add_gallery', [verifyAccessToken], TrekController.addGallery)
 router.put('/:id/description', [verifyAccessToken], TrekController.saveDescription)
+router.get('/:slug/by_slug', [], TrekController.showBySlug)
 
 export default router

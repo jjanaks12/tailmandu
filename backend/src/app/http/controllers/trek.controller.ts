@@ -221,6 +221,30 @@ export class TrekController {
         }
     }
 
+    public static async showBySlug(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trek.findUnique({
+                where: {
+                    slug: request.params.slug
+                },
+                include: {
+                    tags: true,
+                    gallery: {
+                        where: {
+                            deleted_at: null
+                        },
+                        include: {
+                            images: true
+                        }
+                    },
+                    thumbnail: true
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async addGallery(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.trek.update({

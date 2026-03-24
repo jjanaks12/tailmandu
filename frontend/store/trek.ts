@@ -19,6 +19,11 @@ export const useTrekStore = defineStore('trek', () => {
         return data as Trek
     }
 
+    const getTrekBySlug = async (slug: string) => {
+        const { data } = await axios.get(`/treks/${slug}/by_slug`)
+        return data as Trek
+    }
+
     const saveDescription = async (id: string, description: string) => {
         await axios.put(`/treks/${id}/description`, { description })
     }
@@ -36,6 +41,6 @@ export const useTrekStore = defineStore('trek', () => {
     return {
         treks,
         isLoading, params,
-        fetchTreks, publish, deleteTrek, getTrek, saveDescription
+        fetchTreks, publish, deleteTrek, getTrek, saveDescription, getTrekBySlug
     }
 })
