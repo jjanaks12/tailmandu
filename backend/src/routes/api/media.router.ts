@@ -5,7 +5,7 @@ import { Router } from 'express'
 const router = Router()
 
 router.get('/gallery_name', [], MediaController.getGalleryName)
-router.get('/', [verifyAccessToken], MediaController.index)
+router.get('/', [], MediaController.index)
 router.post('/', [verifyAccessToken], MediaController.store)
 router.put('/:id', [verifyAccessToken], MediaController.update)
 router.post('/:id/images', [verifyAccessToken], MediaController.addImages)
