@@ -7,7 +7,7 @@ import { useAxios } from '~/services/axios'
 import { useMediaStore } from '~/store/media'
 
 interface GalleryProps {
-    gallery: Gallery
+    gallery?: Gallery | null
 }
 
 const route = useRoute()
@@ -34,7 +34,7 @@ const openHeroMedia = () => {
 <template>
     <div
         class="md:col-span-8 bg-card p-4 rounded-lg overflow-hidden shadow-sm group relative border border-border hover:border-primary/40 transition-colors">
-        <div v-if="gallery.images && gallery.images.length > 0" class="relative w-full rounded-lg overflow-hidden">
+        <div v-if="gallery" class="relative w-full rounded-lg overflow-hidden">
             <Swiper class="overflow-hidden rounded-lg">
                 <SwiperSlide v-for="image in gallery.images" :key="image.id" class="swiper-slide">
                     <img :src="showImage(image.file_name)" :alt="gallery.name" class="w-full h-full object-cover" />
@@ -47,7 +47,8 @@ const openHeroMedia = () => {
             </div>
         </div>
         <div v-else
-            class="aspect-video w-full bg-muted flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg group-hover:bg-primary/5 transition-colors">
+            class="aspect-video w-full bg-muted flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg group-hover:bg-primary/5 transition-colors cursor-pointer"
+            @click="openHeroMedia">
             <CameraIcon class="w-10 h-10 text-muted-foreground mb-2 group-hover:text-primary" />
             <p class="text-sm font-bold text-foreground">Click to choose trek hero image</p>
             <p class="text-xs text-muted-foreground">Recommended: 1920x1080 (Max 5MB)</p>

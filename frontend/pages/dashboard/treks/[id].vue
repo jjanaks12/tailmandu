@@ -1,15 +1,5 @@
 <script setup lang="ts">
-import {
-    CameraIcon, SearchIcon, ImageIcon, UploadIcon, BarChart3Icon,
-    PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon,
-    CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon,
-    CheckSquareIcon,
-    MinusCircleIcon,
-    MinusIcon,
-    Loader2Icon
-} from 'lucide-vue-next'
-import { showImage } from '~/lib/filters'
-import { cn } from '~/lib/helpers'
+import { BarChart3Icon, PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon } from 'lucide-vue-next'
 import type { Trek } from '~/lib/types'
 import { useTrekStore } from '~/store/trek'
 
@@ -180,50 +170,10 @@ onMounted(init)
                 </div>
             </section>
 
-            <!-- Pricing Dialog -->
-            <Dialog v-model:open="showPricingDialog">
-                <DialogContent class="max-w-xl">
-                    <DialogHeader>
-                        <DialogTitle class="text-2xl font-black tracking-tight">Manage Pricing Tiers</DialogTitle>
-                        <DialogDescription class="text-muted-foreground font-medium">
-                            Define volume-based pricing for groups. The base price will be updated to match the first
-                            tier.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <PagesDashboardTreksPricing :trek="trek" @fetch="init" @close="showPricingDialog = false" />
-                </DialogContent>
-            </Dialog>
-
-            <!-- Stats Dialog -->
-            <Dialog v-model:open="showStatsDialog">
-                <DialogContent class="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle class="text-2xl font-black tracking-tight">Edit Vital Metrics</DialogTitle>
-                        <DialogDescription class="text-muted-foreground font-medium">
-                            Update the core performance stats for this trek.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <PagesDashboardTreksStats :trek="trek" @fetch="init" @close="showStatsDialog = false" />
-                </DialogContent>
-            </Dialog>
-
-            <!-- Protocols Dialog -->
-            <Dialog v-model:open="showProtocolsDialog">
-                <DialogContent class="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle class="text-2xl font-black tracking-tight">Security Protocols</DialogTitle>
-                        <DialogDescription class="text-muted-foreground font-medium">
-                            Manage the high-altitude safety standards and emergency procedures.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <PagesDashboardTreksProtocols :trek="trek" @fetch="init" @close="showProtocolsDialog = false" />
-                </DialogContent>
-            </Dialog>
-
             <!-- Image Upload & Vital Stats Bento -->
             <section class="grid grid-cols-1 md:grid-cols-12 gap-6">
                 <!-- Main Image Section -->
-                <PagesDashboardMediaSlider v-if="trek.gallery" :gallery="trek.gallery" @fetch="init" />
+                <PagesDashboardMediaSlider :gallery="trek.gallery" @fetch="init" />
                 <!-- Vital Stats -->
                 <div class="md:col-span-4 space-y-4">
                     <PagesDashboardMediaThumbnail :trek="trek" @fetch="init" />
@@ -447,6 +397,46 @@ onMounted(init)
                     </div>
                 </div>
             </section>
+
+            <!-- Stats Dialog -->
+            <Dialog v-model:open="showStatsDialog">
+                <DialogContent class="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle class="text-2xl font-black tracking-tight">Edit Vital Metrics</DialogTitle>
+                        <DialogDescription class="text-muted-foreground font-medium">
+                            Update the core performance stats for this trek.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <PagesDashboardTreksStats :trek="trek" @fetch="init" @close="showStatsDialog = false" />
+                </DialogContent>
+            </Dialog>
+
+            <!-- Protocols Dialog -->
+            <Dialog v-model:open="showProtocolsDialog">
+                <DialogContent class="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle class="text-2xl font-black tracking-tight">Security Protocols</DialogTitle>
+                        <DialogDescription class="text-muted-foreground font-medium">
+                            Manage the high-altitude safety standards and emergency procedures.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <PagesDashboardTreksProtocols :trek="trek" @fetch="init" @close="showProtocolsDialog = false" />
+                </DialogContent>
+            </Dialog>
+
+            <!-- Pricing Dialog -->
+            <Dialog v-model:open="showPricingDialog">
+                <DialogContent class="max-w-xl">
+                    <DialogHeader>
+                        <DialogTitle class="text-2xl font-black tracking-tight">Manage Pricing Tiers</DialogTitle>
+                        <DialogDescription class="text-muted-foreground font-medium">
+                            Define volume-based pricing for groups. The base price will be updated to match the first
+                            tier.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <PagesDashboardTreksPricing :trek="trek" @fetch="init" @close="showPricingDialog = false" />
+                </DialogContent>
+            </Dialog>
         </template>
     </div>
 </template>

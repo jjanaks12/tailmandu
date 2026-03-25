@@ -14,7 +14,7 @@ definePageMeta({
     authorization: ['manage_user']
 })
 
-const { fetchTreks, publish, deleteTrek } = useTrekStore()
+const { fetchTreks, publish, deleteTrek, unpublish } = useTrekStore()
 const { treks, params, isLoading } = storeToRefs(useTrekStore())
 
 const showForm = ref(false)
@@ -96,6 +96,10 @@ onMounted(() => fetchTreks(true))
                             <DropdownMenuItem @click="publish(trek.id)" v-if="!trek.published_at">
                                 <CornerRightUpIcon />
                                 {{ $t('dashboard.treks.listing.table.publish') }}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem @click="unpublish(trek.id)" v-else>
+                                <CornerRightUpIcon />
+                                {{ $t('dashboard.treks.listing.table.unpublish') }}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

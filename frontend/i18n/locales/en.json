@@ -93,7 +93,8 @@
                     "action": "Action",
                     "edit": "Edit",
                     "delete": "Delete",
-                    "publish": "Publish"
+                    "publish": "Publish",
+                    "unpublish": "Unpublish"
                 }
             },
             "modal": {

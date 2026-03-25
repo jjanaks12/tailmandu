@@ -39,7 +39,7 @@ const bookingBar = useTemplateRef('booking-bar')
 const isBookingBarVisible = useElementVisibility(bookingBar)
 
 const duration = computed(() => {
-    return trek.value?.details?.itinerary?.length || trek.value?.details.itinerary?.length || 0
+    return trek.value?.details ? trek.value?.details.itinerary?.length || 0 : 0
 })
 
 const startingPrice = computed(() => {
@@ -123,7 +123,7 @@ onMounted(init)
                                 Itinerary Highlights
                             </h3>
                             <ul class="space-y-3">
-                                <li v-for="(day, index) in (trek.details?.itinerary as Array<any>).slice(0, 3)"
+                                <li v-for="(day, index) in (trek.details?.itinerary as Array<any>)?.slice(0, 3)"
                                     :key="index" class="flex items-center gap-3 text-[14px] font-bold">
                                     <span class="text-primary font-black">
                                         {{ index + 1 < 10 ? `0${index + 1}` : index + 1 }} </span>

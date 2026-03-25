@@ -197,6 +197,21 @@ export class TrekController {
         }
     }
 
+    public static async unpublish(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trek.update({
+                where: {
+                    id: request.params.id
+                },
+                data: {
+                    published_at: null
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async show(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.trek.findUnique({

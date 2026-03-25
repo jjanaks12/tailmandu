@@ -2,7 +2,7 @@
 import HomeBanner from '@/components/pages/default/home/banner/Hero.vue'
 import Newsletter from '@/components/pages/default/newsletter.vue'
 import img01 from '@/assets/images/review-img01.jpg'
-import { GlobeIcon, MailIcon, MoonIcon, SunIcon } from 'lucide-vue-next'
+import { ChevronLeftIcon, ChevronRightIcon, GlobeIcon, MailIcon, MoonIcon, StarIcon, SunIcon } from 'lucide-vue-next'
 
 definePageMeta({
     layout: 'default'
@@ -44,11 +44,11 @@ onMounted(() => {
                             <div
                                 class="bg-white dark:bg-deep-slate p-10 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800">
                                 <div class="flex items-center space-x-1 mb-6">
-                                    <span class="material-symbols-outlined text-primary text-2xl fill-1">star</span>
-                                    <span class="material-symbols-outlined text-primary text-2xl fill-1">star</span>
-                                    <span class="material-symbols-outlined text-primary text-2xl fill-1">star</span>
-                                    <span class="material-symbols-outlined text-primary text-2xl fill-1">star</span>
-                                    <span class="material-symbols-outlined text-primary text-2xl fill-1">star</span>
+                                    <StarIcon class="text-primary text-2xl fill-1" />
+                                    <StarIcon class="text-primary text-2xl fill-1" />
+                                    <StarIcon class="text-primary text-2xl fill-1" />
+                                    <StarIcon class="text-primary text-2xl fill-1" />
+                                    <StarIcon class="text-primary text-2xl fill-1" />
                                 </div>
                                 <p class="text-xl italic text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
                                     "Trail Mandu isn't just a race organizer; they are guardians of a true Himalayan
@@ -68,11 +68,11 @@ onMounted(() => {
                             <div class="flex space-x-3 mt-8">
                                 <button
                                     class="w-12 h-12 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all">
-                                    <span class="material-symbols-outlined">west</span>
+                                    <ChevronLeftIcon />
                                 </button>
                                 <button
                                     class="w-12 h-12 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all">
-                                    <span class="material-symbols-outlined">east</span>
+                                    <ChevronRightIcon />
                                 </button>
                             </div>
                         </div>

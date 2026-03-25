@@ -28,7 +28,7 @@ const startingPrice = computed(() => {
 })
 
 const duration = computed(() => {
-    return props.item.details?.itinerary?.length || props.item.details.itinerary?.length || 0
+    return props.item.details?.itinerary?.length || 0
 })
 </script>
 
