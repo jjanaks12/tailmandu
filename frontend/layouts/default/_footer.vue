@@ -39,6 +39,9 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
                         <li><a class="hover:text-primary transition-colors" href="#">Elite Program</a></li>
                         <li><a class="hover:text-primary transition-colors" href="#">Past Results</a></li>
                         <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+                        <li>
+                            <NuxtLink class="hover:text-primary transition-colors" to="/our_team">Our team</NuxtLink>
+                        </li>
                     </ul>
                 </div>
                 <div>

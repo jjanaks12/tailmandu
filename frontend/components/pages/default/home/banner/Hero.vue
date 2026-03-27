@@ -22,14 +22,12 @@ const totalDistance = computed(() => currentStage.value?.stage_categories.reduce
     <ClientOnly>
         <template v-if="currentRace">
             <section class="relative h-screen flex items-center mountain-bg pt-20 z-[1] overflow-hidden">
-                <figure
-                    class="absolute inset-0 z-[-1] after:absolute after:inset-0 after:bg-gradient-to-b after:from-gray-500/30 after:to-white after:z-[2]"
-                    v-if="currentRace.thumbnail">
+                <figure class="absolute inset-0 z-[-1] after:absolute" v-if="currentRace.thumbnail">
                     <img :src="showImage(currentRace?.thumbnail?.file_name as string)" :alt="currentRace.name"
                         class="w-full h-full object-cover">
                 </figure>
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="text-white grid lg:grid-cols-2 gap-12 items-center">
                         <div>
                             <h1 class="font-display text-5xl md:text-7xl font-extrabold leading-tight mb-6">
                                 {{ currentRace.name }}

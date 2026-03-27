@@ -59,34 +59,32 @@ onMounted(init)
         Loading Trek...
     </div>
     <template v-else-if="trek">
+        <section class="relative w-full overflow-hidden flex flex-col justify-end">
+            <div class="inset-0 z-0">
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-background-light via-transparent to-transparent z-10">
+                </div>
+                <img :alt="trek.name" class="w-full h-auto object-cover shadow-2xl"
+                    :src="showImage(trek.thumbnail?.file_name)" v-if="trek.thumbnail" />
+            </div>
+            <div class="pb-[200px] absolute bottom-0 left-0 right-0 text-white z-20 max-w-4xl px-4">
+                <span v-for="tag in trek.tags" :key="tag.id"
+                    class="inline-block px-2 py-1 border border-primary text-[12px] font-black uppercase tracking-[0.2em] mb-4 mr-2">
+                    {{ tag.name }}
+                </span>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-none uppercase mb-2">
+                    {{ trek.name }}
+                </h1>
+                <p class="text-xl md:text-2xl font-bold tracking-tight">
+                    {{ trek.excerpt }}
+                </p>
+            </div>
+        </section>
         <main class="max-w-7xl mx-auto px-6 md:px-10">
             <!-- Hero Section -->
-            <section class="relative w-full h-[500px] overflow-hidden flex flex-col justify-end pb-12">
-                <div class="absolute inset-0 z-0">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-background-light via-transparent to-transparent z-10">
-                    </div>
-                    <img :alt="trek.name"
-                        class="w-full h-full object-cover grayscale contrast-125 opacity-40 shadow-2xl"
-                        :src="showImage(trek.thumbnail?.file_name)" v-if="trek.thumbnail" />
-                </div>
-                <div class="relative z-20 max-w-4xl px-4">
-                    <span v-for="tag in trek.tags" :key="tag.id"
-                        class="inline-block px-2 py-1 border border-primary text-primary text-[12px] font-black uppercase tracking-[0.2em] mb-4 mr-2">
-                        {{ tag.name }}
-                    </span>
-                    <h1
-                        class="text-4xl md:text-6xl lg:text-7xl 2xl:text-8xl font-black text-[#1A1A1A] leading-none uppercase mb-2">
-                        {{ trek.name }}
-                    </h1>
-                    <p class="text-xl md:text-2xl text-primary font-bold tracking-tight">
-                        {{ trek.excerpt }}
-                    </p>
-                </div>
-            </section>
             <!-- Quick Facts Bar -->
             <section class="relative z-30 mb-16">
-                <div class="bg-surface-light border border-black/5 p-1 shadow-xl">
+                <div class="bg-white border border-black/5 p-1 shadow-xl -mt-[50px]">
                     <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-black/5">
                         <div class="p-8 space-y-6">
                             <h3
@@ -120,7 +118,7 @@ onMounted(init)
                             <h3
                                 class="text-primary text-[14px] font-black uppercase tracking-widest flex items-center gap-2">
                                 <StarIcon />
-                                Itinerary Highlights
+                                Trip Highlights
                             </h3>
                             <ul class="space-y-3">
                                 <li v-for="(day, index) in (trek.details?.itinerary as Array<any>)?.slice(0, 3)"
@@ -174,7 +172,7 @@ onMounted(init)
                                 <SwiperSlide v-for="image in trek.gallery?.images"
                                     @click="setImageForPreview(showImage(image.file_name))">
                                     <img alt="Forest trail"
-                                        class="w-full h-48 rounded-sm object-cover grayscale hover:grayscale-0 transition-all duration-500 border border-black/5"
+                                        class="w-full h-48 rounded-sm object-cover border border-black/5"
                                         :src="showImage(image.file_name)" />
                                 </SwiperSlide>
                             </Swiper>
@@ -184,10 +182,11 @@ onMounted(init)
                     <section class="space-y-6" id="pricing">
                         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                             <div>
-                                <h2 class="text-3xl font-black uppercase tracking-tighter text-[#1A1A1A]">Transparent
-                                    Investment</h2>
+                                <h2 class="text-3xl font-black uppercase tracking-tighter text-[#1A1A1A]">
+                                    Trip packages
+                                </h2>
                                 <p class="text-text-muted font-bold text-[14px] uppercase tracking-widest mt-1">Starting
-                                    from <span class="text-primary">${{ startingPrice }}</span> per person</p>
+                                    from <span class="text-primary">NPR{{ startingPrice }}</span> per person</p>
                             </div>
                         </div>
 
@@ -257,8 +256,9 @@ onMounted(init)
                     <div class="sticky top-28 space-y-8">
                         <!-- Detailed Itinerary -->
                         <section v-if="trek.details?.itinerary?.length">
-                            <h3 class="text-[14px] font-black uppercase tracking-widest text-primary mb-6">Expedition
-                                Timeline</h3>
+                            <h3 class="text-[14px] font-black uppercase tracking-widest text-primary mb-6">
+                                Itinerary Timeline
+                            </h3>
                             <div
                                 class="max-h-[500px] overflow-y-auto pr-4 border-l-2 border-primary/20 space-y-8 relative">
                                 <div v-for="(day, index) in trek.details.itinerary as any[]" :key="index"

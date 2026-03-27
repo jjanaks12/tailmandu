@@ -13,3 +13,5 @@ my_database_backup.sql
 doc.md
 
 package-lock.json
+.agents
+skills-lock.json
