@@ -3,16 +3,16 @@ import { useAuthStore } from "~/store/auth"
 
 export const useMenu = () => {
     const menus = ref<Menu[]>([{
-        title: 'Home',
-        path: '/',
+        title: 'Fastpacking',
+        path: '/fastpacking',
         icon: 'Home',
-        slug: 'home',
+        slug: 'fastpacking',
         permissions: '*'
     }, {
-        title: 'Fastpacking & Trek',
-        path: '/fastpacking-trek',
+        title: 'Trek',
+        path: '/treks',
         icon: 'Home',
-        slug: 'fastpacking-trek',
+        slug: 'treks',
         permissions: '*'
 
     }/* , {

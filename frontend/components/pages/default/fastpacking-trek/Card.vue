@@ -75,7 +75,7 @@ const duration = computed(() => {
             </p>
             <div class="flex gap-2 mt-auto">
                 <Button as-child modifier="outline">
-                    <NuxtLink :to="`/fastpacking-trek/${item.slug}`">
+                    <NuxtLink :to="`/fastpacking/${item.slug}`">
                         Details
                     </NuxtLink>
                 </Button>

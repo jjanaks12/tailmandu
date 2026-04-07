@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BarChart3Icon, PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon } from 'lucide-vue-next'
+import { BarChart3Icon, PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon, SparklesIcon, InfoIcon } from 'lucide-vue-next'
 import type { Trek } from '~/lib/types'
 import { useTrekStore } from '~/store/trek'
 
@@ -32,6 +32,15 @@ const removeItineraryDay = (index: number) => {
     itinerary.value.splice(index, 1)
 }
 
+const addHighlightItem = () => {
+    trek.value?.details?.highlights.push('')
+}
+
+const removeHighlightItem = (index: number) => {
+    trek.value?.details?.highlights.splice(index, 1)
+    saveDetails()
+}
+
 const addIncludedItem = () => {
     trek.value?.details?.included.push('')
 }
@@ -54,6 +63,31 @@ const removeGear = (index: number) => {
     trek.value?.details.mandatoryGear.splice(index, 1)
     saveDetails()
 }
+
+const addImportantDetailSection = () => {
+    trek.value?.details?.importantDetails.push({
+        title: 'New Section',
+        items: []
+    })
+}
+
+const removeImportantDetailSection = (index: number) => {
+    trek.value?.details?.importantDetails.splice(index, 1)
+    saveDetails()
+}
+
+const addImportantDetailItem = (sectionIndex: number) => {
+    trek.value?.details?.importantDetails[sectionIndex].items.push({
+        title: 'New Item',
+        description: ''
+    })
+}
+
+const removeImportantDetailItem = (sectionIndex: number, itemIndex: number) => {
+    trek.value?.details?.importantDetails[sectionIndex].items.splice(itemIndex, 1)
+    saveDetails()
+}
+
 
 const isSavingDetails = ref(false)
 const saveDetails = async () => {
@@ -105,11 +139,13 @@ const init = async () => {
         itinerary.value = trek.value.details?.itinerary ?? []
         trek.value.details = trek.value.details ?? {}
         trek.value.details.stats = trek.value.details?.stats ?? {}
+        trek.value.details.highlights = trek.value.details?.highlights ?? []
         trek.value.details.included = trek.value.details?.included ?? []
         trek.value.details.excluded = trek.value.details?.excluded ?? []
         trek.value.details.mandatoryGear = trek.value.details?.mandatoryGear ?? []
         trek.value.details.optionalGear = trek.value.details?.optionalGear ?? []
         trek.value.details.securityProtocols = trek.value.details?.securityProtocols ?? []
+        trek.value.details.importantDetails = trek.value.details?.importantDetails ?? []
     }
 }
 
@@ -232,6 +268,31 @@ onMounted(init)
                             Trek Description</label>
                         <PagesDashboardTreksDescription :trek="trek" @update="init" />
                     </div>
+                </div>
+            </section>
+
+            <!-- Trip Highlights -->
+            <section class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-foreground">Trip Highlights</h3>
+                    <Button v-if="trek?.details?.highlights?.length > 0" variant="ghost" size="sm" @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
+                        <Loader2Icon v-if="isSavingDetails" class="w-4 h-4 animate-spin mr-2" />
+                        Save Highlights
+                    </Button>
+                </div>
+                <div class="bg-card rounded-lg p-6 border border-border shadow-sm">
+                    <div class="space-y-3">
+                        <div v-for="(highlight, index) in (trek?.details?.highlights as Array<string>)" :key="index" class="flex items-center gap-3 group relative">
+                            <SparklesIcon class="w-4 h-4 text-primary shrink-0" />
+                            <Input v-model="trek.details.highlights[index]" type="text" class="flex-1" placeholder="A key highlight of the trip..." />
+                            <Button variant="ghost" size="icon" @click="removeHighlightItem(index)" class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0">
+                                <Trash2Icon class="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
+                    <Button @click="addHighlightItem" variant="ghost" class="w-full mt-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
+                        <PlusIcon class="w-3.5 h-3.5" /> Add Highlight
+                    </Button>
                 </div>
             </section>
 
@@ -394,6 +455,53 @@ onMounted(init)
                             class="bg-foreground text-background font-bold h-full min-h-[100px] rounded-lg flex items-center justify-center gap-2 hover:bg-foreground/90 transition-all">
                             <ShieldIcon class="w-4 h-4" /> Edit All Protocols
                         </Button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Important Details Section -->
+            <section class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-foreground">Important Details</h3>
+                        <p class="text-sm text-muted-foreground">Information like Food, Water, Toilets, etc.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <Button v-if="trek?.details?.importantDetails?.length > 0" variant="ghost" size="sm" @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
+                            <Loader2Icon v-if="isSavingDetails" class="w-4 h-4 animate-spin mr-2" />
+                            Save Changes
+                        </Button>
+                        <Button @click="addImportantDetailSection" variant="secondary" class="font-bold text-primary bg-primary/10 hover:bg-primary/20 flex items-center gap-2">
+                            <PlusCircleIcon class="w-4 h-4" /> Add Section
+                        </Button>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div v-for="(section, sectionIndex) in (trek?.details?.importantDetails as Array<any>)" :key="sectionIndex" class="bg-card border border-border rounded-lg p-6 shadow-sm group/section">
+                        <div class="flex justify-between items-center mb-6">
+                            <Input v-model="section.title" class="text-lg font-bold border-none bg-transparent focus-visible:ring-0 px-0 h-auto w-full md:w-1/2" placeholder="Section Title (e.g. Food, Water & Toilets)" />
+                            <Button variant="ghost" size="icon" @click="removeImportantDetailSection(sectionIndex as number)" class="text-muted-foreground hover:text-destructive shrink-0">
+                                <Trash2Icon class="w-4 h-4" />
+                            </Button>
+                        </div>
+                        
+                        <div class="space-y-4 pl-4 border-l-2 border-border/50">
+                            <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="group/item relative space-y-2 pb-4 mb-4 border-b border-border/50 last:border-0 last:pb-0 last:mb-0">
+                                <div class="flex flex-col md:flex-row justify-between gap-4">
+                                    <div class="flex-1 space-y-2">
+                                        <Input v-model="item.title" class="font-bold" placeholder="Item Title (e.g. Food)" />
+                                        <Textarea v-model="item.description" rows="2" placeholder="Item Description..." class="resize-none" />
+                                    </div>
+                                    <Button variant="ghost" size="icon" @click="removeImportantDetailItem(sectionIndex as number, itemIndex as number)" class="opacity-0 group-hover/item:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0 mt-1 self-end md:self-start">
+                                        <Trash2Icon class="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <Button @click="addImportantDetailItem(sectionIndex as number)" variant="ghost" class="w-full text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
+                                <PlusIcon class="w-3.5 h-3.5" /> Add Item
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </section>

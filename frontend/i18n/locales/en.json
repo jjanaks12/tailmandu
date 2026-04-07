@@ -3,13 +3,15 @@
         "delete": "Delete selected"
     },
     "header": {
-        "register_btn": "Register",
+        "register_btn": "Sign In / Sign Up",
         "dashboard_btn": "Dashboard",
         "search_placeholder": "Search {name}...",
         "filter_title": "Filters"
     },
     "home": {
         "banner": {
+            "title": "From The City To The Mountains",
+            "description": "Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes",
             "explore_races": "Explore Races",
             "watch_film": "Watch Film",
             "register_now": "Register Now",
@@ -23,7 +25,8 @@
         "stage": {
             "title": "Choose your stage from Race",
             "description": "Whether you're an elite athlete or a weekend warrior, we have a trail for your level of experience.",
-            "see_result": "See Result"
+            "see_result": "See Result",
+            "learn_more": "Learn More"
         },
         "adventures": {
             "title": "Unique Trail Adventures",

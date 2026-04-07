@@ -18,8 +18,8 @@ const adventureList = computed(() => {
         distance: trek.details?.stats?.distance || '---',
         duration: trek.details?.itinerary?.length ? `${trek.details.itinerary.length} Days` : '---',
         elevation: trek.details?.stats?.maxElevation || '---',
-        buttonLink: `/fastpacking-trek/${trek.slug}/booking`,
-        viewItineraryLink: `/fastpacking-trek/${trek.slug}`,
+        buttonLink: `/fastpacking/${trek.slug}/booking`,
+        viewItineraryLink: `/fastpacking/${trek.slug}`,
     }))
 })
 
@@ -106,7 +106,7 @@ onMounted(async () => {
                 </div>
                 <div class="text-right">
                     <Button modifier="link" as-child>
-                        <NuxtLink to="/fastpacking-trek">view all</NuxtLink>
+                        <NuxtLink to="/fastpacking">view all</NuxtLink>
                     </Button>
                 </div>
             </div>

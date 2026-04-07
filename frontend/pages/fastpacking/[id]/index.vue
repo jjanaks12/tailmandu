@@ -85,8 +85,8 @@ onMounted(init)
             <!-- Quick Facts Bar -->
             <section class="relative z-30 mb-16">
                 <div class="bg-white border border-black/5 p-1 shadow-xl -mt-[50px]">
-                    <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-black/5">
-                        <div class="p-8 space-y-6">
+                    <div class="md:flex divide-y md:divide-y-0 md:divide-x divide-black/5">
+                        <div class="md:w-1/3 p-8 space-y-6">
                             <h3
                                 class="text-primary text-[14px] font-black uppercase tracking-widest flex items-center gap-2">
                                 <ChartNoAxesCombinedIcon />
@@ -105,7 +105,7 @@ onMounted(init)
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                        }}</p>
+                                    }}</p>
                                 </div>
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Distance</p>
@@ -120,26 +120,14 @@ onMounted(init)
                                 <StarIcon />
                                 Trip Highlights
                             </h3>
-                            <ul class="space-y-3">
-                                <li v-for="(day, index) in (trek.details?.itinerary as Array<any>)?.slice(0, 3)"
-                                    :key="index" class="flex items-center gap-3 text-[14px] font-bold">
+                            <ul class="space-y-3 columns-2">
+                                <li v-for="(day, index) in (trek.details?.highlights as Array<any>)" :key="index"
+                                    class="flex items-start gap-3 text-[12px] font-bold">
                                     <span class="text-primary font-black">
                                         {{ index + 1 < 10 ? `0${index + 1}` : index + 1 }} </span>
-                                            {{ day.title }}
-                                </li>
-                                <li v-if="(trek.details?.itinerary || []).length > 3"
-                                    class="text-[12px] text-text-muted font-bold uppercase tracking-widest mt-2 pl-8">
-                                    & {{ (trek.details?.itinerary || []).length - 3 }} More Days...
+                                            {{ day }}
                                 </li>
                             </ul>
-                        </div>
-                        <div class="p-8 flex flex-col justify-center gap-4">
-                            <Button as-child size="xl">
-                                <NuxtLink :to="`/fastpacking-trek/${trek.slug}/booking`">
-                                    Secure Your Spot
-                                </NuxtLink>
-                            </Button>
-                            <!-- <Button variant="dark" modifier="outline" size="xl">Download Brochure</Button> -->
                         </div>
                     </div>
                 </div>
@@ -168,7 +156,7 @@ onMounted(init)
                                     <p class="text-[14px] text-text-muted">{{ protocol.description }}</p>
                                 </div>
                             </div>
-                            <Swiper :slides-per-view="2" :space-between="10">
+                            <Swiper :slides-per-view="2.2" :space-between="10">
                                 <SwiperSlide v-for="image in trek.gallery?.images"
                                     @click="setImageForPreview(showImage(image.file_name))">
                                     <img alt="Forest trail"
@@ -251,6 +239,33 @@ onMounted(init)
                             </div>
                         </div>
                     </section>
+
+                    <!-- Important Details -->
+                    <section v-if="trek.details?.importantDetails?.length"
+                        class="space-y-6 pt-12 border-t border-black/5" id="important-details">
+                        <h2 class="text-3xl font-black uppercase tracking-tighter text-[#1A1A1A]">
+                            Important Details
+                        </h2>
+                        <div class="grid grid-cols-1 gap-8">
+                            <div v-for="(section, index) in trek.details.importantDetails as any[]" :key="index"
+                                class="bg-white border border-black/5 p-8 shadow-sm">
+                                <h3
+                                    class="text-primary text-[16px] font-black uppercase tracking-widest mb-6 border-b border-black/5 pb-4">
+                                    {{ section.title }}
+                                </h3>
+                                <div class="space-y-6">
+                                    <div v-for="(item, itemIndex) in section.items" :key="itemIndex">
+                                        <h4 class="text-[14px] font-bold uppercase text-[#1A1A1A] mb-1"
+                                            v-if="trek.details?.importantDetails?.length > 2">
+                                            {{ item.title }}
+                                        </h4>
+                                        <p class="text-[14px] text-text-muted leading-relaxed">{{ item.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
                 <div class="lg:col-span-5 space-y-8">
                     <div class="sticky top-28 space-y-8">
@@ -278,8 +293,23 @@ onMounted(init)
                                 </div>
                             </div>
                         </section>
+                        <!-- Mandatory Gear -->
+                        <section v-if="trek.details?.mandatoryGear?.length" class="space-y-4">
+                            <h3 class="text-[14px] font-black uppercase tracking-widest text-primary">Recommended Gear
+                            </h3>
+                            <ul class="bg-white border border-black/5 shadow-sm divide-y divide-black/5">
+                                <li v-for="(gear, index) in trek.details.mandatoryGear as any[]" :key="index"
+                                    class="p-4 flex items-center gap-3">
+                                    <span
+                                        class="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
+                                        <span class="w-2.5 h-2.5 bg-primary rounded-full"></span>
+                                    </span>
+                                    <span class="text-[14px] text-[#1A1A1A]">{{ gear.title }}</span>
+                                </li>
+                            </ul>
+                        </section>
                         <!-- Safety & Risk -->
-                        <section v-if="trek.details?.securityProtocols?.length" class="space-y-4">
+                        <!-- <section v-if="trek.details?.securityProtocols?.length" class="space-y-4">
                             <h3 class="text-[14px] font-black uppercase tracking-widest text-primary">Security Protocols
                             </h3>
                             <div v-for="(protocol, index) in trek.details.securityProtocols as any[]" :key="index"
@@ -293,7 +323,7 @@ onMounted(init)
                                 </div>
                                 <p class="text-[14px] text-text-muted leading-relaxed">{{ protocol.description }}</p>
                             </div>
-                        </section>
+                        </section> -->
                     </div>
                 </div>
             </div>

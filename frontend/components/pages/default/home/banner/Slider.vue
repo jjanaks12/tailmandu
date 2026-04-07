@@ -26,7 +26,7 @@ const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
                         {{ trailRace.name }}
                     </h2>
                     <p class="text-slate-500 dark:text-slate-400 max-w-xl">
-                        {{ $t('home.stage.description') }}
+                        {{ trailRace.excerpt }}
                     </p>
                 </div>
                 <div class="flex space-x-2">
@@ -40,7 +40,12 @@ const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
                     </Button>
                 </div>
             </div>
-            <swiper-container ref="swiperRef" :slides-per-view="3" :space-between="20">
+            <swiper-container ref="swiperRef" :slides-per-view="stages.length == 1 ? 1 : 1.2" :space-between="20"
+                :breakpoints="{
+                    768: {
+                        slidesPerView: 2.2,
+                    }
+                }">
                 <swiper-slide v-for="stage in stages">
                     <PagesDefaultHomeBannerCard :stage="stage" />
                 </swiper-slide>
