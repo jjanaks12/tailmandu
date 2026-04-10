@@ -24,19 +24,29 @@ export class GalleryController {
                 a.push(await fileService.saveFile(image))
             }
 
+            const tags = []
+            if (validationData.tags) {
+                for (const tag of validationData.tags) {
+                    const existingTag = await prisma.tag.findFirst({
+                        where: { name: tag }
+                    })
+                    if (existingTag) {
+                        tags.push({ id: existingTag.id })
+                    } else {
+                        const newTag = await prisma.tag.create({
+                            data: { name: tag }
+                        })
+                        tags.push({ id: newTag.id })
+                    }
+                }
+            }
+
             response.send(await prisma.gallery.create({
                 data: {
                     name: validationData.name,
                     description: validationData.description,
                     tags: {
-                        connectOrCreate: validationData.tags.map(tag => ({
-                            where: {
-                                name: tag
-                            },
-                            create: {
-                                name: tag
-                            }
-                        }))
+                        connect: tags
                     },
                     images: {
                         connect: a.map(img => ({ id: img.id }))
@@ -58,6 +68,23 @@ export class GalleryController {
                 a.push(await fileService.saveFile(image))
             }
 
+            const tags = []
+            if (validationData.tags) {
+                for (const tag of validationData.tags) {
+                    const existingTag = await prisma.tag.findFirst({
+                        where: { name: tag }
+                    })
+                    if (existingTag) {
+                        tags.push({ id: existingTag.id })
+                    } else {
+                        const newTag = await prisma.tag.create({
+                            data: { name: tag }
+                        })
+                        tags.push({ id: newTag.id })
+                    }
+                }
+            }
+
             response.send(await prisma.gallery.update({
                 where: {
                     id: request.params.id
@@ -66,14 +93,7 @@ export class GalleryController {
                     name: validationData.name,
                     description: validationData.description,
                     tags: {
-                        connectOrCreate: validationData.tags.map(tag => ({
-                            where: {
-                                name: tag
-                            },
-                            create: {
-                                name: tag
-                            }
-                        }))
+                        connect: tags
                     },
                     images: {
                         connect: a.map(img => ({ id: img.id }))

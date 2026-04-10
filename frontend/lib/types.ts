@@ -4,7 +4,7 @@ export type Leaflet = typeof import('leaflet')
 
 type APISort<T> = {
     order: "asc" | "desc"
-    field: keyof typeof T
+    field: keyof T
 }
 
 export const paymentMethods = ['PAY_AT_VENUE', 'QR'] as const
@@ -447,6 +447,15 @@ export type TrekDetailTitles = 'Trip highlights' | 'Best time to visit' | 'Accom
 // type TrekDetail = TrekStats | Record<TrekDetailTitles, Record<'key' | 'value', string | number>[]>
 type TrekDetail = any
 
+export type TrekCategory = {
+    id: string
+    name: string
+    description: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+}
+
 export type Trek = {
     id: string
     name: string
@@ -463,6 +472,8 @@ export type Trek = {
     thumbnail?: Image
     gallery_id?: string
     gallery?: Gallery
+    category_id?: string
+    category?: TrekCategory
     tags: Tag[]
 }
 type MediaMode = "image" | "gallery"

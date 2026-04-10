@@ -622,7 +622,79 @@ model Trek {
   gallery_id String?
   gallery    Gallery? @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
 
-  tags Tag[]
+  category_id String?
+  category    TrekCategory? @relation(fields: [category_id], references: [id])
+
+  tags     Tag[]
+  bookings TrekBooking[]
 
   @@map("treks")
 }
+
+model TrekCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  treks       Trek[]
+
+  @@map("trek_categories")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model TrekBooking {
+  id             String        @id @default(cuid())
+  status         BookingStatus @default(PENDING)
+  departure_date DateTime
+  adults         Int           @default(1)
+  children       Int           @default(0)
+  gear_option    String        @default("standard") // "standard" | "pro"
+  insurance      Boolean       @default(true)
+  airport_pickup Boolean       @default(false)
+  subtotal       Decimal       @db.Decimal(10, 2)
+  total_price    Decimal       @db.Decimal(10, 2)
+  notes          String?       @db.Text
+  created_at     DateTime      @default(now())
+  updated_at     DateTime?
+  deleted_at     DateTime?
+
+  // Lead traveler denormalized for quick access
+  lead_name              String
+  lead_passport          String
+  lead_fitness_level     String
+  lead_altitude_exp      String?
+  lead_dietary           String?
+
+  trek_id String
+  trek    Trek   @relation(fields: [trek_id], references: [id], onDelete: Cascade)
+
+  travelers TrekBookingTraveler[]
+
+  @@map("trek_bookings")
+}
+
+model TrekBookingTraveler {
+  id          String   @id @default(cuid())
+  name        String
+  passport    String
+  nationality String?
+  age         Int?
+  dietary     String?
+  is_lead     Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  booking_id String
+  booking    TrekBooking @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@map("trek_booking_travelers")
+}
+

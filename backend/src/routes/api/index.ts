@@ -11,6 +11,8 @@ import RunnerRouter from '@/routes/api/runner.router'
 import CheckpointRouter from '@/routes/api/checkpoint.router'
 import MediaRouter from '@/routes/api/media.router'
 import trekRouter from '@/routes/api/trek.router'
+import trekCategoryRouter from '@/routes/api/trek_category.router'
+import bookingRouter from '@/routes/api/booking.router'
 
 const router = Router()
 
@@ -25,5 +27,7 @@ router.use('/runners', RunnerRouter)
 router.use('/checkpoints', CheckpointRouter)
 router.use('/medias', MediaRouter)
 router.use('/treks', trekRouter)
+router.use('/trek-categories', trekCategoryRouter)
+router.use('/bookings', bookingRouter)
 
 export default router

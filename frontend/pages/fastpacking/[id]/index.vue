@@ -2,15 +2,16 @@
 import { useElementVisibility } from '@vueuse/core'
 import type { Trek } from '~/lib/types'
 import {
-    ActivityIcon, BanIcon, BriefcaseMedicalIcon,
-    ChartNoAxesCombinedIcon, CircleCheckIcon, ClockIcon,
-    DumbbellIcon, StarIcon, TriangleAlertIcon, Loader2Icon,
-    CrossIcon
+    ActivityIcon, BanIcon, BriefcaseMedicalIcon, ChartNoAxesCombinedIcon, CircleCheckIcon, ClockIcon, DumbbellIcon, StarIcon, Loader2Icon,
+    CrossIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon
 } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import { useTrekStore } from '~/store/trek'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { useAppStore } from '~/store/app'
+import { Autoplay, Navigation } from 'swiper/modules'
 
 const { getTrekBySlug } = useTrekStore()
 const route = useRoute()
@@ -38,6 +39,11 @@ const init = async () => {
 const bookingBar = useTemplateRef('booking-bar')
 const isBookingBarVisible = useElementVisibility(bookingBar)
 
+const swiperRef = ref()
+const { isEnd, isBeginning } = useSwiper(swiperRef, {
+    modules: [Navigation]
+})
+
 const duration = computed(() => {
     return trek.value?.details ? trek.value?.details.itinerary?.length || 0 : 0
 })
@@ -59,14 +65,16 @@ onMounted(init)
         Loading Trek...
     </div>
     <template v-else-if="trek">
-        <section class="relative w-full overflow-hidden flex flex-col justify-end">
-            <div class="inset-0 z-0">
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-background-light via-transparent to-transparent z-10">
-                </div>
-                <img :alt="trek.name" class="w-full h-auto object-cover shadow-2xl"
-                    :src="showImage(trek.thumbnail?.file_name)" v-if="trek.thumbnail" />
-            </div>
+        <section class="relative w-full overflow-hidden">
+            <Swiper :modules="[Autoplay]" class="h-screen" :autoplay="{
+                delay: 2500,
+                disableOnInteraction: false,
+            }">
+                <SwiperSlide v-for="image in trek.gallery?.images">
+                    <img alt="Forest trail" class="w-full h-full rounded-sm object-cover border border-black/5"
+                        :src="showImage(image.file_name)" />
+                </SwiperSlide>
+            </Swiper>
             <div class="pb-[200px] absolute bottom-0 left-0 right-0 text-white z-20 max-w-4xl px-4">
                 <span v-for="tag in trek.tags" :key="tag.id"
                     class="inline-block px-2 py-1 border border-primary text-[12px] font-black uppercase tracking-[0.2em] mb-4 mr-2">
@@ -84,7 +92,7 @@ onMounted(init)
             <!-- Hero Section -->
             <!-- Quick Facts Bar -->
             <section class="relative z-30 mb-16">
-                <div class="bg-white border border-black/5 p-1 shadow-xl -mt-[50px]">
+                <div class="bg-white border border-black/5 p-1 shadow-xl -mt-[100px]">
                     <div class="md:flex divide-y md:divide-y-0 md:divide-x divide-black/5">
                         <div class="md:w-1/3 p-8 space-y-6">
                             <h3
@@ -105,7 +113,7 @@ onMounted(init)
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                    }}</p>
+                                        }}</p>
                                 </div>
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Distance</p>
@@ -156,7 +164,19 @@ onMounted(init)
                                     <p class="text-[14px] text-text-muted">{{ protocol.description }}</p>
                                 </div>
                             </div>
-                            <Swiper :slides-per-view="2.2" :space-between="10">
+                            <Swiper ref="swiperRef" :modules="[Navigation]" :slides-per-view="2.2" :space-between="10">
+                                <template v-slot:container-start>
+                                    <Button variant="light" size="icon" @click="swiperRef?.slidePrev()"
+                                        :disabled="isBeginning" class="absolute top-1/2 left-2 -translate-y-1/2 z-10">
+                                        <ArrowLeftIcon />
+                                    </Button>
+                                </template>
+                                <template v-slot:container-end>
+                                    <Button variant="light" size="icon" @click="swiperRef?.slideNext()"
+                                        :disabled="isEnd" class="absolute top-1/2 right-2 -translate-y-1/2 z-10">
+                                        <ArrowRightIcon />
+                                    </Button>
+                                </template>
                                 <SwiperSlide v-for="image in trek.gallery?.images"
                                     @click="setImageForPreview(showImage(image.file_name))">
                                     <img alt="Forest trail"
@@ -338,7 +358,7 @@ onMounted(init)
                             today. Expert guides, premium gear, and unforgettable views await.</p>
                     </div>
                     <div class="flex flex-col gap-4">
-                        <NuxtLink :to="`/fastpacking-trek/${trek.slug}/booking`"
+                        <NuxtLink :to="`/fastpacking/${trek.slug}/booking`"
                             class="bg-primary text-center text-white px-10 py-5 font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
                             Secure Your Spot
                         </NuxtLink>
@@ -366,7 +386,7 @@ onMounted(init)
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <NuxtLink :to="`/fastpacking-trek/${trek.slug}/booking`"
+                    <NuxtLink :to="`/fastpacking/${trek.slug}/booking`"
                         class="bg-primary text-white px-6 md:px-10 py-3 rounded-sm font-black text-[12px] md:text-[14px] uppercase tracking-widest hover:bg-black transition-all shadow-md">
                         Secure Your Spot
                     </NuxtLink>

@@ -14,7 +14,7 @@ const { toggleSidebar } = useSidebar()
 
 <template>
     <header id="header"
-        class="fixed w-full z-50 bg-white/80 dark:bg-deep-slate/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        class="fixed w-full z-50 bg-white/90 dark:bg-deep-slate/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <Brand />

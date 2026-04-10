@@ -7,11 +7,11 @@ export const useTrekStore = defineStore('trek', () => {
     const { axios } = useAxios()
     const showDraft = ref(false)
 
-    const fetchTreks = async (draft?: boolean) => {
+    const fetchTreks = async (draft?: boolean, category?: string) => {
         isLoading.value = true
         showDraft.value = draft ?? showDraft.value
 
-        const { data: { data, ...p } } = await axios.get('/treks', { params: { ...params.value, show_draft: showDraft.value } })
+        const { data: { data, ...p } } = await axios.get('/treks', { params: { ...params.value, show_draft: showDraft.value, category } })
         treks.value = data
         params.value = p
         isLoading.value = false

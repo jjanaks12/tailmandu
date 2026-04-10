@@ -24,7 +24,7 @@ const adventureList = computed(() => {
 })
 
 onMounted(async () => {
-    await fetchTreks()
+    await fetchTreks(false, 'Fastpacking')
 })
 </script>
 

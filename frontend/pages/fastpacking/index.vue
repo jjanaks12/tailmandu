@@ -7,7 +7,7 @@ const { treks } = storeToRefs(useTrekStore())
 const { fetchTreks, params } = useTrekStore()
 
 onMounted(() => {
-    fetchTreks()
+    fetchTreks(undefined, 'Fastpacking')
 })
 </script>
 

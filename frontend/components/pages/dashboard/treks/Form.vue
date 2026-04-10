@@ -2,7 +2,7 @@
 import { Loader2Icon } from 'lucide-vue-next'
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { trekSchema } from '~/lib/schema/treks.schema'
-import type { Trek } from '~/lib/types'
+import type { Trek, TrekCategory } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
 type TrekFormProps = {
@@ -12,21 +12,36 @@ type TrekFormProps = {
 const props = defineProps<TrekFormProps>()
 const form = useTemplateRef('form')
 const tags = ref<string[]>([])
+const categories = ref<TrekCategory[]>([])
 const isLoading = ref(false)
 
 const { axios } = useAxios()
 const emit = defineEmits(['fetch'])
 
-const init = () => {
+const init = async () => {
+    try {
+        const response = await axios.get('/trek-categories')
+        categories.value = response.data?.data || []
+    } catch(e) {
+        console.error(e)
+    }
+
     if (props.trek) {
         form.value?.setValues({
             name: props.trek.name,
             excerpt: props.trek.excerpt,
             price: props.trek.price,
-            tags: props.trek.tags.map(tag => tag.name)
+            tags: props.trek.tags.map(tag => tag.name),
+            category_id: props.trek.category_id
         })
 
         tags.value = props.trek.tags.map(tag => tag.name)
+    } else if (categories.value.length > 0) {
+        // Set default category to Fastpacking if creating
+        const fastpacking = categories.value.find(c => c.name === 'Fastpacking')
+        if (fastpacking) {
+            form.value?.setFieldValue('category_id', fastpacking.id)
+        }
     }
 }
 
@@ -57,6 +72,20 @@ onMounted(init)
         <Field name="excerpt" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Textarea v-bind="field" placeholder="Excerpt" />
             <ErrorMessage class="error__message" name="excerpt" />
+        </Field>
+        <Field name="category_id" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
+            <Label>Category</Label>
+            <Select :model-value="value" @update:modelValue="handleChange">
+                <SelectTrigger>
+                    <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
+            <ErrorMessage class="error__message" name="category_id" />
         </Field>
         <Field name="price" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Input v-bind="field" placeholder="Price" />

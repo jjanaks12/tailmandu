@@ -50,6 +50,15 @@ const removeIncludedItem = (index: number) => {
     saveDetails()
 }
 
+const addItemisedInclusion = () => {
+    trek.value?.details?.itemisedInclusions.push({ title: '', price: 0, percent: 0, isIncluded: true })
+}
+
+const removeItemisedInclusion = (index: number) => {
+    trek.value?.details?.itemisedInclusions.splice(index, 1)
+    saveDetails()
+}
+
 const gearInput = ref('')
 const addGear = () => {
     if (gearInput.value.trim()) {
@@ -141,6 +150,7 @@ const init = async () => {
         trek.value.details.stats = trek.value.details?.stats ?? {}
         trek.value.details.highlights = trek.value.details?.highlights ?? []
         trek.value.details.included = trek.value.details?.included ?? []
+        trek.value.details.itemisedInclusions = trek.value.details?.itemisedInclusions ?? []
         trek.value.details.excluded = trek.value.details?.excluded ?? []
         trek.value.details.mandatoryGear = trek.value.details?.mandatoryGear ?? []
         trek.value.details.optionalGear = trek.value.details?.optionalGear ?? []
@@ -166,14 +176,20 @@ onMounted(init)
             <!-- Trek Header Section -->
             <section class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                 <div class="md:col-span-2 space-y-4">
-                    <Badge v-if="trek.published_at"
-                        class="bg-primary/10 text-primary uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1">
-                        Active Expedition
-                    </Badge>
-                    <Badge v-else
-                        class="bg-secondary/10 text-secondary uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1">
-                        Draft
-                    </Badge>
+                    <div class="flex gap-2">
+                        <Badge
+                            class="bg-purple-400/10 text-purple-400 uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1">
+                            {{ trek.category?.name }}
+                        </Badge>
+                        <Badge v-if="trek.published_at"
+                            class="bg-primary/10 text-primary uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1">
+                            Active Expedition
+                        </Badge>
+                        <Badge v-else
+                            class="bg-secondary/10 text-secondary uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1">
+                            Draft
+                        </Badge>
+                    </div>
                     <h2 class="text-5xl font-black text-foreground tracking-tight">
                         {{ trek?.name }}
                     </h2>
@@ -275,22 +291,27 @@ onMounted(init)
             <section class="space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-2xl font-bold text-foreground">Trip Highlights</h3>
-                    <Button v-if="trek?.details?.highlights?.length > 0" variant="ghost" size="sm" @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
+                    <Button v-if="trek?.details?.highlights?.length > 0" variant="ghost" size="sm" @click="saveDetails"
+                        :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
                         <Loader2Icon v-if="isSavingDetails" class="w-4 h-4 animate-spin mr-2" />
                         Save Highlights
                     </Button>
                 </div>
                 <div class="bg-card rounded-lg p-6 border border-border shadow-sm">
                     <div class="space-y-3">
-                        <div v-for="(highlight, index) in (trek?.details?.highlights as Array<string>)" :key="index" class="flex items-center gap-3 group relative">
+                        <div v-for="(highlight, index) in (trek?.details?.highlights as Array<string>)" :key="index"
+                            class="flex items-center gap-3 group relative">
                             <SparklesIcon class="w-4 h-4 text-primary shrink-0" />
-                            <Input v-model="trek.details.highlights[index]" type="text" class="flex-1" placeholder="A key highlight of the trip..." />
-                            <Button variant="ghost" size="icon" @click="removeHighlightItem(index)" class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0">
+                            <Input v-model="trek.details.highlights[index]" type="text" class="flex-1"
+                                placeholder="A key highlight of the trip..." />
+                            <Button variant="ghost" size="icon" @click="removeHighlightItem(index)"
+                                class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0">
                                 <Trash2Icon class="w-4 h-4" />
                             </Button>
                         </div>
                     </div>
-                    <Button @click="addHighlightItem" variant="ghost" class="w-full mt-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
+                    <Button @click="addHighlightItem" variant="ghost"
+                        class="w-full mt-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
                         <PlusIcon class="w-3.5 h-3.5" /> Add Highlight
                     </Button>
                 </div>
@@ -342,17 +363,18 @@ onMounted(init)
             </section>
 
             <!-- Logistics & Mandatory Gear -->
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section class="space-y-8">
                 <!-- Package Details -->
-                <div class="space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-bold text-foreground">Package Details</h3>
-                        <Button v-if="trek?.details?.included?.length > 0" variant="ghost" size="sm"
-                            @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
-                            <Loader2Icon v-if="isSavingDetails" class="w-3 h-3 animate-spin mr-1" />
-                            Save Changes
-                        </Button>
-                    </div>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-foreground">Package Details</h3>
+                    <Button v-if="trek?.details?.included?.length > 0" variant="ghost" size="sm" @click="saveDetails"
+                        :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
+                        <Loader2Icon v-if="isSavingDetails" class="w-3 h-3 animate-spin mr-1" />
+                        Save Changes
+                    </Button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- What's Included -->
                     <div class="bg-card rounded-lg overflow-hidden border border-border shadow-sm">
                         <div class="p-5 bg-primary/5 border-b border-border">
                             <h4 class="text-sm font-bold text-primary uppercase flex items-center gap-2">
@@ -377,7 +399,7 @@ onMounted(init)
                     </div>
 
                     <!-- Excluded Items -->
-                    <div class="bg-card rounded-lg overflow-hidden border border-border shadow-sm mt-6">
+                    <div class="bg-card rounded-lg overflow-hidden border border-border shadow-sm">
                         <div class="p-5 bg-destructive/5 border-b border-border">
                             <h4 class="text-sm font-bold text-destructive uppercase flex items-center gap-2">
                                 <MinusCircleIcon class="w-4 h-4" /> What's NOT Included
@@ -400,33 +422,100 @@ onMounted(init)
                             </Button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Mandatory Gear -->
-                <div class="space-y-6">
-                    <h3 class="text-xl font-bold text-foreground">Mandatory Gear</h3>
-                    <div class="bg-card rounded-lg p-6 border border-border shadow-sm">
-                        <div class="space-y-4">
-                            <div v-for="(gear, index) in (trek?.details?.mandatoryGear as Array<{ title: string, checked: boolean }>)"
-                                :key="index" class="flex items-center gap-3 group relative">
-                                <CheckSquareIcon class="w-4 h-4 text-primary" />
-                                <span class="text-sm font-medium text-foreground flex-1">
-                                    {{ gear.title }}
-                                </span>
-                                <Button variant="ghost" size="icon" @click="removeGear(index)"
-                                    class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive absolute right-0">
-                                    <Trash2Icon class="w-4 h-4" />
+                    <!-- Itemized Inclusions -->
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-foreground">Itemized Inclusions</h3>
+                        </div>
+                        <div class="bg-card rounded-lg overflow-hidden border border-border shadow-sm">
+                            <div class="p-5 bg-primary/5 border-b border-border">
+                                <h4 class="text-sm font-bold text-primary uppercase flex items-center gap-2">
+                                    <span
+                                        class="bg-primary text-primary-foreground font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px]">$</span>
+                                    Priced Inclusions
+                                </h4>
+                                <p class="text-[11px] text-muted-foreground mt-1">These inclusions have specific base
+                                    prices
+                                    assigned to them (e.g. Permit Fees, Guide costs).</p>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <div v-for="(item, index) in (trek?.details?.itemisedInclusions as Array<{ title: string, price: number, percent?: number, isIncluded?: boolean }>)"
+                                    :key="index"
+                                    class="flex items-center gap-3 p-3 group bg-muted/20 border border-border/50 rounded-lg">
+                                    <div class="flex-1 space-y-3">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <Input v-model="item.title" type="text"
+                                                placeholder="Inclusion Title (e.g. TIMS Permit)"
+                                                class="font-bold border-none bg-transparent shadow-none px-0 h-auto flex-1 text-base" />
+                                            <label
+                                                class="flex items-center gap-2 cursor-pointer bg-background px-2.5 py-1.5 rounded-md border border-border shadow-sm hover:border-primary/50 transition-colors">
+                                                <input type="checkbox" v-model="item.isIncluded"
+                                                    class="w-3.5 h-3.5 rounded text-primary accent-primary" />
+                                                <span
+                                                    class="text-[10px] font-bold text-muted-foreground uppercase">Included
+                                                    in Base</span>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <div
+                                                class="flex items-center gap-2 bg-background px-3 py-1.5 rounded-md border border-border shadow-sm">
+                                                <span class="text-[10px] font-bold text-muted-foreground uppercase">NPR
+                                                    (Flat)</span>
+                                                <Input v-model="item.price" type="number" placeholder="0"
+                                                    class="h-6 w-24 border-none bg-transparent shadow-none p-0 text-sm font-medium focus-visible:ring-0" />
+                                            </div>
+                                            <span
+                                                class="text-[10px] font-bold text-muted-foreground uppercase">OR</span>
+                                            <div
+                                                class="flex items-center gap-2 bg-background px-3 py-1.5 rounded-md border border-border shadow-sm">
+                                                <span
+                                                    class="text-[10px] font-bold text-muted-foreground uppercase">Percent
+                                                    (%)</span>
+                                                <Input v-model="item.percent" type="number" placeholder="0"
+                                                    class="h-6 w-16 border-none bg-transparent shadow-none p-0 text-sm font-medium focus-visible:ring-0" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button variant="ghost" size="icon" @click="removeItemisedInclusion(index)"
+                                        class="text-muted-foreground hover:text-destructive">
+                                        <Trash2Icon class="w-4 h-4" />
+                                    </Button>
+                                </div>
+                                <Button @click="addItemisedInclusion" variant="ghost"
+                                    class="w-full mt-2 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all">
+                                    + Add Priced Item
                                 </Button>
                             </div>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-border">
-                            <div class="flex items-center gap-2">
-                                <Input v-model="gearInput" @keyup.enter="addGear" placeholder="Add gear requirement..."
-                                    type="text" />
-                                <Button @click="addGear" size="icon"
-                                    class="h-9 w-9 bg-foreground text-background hover:bg-foreground/90 transition-all">
-                                    <PlusIcon class="w-4 h-4" />
-                                </Button>
+                    </div>
+
+                    <!-- Mandatory Gear -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-foreground">Mandatory Gear</h3>
+                        <div class="bg-card rounded-lg p-6 border border-border shadow-sm">
+                            <div class="space-y-4">
+                                <div v-for="(gear, index) in (trek?.details?.mandatoryGear as Array<{ title: string, checked: boolean }>)"
+                                    :key="index" class="flex items-center gap-3 group relative">
+                                    <CheckSquareIcon class="w-4 h-4 text-primary" />
+                                    <span class="text-sm font-medium text-foreground flex-1">
+                                        {{ gear.title }}
+                                    </span>
+                                    <Button variant="ghost" size="icon" @click="removeGear(index)"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive absolute right-0">
+                                        <Trash2Icon class="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-border">
+                                <div class="flex items-center gap-2">
+                                    <Input v-model="gearInput" @keyup.enter="addGear"
+                                        placeholder="Add gear requirement..." type="text" />
+                                    <Button @click="addGear" size="icon"
+                                        class="h-9 w-9 bg-foreground text-background hover:bg-foreground/90 transition-all">
+                                        <PlusIcon class="w-4 h-4" />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -467,38 +556,51 @@ onMounted(init)
                         <p class="text-sm text-muted-foreground">Information like Food, Water, Toilets, etc.</p>
                     </div>
                     <div class="flex gap-2">
-                        <Button v-if="trek?.details?.importantDetails?.length > 0" variant="ghost" size="sm" @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
+                        <Button v-if="trek?.details?.importantDetails?.length > 0" variant="ghost" size="sm"
+                            @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
                             <Loader2Icon v-if="isSavingDetails" class="w-4 h-4 animate-spin mr-2" />
                             Save Changes
                         </Button>
-                        <Button @click="addImportantDetailSection" variant="secondary" class="font-bold text-primary bg-primary/10 hover:bg-primary/20 flex items-center gap-2">
+                        <Button @click="addImportantDetailSection" variant="secondary"
+                            class="font-bold text-primary bg-primary/10 hover:bg-primary/20 flex items-center gap-2">
                             <PlusCircleIcon class="w-4 h-4" /> Add Section
                         </Button>
                     </div>
                 </div>
 
                 <div class="space-y-6">
-                    <div v-for="(section, sectionIndex) in (trek?.details?.importantDetails as Array<any>)" :key="sectionIndex" class="bg-card border border-border rounded-lg p-6 shadow-sm group/section">
+                    <div v-for="(section, sectionIndex) in (trek?.details?.importantDetails as Array<any>)"
+                        :key="sectionIndex" class="bg-card border border-border rounded-lg p-6 shadow-sm group/section">
                         <div class="flex justify-between items-center mb-6">
-                            <Input v-model="section.title" class="text-lg font-bold border-none bg-transparent focus-visible:ring-0 px-0 h-auto w-full md:w-1/2" placeholder="Section Title (e.g. Food, Water & Toilets)" />
-                            <Button variant="ghost" size="icon" @click="removeImportantDetailSection(sectionIndex as number)" class="text-muted-foreground hover:text-destructive shrink-0">
+                            <Input v-model="section.title"
+                                class="text-lg font-bold border-none bg-transparent focus-visible:ring-0 px-0 h-auto w-full md:w-1/2"
+                                placeholder="Section Title (e.g. Food, Water & Toilets)" />
+                            <Button variant="ghost" size="icon"
+                                @click="removeImportantDetailSection(sectionIndex as number)"
+                                class="text-muted-foreground hover:text-destructive shrink-0">
                                 <Trash2Icon class="w-4 h-4" />
                             </Button>
                         </div>
-                        
+
                         <div class="space-y-4 pl-4 border-l-2 border-border/50">
-                            <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="group/item relative space-y-2 pb-4 mb-4 border-b border-border/50 last:border-0 last:pb-0 last:mb-0">
+                            <div v-for="(item, itemIndex) in section.items" :key="itemIndex"
+                                class="group/item relative space-y-2 pb-4 mb-4 border-b border-border/50 last:border-0 last:pb-0 last:mb-0">
                                 <div class="flex flex-col md:flex-row justify-between gap-4">
                                     <div class="flex-1 space-y-2">
-                                        <Input v-model="item.title" class="font-bold" placeholder="Item Title (e.g. Food)" />
-                                        <Textarea v-model="item.description" rows="2" placeholder="Item Description..." class="resize-none" />
+                                        <Input v-model="item.title" class="font-bold"
+                                            placeholder="Item Title (e.g. Food)" />
+                                        <Textarea v-model="item.description" rows="2" placeholder="Item Description..."
+                                            class="resize-none" />
                                     </div>
-                                    <Button variant="ghost" size="icon" @click="removeImportantDetailItem(sectionIndex as number, itemIndex as number)" class="opacity-0 group-hover/item:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0 mt-1 self-end md:self-start">
+                                    <Button variant="ghost" size="icon"
+                                        @click="removeImportantDetailItem(sectionIndex as number, itemIndex as number)"
+                                        class="opacity-0 group-hover/item:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0 mt-1 self-end md:self-start">
                                         <Trash2Icon class="w-4 h-4" />
                                     </Button>
                                 </div>
                             </div>
-                            <Button @click="addImportantDetailItem(sectionIndex as number)" variant="ghost" class="w-full text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
+                            <Button @click="addImportantDetailItem(sectionIndex as number)" variant="ghost"
+                                class="w-full text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
                                 <PlusIcon class="w-3.5 h-3.5" /> Add Item
                             </Button>
                         </div>

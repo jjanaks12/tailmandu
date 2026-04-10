@@ -20,6 +20,12 @@ export class TrekController {
                 whereQuery.NOT = {
                     published_at: null
                 }
+            
+            if (request.query.category) {
+                whereQuery.category = {
+                    name: request.query.category as string
+                }
+            }
 
             const treks = await prisma.trek.findMany({
                 skip,
@@ -40,7 +46,8 @@ export class TrekController {
                             images: true
                         }
                     },
-                    thumbnail: true
+                    thumbnail: true,
+                    category: true
                 }
             })
 
@@ -94,6 +101,7 @@ export class TrekController {
                     image_id: validationData.image,
                     details: validationData.details,
                     gallery_id: validationData.gallery_id,
+                    category_id: (validationData as any).category_id,
                     tags: {
                         connect: tags
                     }
@@ -155,6 +163,7 @@ export class TrekController {
                     image_id: request.body.image_id ?? existingTrek.image_id,
                     details: request.body.details ?? existingTrek.details,
                     gallery_id: request.body.gallery_id ?? existingTrek.gallery_id,
+                    category_id: request.body.category_id ?? (existingTrek as any).category_id,
                     price: request.body.price ?? existingTrek.price,
                     tags: {
                         connect: tags,
@@ -228,7 +237,8 @@ export class TrekController {
                             images: true
                         }
                     },
-                    thumbnail: true
+                    thumbnail: true,
+                    category: true
                 }
             }))
         } catch (error) {
@@ -252,7 +262,8 @@ export class TrekController {
                             images: true
                         }
                     },
-                    thumbnail: true
+                    thumbnail: true,
+                    category: true
                 }
             }))
         } catch (error) {

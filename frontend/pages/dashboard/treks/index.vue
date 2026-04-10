@@ -59,6 +59,7 @@ onMounted(() => fetchTreks(true))
             <TableRow>
                 <TableHead>{{ $t('dashboard.treks.listing.table.sn') }}</TableHead>
                 <TableHead>{{ $t('dashboard.treks.listing.table.name') }}</TableHead>
+                <TableHead>Category</TableHead>
                 <TableHead>{{ $t('dashboard.treks.listing.table.price') }}</TableHead>
                 <TableHead>{{ $t('dashboard.treks.listing.table.status') }}</TableHead>
                 <TableHead class="text-right">{{ $t('dashboard.treks.listing.table.action') }}</TableHead>
@@ -72,6 +73,7 @@ onMounted(() => fetchTreks(true))
                         {{ trek.name }}
                     </NuxtLink>
                 </TableCell>
+                <TableCell>{{ trek.category?.name || 'N/A' }}</TableCell>
                 <TableCell>{{ trek.price }}</TableCell>
                 <TableCell>
                     <Badge v-if="trek.published_at">published</Badge>
