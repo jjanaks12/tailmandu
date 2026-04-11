@@ -86,12 +86,21 @@ export class BookingController {
 
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
+            const { trek_id } = request.query
+            
+            const whereClause: any = {}
+            if (trek_id) {
+                whereClause.trek_id = trek_id as string
+            }
+
             const bookings = await prisma.trekBooking.findMany({
+                where: whereClause,
                 orderBy: {
                     created_at: 'desc'
                 },
                 include: {
                     trek: true,
+                    travelers: true
                 }
             })
             response.send({ data: bookings })
@@ -110,6 +119,19 @@ export class BookingController {
                     trek: true,
                     travelers: true
                 }
+            })
+            response.send(booking)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async updateStatus(request: Request, response: Response, next: NextFunction) {
+        try {
+            const { status } = request.body
+            const booking = await prisma.trekBooking.update({
+                where: { id: request.params.id },
+                data: { status }
             })
             response.send(booking)
         } catch (error) {

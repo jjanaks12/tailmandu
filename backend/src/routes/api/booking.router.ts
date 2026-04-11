@@ -6,5 +6,6 @@ const router = Router()
 router.get('/', [], BookingController.index)
 router.get('/:id', [], BookingController.show)
 router.post('/', [], BookingController.create)
+router.put('/:id/status', [], BookingController.updateStatus)
 
 export default router

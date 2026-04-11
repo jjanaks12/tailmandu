@@ -73,10 +73,33 @@ const basePrice = computed(() => {
 
 const gearCost = computed(() => gearOption.value === 'pro' ? 90 : 0)
 const pickupCost = computed(() => airportPickup.value ? 45 : 0)
-const permitFee = computed(() => totalTravelers.value > 0 ? 75 * totalTravelers.value : 0)
 
 const subtotal = computed(() => basePrice.value * totalTravelers.value)
-const totalPrice = computed(() => subtotal.value + gearCost.value + pickupCost.value + permitFee.value)
+
+const dynamicInclusions = computed(() => {
+    const list = trek.value?.details?.itemisedInclusions || []
+    return list.map((item: any) => {
+        let cost = 0
+        if (item.percent) {
+            cost = subtotal.value * (Number(item.percent) / 100)
+        } else if (item.price) {
+            cost = Number(item.price) * totalTravelers.value // Flat fee scales per traveler
+        }
+        return {
+            title: item.title,
+            isIncluded: !!item.isIncluded,
+            cost: cost
+        }
+    })
+})
+
+const dynamicInclusionsCost = computed(() => {
+    return dynamicInclusions.value
+        .filter((item: any) => !item.isIncluded)
+        .reduce((sum: number, item: any) => sum + item.cost, 0)
+})
+
+const totalPrice = computed(() => subtotal.value + gearCost.value + pickupCost.value + dynamicInclusionsCost.value)
 const vatAmount = computed(() => Math.round(totalPrice.value * 0.13 * 100) / 100)
 
 const departureDates = computed(() => {
@@ -782,20 +805,14 @@ const inputClass = (errorKey: string) => [
                                         </span>
                                         <span class="font-bold text-gray-900">NPR {{ subtotal.toLocaleString() }}</span>
                                     </div>
-                                    <div class="flex items-center justify-between text-sm">
+                                    <div v-for="(item, i) in dynamicInclusions" :key="i" class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
                                             <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
-                                            Permits & TIMS
+                                            {{ item.title }}
                                         </span>
-                                        <span class="font-bold text-gray-900">NPR {{ permitFee.toLocaleString()
-                                        }}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="flex items-center gap-2 text-gray-700 font-medium">
-                                            <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
-                                            Guide & Porterage
+                                        <span class="font-bold text-gray-900">
+                                            {{ item.isIncluded ? 'Included' : `NPR ${item.cost.toLocaleString()}` }}
                                         </span>
-                                        <span class="font-bold text-gray-900">Included</span>
                                     </div>
                                     <div v-if="gearOption === 'pro'" class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
