@@ -258,10 +258,10 @@ export class RunnerController {
                     method: validationData.payment_method
                 }
             })
-            const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
-            const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
+            /* const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
+            const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a') */
 
-            const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
+            /* const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
             calendar.method(ICalCalendarMethod.REQUEST)
             calendar.createEvent({
                 start: new Date(stageCategory.start),
@@ -301,7 +301,7 @@ export class RunnerController {
                 filename: `${stageCategory.stage.name} - ${stageCategory.name}.ics`,
                 type: "text/calendar; charset=UTF-8; method=REQUEST",
                 disposition: 'attachment'
-            }], 'event')
+            }], 'event') */
 
             response.send(payment)
         } catch (error) {
