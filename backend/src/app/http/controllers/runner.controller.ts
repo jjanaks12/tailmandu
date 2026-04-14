@@ -187,7 +187,7 @@ export class RunnerController {
                     }
                 })
 
-            let user = await prisma.user.findFirst({ where: { personal_id: personal.id } })
+            /* let user = await prisma.user.findFirst({ where: { personal_id: personal.id } })
             if (!user) {
                 const salt = await Bcrypt.genSalt(10)
                 const hashPassword = await Bcrypt.hash('password', salt)
@@ -204,7 +204,7 @@ export class RunnerController {
                         role_id: role.id
                     }
                 })
-            }
+            } */
 
             let runner = await prisma.eventRunner.findFirst({
                 where: {
@@ -259,9 +259,9 @@ export class RunnerController {
                 }
             })
             /* const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
-            const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a') */
+            const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
 
-            /* const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
+            const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
             calendar.method(ICalCalendarMethod.REQUEST)
             calendar.createEvent({
                 start: new Date(stageCategory.start),

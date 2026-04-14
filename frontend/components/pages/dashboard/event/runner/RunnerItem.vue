@@ -110,15 +110,15 @@ const doAttendance = async () => {
             <ul class="text-gray-500 text-xs flex flex-col gap-1">
                 <li>
                     Payment method:
-                    <Badge variant="info">{{ humanize(runner.payments[0]?.method) }}</Badge>
+                    <Badge variant="info">{{ humanize(runner.payments[0]?.method ?? '') }}</Badge>
                 </li>
                 <li>
                     Payment status:
-                    <Badge variant="info">{{ humanize(runner.payments[0]?.status) }}</Badge>
+                    <Badge variant="info">{{ humanize(runner.payments[0]?.status ?? '') }}</Badge>
                 </li>
                 <li v-if="runner.status">
                     Status:
-                    <Badge variant="destructive">{{ humanize(runner.status.status) }}</Badge>
+                    <Badge variant="destructive">{{ humanize(runner.status.status ?? '') }}</Badge>
                 </li>
             </ul>
         </TableCell>
