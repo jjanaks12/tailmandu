@@ -24,13 +24,13 @@ router.get('/', async (_: Request, response: Response) => {
 })
 
 router.get('/resources/:filetype/:filename', async (request: Request, response: Response) => {
-    const uploadPath = path.join(__basedir, '/uploads/', request.params.filetype, request.params.filename)
+    const uploadPath = path.join(__basedir, '/uploads/', request.params.filetype as string, request.params.filename as string)
 
     fs.readFile(uploadPath, (err, data) => {
         if (err)
             createHttpError.InternalServerError(err.message)
 
-        response.set('Content-Type', contentType[request.params.filetype])
+        response.set('Content-Type', contentType[request.params.filetype as keyof typeof contentType])
         response.send(data)
     })
 })

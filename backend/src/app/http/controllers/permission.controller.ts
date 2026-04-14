@@ -47,7 +47,7 @@ export class PermissionController {
 
             const permission = await prisma.permission.findFirst({
                 where: {
-                    id: request.params.permission_id
+                    id: request.params.permission_id as string
                 }
             })
 
@@ -57,7 +57,7 @@ export class PermissionController {
 
             response.send(await prisma.permission.update({
                 where: {
-                    id: request.params.permission_id
+                    id: request.params.permission_id as string
                 },
                 data: {
                     name: validationData.name,
@@ -73,7 +73,7 @@ export class PermissionController {
         try {
             const permission = await prisma.permission.findFirst({
                 where: {
-                    id: request.params.permission_id
+                    id: request.params.permission_id as string
                 }
             })
 
@@ -83,7 +83,7 @@ export class PermissionController {
 
             response.send(await prisma.permission.delete({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 }
             }))
         } catch (error) {

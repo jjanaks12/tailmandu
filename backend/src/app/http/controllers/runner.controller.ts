@@ -27,8 +27,8 @@ export class RunnerController {
 
             const runners = await prisma.eventRunner.findMany({
                 where: {
-                    event_id: request.params.event_id,
-                    stage_id: request.params.stage_id,
+                    event_id: request.params.event_id as string,
+                    stage_id: request.params.stage_id as string,
                     stage_category_id: request.query.stage_category as string,
                     OR: [
                         {
@@ -63,7 +63,7 @@ export class RunnerController {
                     tshirt_size: true,
                     runner_attendances: {
                         where: {
-                            stage_id: request.params.stage_id
+                            stage_id: request.params.stage_id as string
                         }
                     },
                     personal: {
@@ -111,7 +111,7 @@ export class RunnerController {
     public static async save(request: Request, response: Response, next: NextFunction) {
         try {
             const validationData = await trailRaceRunner.validate(request.body, { abortEarly: false })
-            const eventId = request.params.event_id
+            const eventId = request.params.event_id as string
             const body: any = {}
             const { sendEmail } = useMailTrap()
 
@@ -342,7 +342,7 @@ export class RunnerController {
 
             const runner = await prisma.eventRunner.update({
                 where: {
-                    id: request.params.runner_id
+                    id: request.params.runner_id as string
                 },
                 data: {
                     ...runnerData,
@@ -383,7 +383,7 @@ export class RunnerController {
         try {
             const checkpoint = await prisma.checkpoint.findFirst({
                 where: {
-                    id: request.params.checkpoint_id
+                    id: request.params.checkpoint_id as string
                 }
             })
             const volunteer = await prisma.volunteer.findFirst({
@@ -396,8 +396,8 @@ export class RunnerController {
 
             const hasAlreadyBeenAdded = await prisma.volunteerCheckpoint.findFirst({
                 where: {
-                    runner_id: request.params.runner_id,
-                    checkpoint_id: request.params.checkpoint_id,
+                    runner_id: request.params.runner_id as string,
+                    checkpoint_id: request.params.checkpoint_id as string,
                     volunteer_id: volunteer.id
                 }
             })
@@ -407,7 +407,7 @@ export class RunnerController {
 
             const runner = await prisma.eventRunner.findFirst({
                 where: {
-                    id: request.params.runner_id
+                    id: request.params.runner_id as string
                 },
                 include: {
                     personal: true
@@ -417,24 +417,24 @@ export class RunnerController {
             const rank = await prisma.rank.count({
                 where: {
                     stage_category_id: request.body.stage_category_id as string,
-                    gender_id: runner.personal.gender_id
+                    gender_id: runner.personal.gender_id as string
                 }
             })
 
             if (checkpoint.is_end)
                 await prisma.rank.create({
                     data: {
-                        runner_id: request.params.runner_id,
+                        runner_id: request.params.runner_id as string,
                         position: rank + 1,
-                        gender_id: runner.personal.gender_id,
+                        gender_id: runner.personal.gender_id as string,
                         stage_category_id: request.body.stage_category_id as string
                     }
                 })
 
             const ifAlreadyAdded = await prisma.volunteerCheckpoint.findFirst({
                 where: {
-                    runner_id: request.params.runner_id,
-                    checkpoint_id: request.params.checkpoint_id,
+                    runner_id: request.params.runner_id as string,
+                    checkpoint_id: request.params.checkpoint_id as string,
                     volunteer_id: volunteer.id
                 }
             })
@@ -445,8 +445,8 @@ export class RunnerController {
             response.send(await prisma.volunteerCheckpoint.create({
                 data: {
                     volunteer_id: volunteer.id,
-                    runner_id: request.params.runner_id,
-                    checkpoint_id: request.params.checkpoint_id
+                    runner_id: request.params.runner_id as string,
+                    checkpoint_id: request.params.checkpoint_id as string
                 }
             }))
         } catch (error) {
@@ -479,7 +479,7 @@ export class RunnerController {
         try {
             const runner = await prisma.eventRunner.findFirst({
                 where: {
-                    id: request.params.runner_id
+                    id: request.params.runner_id as string
                 },
                 include: {
                     personal: true,
@@ -502,7 +502,7 @@ export class RunnerController {
         try {
             const personal = await prisma.personal.findFirst({
                 where: {
-                    email: request.params.email
+                    email: request.params.email as string
                 },
                 include: {
                     runners: true
@@ -520,7 +520,7 @@ export class RunnerController {
             await prisma.$transaction(async (prisma) => {
                 const runner = await prisma.eventRunner.findFirst({
                     where: {
-                        id: request.params.runner_id
+                        id: request.params.runner_id as string
                     },
                     include: {
                         payments: true
@@ -549,7 +549,7 @@ export class RunnerController {
 
                 await prisma.eventRunner.delete({
                     where: {
-                        id: request.params.runner_id
+                        id: request.params.runner_id as string
                     }
                 })
             })
@@ -563,7 +563,7 @@ export class RunnerController {
         try {
             response.send(await prisma.eventRunnerStatus.create({
                 data: {
-                    runner_id: request.params.runner_id,
+                    runner_id: request.params.runner_id as string,
                     status: 'DISQUALIFIED'
                 }
             }))
@@ -577,7 +577,7 @@ export class RunnerController {
             await prisma.$transaction(async (prisma) => {
                 await prisma.eventRunnerStatus.create({
                     data: {
-                        runner_id: request.params.runner_id,
+                        runner_id: request.params.runner_id as string,
                         status: 'DID_NOT_FINISH'
                     }
                 })
@@ -598,7 +598,7 @@ export class RunnerController {
                 for (const checkpoint of stage.checkpoints) {
                     await prisma.volunteerCheckpoint.deleteMany({
                         where: {
-                            runner_id: request.params.runner_id,
+                            runner_id: request.params.runner_id as string,
                             checkpoint_id: checkpoint.id
                         }
                     })
@@ -606,7 +606,7 @@ export class RunnerController {
 
                 await prisma.rank.deleteMany({
                     where: {
-                        runner_id: request.params.runner_id,
+                        runner_id: request.params.runner_id as string,
                         stage_category_id: stage.id
                     }
                 })
@@ -621,8 +621,8 @@ export class RunnerController {
         try {
             const ifAlreadyPresent = await prisma.runnerAttendance.findFirst({
                 where: {
-                    runner_id: request.params.runner_id,
-                    stage_id: request.body.stage_id
+                    runner_id: request.params.runner_id as string,
+                    stage_id: request.body.stage_id as string
                 }
             })
 
@@ -630,8 +630,8 @@ export class RunnerController {
 
             response.send(await prisma.runnerAttendance.create({
                 data: {
-                    runner_id: request.params.runner_id,
-                    stage_id: request.params.stage_id
+                    runner_id: request.params.runner_id as string,
+                    stage_id: request.params.stage_id as string
                 }
             }))
         } catch (error) {

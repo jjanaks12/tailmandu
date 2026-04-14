@@ -98,7 +98,7 @@ export class VolunteerController {
                 })
 
             const volunteer = await prisma.volunteer.findFirst({
-                where: { id: request.params.volunteer_id },
+                where: { id: request.params.volunteer_id as string },
                 include: {
                     checkpoints: true
                 }
@@ -120,7 +120,7 @@ export class VolunteerController {
 
             response.send(await prisma.volunteer.update({
                 where: {
-                    id: request.params.volunteer_id
+                    id: request.params.volunteer_id as string
                 },
                 data: {
                     checkpoints: {
@@ -163,7 +163,7 @@ export class VolunteerController {
                     personal_id: request.body.auth_user.personal_id,
                     stages: {
                         some: {
-                            id: request.params.stage_id
+                            id: request.params.stage_id as string
                         }
                     }
                 },
@@ -184,7 +184,7 @@ export class VolunteerController {
         try {
             response.send(await prisma.volunteerCheckpoint.findMany({
                 where: {
-                    checkpoint_id: request.params.checkpoint_id
+                    checkpoint_id: request.params.checkpoint_id as string
                 },
                 include: {
                     runner: true,
@@ -201,12 +201,12 @@ export class VolunteerController {
             await prisma.$transaction(async (prisma) => {
                 await prisma.volunteerCheckpoint.deleteMany({
                     where: {
-                        volunteer_id: request.params.volunteer_id
+                        volunteer_id: request.params.volunteer_id as string
                     }
                 })
                 await prisma.volunteer.delete({
                     where: {
-                        id: request.params.volunteer_id
+                        id: request.params.volunteer_id as string
                     }
                 })
             })

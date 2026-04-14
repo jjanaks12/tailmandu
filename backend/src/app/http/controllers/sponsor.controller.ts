@@ -9,7 +9,7 @@ export class SponsorController {
         try {
             response.send(await prisma.sponsor.findMany({
                 where: {
-                    race_id: request.params.race_id
+                    race_id: request.params.race_id as string
                 },
                 include: {
                     sponsorType: true,
@@ -51,7 +51,7 @@ export class SponsorController {
         try {
             const body: any = {}
             const validationData = await sponsorSchema.validate(request.body, { abortEarly: false })
-            const sponsor = await prisma.sponsor.findFirst({ where: { id: request.params.sponsor_id } })
+            const sponsor = await prisma.sponsor.findFirst({ where: { id: request.params.sponsor_id as string } })
 
             if (request.body.image) {
                 const fileUpload = new FileHandler('images')
@@ -61,7 +61,7 @@ export class SponsorController {
 
             response.send(await prisma.sponsor.update({
                 where: {
-                    id: request.params.sponsor_id
+                    id: request.params.sponsor_id as string
                 },
                 data: {
                     ...body,
@@ -82,7 +82,7 @@ export class SponsorController {
         try {
             response.send(await prisma.sponsor.update({
                 where: {
-                    id: request.params.sponsor_id
+                    id: request.params.sponsor_id as string
                 },
                 data: {
                     deleted_at: moment().toISOString()

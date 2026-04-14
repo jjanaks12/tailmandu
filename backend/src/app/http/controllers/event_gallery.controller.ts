@@ -10,7 +10,7 @@ export class GalleryController {
         try {
             const event = await prisma.trailRace.findFirst({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.event_id as string
                 },
                 include: {
                     galleries: true
@@ -34,7 +34,7 @@ export class GalleryController {
 
             response.send(await prisma.trailRace.update({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.event_id as string
                 },
                 data: {
                     galleries: {
@@ -50,15 +50,15 @@ export class GalleryController {
     public static async destory(request: Request, response: Response, next: NextFunction) {
         try {
             const fileHandler = new FileHandler('images')
-            await fileHandler.deleteFile(request.params.image_id)
+            await fileHandler.deleteFile(request.params.image_id as string)
             response.send(await prisma.trailRace.update({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.event_id as string
                 },
                 data: {
                     galleries: {
                         disconnect: {
-                            id: request.params.image_id
+                            id: request.params.image_id as string
                         }
                     }
                 }

@@ -11,7 +11,7 @@ export class StageController {
         try {
             response.send(await prisma.stage.findMany({
                 where: {
-                    event_id: request.params.event_id,
+                    event_id: request.params.event_id as string,
                     deleted_at: null
                 },
                 include: {
@@ -61,7 +61,7 @@ export class StageController {
         try {
             const body: any = {}
             const validationData = await stageSchema.validate(request.body, { abortEarly: false })
-            const stage = await prisma.stage.findFirst({ where: { id: request.params.stage_id } })
+            const stage = await prisma.stage.findFirst({ where: { id: request.params.stage_id as string } })
 
             if (validationData.thumbnail && isBase64(validationData.thumbnail)) {
                 const file = new FileHandler('images')
@@ -71,7 +71,7 @@ export class StageController {
 
             response.send(await prisma.stage.update({
                 where: {
-                    id: request.params.stage_id
+                    id: request.params.stage_id as string
                 },
                 data: {
                     ...body,
@@ -113,7 +113,7 @@ export class StageController {
         try {
             response.send(await prisma.stage.update({
                 where: {
-                    id: request.params.stage_id
+                    id: request.params.stage_id as string
                 },
                 data: {
                     deleted_at: moment.utc().toISOString()
@@ -128,7 +128,7 @@ export class StageController {
         try {
             const stage = await prisma.stage.findFirst({
                 where: {
-                    id: request.params.stage_id
+                    id: request.params.stage_id as string
                 },
                 include: {
                     stage_categories: {

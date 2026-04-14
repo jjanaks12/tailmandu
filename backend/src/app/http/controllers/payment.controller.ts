@@ -9,7 +9,7 @@ export class PaymentController {
         try {
             response.send(await prisma.trailRace.findUnique({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.event_id as string
                 },
                 include: {
                     stages: {
@@ -66,7 +66,7 @@ export class PaymentController {
             const validationData = await stageCategoryPaymentSchema.validate(request.body, { abortEarly: false })
             const payment = await prisma.stageCategoryPayment.findUnique({
                 where: {
-                    id: request.params.payment_id
+                    id: request.params.payment_id as string
                 }
             })
             const body: any = {}
@@ -79,7 +79,7 @@ export class PaymentController {
 
             response.send(await prisma.stageCategoryPayment.update({
                 where: {
-                    id: request.params.payment_id
+                    id: request.params.payment_id as string
                 },
                 data: {
                     ...body,
@@ -98,7 +98,7 @@ export class PaymentController {
         try {
             response.send(await prisma.payment.update({
                 where: {
-                    id: request.params.payment_id
+                    id: request.params.payment_id as string
                 },
                 data: {
                     status: request.body.status as PaymentStatus

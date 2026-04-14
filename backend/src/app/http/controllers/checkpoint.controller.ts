@@ -8,7 +8,7 @@ export class CheckpointController {
         try {
             response.send(await prisma.checkpoint.findMany({
                 where: {
-                    stage_category_id: request.params.stage_category_id,
+                    stage_category_id: request.params.stage_category_id as string,
                     deleted_at: null
                 },
                 include: {
@@ -41,11 +41,11 @@ export class CheckpointController {
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
             const validationData = await checkpointSchema.validate(request.body, { abortEarly: false })
-            const stage = await prisma.checkpoint.findFirst({ where: { id: request.params.checkpoint_id } })
+            const stage = await prisma.checkpoint.findFirst({ where: { id: request.params.checkpoint_id as string } })
 
             response.send(await prisma.checkpoint.update({
                 where: {
-                    id: request.params.checkpoint_id
+                    id: request.params.checkpoint_id as string
                 },
                 data: {
                     name: validationData.name ?? stage.name,
@@ -63,7 +63,7 @@ export class CheckpointController {
         try {
             response.send(await prisma.checkpoint.update({
                 where: {
-                    id: request.params.checkpoint_id
+                    id: request.params.checkpoint_id as string
                 },
                 data: {
                     deleted_at: moment.utc().toISOString()
@@ -79,7 +79,7 @@ export class CheckpointController {
             await prisma.$transaction(async (prisma) => {
                 const volunteerCheckpoint = await prisma.volunteerCheckpoint.delete({
                     where: {
-                        id: request.params.delete_checkpoint_data_id
+                        id: request.params.delete_checkpoint_data_id as string
                     }
                 })
 
@@ -87,7 +87,7 @@ export class CheckpointController {
                     where: {
                         checkpoints: {
                             some: {
-                                id: request.params.checkpoint_id
+                                id: request.params.checkpoint_id as string
                             }
                         }
                     }
@@ -112,7 +112,7 @@ export class CheckpointController {
 
             response.send(await prisma.volunteerCheckpoint.update({
                 where: {
-                    id: request.params.checkpoint_id
+                    id: request.params.checkpoint_id as string
                 },
                 data: {
                     timer: timer.toISOString()

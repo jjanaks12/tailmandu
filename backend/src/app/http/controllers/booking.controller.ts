@@ -27,7 +27,7 @@ export class BookingController {
 
             // Transaction mapping for travelers
             const travelersData = []
-            
+
             // Add lead traveler to the travelers list as well, per the design
             // if we want them distinctly stored as a TrekBookingTraveler along with additional travelers
             travelersData.push({
@@ -87,7 +87,7 @@ export class BookingController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
             const { trek_id } = request.query
-            
+
             const whereClause: any = {}
             if (trek_id) {
                 whereClause.trek_id = trek_id as string
@@ -113,7 +113,7 @@ export class BookingController {
         try {
             const booking = await prisma.trekBooking.findUnique({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 include: {
                     trek: true,
@@ -130,7 +130,7 @@ export class BookingController {
         try {
             const { status } = request.body
             const booking = await prisma.trekBooking.update({
-                where: { id: request.params.id },
+                where: { id: request.params.id as string },
                 data: { status }
             })
             response.send(booking)

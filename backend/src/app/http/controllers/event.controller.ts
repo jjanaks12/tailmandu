@@ -73,7 +73,7 @@ export class EventController {
 
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
-            const id = request.params.event_id
+            const id = request.params.event_id as string
             const validationData = await eventSchema.validate(request.body, { abortEarly: false })
 
             const event = await prisma.trailRace.findFirstOrThrow({ where: { id } })
@@ -101,7 +101,7 @@ export class EventController {
         try {
             response.send(await prisma.trailRace.update({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.event_id as string
                 },
                 data: {
                     deleted_at: moment.utc().toISOString()
@@ -115,7 +115,7 @@ export class EventController {
     public static async get(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.trailRace.findFirst({
-                where: { id: request.params.event_id },
+                where: { id: request.params.event_id as string },
                 include: {
                     stages: {
                         include: {
@@ -175,7 +175,7 @@ export class EventController {
     public static async getBySlug(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.trailRace.findFirst({
-                where: { slug: request.params.slug },
+                where: { slug: request.params.slug as string },
                 include: {
                     stages: {
                         include: {
@@ -209,7 +209,7 @@ export class EventController {
         try {
             response.send(await prisma.trailRace.update({
                 where: {
-                    id: request.params.event_id
+                    id: request.params.event_id as string
                 },
                 data: {
                     description: request.body.description
@@ -223,7 +223,7 @@ export class EventController {
     public static async updateThumbnail(request: Request, response: Response, next: NextFunction) {
         try {
             const fileUpload = new FileHandler('images')
-            const event = await prisma.trailRace.findFirstOrThrow({ where: { id: request.params.event_id } })
+            const event = await prisma.trailRace.findFirstOrThrow({ where: { id: request.params.event_id as string } })
             const image = await fileUpload.saveFile(request.body.image, event.image_id)
 
             response.send(await prisma.trailRace.update({
@@ -240,7 +240,7 @@ export class EventController {
     public static async updateGPXFile(request: Request, response: Response, next: NextFunction) {
         try {
             const fileUpload = new FileHandler('gpx')
-            const event = await prisma.trailRace.findFirstOrThrow({ where: { id: request.params.event_id } })
+            const event = await prisma.trailRace.findFirstOrThrow({ where: { id: request.params.event_id as string } })
             const file = await fileUpload.saveFile(request.body.file, event.map_file_id, 'gpx')
 
             response.send(await prisma.trailRace.update({

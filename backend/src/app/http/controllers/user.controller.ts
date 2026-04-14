@@ -49,7 +49,7 @@ export class UserController {
         try {
             response.send(await prisma.user.findFirst({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 include: {
                     role: true,

@@ -81,7 +81,7 @@ export class MediaController {
 
             const existingGallery = await prisma.gallery.findUnique({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 include: {
                     images: true,
@@ -114,7 +114,7 @@ export class MediaController {
 
             const gallery = await prisma.gallery.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     name: validationData.name,
@@ -142,7 +142,7 @@ export class MediaController {
             }
             const gallery = await prisma.gallery.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     images: {
@@ -160,7 +160,7 @@ export class MediaController {
         try {
             const gallery = await prisma.gallery.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     deleted_at: moment().toISOString()
@@ -175,16 +175,16 @@ export class MediaController {
     public static async removeImage(request: Request, response: Response, next: NextFunction) {
         try {
             const fileHandler = new FileHandler('images')
-            fileHandler.deleteFile(request.params.imageId)
+            fileHandler.deleteFile(request.params.imageId as string)
 
             const gallery = await prisma.gallery.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     images: {
                         disconnect: {
-                            id: request.params.imageId
+                            id: request.params.imageId as string
                         }
                     }
                 }
@@ -202,7 +202,7 @@ export class MediaController {
                     deleted_at: moment().toISOString()
                 },
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 include: {
                     treks: true
@@ -217,7 +217,7 @@ export class MediaController {
                     data: {
                         gallery: {
                             disconnect: {
-                                id: request.params.id
+                                id: request.params.id as string
                             }
                         }
                     }
@@ -233,7 +233,7 @@ export class MediaController {
         try {
             await prisma.gallery.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     images: {

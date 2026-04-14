@@ -9,7 +9,7 @@ export class StageCategoryController {
         try {
             response.send(await prisma.stageCategory.findMany({
                 where: {
-                    stage_id: request.params.stage_id,
+                    stage_id: request.params.stage_id as string,
                     deleted_at: null
                 },
                 include: {
@@ -82,7 +82,7 @@ export class StageCategoryController {
 
             const stageCategory = await prisma.stageCategory.update({
                 where: {
-                    id: request.params.stage_category_id
+                    id: request.params.stage_category_id as string
                 },
                 data: {
                     ...body,
@@ -108,7 +108,7 @@ export class StageCategoryController {
         try {
             response.send(await prisma.stageCategory.update({
                 where: {
-                    id: request.params.stage_category_id
+                    id: request.params.stage_category_id as string
                 },
                 data: {
                     start: moment().toISOString()
@@ -124,7 +124,7 @@ export class StageCategoryController {
 
             response.send(await prisma.stageCategory.update({
                 where: {
-                    id: request.params.stage_category_id
+                    id: request.params.stage_category_id as string
                 },
                 data: {
                     end: moment().toISOString()

@@ -43,7 +43,7 @@ export class RoleController {
 
     public static async update(request: Request, response: Response, next: NextFunction) {
         try {
-            const id = request.params.role_id
+            const id = request.params.role_id as string
             const validationData = await roleSchema.validate(request.body, { abortEarly: false })
 
             const role = await prisma.role.findFirstOrThrow({
@@ -78,7 +78,7 @@ export class RoleController {
 
     public static async destory(request: Request, response: Response, next: NextFunction) {
         try {
-            const id = request.params.role_id
+            const id = request.params.role_id as string
 
             response.send(await prisma.role.update({
                 where: { id },

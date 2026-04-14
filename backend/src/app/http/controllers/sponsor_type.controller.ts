@@ -35,7 +35,7 @@ export class SponsorTypeController {
             const validationData = await sponsorTypeSchema.validate(request.body, { abortEarly: false })
             response.send(await prisma.sponsorType.update({
                 where: {
-                    id: request.params.sponsor_type_id
+                    id: request.params.sponsor_type_id as string
                 },
                 data: {
                     name: validationData.name,
@@ -52,7 +52,7 @@ export class SponsorTypeController {
         try {
             response.send(await prisma.sponsorType.update({
                 where: {
-                    id: request.params.sponsor_type_id
+                    id: request.params.sponsor_type_id as string
                 },
                 data: {
                     deleted_at: moment().toISOString()

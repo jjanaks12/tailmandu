@@ -66,7 +66,7 @@ export class CompanyController {
         try {
             const body: any = {}
             const validationData = await companySchema.validate(request.body, { abortEarly: false })
-            const company = await prisma.company.findFirst({ where: { id: request.params.id } })
+            const company = await prisma.company.findFirst({ where: { id: request.params.id as string } })
 
             if (request.body.image) {
                 const fileUpload = new FileHandler('images')
@@ -132,7 +132,7 @@ export class CompanyController {
                     url: validationData.url,
                     company: {
                         connect: {
-                            id: request.params.id
+                            id: request.params.id as string
                         }
                     }
                 }

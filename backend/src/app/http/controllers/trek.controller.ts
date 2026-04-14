@@ -20,7 +20,7 @@ export class TrekController {
                 whereQuery.NOT = {
                     published_at: null
                 }
-            
+
             if (request.query.category) {
                 whereQuery.category = {
                     name: request.query.category as string
@@ -119,7 +119,7 @@ export class TrekController {
 
             const existingTrek = await prisma.trek.findUnique({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 include: {
                     tags: true
@@ -154,7 +154,7 @@ export class TrekController {
 
             response.send(await prisma.trek.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     name: request.body.name ?? existingTrek.name,
@@ -180,7 +180,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     deleted_at: moment().toISOString()
@@ -195,7 +195,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     published_at: moment().toISOString()
@@ -210,7 +210,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     published_at: null
@@ -225,7 +225,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.findUnique({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 include: {
                     tags: true,
@@ -250,7 +250,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.findUnique({
                 where: {
-                    slug: request.params.slug
+                    slug: request.params.slug as string
                 },
                 include: {
                     tags: true,
@@ -275,7 +275,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     gallery_id: request.body.gallery_id
@@ -290,7 +290,7 @@ export class TrekController {
         try {
             response.send(await prisma.trek.update({
                 where: {
-                    id: request.params.id
+                    id: request.params.id as string
                 },
                 data: {
                     description: request.body.description
