@@ -253,4 +253,44 @@ export class EventController {
             next(error)
         }
     }
+
+    public static async stats(request: Request, response: Response, next: NextFunction) {
+        try {
+            const runnersStats = moment.months().reduce((acc, month) => ({
+                ...acc,
+                [month]: {}
+            }), {})
+
+            const where = {
+                deleted_at: null
+            }
+
+            if (request.query.event_id)
+                where['event_id'] = request.query.event_id as string
+
+            const runners = await prisma.eventRunner.findMany({ where })
+            const total_volunteers = await prisma.volunteer.count({ where: { deleted_at: null } })
+            const total_checkpoints = await prisma.checkpoint.count({ where: { deleted_at: null } })
+            const total_stages = await prisma.stage.count({ where: { deleted_at: null } })
+
+            for (const runner of runners) {
+                const created_at = moment(runner.created_at)
+                const month = created_at.format('MMMM')
+
+                const week = created_at.get('week')
+                if (!runnersStats[month][week])
+                    runnersStats[month][week] = 0
+                runnersStats[month][week]++
+            }
+
+            response.send({
+                runners: runnersStats,
+                total_volunteers,
+                total_checkpoints,
+                total_stages
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }

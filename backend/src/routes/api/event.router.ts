@@ -15,6 +15,7 @@ const router = Router()
 
 router.get('/', [], EventController.index)
 router.post('/', [verifyAccessToken], EventController.create)
+router.get('/stats', [], EventController.stats)
 router.get('/:event_id', [], EventController.get)
 router.get('/by_slug/:slug', [], EventController.getBySlug)
 router.put('/:event_id', [verifyAccessToken], EventController.update)
