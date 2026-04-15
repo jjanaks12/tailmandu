@@ -14,6 +14,6 @@ router.put('/:runner_id/disqualify', [verifyAccessToken], RunnerController.disqu
 router.put('/:runner_id/did-not-finish', [verifyAccessToken], RunnerController.didNotFinished)
 
 router.put('/:runner_id/:stage_id/attendance', [verifyAccessToken], RunnerController.attendance)
-router.post('/import', RunnerController.bulkImport)
+router.post('/import', [verifyAccessToken], RunnerController.bulkImport)
 
 export default router
