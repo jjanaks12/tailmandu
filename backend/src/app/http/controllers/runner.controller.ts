@@ -518,7 +518,7 @@ export class RunnerController {
     public static async delete(request: Request, response: Response, next: NextFunction) {
         try {
             await prisma.$transaction(async (prisma) => {
-                const runner = await prisma.eventRunner.findFirst({
+                const runner = await prisma.eventRunner.findUnique({
                     where: {
                         id: request.params.runner_id as string
                     },
@@ -526,6 +526,9 @@ export class RunnerController {
                         payments: true
                     }
                 })
+
+                if (!runner)
+                    throw createHttpError.NotFound('Runner not found')
 
                 if (runner.payments)
                     for (const payment of runner.payments) {
@@ -634,6 +637,82 @@ export class RunnerController {
                     stage_id: request.params.stage_id as string
                 }
             }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async bulkImport(request: Request, response: Response, next: NextFunction) {
+        try {
+            const event_id = 'cmn7ffez5001sw8s1evt3kput'
+            const stage_id = 'cmn7fg8ol001uw8s14zvcbn01'
+            const stageCategoryMap = {
+                '100_mile': 'cmn7fhnye001ww8s1lenw2eud',
+                '80_km': 'cmnzfh9x1000104vdudv9um79'
+            }
+            const runnersIDS = []
+
+            for (const requestRunner of request.body.runners ?? []) {
+                const nameSplits = requestRunner.name.split(' ')
+                const first_name = nameSplits[0];
+                const last_name = nameSplits.length > 1 ? nameSplits.pop() : "";
+                const middle_name = nameSplits.slice(1).join(" ");
+                await prisma.$transaction(async (tx) => {
+
+                    const tshirt_size = await tx.size.findFirst({
+                        where: {
+                            name: {
+                                contains: requestRunner.tshirt_size
+                            }
+                        }
+                    })
+
+                    const country = await tx.country.findFirst({
+                        where: {
+                            name: {
+                                contains: requestRunner.country
+                            }
+                        }
+                    })
+
+                    const gender = await tx.gender.findFirst({
+                        where: {
+                            name: {
+                                contains: requestRunner.gender
+                            }
+                        }
+                    })
+
+                    let personal = await tx.personal.findFirst({ where: { email: requestRunner.email } })
+                    if (!personal)
+                        personal = await tx.personal.create({
+                            data: {
+                                first_name,
+                                middle_name,
+                                last_name,
+                                email: requestRunner.email,
+                                gender_id: gender.id,
+                                country_id: country?.id as string,
+                            }
+                        })
+
+                    const runner = await tx.eventRunner.create({
+                        data: {
+                            bib: requestRunner.bib_number.toString(),
+                            personal_id: personal.id,
+                            event_id: event_id,
+                            stage_id: stage_id,
+                            stage_category_id: stageCategoryMap[requestRunner.race_category],
+                            shirt_id: tshirt_size?.id,
+                            club_name: requestRunner.club,
+                        }
+                    })
+
+                    runnersIDS.push(runner.id)
+                })
+            }
+
+            response.send(runnersIDS)
         } catch (error) {
             next(error)
         }

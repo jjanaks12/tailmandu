@@ -49,11 +49,11 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
                     <ul class="space-y-4 text-sm">
                         <li class="flex items-start">
                             <MapPinIcon class="text-primary text-sm mr-2" />
-                            {{ company?.address.address }},
-                            {{ company?.address.street }},
-                            {{ company?.address.city }},
-                            {{ company?.address.state }},
-                            {{ company?.address.country.name }}
+                            {{ company?.address?.address }},
+                            {{ company?.address?.street }},
+                            {{ company?.address?.city }},
+                            {{ company?.address?.state }},
+                            {{ company?.address?.country.name }}
                         </li>
                         <li class="flex items-center">
                             <PhoneIcon class="text-primary text-sm mr-2" />

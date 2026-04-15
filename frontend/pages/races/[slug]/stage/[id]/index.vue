@@ -64,15 +64,12 @@ onBeforeMount(init)
             </div>
             <div class="mb-6 leading-7 content_editor" v-html="stage.description" />
             <NuxtLink
-                :to="{ name: 'races-slug-runner', params: { slug: stage.event.slug }, query: { stage_id: stage.id } }"
+                :to="$localePath({ name: 'races-slug-runner', params: { slug: stage.event.slug }, query: { stage_id: stage.id } })"
                 v-if="!hasEnded" as-child>
                 <Button type="button" variant="secondary">Register for race</Button>
             </NuxtLink>
         </div>
         <section class="bg-gray-200 relative overflow-hidden z-[1]">
-            <!-- <figure class="absolute inset-0 z-[-1]">
-                <img :src="bg01" />
-            </figure> -->
             <div class="container text-[#13304a] py-[100px]">
                 <ul
                     class="flex flex-col md:flex-row justify-between gap-4 lg:gap-12 [&>li>strong]:block [&>li>strong]:text-[25px] [&>li>em]:not-italic [&>li>em]:text-[25px] md:[&>li>em]:text-[40px]">
@@ -145,7 +142,7 @@ onBeforeMount(init)
                             <em class="not-italic block">Registration opened</em>
                         </Countdown>
                         <NuxtLink
-                            :to="{ name: 'races-slug-runner', params: { slug: stage.event.slug }, query: { stage_id: stage.id } }"
+                            :to="$localePath({ name: 'races-slug-runner', params: { slug: stage.event.slug }, query: { stage_id: stage.id } })"
                             as-child>
                             <Button type="button" variant="secondary" size="lg" class="w-[200px] rounded-full">
                                 Register now
@@ -156,7 +153,7 @@ onBeforeMount(init)
                         <strong class="font-normal text-5xl block">Registration closed</strong>
                         <Button as-child>
                             <NuxtLink
-                                :to="{ name: 'races-id-stage-stage_id-result', params: { id: stage.event.id, stage_id: stage.id } }">
+                                :to="$localePath({ name: 'races-id-stage-stage_id-result', params: { id: stage.event.id, stage_id: stage.id } })">
                                 view results
                             </NuxtLink>
                         </Button>
