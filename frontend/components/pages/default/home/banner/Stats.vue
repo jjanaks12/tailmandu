@@ -46,7 +46,7 @@ const totalDistance = computed(() => props.stage?.stage_categories.reduce((total
                 <div class="text-xs uppercase opacity-60">{{ $t('home.banner.difficulty') }}</div>
             </div>
         </div>
-        <NuxtLink as-child :to="$localePath({ name: 'races-slug', params: { slug } })">
+        <NuxtLink as-child :to="$localePath({ name: 'races-slug-runner', params: { slug } })">
             <Button size="xl" class="w-full">{{ $t('home.banner.register_now') }}</Button>
         </NuxtLink>
         <p class="text-center text-sm mt-4 opacity-60">

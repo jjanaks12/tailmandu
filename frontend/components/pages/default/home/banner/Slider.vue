@@ -29,7 +29,7 @@ const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
                         {{ trailRace.excerpt }}
                     </p>
                 </div>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2" v-if="stages.length > 1">
                     <Button size="icon" @click="prev()" :disabled="isBeginning" modifier="outline" variant="dark"
                         class="rounded-full">
                         <ChevronLeftIcon />
@@ -40,8 +40,8 @@ const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
                     </Button>
                 </div>
             </div>
-            <swiper-container ref="swiperRef" :slides-per-view="stages.length == 1 ? 1 : 1.2" :space-between="20"
-                :breakpoints="{
+            <swiper-container ref="swiperRef" v-if="stages.length > 1" :slides-per-view="stages.length == 1 ? 1 : 1.2"
+                :space-between="20" :breakpoints="{
                     768: {
                         slidesPerView: 2.2,
                     }

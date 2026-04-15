@@ -53,10 +53,19 @@ const currentStage = computed(() => currentRace.value?.stages
                     </div>
                 </div>
             </section>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:flex gap-4 items-center">
-                <PagesDefaultHomeBannerSlider class="lg:w-2/3" :trail-race="currentRace" :stages="currentRace.stages" />
-                <PagesDefaultHomeBannerStats class="hidden lg:block" v-if="currentStage" :stage="currentStage"
-                    :slug="currentRace.slug" />
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 space-y-4">
+                <div class="lg:flex gap-4 items-center">
+                    <PagesDefaultHomeBannerSlider class="lg:w-2/3" :trail-race="currentRace"
+                        :stages="currentRace.stages" />
+                    <PagesDefaultHomeBannerStats class="hidden lg:block" v-if="currentStage" :stage="currentStage"
+                        :slug="currentRace.slug" />
+                </div>
+                <div class="text-right">
+                    <Button as-child modifier="link">
+                        <NuxtLink :to="$localePath({ name: 'races-slug', params: { slug: currentRace.slug } })">more
+                            details</NuxtLink>
+                    </Button>
+                </div>
             </div>
         </template>
         <PagesDefaultHomeBannerLoader v-else />

@@ -46,7 +46,7 @@ const { toggleSidebar } = useSidebar()
                                 </template>
                             </template>
                         </NavigationMenuList>
-                        <NuxtLink to="/register" as-child v-if="!isLoggedin">
+                        <NuxtLink to="/login" as-child v-if="!isLoggedin">
                             <Button>
                                 {{ $t('header.register_btn') }}
                             </Button>
