@@ -42,22 +42,22 @@ onMounted(init)
 
 <template>
     <!-- <Button @click="fetch">fetch</Button> -->
-    <div class="grid grid-cols-4 gap-4">
+    <div class="w-full grid grid-cols-4 gap-4">
         <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-lg font-medium">Total Runners</h3>
-            <p class="text-2xl font-bold">{{ total_runners }}</p>
+            <h3 class="text-sm uppercase">Total Runners</h3>
+            <p class="text-black text-4xl font-bold">{{ total_runners }}</p>
         </div>
         <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-lg font-medium">Total Volunteers</h3>
-            <p class="text-2xl font-bold">{{ stats.total_volunteers }}</p>
+            <h3 class="text-sm uppercase">Total Volunteers</h3>
+            <p class="text-black text-4xl font-bold">{{ stats.total_volunteers }}</p>
         </div>
         <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-lg font-medium">Total Checkpoints</h3>
-            <p class="text-2xl font-bold">{{ stats.total_checkpoints }}</p>
+            <h3 class="text-sm uppercase">Total Checkpoints</h3>
+            <p class="text-black text-4xl font-bold">{{ stats.total_checkpoints }}</p>
         </div>
         <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-lg font-medium">Total Stages</h3>
-            <p class="text-2xl font-bold">{{ stats.total_stages }}</p>
+            <h3 class="text-sm uppercase">Total Stages</h3>
+            <p class="text-black text-4xl font-bold">{{ stats.total_stages }}</p>
         </div>
     </div>
     <PagesDashboardEventStatsRunner :runners="stats.runners" v-model:year="selectedYear"
