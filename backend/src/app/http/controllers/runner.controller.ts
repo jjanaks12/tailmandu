@@ -644,12 +644,15 @@ export class RunnerController {
 
     public static async bulkImport(request: Request, response: Response, next: NextFunction) {
         try {
-            const event_id = 'cmn7ffez5001sw8s1evt3kput'
-            const stage_id = 'cmn7fg8ol001uw8s14zvcbn01'
-            const stageCategoryMap = {
-                '100_mile': 'cmn7fhnye001ww8s1lenw2eud',
-                '80_km': 'cmnzfh9x1000104vdudv9um79'
-            }
+            const event_id = request.body.event_id
+            const stage_id = request.body.stage_id
+            const stageCategoryMap = request.body.stage_categories
+            /*  const event_id = 'cmn7ffez5001sw8s1evt3kput'
+             const stage_id = 'cmn7fg8ol001uw8s14zvcbn01'
+             const stageCategoryMap = {
+                 '100_mile': 'cmn7fhnye001ww8s1lenw2eud',
+                 '80_km': 'cmnzfh9x1000104vdudv9um79'
+             } */
             const runnersIDS = []
 
             for (const requestRunner of request.body.runners ?? []) {
