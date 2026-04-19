@@ -28,7 +28,7 @@ const isLoading = ref(false)
 const searchText = ref('')
 
 if (!['Admin'].includes(user.value?.role.name ?? '')) {
-    navigateTo('/login')
+    navigateTo('/404')
 }
 
 const updatedRunners = computed(() => sortRunner(runners.value))

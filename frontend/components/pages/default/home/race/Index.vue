@@ -18,7 +18,6 @@ const init = async () => {
 onMounted(init)
 </script>
 <template>
-    <Button @click="init">Init</Button>
     <ClientOnly>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 space-y-4" v-if="currentRace">
             <div class="lg:flex gap-4 items-center">

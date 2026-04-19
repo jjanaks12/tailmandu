@@ -160,8 +160,7 @@ onMounted(() => {
             </div>
         </Form>
         <Form ref="form" class="space-y-8" :validation-schema="mode == 'runner' ? trailRaceRunner : trailRaceVolunteer"
-            v-slot="{ values, setFieldValue, errors }" @submit="onSubmit" v-if="hasEnteredEmail">
-            {{ errors }}
+            v-slot="{ values, setFieldValue }" @submit="onSubmit" v-if="hasEnteredEmail">
             <div
                 class="bg-white rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
