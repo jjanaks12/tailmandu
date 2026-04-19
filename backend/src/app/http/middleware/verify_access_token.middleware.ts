@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express-serve-static-core'
 import createHttpError from 'http-errors'
 import jwt from 'jsonwebtoken'
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 
 export const verifyAccessToken = (request: Request, response: Response, next: NextFunction) => {
     if (!request.headers['authorization'])

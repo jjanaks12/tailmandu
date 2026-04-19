@@ -1,8 +1,8 @@
 import { gallerySchema } from "@/app/lib/schema/gallery.schema"
-import { FileHandler } from "@/app/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/file.service"
 import { NextFunction, Request, Response } from "express"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 import { Image } from "@prisma/client/index-browser"
 export class GalleryController {
     public static async index(request: Request, response: Response, next: NextFunction) {

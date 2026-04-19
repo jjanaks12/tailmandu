@@ -4,7 +4,6 @@ import { useAppStore } from '~/store/app'
 import Jobs from '~/lib/jobs'
 import { useRoleStore } from './store/role'
 import { usePermissionStore } from './store/permission'
-import { useEventStore } from './store/event'
 
 const { isLoggedin } = storeToRefs(useAuthStore())
 const { imagePreview } = storeToRefs(useAppStore())
@@ -12,13 +11,12 @@ const { fetch } = useAuthStore()
 const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany, fetchShirtSizes } = useAppStore()
 const { fetch: fetchRole } = useRoleStore()
 const { fetch: fetchPermission } = usePermissionStore()
-const { fetch: fetchEvents } = useEventStore()
 
 const isLoading = ref(true)
 const job = new Jobs()
 
 const initPage = async () => {
-  const jobList: Function[] = [fetchCompany, fetchEvents, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes]
+  const jobList: Function[] = [fetchCompany, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes]
 
   if (isLoggedin.value)
     jobList.push(fetch, fetchPermission, fetchRole)

@@ -2,7 +2,7 @@ import { roleSchema } from "@/app/lib/schema/role.schema"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class RoleController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

@@ -1,6 +1,6 @@
 import { trekSchema } from "@/app/lib/schema/treks.schema"
 import { APIQuery } from "@/app/lib/types"
-import { prisma } from "@/prisma/client"
+import { prisma } from "@/app/lib/services/prisma.service"
 import { Prisma } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import createHttpError from "http-errors"

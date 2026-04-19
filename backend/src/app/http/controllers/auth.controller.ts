@@ -1,10 +1,10 @@
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 import { NextFunction, Request, Response } from 'express-serve-static-core'
 import createHttpError from 'http-errors'
 import Bcrypt from 'bcrypt'
 
 import { userLoginSchema, userRegistrationSchema } from '@/app/lib/schema/user.schema'
-import { JWT } from '@/app/lib/services/jwt.services'
+import { JWT } from '@/app/lib/services/jwt.service'
 import { Redis } from '@/app/lib/services/redis.service'
 
 type UserRegistrationRequest = {

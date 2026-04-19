@@ -2,7 +2,7 @@ import { sponsorTypeSchema } from "@/app/lib/schema/event.schema"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class SponsorTypeController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

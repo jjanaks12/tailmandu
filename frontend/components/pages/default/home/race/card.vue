@@ -37,7 +37,8 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
                     <TimerIcon class="mr-1 size-4" />
                     {{ stage.cut_off_time }} Cutoff
                 </span> -->
-                <NuxtLink :to="localePath({name: 'races-slug-stage-id', params: {slug: eventSlug, id: stage.id}})" class="text-primary hover:text-[#d8561a] underline cursor-pointer" v-if="showLink">
+                <NuxtLink :to="localePath({ name: 'races-slug-stage-id', params: { slug: eventSlug, id: stage.id } })"
+                    class="text-primary hover:text-[#d8561a] underline cursor-pointer" v-if="showLink">
                     {{ $t('home.stage.learn_more') }}
                     →
                 </NuxtLink>

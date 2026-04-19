@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express-serve-static-core"
 import { assignRoleSchema } from "@/app/lib/schema/role.schema"
 import { APIQuery } from "@/app/lib/types"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class UserController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {

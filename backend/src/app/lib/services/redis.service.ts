@@ -1,8 +1,10 @@
 import createHttpError from 'http-errors'
-import { createClient, RedisClientType } from 'redis'
+import { createClient } from 'redis'
+
+type RedisClient = ReturnType<typeof createClient>
 
 export abstract class Redis {
-    static client: RedisClientType
+    static client: RedisClient
 
     static start() {
         Redis.client = createClient({

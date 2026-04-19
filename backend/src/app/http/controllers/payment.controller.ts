@@ -1,8 +1,8 @@
 import { stageCategoryPaymentSchema } from "@/app/lib/schema/event.schema"
-import { FileHandler } from "@/app/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/file.service"
 import { NextFunction, Request, Response } from "express"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 import { PaymentStatus, PaymentType } from "@prisma/client/index-browser"
 export class PaymentController {
     public static async index(request: Request, response: Response, next: NextFunction) {

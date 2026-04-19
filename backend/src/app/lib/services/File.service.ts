@@ -1,7 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import createHttpError from "http-errors"
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 
 import { generateUUID } from "@/app/lib/plugins"
 import { __basedir } from "@/index"

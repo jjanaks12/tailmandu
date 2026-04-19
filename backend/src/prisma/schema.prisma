@@ -639,7 +639,7 @@ model TrekCategory {
   updated_at  DateTime?
   deleted_at  DateTime?
 
-  treks       Trek[]
+  treks Trek[]
 
   @@map("trek_categories")
 }
@@ -668,11 +668,11 @@ model TrekBooking {
   deleted_at     DateTime?
 
   // Lead traveler denormalized for quick access
-  lead_name              String
-  lead_passport          String
-  lead_fitness_level     String
-  lead_altitude_exp      String?
-  lead_dietary           String?
+  lead_name          String
+  lead_passport      String
+  lead_fitness_level String
+  lead_altitude_exp  String?
+  lead_dietary       String?
 
   trek_id String
   trek    Trek   @relation(fields: [trek_id], references: [id], onDelete: Cascade)
@@ -697,4 +697,3 @@ model TrekBookingTraveler {
 
   @@map("trek_booking_travelers")
 }
-

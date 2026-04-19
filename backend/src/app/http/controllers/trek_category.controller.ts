@@ -1,4 +1,4 @@
-import { prisma } from "@/prisma/client"
+import { prisma } from "@/app/lib/services/prisma.service"
 import { NextFunction, Request, Response } from "express"
 
 export class TrekCategoryController {

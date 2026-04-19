@@ -3,12 +3,12 @@ import Bcrypt from 'bcrypt'
 
 import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
-import { FileHandler } from "@/app/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/file.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
 import createHttpError from "http-errors"
 import ical, { ICalCalendarMethod } from "ical-generator"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 import { PaymentMethod, PaymentStatus } from "@prisma/client/index-browser"
 export class RunnerController {
     public static async index(request: Request, response: Response, next: NextFunction) {

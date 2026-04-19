@@ -3,7 +3,7 @@ import { APIQuery } from "@/app/lib/types"
 import { NextFunction, Request, Response } from "express"
 import createHttpError from "http-errors"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class NewsletterController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {

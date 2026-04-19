@@ -1,8 +1,8 @@
 import { companySchema, socialLinkSchema } from "@/app/lib/schema/account.schema"
-import { FileHandler } from "@/app/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/file.service"
 import { NextFunction, Request, Response } from "express"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class CompanyController {
     public static async get(request: Request, response: Response, next: NextFunction) {
         try {

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class HomeController {
     public static async gallery(request: Request, response: Response, next: NextFunction) {
         const data = await prisma.image.findMany({

@@ -1,4 +1,4 @@
-import { prisma } from './src/prisma/client'
+import { prisma } from './src/app/lib/services/prisma.service'
 
 async function main() {
   const fastpacking = await prisma.trekCategory.create({
@@ -22,7 +22,7 @@ async function main() {
     where: { category_id: null },
     data: { category_id: fastpacking.id }
   })
-  
+
   console.log('Updated existing treks to Fastpacking category')
 }
 

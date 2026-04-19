@@ -1,9 +1,9 @@
 import { stageCategorySchema } from "@/app/lib/schema/event.schema"
-import { FileHandler } from "@/app/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/file.service"
 import { NextFunction, Request, Response } from "express"
 import moment from "moment"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class StageCategoryController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {

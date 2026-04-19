@@ -5,7 +5,7 @@ import { trailRaceVolunteer } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import createHttpError from "http-errors"
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 import { Personal, User } from "@prisma/client/index-browser"
 export class VolunteerController {
     public static async save(request: Request, response: Response, next: NextFunction) {

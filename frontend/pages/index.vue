@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HomeBanner from '@/components/pages/default/home/banner/Hero.vue'
 import Newsletter from '@/components/pages/default/newsletter.vue'
 import img01 from '@/assets/images/review-img01.jpg'
 import { ChevronLeftIcon, ChevronRightIcon, GlobeIcon, MailIcon, MoonIcon, StarIcon, SunIcon } from 'lucide-vue-next'
@@ -32,7 +31,8 @@ onMounted(() => {
 
 <template>
     <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans">
-        <HomeBanner />
+        <PagesDefaultHomeBannerHero />
+        <PagesDefaultHomeRace />
         <PagesDefaultHomeAdventures />
         <PagesDefaultHomeGallery />
         <section class="py-24 bg-slate-50 dark:bg-deep-slate/30" id="contact">

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { permissionSchema } from '@/app/lib/schema/permission.schema'
 import createHttpError from 'http-errors'
 
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 export class PermissionController {
     public static async save(request: Request, response: Response, next: NextFunction) {
         try {

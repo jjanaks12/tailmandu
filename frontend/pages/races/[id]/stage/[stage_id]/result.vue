@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import moment from 'moment'
 import { formatDate, showImage } from '~/lib/filters'
 import type { EventRunner, Stage, StageCategory, VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios'
@@ -9,12 +8,14 @@ import KVRLogo from '~/assets/images/kvr-summit-logo.png'
 import trailmanduLogo from '~/assets/images/logo.png'
 import { LoaderIcon, XIcon } from 'lucide-vue-next'
 import { getDuration, sortRunner } from '~/lib/filters/runner'
+import { useAuthStore } from '~/store/auth'
 
 definePageMeta({
     layout: 'simple'
 })
 
 const { genders } = storeToRefs(useAppStore())
+const { user } = storeToRefs(useAuthStore())
 const { axios } = useAxios()
 const route = useRoute()
 
@@ -25,6 +26,10 @@ const selectGender = ref<string>('')
 const selectStage = ref<StageCategory | null>(null)
 const isLoading = ref(false)
 const searchText = ref('')
+
+if (!['Admin'].includes(user.value?.role.name ?? '')) {
+    navigateTo('/login')
+}
 
 const updatedRunners = computed(() => sortRunner(runners.value))
 const filteredRunners = computed(() => updatedRunners.value
@@ -53,21 +58,6 @@ const fetchStage = async () => {
     })
 }
 
-const fetchRunnerList = async () => {
-    if (!selectStage.value) return
-
-    isLoading.value = true
-    const { data } = await axios.get(`/events/${route.params.id as string}/${route.params.stage_id as string}/runners`, {
-        params: {
-            s: '',
-            gender: selectGender.value ? selectGender.value : undefined,
-            stage_category: selectStage.value?.id
-        }
-    })
-    runners.value = data
-    isLoading.value = false
-}
-
 const getFinalDuration = (volunteerCheckpoints: VolunteerCheckpoint[]) => {
     const a = volunteerCheckpoints.find(volunteerCheckpoint => volunteerCheckpoint.checkpoint.is_end)
 
@@ -75,7 +65,19 @@ const getFinalDuration = (volunteerCheckpoints: VolunteerCheckpoint[]) => {
     return getDuration(a.timer, selectStage.value?.start as string)
 }
 
-watch([selectGender, selectStage], fetchRunnerList)
+const fetchRunnerResult = async () => {
+    if (selectGender.value && selectStage.value) {
+        const { data } = await axios.get(`/events/${route.params.id as string}/${route.params.stage_id as string}/results`, {
+            params: {
+                gender: selectGender.value ? selectGender.value : undefined,
+                stage_category: selectStage.value?.id
+            }
+        })
+        runners.value = data
+    }
+}
+
+watch([selectGender, selectStage], fetchRunnerResult)
 onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
 </script>
 
@@ -87,7 +89,8 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                 {{ stage?.name }}
             </strong>
             <strong
-                class="block block--left [--block-bg:var(--color-blue-400)] [--block-color:var(--color-white)] translate-y-full">
+                class="block block--left [--block-bg:var(--color-blue-400)] [--block-color:var(--color-white)] translate-y-full"
+                v-if="selectStage">
                 {{ selectStage?.name }}
             </strong>
             <time :datetime="selectStage?.start"

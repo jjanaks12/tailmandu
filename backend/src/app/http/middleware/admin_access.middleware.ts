@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 
 export const hasAdminAccess = async (request: Request, response: Response, next: NextFunction) => {
     const role = await prisma.role.findFirst({

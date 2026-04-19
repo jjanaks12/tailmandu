@@ -23,6 +23,8 @@ const { fetch } = useEventStore()
 
 const showForm = ref(false)
 const trailRace = ref<TrailRace | null>(null)
+
+onMounted(fetch)
 </script>
 <template>
     <div class="flex items-center justify-between mb-12">

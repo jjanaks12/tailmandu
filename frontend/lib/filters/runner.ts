@@ -48,7 +48,8 @@ const getDuration = (time: string, started_time: string) => {
     const now = moment.utc(time)
 
     const duration = moment.duration(now.diff(started))
-    return `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+
+    return `${duration.hours() + (duration.days() * 24)}:${duration.minutes()}:${duration.seconds()}`
 }
 
 export { sortRunner, getDuration }

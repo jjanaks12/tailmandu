@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronUpIcon, CopyIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import moment from 'moment'
-import { humanize } from '~/lib/filters'
+import { formatDate, humanize } from '~/lib/filters'
 import { getDuration } from '~/lib/filters/runner'
 import type { EventRunner, VolunteerCheckpoint } from '~/lib/types'
 import { useAxios } from '~/services/axios'
@@ -107,7 +107,7 @@ const doAttendance = async () => {
             </div>
         </TableCell>
         <TableCell>
-            <ul class="text-gray-500 text-xs flex flex-col gap-1">
+            <ul class="text-gray-500 text-xs flex flex-col gap-1" v-if="runner.payments.length > 0">
                 <li>
                     Payment method:
                     <Badge variant="info">{{ humanize(runner.payments[0]?.method ?? '') }}</Badge>
@@ -205,7 +205,8 @@ const doAttendance = async () => {
                                     : runner.volunteer_on_checkpoints[index + 1].timer) }}
                         </TableCell>
                         <TableCell>
-                            {{ getDuration(record?.timer, runner.stage_category.start) }}
+                            Time: {{ moment(record?.timer).local().format('HH:mm:ss a') }}<br />
+                            Duration: {{ getDuration(record?.timer, runner.stage_category.start) }}
                         </TableCell>
                         <TableCell>
                             <div class="flex justify-end gap-2">

@@ -1,4 +1,4 @@
-import { prisma } from '@/prisma/client'
+import { prisma } from '@/app/lib/services/prisma.service'
 import { Request, Response, NextFunction } from 'express'
 
 export class AgeCategoryController {

@@ -10,10 +10,13 @@ import { RunnerController } from '@/app/http/controllers/runner.controller'
 import { StageCategoryController } from '@/app/http/controllers/stage_category.controller'
 import { SponsorController } from '@/app/http/controllers/sponsor.controller'
 import { PaymentController } from '@/app/http/controllers/payment.controller'
+import { ResultController } from '@/app/http/controllers/result.controller'
 
 const router = Router()
 
-router.get('/', [], EventController.index)
+router.get('/', [verifyAccessToken], EventController.index)
+router.get('/current', [], EventController.currentRace)
+router.get('/list', [], EventController.eventList)
 router.post('/', [verifyAccessToken], EventController.create)
 router.get('/stats', [], EventController.stats)
 router.get('/:event_id', [], EventController.get)
@@ -67,5 +70,8 @@ router.delete('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.de
 // PAYMENTS
 router.get('/:event_id/payments', [verifyAccessToken], PaymentController.index)
 router.put('/:event_id/payments/:payment_id', [verifyAccessToken], PaymentController.updatePaymentStatus)
+
+// RESULTS
+router.get('/:event_id/:stage_id/results', [], ResultController.index)
 
 export default router

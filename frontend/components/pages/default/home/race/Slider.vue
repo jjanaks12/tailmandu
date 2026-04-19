@@ -47,7 +47,7 @@ const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
                     }
                 }">
                 <swiper-slide v-for="stage in stages">
-                    <PagesDefaultHomeBannerCard :stage="stage" :event-slug="trailRace.slug" />
+                    <PagesDefaultHomeRaceCard :stage="stage" :event-slug="trailRace.slug" />
                 </swiper-slide>
             </swiper-container>
         </div>

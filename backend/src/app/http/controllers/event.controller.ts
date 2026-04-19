@@ -3,9 +3,9 @@ import { NextFunction, Request, Response } from "express"
 import { APIQuery } from "@/app/lib/types"
 import { eventSchema } from "@/app/lib/schema/event.schema"
 import moment from "moment"
-import { FileHandler } from "@/app/lib/services/File.service"
+import { FileHandler } from "@/app/lib/services/file.service"
+import { prisma } from '@/app/lib/services/prisma.service'
 
-import { prisma } from '@/prisma/client'
 export class EventController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
@@ -44,6 +44,45 @@ export class EventController {
                 total_page: Math.ceil(total / per_page),
                 data: events
             })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async eventList(request: Request, response: Response, next: NextFunction) {
+        try {
+            const events = await prisma.trailRace.findMany({
+                where: {
+                    deleted_at: null
+                },
+                orderBy: [{ created_at: 'desc' }],
+            })
+
+            response.send(events)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async currentRace(request: Request, response: Response, next: NextFunction) {
+        try {
+            const events = await prisma.trailRace.findFirst({
+                where: {
+                    deleted_at: null
+                },
+                include: {
+                    stages: {
+                        include: {
+                            stage_categories: true,
+                            thumbnail: true
+                        }
+                    },
+                    thumbnail: true
+                },
+                orderBy: [{ created_at: 'desc' }]
+            })
+
+            response.send(events)
         } catch (error) {
             next(error)
         }
@@ -195,7 +234,6 @@ export class EventController {
                             deleted_at: null
                         }
                     },
-                    runners: true,
                     thumbnail: true,
                     map_file: true
                 }

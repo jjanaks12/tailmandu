@@ -2,7 +2,6 @@
 import { formatDate, showImage } from '~/lib/filters'
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
-import StageCard from '@/components/pages/default/home/banner/card.vue'
 import moment from 'moment'
 
 const route = useRoute()
@@ -63,8 +62,9 @@ onBeforeMount(async () => {
             <div class="container">
                 <h2 class="text-2xl mb-7">Stages</h2>
                 <div class="flex flex-wrap gap-4">
-                    <StageCard class="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)]"
-                        v-for="(stage, index) in trailRace.stages" :race-slug="trailRace.slug" :stage="stage"
+                    <PagesDefaultHomeRaceCard :stage="stage"
+                        class="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)]"
+                        v-for="(stage, index) in trailRace.stages" :event-slug="trailRace.slug"
                         :race-name="`${trailRace.name} #${index + 1}`" />
                 </div>
             </div>
