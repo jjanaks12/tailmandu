@@ -17,7 +17,11 @@ export class ResultController {
                 },
                 include: {
                     status: true,
-                    volunteer_on_checkpoints: true,
+                    volunteer_on_checkpoints: {
+                        include: {
+                            checkpoint: true
+                        }
+                    },
                     runner_attendances: true,
                     personal: {
                         select: {
