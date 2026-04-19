@@ -72,6 +72,9 @@ export class EventController {
                 },
                 include: {
                     stages: {
+                        where: {
+                            deleted_at: null
+                        },
                         include: {
                             stage_categories: true,
                             thumbnail: true
