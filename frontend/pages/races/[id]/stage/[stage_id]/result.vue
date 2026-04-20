@@ -154,9 +154,9 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                         <TableHead>Timing</TableHead>
                     </TableRow>
                 </TableHeader>
-                <TableBody>
-                    <TableRow v-for="(runner, index) in filteredRunners" :key="runner.id">
-                        <TableCell>{{ index + 1 }}</TableCell>
+                <TableBody class="data-body">
+                    <TableRow v-for="runner in filteredRunners" :key="runner.id" class="data-row">
+                        <TableCell class="data-count"></TableCell>
                         <TableCell>{{ runner.bib }}</TableCell>
                         <TableCell>
                             {{ runner.personal.first_name }}
@@ -305,5 +305,17 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
         border-width: 40px 15px 0 0;
         border-color: transparent var(--block-bg) transparent;
     }
+}
+
+.data-body {
+    counter-reset: row;
+}
+
+.data-row {
+    counter-increment: row;
+}
+
+.data-count::after {
+    content: counter(row);
 }
 </style>

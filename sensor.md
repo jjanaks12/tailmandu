@@ -56,3 +56,6 @@ Because you are dealing with real-time data from the RFID reader and the camera,
 | **Tags** | UHF RFID Bib Tags (100 pack) | $30 |
 
 **Would you like me to help you draft the basic Python or Go code to capture the RFID data and trigger the video save?**
+
+350+(50*1)+80+(40*1)+(30*1)=550
+(350*10)+(50*10)+(80*10)+(40*10)+(30*10)=8000
