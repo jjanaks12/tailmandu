@@ -8,8 +8,8 @@ export class ResultController {
             const { gender, stage_category } = req.query
             const runners = await prisma.eventRunner.findMany({
                 where: {
-                    event_id: event_id,
-                    stage_id: stage_id,
+                    event_id: event_id as string,
+                    stage_id: stage_id as string,
                     personal: {
                         gender_id: gender as string
                     },
