@@ -27,10 +27,6 @@ const selectStage = ref<StageCategory | null>(null)
 const isLoading = ref(false)
 const searchText = ref('')
 
-if (!['Admin'].includes(user.value?.role.name ?? '')) {
-    navigateTo('/404')
-}
-
 const updatedRunners = computed(() => sortRunner(runners.value))
 const filteredRunners = computed(() => updatedRunners.value
     .filter(runner => runner.runner_attendances.length > 0)
@@ -39,6 +35,7 @@ const filteredRunners = computed(() => updatedRunners.value
         || (runner.personal.last_name || '').toLowerCase().includes(searchText.value.toLowerCase())
         || runner.bib.toString().includes(searchText.value))
 )
+const showResult = computed(() => !!user.value)
 
 const fetchStageCategory = async () => {
     const { data } = await axios.get(`/events/${route.params.stage_id as string}/stage_categories`)
@@ -66,7 +63,7 @@ const getFinalDuration = (volunteerCheckpoints: VolunteerCheckpoint[]) => {
 }
 
 const fetchRunnerResult = async () => {
-    if (selectGender.value && selectStage.value) {
+    if (selectStage.value) {
         const { data } = await axios.get(`/events/${route.params.id as string}/${route.params.stage_id as string}/results`, {
             params: {
                 gender: selectGender.value ? selectGender.value : undefined,
@@ -77,12 +74,24 @@ const fetchRunnerResult = async () => {
     }
 }
 
+const init = () => {
+    if (showResult.value) {
+        if (!['Admin'].includes(user.value?.role.name ?? '')) {
+            navigateTo('/404')
+        }
+    }
+}
+
 watch([selectGender, selectStage], fetchRunnerResult)
+watch(user, init)
+
+onMounted(init)
 onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
 </script>
 
 <template>
-    <section class="result__section bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]">
+    <section class="result__section bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]"
+        v-if="showResult">
         <header class="pt-12 pb-20 relative">
             <strong class="block block--left [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
                 v-if="stage">
