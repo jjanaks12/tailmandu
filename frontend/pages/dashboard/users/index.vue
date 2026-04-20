@@ -1,33 +1,30 @@
 <script lang="ts" setup>
-    import { EllipsisVertical, Eye, Pencil, Search, ShieldCheckIcon, SlidersVertical, Trash } from 'lucide-vue-next'
-    import { Form, Field } from 'vee-validate'
+import { EllipsisVertical, Eye, Pencil, Search, ShieldCheckIcon, SlidersVertical, Trash } from 'lucide-vue-next'
+import { Form, Field } from 'vee-validate'
 
-    import type { User } from '~/lib/types'
-    import { useUsersStore } from '~/store/user'
+import type { User } from '~/lib/types'
+import { useUsersStore } from '~/store/user'
 
-    import ChangeRoleForm from './_components/roleForm.vue'
+import ChangeRoleForm from './_components/roleForm.vue'
 
-    useHead({
-        title: 'Contacts'
-    })
+useHead({
+    title: 'Contacts'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: ['manage_user']
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['manage_user']
+})
 
-    const { public: { mailAdmin } } = useRuntimeConfig()
-    const { users, params } = storeToRefs(useUsersStore())
-    const { fetch } = useUsersStore()
-    const { can } = useAuthorization()
+const { public: { mailAdmin } } = useRuntimeConfig()
+const { users, params } = storeToRefs(useUsersStore())
+const { fetch } = useUsersStore()
 
-    const isUserRoleChangeDialogOpen = ref(false)
-    const tempUser = ref<User | null>(null)
+const isUserRoleChangeDialogOpen = ref(false)
+const tempUser = ref<User | null>(null)
 
-    onMounted(() => {
-        fetch()
-    })
+onMounted(fetch)
 </script>
 
 <template>
