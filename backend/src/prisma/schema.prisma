@@ -575,6 +575,7 @@ model Tag {
   images     Image[]
   galleries  Gallery[]
   treks      Trek[]
+  products   Product[]
 
   @@map("tags")
 }
@@ -753,6 +754,7 @@ model Product {
   specs       ProductSpec[]
   reviews     ProductReview[]
   order_items OrderItem[]
+  tags        Tag[]
 
   @@map("products")
 }

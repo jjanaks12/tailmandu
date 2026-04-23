@@ -4,6 +4,7 @@ export const useModalMeta = (p?: Partial<APIParam>) => {
     const isLoading = ref(false)
     const params = ref<APIParam>(Object.assign({
         current: 1,
+        s: '',
         per_page: 15,
         total: 0,
         total_page: 0

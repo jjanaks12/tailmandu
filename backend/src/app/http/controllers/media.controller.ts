@@ -6,12 +6,37 @@ import { FileHandler } from "@/app/lib/services/file.service"
 import { APIQuery } from "@/app/lib/types"
 
 import { prisma } from '@/app/lib/services/prisma.service'
+import createHttpError from "http-errors"
 export class MediaController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
             const galleries = await prisma.gallery.findMany({
                 include: {
-                    images: true,
+                    images: {
+                        include: {
+                            product_thumbnails: {
+                                select: { id: true, name: true, slug: true }
+                            },
+                            treks: {
+                                select: { id: true, name: true, slug: true }
+                            },
+                            events: {
+                                select: { id: true, name: true, slug: true }
+                            },
+                            maps: {
+                                select: { id: true, name: true, slug: true }
+                            },
+                            companies: {
+                                select: { id: true, name: true }
+                            },
+                            personal: {
+                                select: { id: true, first_name: true, last_name: true }
+                            },
+                            thumbnail_stages: {
+                                select: { id: true, name: true }
+                            }
+                        }
+                    },
                     tags: true
                 },
                 where: {
@@ -26,6 +51,29 @@ export class MediaController {
                 uncategories: await prisma.image.findMany({
                     where: {
                         galleryId: null
+                    },
+                    include: {
+                        product_thumbnails: {
+                            select: { id: true, name: true, slug: true }
+                        },
+                        treks: {
+                            select: { id: true, name: true, slug: true }
+                        },
+                        events: {
+                            select: { id: true, name: true, slug: true }
+                        },
+                        maps: {
+                            select: { id: true, name: true, slug: true }
+                        },
+                        companies: {
+                            select: { id: true, name: true }
+                        },
+                        personal: {
+                            select: { id: true, first_name: true, last_name: true }
+                        },
+                        thumbnail_stages: {
+                            select: { id: true, name: true }
+                        }
                     }
                 })
             })
@@ -308,6 +356,62 @@ export class MediaController {
                 total_page: Math.ceil(total / per_page),
                 data: images
             })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async deleteUncategorizedImage(request: Request, response: Response, next: NextFunction) {
+        try {
+            if (!request.body.images || request.body.images.length === 0)
+                throw createHttpError.UnprocessableEntity('Images is required')
+
+            const fileHandler = new FileHandler('images')
+            for (const imageId of request.body.images) {
+                try {
+                    await fileHandler.deleteFile(imageId)
+                } catch (err) {
+                    console.error(`Failed to delete uncategorized image ${imageId}:`, err)
+                }
+            }
+            response.send('All ok!')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async updateImage(request: Request, response: Response, next: NextFunction) {
+        try {
+            const { image } = request.body
+            const { id } = request.params
+
+            if (!image) throw createHttpError.UnprocessableEntity('Image is required')
+
+            const fileHandler = new FileHandler('images')
+            const updatedImage = await fileHandler.saveFile(image, id)
+
+            response.send(updatedImage)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async moveImages(request: Request, response: Response, next: NextFunction) {
+        try {
+            const { images, gallery_id } = request.body
+            if (!images || images.length === 0) throw createHttpError.UnprocessableEntity('Images is required')
+            if (!gallery_id) throw createHttpError.UnprocessableEntity('Gallery is required')
+
+            await prisma.image.updateMany({
+                where: {
+                    id: { in: images }
+                },
+                data: {
+                    galleryId: gallery_id
+                }
+            })
+
+            response.send('Moved successfully')
         } catch (error) {
             next(error)
         }

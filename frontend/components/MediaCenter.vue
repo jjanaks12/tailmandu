@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { SearchIcon, FilterIcon, ImagePlusIcon, SquareIcon, SquareCheckIcon } from 'lucide-vue-next'
+import type { Image } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { useMediaStore } from '~/store/media'
 
@@ -14,6 +15,7 @@ const filterList = [
 const showGalleryForm = ref(false)
 const showDeleteGalleryDialog = ref(false)
 const showFilter = ref<Record<string, boolean>>({})
+const images = ref<Image[]>([])
 
 const filteredGallery = computed(() => galleryList.value.filter((gallery) => {
     if (showFilter.value.empty || gallery._count.images > 0) {
@@ -96,9 +98,9 @@ onMounted(init)
                 <div class="group relative cursor-pointer rounded-xl overflow-hidden border-2 border-dashed border-outline-variant bg-transparent flex flex-col items-center justify-center p-6 transition-all hover:bg-[#ffe9e2] hover:border-[#f06723] min-h-[220px]"
                     @click="showGalleryForm = true">
                     <ImagePlusIcon class="size-10 mb-2 group-hover:text-[#f06723] transition-colors" />
-                    <span
-                        class="font-headline font-bold text-on-surface-variant text-sm group-hover:text-[#f06723]">Create
-                        New</span>
+                    <span class="font-headline font-bold text-on-surface-variant text-sm group-hover:text-[#f06723]">
+                        Create New
+                    </span>
                 </div>
                 <!-- Gallery Card: Selected -->
                 <PagesDashboardMediaGallery v-for="gallery in filteredGallery" :key="gallery.id" :gallery="gallery"
@@ -108,7 +110,7 @@ onMounted(init)
             </div>
         </div>
     </div>
-    <PagesDashboardMediaImageList v-else :gallery="media.selectedGallery" />
+    <PagesDashboardMediaImageList v-else :gallery="media.selectedGallery" v-model:images="images" />
     <Dialog v-model:open="showGalleryForm" @update:open="showGalleryForm = false; media.selectedGallery = null">
         <DialogContent class="w-[600px]">
             <DialogHeader>

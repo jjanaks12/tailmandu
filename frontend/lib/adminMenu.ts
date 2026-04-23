@@ -55,6 +55,18 @@ export const useMenu = () => {
             slug: 'treks',
             path: '/dashboard/treks',
             permissions: 'manage_trek'
+        }, {
+            title: 'Products',
+            icon: 'Box',
+            slug: 'products',
+            path: '/dashboard/product',
+            permissions: 'manage_product'
+        }, {
+            title: 'Product categories',
+            icon: 'Box',
+            slug: 'product_categories',
+            path: '/dashboard/product/category',
+            permissions: 'manage_product_category'
         }]
     }, {
         title: 'Miscellanous',

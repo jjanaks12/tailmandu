@@ -54,6 +54,6 @@ export const useMediaStore = defineStore('media', () => {
 
     return {
         galleries, isLoading, params, galleryList, media,
-        fetch, fetchGalleryList, createGallery, deleteGallery, resetMedia
+        fetch, fetchGalleryList, createGallery, deleteGallery, resetMedia, updateGallery
     }
 })

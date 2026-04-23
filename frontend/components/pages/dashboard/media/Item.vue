@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
+import { EllipsisVerticalIcon, PencilIcon, SquareCheckBigIcon, TrashIcon } from 'lucide-vue-next'
 import type { Gallery } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
@@ -62,6 +62,10 @@ const init = () => {
         selectedImages.value = props.gallery.images.map(_ => null)
 }
 
+const selectAllImages = () => {
+    selectedImages.value = props.gallery.images.map(image => image.id)
+}
+
 watch(() => props.gallery, () => {
     images.value = props.gallery.images.map(image => image.file_name)
 })
@@ -96,14 +100,18 @@ onMounted(init)
                     </Button>
                 </template>
                 <DropdownMenu :open="selectedImages.filter(id => id != null).length > 0">
-                    <DropdownMenuTrigger>
-                        <Button size="icon">
-                            <EllipsisVerticalIcon />
+                    <DropdownMenuTrigger as-child>
+                        <Button size="icon" variant="secondary">
+                            <EllipsisVerticalIcon class="size-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem @click="deleteImage">
-                            <TrashIcon />
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem @click="selectAllImages">
+                            <SquareCheckBigIcon class="mr-2 size-4" />
+                            {{ $t('options.select_all') }}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem @click="deleteImage" class="text-destructive">
+                            <TrashIcon class="mr-2 size-4" />
                             {{ $t('options.delete') }}
                         </DropdownMenuItem>
                     </DropdownMenuContent>

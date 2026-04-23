@@ -25,6 +25,7 @@ export type APIQuery<T> = {
 }
 
 export type APIParam = {
+    s?: string
     total_page: number
     total: number
     current: number
@@ -476,6 +477,44 @@ export type Trek = {
     category?: TrekCategory
     tags: Tag[]
 }
+
+export type ProductCategory = {
+    id: string
+    name: string
+    slug: string
+    description?: string
+    parent_id?: string
+    parent?: ProductCategory
+    children?: ProductCategory[]
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+}
+
+export type Product = {
+    id: string
+    name: string
+    slug: string
+    badge?: string
+    excerpt?: string
+    description: string
+    base_price: string
+    original_price?: string
+    published_at?: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+    category_id: string
+    category?: ProductCategory
+    thumbnail_id?: string
+    thumbnail?: Image
+    gallery_id?: string
+    gallery?: Gallery
+    tags?: Tag[]
+    rating?: number
+    reviews?: any[]
+}
+
 type MediaMode = "image" | "gallery"
 
 export type MediaState = {

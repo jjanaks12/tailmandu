@@ -1,6 +1,7 @@
 {
     "options": {
-        "delete": "Delete selected"
+        "delete": "Delete selected",
+        "select_all": "Select all"
     },
     "header": {
         "register_btn": "Sign In / Sign Up",
@@ -112,6 +113,75 @@
                 "delete": {
                     "title": "Are you sure?",
                     "description": "This action cannot be undone. This will permanently delete your trek and remove it from the server.",
+                    "cancel": "No, cancel",
+                    "confirm": "Yes, delete"
+                }
+            }
+        },
+        "products": {
+            "title": "Products",
+            "add_btn": "Add new Product",
+            "header": {
+                "filter_title": "Filters"
+            },
+            "listing": {
+                "table": {
+                    "name": "Name",
+                    "sn": "SN",
+                    "price": "Price",
+                    "status": "Status",
+                    "action": "Action",
+                    "edit": "Edit",
+                    "delete": "Delete",
+                    "publish": "Publish",
+                    "unpublish": "Unpublish"
+                }
+            },
+            "modal": {
+                "add": {
+                    "title": "Add Product",
+                    "description": "Add a new product"
+                },
+                "edit": {
+                    "title": "Edit Product",
+                    "description": "Edit product"
+                },
+                "delete": {
+                    "title": "Are you sure?",
+                    "description": "This action cannot be undone. This will permanently delete your product and remove it from the server.",
+                    "cancel": "No, cancel",
+                    "confirm": "Yes, delete"
+                }
+            }
+        },
+        "product_categories": {
+            "title": "Product Categories",
+            "add_btn": "Add new Category",
+            "header": {
+                "filter_title": "Filters"
+            },
+            "listing": {
+                "table": {
+                    "name": "Name",
+                    "sn": "SN",
+                    "parent": "Parent Category",
+                    "action": "Action",
+                    "edit": "Edit",
+                    "delete": "Delete"
+                }
+            },
+            "modal": {
+                "add": {
+                    "title": "Add Category",
+                    "description": "Add a new product category"
+                },
+                "edit": {
+                    "title": "Edit Category",
+                    "description": "Edit product category"
+                },
+                "delete": {
+                    "title": "Are you sure?",
+                    "description": "This action cannot be undone. This will permanently delete your category and remove it from the server.",
                     "cancel": "No, cancel",
                     "confirm": "Yes, delete"
                 }

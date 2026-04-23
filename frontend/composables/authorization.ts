@@ -20,12 +20,13 @@ export const useAuthorization = () => {
     }
 
     const checkPermission = (permission: string) => {
-        const [access, resource] = permission.split('_')
+        const [access, ...res] = permission.split('_')
+        const resource = res.join('_')
 
         return access === '*'
             ? true
             : access === 'manage'
-                ? permissions.value.filter(permission => permission.includes(resource)).length === 4
+                ? permissions.value.filter(permission => permission.includes(resource)).length >= 4
                 : permissions.value.includes(permission)
     }
 

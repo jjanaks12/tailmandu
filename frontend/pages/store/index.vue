@@ -1,29 +1,49 @@
 <script setup lang="ts">
 import { ArrowUpDownIcon, FilterIcon } from 'lucide-vue-next'
 import { useProductStore } from '~/store/product'
+import { useRouteQuery } from '@vueuse/router'
 
 const productStore = useProductStore()
+const activeCategory = useRouteQuery("category", "all")
+const currentPage = useRouteQuery("page", 1)
+const { params } = storeToRefs(productStore)
+
+onMounted(productStore.fetchCategories)
+
+watch(activeCategory, () => {
+    currentPage.value = 1
+})
+
+watch([activeCategory, currentPage], ([newCat, newPage]) => {
+    productStore.listProducts(newCat === 'all' ? undefined : newCat, Number(newPage) ?? 1)
+}, { immediate: true })
 </script>
 
 <template>
-    <div class="flex min-h-screen pt-4">
+    <div class="flex min-h-screen pt-24 pb-5">
         <!-- SideNavBar -->
         <aside
             class="hidden md:flex h-screen w-64 rounded-r-3xl bg-[#fff1ec] dark:bg-stone-900 flex-col p-6 space-y-4 sticky top-20">
             <div class="mb-6">
-                <h3 class="text-sm font-bold text-[#f06723] uppercase tracking-wider">
+                <h3 class="text-sm font-bold text-primary uppercase tracking-wider">
                     {{ $t("store.sidebar.title") }}
                 </h3>
                 <p class="text-xs text-[#251913]/60 dark:text-[#e1bfb3]/60">{{ $t("store.sidebar.subtitle") }}</p>
             </div>
             <nav class="space-y-2">
-                <a v-for="cat in productStore.categories" :key="cat.name"
-                    :class="['flex items-center gap-3 p-3 hover:translate-x-1 transition-transform text-sm font-semibold rounded-xl', cat.active ? 'bg-[#ffffff] dark:bg-stone-800 text-[#f06723] shadow-sm' : 'text-[#251913] dark:text-[#e1bfb3] opacity-70']"
-                    href="#">
-                    <!-- Removed static icons for simplicity or would need an icon mapper -->
-                    <span class="w-2 h-2 rounded-full" :class="cat.active ? 'bg-[#f06723]' : 'bg-transparent'"></span>
+                <NuxtLink :to="$localePath('/store')"
+                    :class="['flex items-center gap-3 p-3 hover:translate-x-1 transition-transform text-sm font-semibold rounded-xl', activeCategory === 'all' ? 'bg-[#ffffff] dark:bg-stone-800 text-primary shadow-sm' : 'text-[#251913] dark:text-[#e1bfb3] opacity-70']">
+                    <span class="w-2 h-2 rounded-full"
+                        :class="activeCategory === 'all' ? 'bg-primary' : 'bg-transparent'"></span>
+                    All
+                </NuxtLink>
+                <NuxtLink v-for="cat in productStore.categories" :key="cat.name"
+                    :class="['flex items-center gap-3 p-3 hover:translate-x-1 transition-transform text-sm font-semibold rounded-xl', activeCategory === cat.slug ? 'bg-[#ffffff] dark:bg-stone-800 text-primary shadow-sm' : 'text-[#251913] dark:text-[#e1bfb3] opacity-70']"
+                    :to="$localePath({ path: '/store', query: { category: cat.slug } })">
+                    <span class="w-2 h-2 rounded-full"
+                        :class="activeCategory === cat.slug ? 'bg-primary' : 'bg-transparent'"></span>
                     {{ cat.name }}
-                </a>
+                </NuxtLink>
             </nav>
             <div class="mt-auto pt-6 border-t border-outline-variant/20">
                 <div class="bg-primary-container/10 p-4 rounded-2xl">
@@ -102,7 +122,8 @@ const productStore = useProductStore()
             </div>
 
             <!-- Pagination -->
-            <Pagination v-slot="{ page }" :items-per-page="12" :total="120" :default-page="1">
+            <Pagination v-slot="{ page }" :items-per-page="params.per_page" :total="params.total"
+                v-model:page="currentPage" v-if="params.total_page > 1">
                 <PaginationContent v-slot="{ items }">
                     <PaginationPrevious />
                     <template v-for="(item, index) in items" :key="index">

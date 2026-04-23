@@ -12,7 +12,7 @@ const props = defineProps<{
 const { media } = storeToRefs(useMediaStore())
 const { axios } = useAxios()
 
-const images = ref<Image[]>([])
+const images = defineModel<Image[]>('images')
 const params = ref<APIParam>({
     current: 1,
     per_page: 15,
