@@ -57,6 +57,7 @@ model Address {
   type       AddressType
 
   companies Company[]
+  orders    Order[]
 
   @@map("addresses")
 }
@@ -204,6 +205,7 @@ model Image {
   gallery                 Gallery?               @relation(fields: [galleryId], references: [id])
   galleryId               String?
   treks                   Trek[]
+  product_thumbnails      Product[]              @relation("product_thumbnail")
 
   @@map("images")
 }
@@ -330,8 +332,9 @@ model Size {
   updated_at  DateTime?
   deleted_at  DateTime?
 
-  Personal Personal[]
-  runners  EventRunner[]
+  Personal         Personal[]
+  runners          EventRunner[]
+  product_variants ProductVariant[]
 
   @@map("sizes")
 }
@@ -479,12 +482,14 @@ model User {
   updated_at DateTime?
   deleted_at DateTime?
 
-  personal_id String   @unique
-  personal    Personal @relation(fields: [personal_id], references: [id], onDelete: Cascade)
-  role_id     String?
-  role        Role?    @relation(fields: [role_id], references: [id], onDelete: Cascade)
-  Company     Company? @relation(fields: [companyId], references: [id])
-  companyId   String?
+  personal_id     String          @unique
+  personal        Personal        @relation(fields: [personal_id], references: [id], onDelete: Cascade)
+  role_id         String?
+  role            Role?           @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  Company         Company?        @relation(fields: [companyId], references: [id])
+  companyId       String?
+  product_reviews ProductReview[]
+  orders          Order[]
 
   @@map("users")
 }
@@ -582,9 +587,10 @@ model Gallery {
   updated_at  DateTime?
   deleted_at  DateTime?
 
-  images Image[]
-  tags   Tag[]
-  treks  Trek[]
+  images   Image[]
+  tags     Tag[]
+  treks    Trek[]
+  products Product[] @relation("product_gallery")
 
   @@map("galleries")
 }
@@ -696,4 +702,188 @@ model TrekBookingTraveler {
   booking    TrekBooking @relation(fields: [booking_id], references: [id], onDelete: Cascade)
 
   @@map("trek_booking_travelers")
+}
+
+// ==========================================
+// STORE / E-COMMERCE MODELS
+// ==========================================
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  parent_id String?
+  parent    ProductCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  children  ProductCategory[] @relation("CategoryHierarchy")
+
+  products Product[]
+
+  @@map("product_categories")
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  badge          String? // e.g., "Bestseller", "New"
+  excerpt        String?  @db.Text
+  description    String   @db.LongText
+  base_price     Decimal  @db.Decimal(10, 2)
+  original_price Decimal? @db.Decimal(10, 2) // For promotions / strike-through pricing
+
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
+
+  category_id String
+  category    ProductCategory @relation(fields: [category_id], references: [id])
+
+  thumbnail_id String?
+  thumbnail    Image?   @relation("product_thumbnail", fields: [thumbnail_id], references: [id])
+  gallery_id   String?
+  gallery      Gallery? @relation("product_gallery", fields: [gallery_id], references: [id])
+
+  variants    ProductVariant[]
+  specs       ProductSpec[]
+  reviews     ProductReview[]
+  order_items OrderItem[]
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id    String   @id @default(cuid())
+  sku   String   @unique
+  price Decimal? @db.Decimal(10, 2) // Overrides product base_price if set
+  stock Int      @default(0)
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  size_id String?
+  size    Size?   @relation(fields: [size_id], references: [id])
+
+  order_items OrderItem[]
+
+  @@map("product_variants")
+}
+
+model ProductSpec {
+  id    String @id @default(cuid())
+  label String // e.g., "Weight", "Waterproof Rating"
+  value String // e.g., "850g", "20,000mm"
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_specs")
+}
+
+model ProductReview {
+  id      String  @id @default(cuid())
+  rating  Float // e.g., 4.5
+  title   String?
+  content String  @db.Text
+
+  author_name String? // If guest review
+  author_role String? // e.g., "Pro Alpinist"
+
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  user_id String?
+  user    User?   @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@map("product_reviews")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model Coupon {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  discount_type  DiscountType
+  discount_value Decimal      @db.Decimal(10, 2)
+  valid_from     DateTime?
+  valid_until    DateTime?
+  usage_limit    Int? // Max times this coupon can be used
+  times_used     Int          @default(0)
+  is_active      Boolean      @default(true)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  orders Order[]
+
+  @@map("coupons")
+}
+
+// ==========================================
+// ORDER MODELS (To support checkout)
+// ==========================================
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  order_number String      @unique
+  status       OrderStatus @default(PENDING)
+
+  subtotal       Decimal @db.Decimal(10, 2)
+  tax            Decimal @db.Decimal(10, 2)
+  shipping_fee   Decimal @db.Decimal(10, 2)
+  discount_total Decimal @default(0) @db.Decimal(10, 2)
+  total          Decimal @db.Decimal(10, 2)
+
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  user_id String?
+  user    User?   @relation(fields: [user_id], references: [id])
+
+  coupon_id String?
+  coupon    Coupon? @relation(fields: [coupon_id], references: [id])
+
+  items OrderItem[]
+
+  // Relation to existing Address table for shipping
+  shipping_address_id String
+  shipping_address    Address @relation(fields: [shipping_address_id], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  quantity   Int
+  unit_price Decimal @db.Decimal(10, 2)
+
+  order_id String
+  order    Order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id])
+
+  variant_id String?
+  variant    ProductVariant? @relation(fields: [variant_id], references: [id])
+
+  @@map("order_items")
 }
