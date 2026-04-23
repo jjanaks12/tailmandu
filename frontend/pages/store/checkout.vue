@@ -1,6 +1,40 @@
-<template>
+<script setup lang="ts">
+import {
+    CreditCardIcon, LandmarkIcon, BitcoinIcon,
+    MountainIcon, BadgeCheckIcon, RocketIcon,
+    SnowflakeIcon
+} from 'lucide-vue-next'
+import { useCartStore } from '~/store/cart'
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+const cartStore = useCartStore()
+
+const paymentMethods = ref([
+    { id: 'card', name: 'Credit Card', icon: CreditCardIcon, active: true },
+    { id: 'bank', name: 'Bank Transfer', icon: LandmarkIcon, active: false },
+    { id: 'crypto', name: 'Crypto', icon: BitcoinIcon, active: false }
+])
+
+const summary = computed(() => {
+    const subtotal = cartStore.cartTotal
+    const tax = subtotal * 0.05
+    const total = subtotal + tax
+    return {
+        subtotal: subtotal.toFixed(2),
+        shipping: 'FREE',
+        tax: tax.toFixed(2),
+        total: total.toFixed(2)
+    }
+})
+
+const selectPaymentMethod = (id: string) => {
+    paymentMethods.value.forEach(method => {
+        method.active = method.id === id
+    })
+}
+</script>
+
+<template>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-24 px-6 pb-32 max-w-screen-2xl mx-auto">
         <!-- Left Column: Checkout Forms -->
         <div class="lg:col-span-7 space-y-8">
             <header class="mb-8">
@@ -9,105 +43,76 @@
                 </p>
             </header>
             <!-- Section: Shipping Address -->
-            <section class="bg-surface-container-lowest rounded-xl p-6 md:p-8 space-y-6">
+            <section class="bg-primary/5 rounded-xl p-6 md:p-8 space-y-6">
                 <div class="flex items-center gap-3 mb-2">
                     <span
-                        class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold">1</span>
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</span>
                     <h2 class="text-xl font-bold tracking-tight">Shipping Address</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline">First
-                            Name</label>
-                        <input
-                            class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                            placeholder="Tenzing" type="text" />
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">First
+                            Name</Label>
+                        <Input type="text" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline">Last
-                            Name</label>
-                        <input
-                            class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                            placeholder="Norgay" type="text" />
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Last
+                            Name</Label>
+                        <Input type="text" />
                     </div>
                     <div class="md:col-span-2 space-y-2">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline">Basecamp
-                            Address</label>
-                        <input
-                            class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                            placeholder="123 Summit Path" type="text" />
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Basecamp
+                            Address</Label>
+                        <Input type="text" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline">City</label>
-                        <input
-                            class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                            placeholder="Kathmandu" type="text" />
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">City</Label>
+                        <Input type="text" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline">Zip Code</label>
-                        <input
-                            class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                            placeholder="44600" type="text" />
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Zip Code</Label>
+                        <Input type="text" />
                     </div>
                 </div>
             </section>
             <!-- Section: Payment Method -->
-            <section class="bg-surface-container-lowest rounded-xl p-6 md:p-8 space-y-6">
+            <section class="bg-primary/5 rounded-xl p-6 md:p-8 space-y-6">
                 <div class="flex items-center gap-3 mb-2">
                     <span
-                        class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold">2</span>
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</span>
                     <h2 class="text-xl font-bold tracking-tight">Payment Method</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button
-                        class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary-container/10 transition-all group">
-                        <span class="material-symbols-outlined text-primary mb-2">credit_card</span>
-                        <span class="text-sm font-bold">Credit Card</span>
-                    </button>
-                    <button
-                        class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-transparent bg-surface-container-low hover:bg-surface-container transition-all group">
-                        <span
-                            class="material-symbols-outlined text-outline group-hover:text-primary mb-2">account_balance</span>
-                        <span class="text-sm font-bold">Bank Transfer</span>
-                    </button>
-                    <button
-                        class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-transparent bg-surface-container-low hover:bg-surface-container transition-all group">
-                        <span
-                            class="material-symbols-outlined text-outline group-hover:text-primary mb-2">payments</span>
-                        <span class="text-sm font-bold">Crypto</span>
+                    <button v-for="method in paymentMethods" :key="method.id" @click="selectPaymentMethod(method.id)"
+                        :class="['flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all group', method.active ? 'border-primary bg-primary/10' : 'border-transparent bg-surface-container-low hover:bg-surface-container']">
+                        <component :is="method.icon"
+                            :class="['mb-2', method.active ? 'text-primary' : 'text-outline group-hover:text-primary']"
+                            class="w-6 h-6" />
+                        <span class="text-sm font-bold">{{ method.name }}</span>
                     </button>
                 </div>
                 <div class="space-y-6 pt-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline">Cardholder
-                            Name</label>
-                        <input
-                            class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                            type="text" />
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Cardholder
+                            Name</Label>
+                        <Input type="text" />
                     </div>
                     <div class="relative">
-                        <label class="text-xs font-bold uppercase tracking-widest text-outline block mb-2">Card
-                            Number</label>
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline block mb-2">Card
+                            Number</Label>
                         <div class="relative">
-                            <input
-                                class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 pl-12 transition-all"
-                                placeholder="0000 0000 0000 0000" type="text" />
-                            <span
-                                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">payment</span>
+                            <Input type="text" placeholder="XXXX XXXX XXXX XXXX" />
+                            <CreditCardIcon class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-outline" />
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-xs font-bold uppercase tracking-widest text-outline">Expiry</label>
-                            <input
-                                class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                                placeholder="MM/YY" type="text" />
+                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">Expiry</Label>
+                            <Input type="text" placeholder="MM/YY" />
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-bold uppercase tracking-widest text-outline">CVC</label>
-                            <input
-                                class="w-full bg-surface-container-low border-0 rounded-lg focus:ring-2 focus:ring-primary py-3 px-4 transition-all"
-                                placeholder="***" type="text" />
+                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">CVC</Label>
+                            <Input type="password" placeholder="***" />
                         </div>
                     </div>
                 </div>
@@ -119,44 +124,26 @@
                 <div class="bg-on-background text-surface-bright rounded-2xl p-6 md:p-8 overflow-hidden relative">
                     <!-- Subtle Background Element -->
                     <div class="absolute -right-10 -bottom-10 opacity-10">
-                        <span class="material-symbols-outlined text-[200px]"
-                            style="font-variation-settings: 'FILL' 1;">terrain</span>
+                        <MountainIcon class="w-64 h-64" />
                     </div>
-                    <h2 class="text-2xl font-black mb-6 brand-font tracking-tight">Mission Manifest</h2>
+                    <h2 class="text-2xl font-black mb-6 brand-font tracking-tight">Order summary</h2>
                     <div class="space-y-6 mb-8 relative z-10">
-                        <!-- Summary Item 1 -->
-                        <div class="flex gap-4">
-                            <div
-                                class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
-                                <img class="w-full h-full object-cover"
-                                    data-alt="Technical orange hardshell mountaineering jacket displayed against a rugged stone background in dramatic morning sunlight"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGbx7JXHwDD8daGXFT47VzHMG_qx08WmFBO1B9CoPrQFRnbjrsUqKspYxyYNrY83UXj-7AAgZMjM1dnhO_vIB22bnCkwCSqe2KnTWbQNTz19max-mtJx0v4xr0oL8OcFA9WEMV46tSmuq0FH7HnohTN_dJ54sSExdAEdaivLtp02gh0io1nuWsxRW0sne9za9f6uUT48Hjjf2FFXwzs3cOLxuNLzLfVTzxx4Fc0quP8EVISqkNMFLQyQeeJ35isIEbT9jRqP4iuf8" />
-                            </div>
-                            <div class="flex-grow">
-                                <h3 class="font-bold text-lg leading-tight">Apex Pro Hardshell</h3>
-                                <p class="text-surface-variant/70 text-sm">Size: Large • Orange</p>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span class="font-bold text-primary-container">$450.00</span>
-                                    <span class="text-xs font-medium uppercase tracking-widest opacity-60">Qty:
-                                        1</span>
-                                </div>
-                            </div>
+                        <!-- Summary Items -->
+                        <div v-if="cartStore.items.length === 0" class="text-center text-surface-variant/70 py-8">
+                            Your cart is empty.
                         </div>
-                        <!-- Summary Item 2 -->
-                        <div class="flex gap-4">
+                        <div v-for="item in cartStore.items" :key="item.id" class="flex gap-4">
                             <div
                                 class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
-                                <img class="w-full h-full object-cover"
-                                    data-alt="Durable technical hiking boots with muddy soles resting on a mountain peak during a hazy sunset"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_IJzUfADOuj0rn2dB3AJovdgNQdkVwCbYsP_tZ73WEAPOrINRxN7E-VeDk9Fjx3XryIyo9yQdOx_G3DV6NJAKMnQoLn4aiwd8XEavA3rvK6HQOadVDRJgbpeilbnfm_NDk35O_M5x6p8uBsXbYstfHFWWEHrXh52XsYnWuWzVYC8zOokhN0R9MAAr_WXLy_zn6-2z0kYTnvC-phSDqmYSmFWTDes108Dra5t3krFv_DADothN6w5-dQj1-qiT4ryxf7gV8ylfXDg" />
+                                <img class="w-full h-full object-cover" :src="item.image" :alt="item.name" />
                             </div>
                             <div class="flex-grow">
-                                <h3 class="font-bold text-lg leading-tight">Sherpa Grip V2 Boots</h3>
-                                <p class="text-surface-variant/70 text-sm">Size: 44 • Obsidian</p>
+                                <h3 class="font-bold text-lg leading-tight">{{ item.name }}</h3>
+                                <p class="text-surface-variant/70 text-sm">{{ item?.category }}</p>
                                 <div class="flex justify-between items-center mt-1">
-                                    <span class="font-bold text-primary-container">$280.00</span>
+                                    <span class="font-bold text-primary">${{ item.price }}</span>
                                     <span class="text-xs font-medium uppercase tracking-widest opacity-60">Qty:
-                                        1</span>
+                                        {{ item.qty }}</span>
                                 </div>
                             </div>
                         </div>
@@ -164,32 +151,32 @@
                     <div class="border-t border-surface-variant/10 pt-6 space-y-4 relative z-10">
                         <div class="flex justify-between text-surface-variant/80">
                             <span>Gear Subtotal</span>
-                            <span class="font-bold">$730.00</span>
+                            <span class="font-bold">${{ summary.subtotal }}</span>
                         </div>
                         <div class="flex justify-between text-surface-variant/80">
                             <span>Expedition Shipping</span>
-                            <span class="font-bold">FREE</span>
+                            <span class="font-bold">{{ summary.shipping }}</span>
                         </div>
                         <div class="flex justify-between text-surface-variant/80">
                             <span>Altitude Tax</span>
-                            <span class="font-bold">$45.50</span>
+                            <span class="font-bold">${{ summary.tax }}</span>
                         </div>
                         <div class="pt-4 border-t border-surface-variant/20 flex justify-between items-end">
                             <div>
-                                <span class="text-xs font-black uppercase tracking-[0.2em] text-primary-container">Total
+                                <span class="text-xs font-black uppercase tracking-[0.2em] text-primary">Total
                                     Investment</span>
-                                <div class="text-4xl font-black brand-font tracking-tighter mt-1">$775.50</div>
+                                <div class="text-4xl font-black brand-font tracking-tighter mt-1">${{ summary.total }}
+                                </div>
                             </div>
-                            <span class="material-symbols-outlined text-primary-container text-4xl"
-                                style="font-variation-settings: 'FILL' 1;">verified</span>
+                            <BadgeCheckIcon class="text-primary w-10 h-10" />
                         </div>
                     </div>
                 </div>
-                <button
-                    class="w-full py-5 rounded-full bg-gradient-to-tr from-[#a53d00] to-[#f06723] text-white font-black text-lg tracking-widest uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+                <Button :disabled="cartStore.items.length === 0"
+                    class="w-full py-7 rounded-full bg-gradient-to-tr from-[#a53d00] to-[#f06723] border-0 text-white font-black text-lg tracking-widest uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
                     Confirm Order
-                    <span class="material-symbols-outlined">rocket_launch</span>
-                </button>
+                    <RocketIcon class="w-5 h-5" />
+                </Button>
                 <p class="text-center text-xs text-outline font-medium px-8">
                     By confirming, you agree to our Expedition Terms of Service and Environmental Ethics Policy.
                 </p>
@@ -200,7 +187,7 @@
     <div
         class="fixed bottom-8 left-8 p-4 bg-surface-bright/60 backdrop-blur-xl rounded-2xl flex items-center gap-4 shadow-xl border border-white/20 md:flex">
         <div class="w-12 h-12 rounded-full bg-secondary-container text-secondary flex items-center justify-center">
-            <span class="material-symbols-outlined">ac_unit</span>
+            <SnowflakeIcon class="w-6 h-6" />
         </div>
         <div>
             <div class="text-xs font-bold uppercase tracking-tighter text-secondary">Trail Condition</div>

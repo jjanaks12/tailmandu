@@ -29,6 +29,7 @@ export const buttonVariants = cva(
         xl: 'h-15 font-bold text-lg rounded-xl px-8 has-[>svg]:px-6 py-4',
         icon: 'size-9',
         iconsm: 'size-5 rounded-sm',
+        iconxl: 'size-14 rounded-full',
       },
       modifier: {
         outline: ['bg-transparent text-[var(--i-c-btn-color)] border border-[var(--i-c-btn-color)] hover:bg-[var(--i-c-btn-color)]', 'hover:text-black'],

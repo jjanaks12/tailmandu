@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia'
 import * as Y from 'yup'
 import { showImage } from '~/lib/filters'
 import type { userDetailSchema, userLoginSchema, userRegisterSchema } from '~/lib/schema/user.schema'

@@ -133,5 +133,49 @@
         "selected_item": "{count} items selected",
         "cancel_btn": "Cancel",
         "insert_btn": "Insert Selected ({count})"
+    },
+    "store": {
+        "sidebar": {
+            "title": "Categories",
+            "subtitle": "Gear up for the peak"
+        },
+        "member": {
+            "title": "Member Special",
+            "description": "Summer Basecamp Sale is Live",
+            "view_sale": "View Sale"
+        },
+        "catalog": {
+            "title": "Expedition Gear Shop",
+            "description": "Curated technical equipment for high-altitude trekking and alpine climbing.",
+            "add_to_cart": "Add to cart"
+        },
+        "filter": {
+            "title": "Filter",
+            "label": "Filter by price",
+            "all": "All"
+        },
+        "sort": {
+            "title": "Sort",
+            "label": "Sort by"
+        },
+        "featured": {
+            "subtitle": "Featured Expedition",
+            "title": "Summit Series 2024",
+            "action": "Explore Series"
+        },
+        "weather": {
+            "title": "Trail Weather Ready",
+            "description": "Every piece of gear is tested in extreme Himalayan conditions."
+        },
+        "recommendation": {
+            "title": "Recommended for You",
+            "description": "Based on your recent interest in 'Winter Gear'"
+        },
+        "cart": {
+            "title": "Your Cart",
+            "empty": "Your cart is empty.",
+            "subtotal": "Subtotal",
+            "checkout": "Proceed to Checkout"
+        }
     }
 }
