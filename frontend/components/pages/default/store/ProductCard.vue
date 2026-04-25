@@ -12,11 +12,11 @@ const props = defineProps<{
 const cartStore = useCartStore()
 
 const handleAddToCart = () => {
-    cartStore.addToCart(props.product)
-    toast.success(`${props.product.name} added to cart!`, {
-        description: 'You can review it in your cart drawer.',
-        position: 'bottom-right'
-    })
+    if (!props.product.variants || props.product.variants.length === 0) {
+        toast.error('No variants available for this product')
+        return
+    }
+    cartStore.addToCart(props.product, props.product.variants[0])
 }
 </script>
 

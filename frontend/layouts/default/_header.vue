@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { MenuIcon } from 'lucide-vue-next'
+import * as Icons from 'lucide-vue-next'
 import { useMenu } from '../../lib/defaultMenus'
 import { useAppStore } from '~/store/app'
 import { useAuthStore } from '~/store/auth'
 import { useSidebar } from '~/components/ui/sidebar'
+import Icon from '~/components/icon.vue'
 
 const { menuList: menus } = useMenu()
 const localePath = useLocalePath()
@@ -27,6 +29,7 @@ const { toggleSidebar } = useSidebar()
                                 <NavigationMenuItem v-if="menu.subMenu && menu.subMenu.length > 0">
                                     <NavigationMenuTrigger
                                         class="bg-transparent uppercase data-[state=open]:hover:bg-transparent">
+                                        <Icon :name="(menu.icon as keyof typeof Icons)" v-if="menu.showIcon" />
                                         {{ menu.title }}
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
@@ -40,8 +43,11 @@ const { toggleSidebar } = useSidebar()
                                     </NavigationMenuContent>
                                 </NavigationMenuItem>
                                 <template v-else>
-                                    <NavigationMenuLink>
-                                        <NuxtLink :to="localePath(menu.path)">{{ menu.title }}</NuxtLink>
+                                    <NavigationMenuLink as-child>
+                                        <NuxtLink :to="localePath(menu.path)" class="flex-row items-center gap-2">
+                                            <Icon :name="(menu.icon as keyof typeof Icons)" v-if="menu.showIcon" />
+                                            {{ menu.title }}
+                                        </NuxtLink>
                                     </NavigationMenuLink>
                                 </template>
                             </template>

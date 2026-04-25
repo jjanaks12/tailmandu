@@ -50,6 +50,7 @@ export type Menu = {
     disabled?: boolean
     role?: string
     permissions: string | string[]
+    showIcon?: boolean
     subMenu?: Menu[]
 }
 
@@ -512,7 +513,57 @@ export type Product = {
     gallery?: Gallery
     tags?: Tag[]
     rating?: number
+    variants?: ProductVariant[]
     reviews?: any[]
+    specs: ProductSpec[]
+}
+
+export type ProductSpec = {
+    id: string
+    label: string
+    value: string
+    product_id: string
+    product: Product
+}
+
+export type Size = {
+    id: string
+    name: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    product_id: string
+    product: Product
+}
+
+export type ProductVariant = {
+    id: string
+    sku: string
+    price: number
+    stock: number
+    product_id: string
+    product: Product
+    size_id: string
+    size: Size
+    orderItems: OrderItem[]
+}
+
+export type OrderItem = {
+    id: string
+    quantity: number
+    unit_price: string
+    order_id: string
+    order: Order
+    product_id: string
+    product: Product
+    variant_id?: string
+    variant?: ProductVariant
+}
+
+export type Order = {
+    id: string
+    order_id: string
+    order_items: OrderItem[]
 }
 
 type MediaMode = "image" | "gallery"
@@ -525,4 +576,14 @@ export type MediaState = {
     selectedGalleries: string[]
     selectedGallery: Gallery | null,
     action?: Function
+}
+
+type CartVariant = ProductVariant & {
+    quantity: number
+}
+
+export interface CartItem {
+    id: string
+    product: Product
+    variants: CartVariant[]
 }

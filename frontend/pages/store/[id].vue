@@ -4,14 +4,15 @@ import { useProductStore } from '~/store/product'
 import { useCartStore } from '~/store/cart'
 import { showImage, formatDate } from '~/lib/filters'
 import { toast } from 'vue-sonner'
+import type { Product, ProductVariant } from '~/lib/types'
 
 const route = useRoute()
 const productStore = useProductStore()
 const cartStore = useCartStore()
 
-const product = ref<any>(null)
+const product = ref<Product | null>(null)
 const isLoading = ref(true)
-const selectedSize = ref<any>(null)
+const selectedSize = ref<ProductVariant | null>(null)
 
 const newReview = ref({
     rating: 5,
@@ -25,7 +26,7 @@ const fetchProduct = async () => {
     isLoading.value = true
     try {
         product.value = await productStore.getProductDetails(route.params.id as string)
-        if (product.value?.variants?.length > 0) {
+        if (product.value?.variants && product.value?.variants?.length > 0) {
             selectedSize.value = product.value.variants[0]
         }
         await fetchRecommended()
@@ -64,20 +65,13 @@ const submitReview = async () => {
 const addToCart = () => {
     if (!product.value) return
 
-    if (product.value.variants?.length > 0 && !selectedSize.value) {
+    if (product.value.variants && product.value.variants?.length > 0 && !selectedSize.value) {
         toast.error('Please select a size')
         return
     }
 
-    cartStore.addToCart({
-        id: product.value.id,
-        name: product.value.name,
-        price: selectedSize.value?.price || product.value.base_price,
-        qty: 1,
-        image: product.value.thumbnail?.file_name,
-        variant: selectedSize.value
-    })
-    toast.success('Added to cart')
+    if (selectedSize.value != null)
+        cartStore.addToCart(product.value, selectedSize.value)
 }
 
 onMounted(fetchProduct)
@@ -117,14 +111,11 @@ watch(() => route.params.id, () => {
                         class="aspect-square bg-surface-container-low rounded-[2.5rem] overflow-hidden mb-6 group relative">
                         <img :alt="product.name"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            :src="showImage(product.thumbnail?.file_name)" />
-                        <Button modifier="outline" size="icon"
-                            class="absolute top-6 right-6 rounded-full bg-background/80 backdrop-blur-md border-none">
-                            <HeartIcon class="w-5 h-5" />
-                        </Button>
+                            :src="showImage(product.thumbnail?.file_name as string)" />
                     </div>
                     <!-- Thumbnail Grid -->
-                    <div v-if="product.gallery?.images?.length > 0" class="grid grid-cols-4 gap-4">
+                    <div v-if="product.gallery?.images && product.gallery.images.length > 0"
+                        class="grid grid-cols-4 gap-4">
                         <div v-for="(img, idx) in product.gallery.images" :key="idx"
                             class="aspect-square rounded-2xl overflow-hidden cursor-pointer relative hover:opacity-80 transition-opacity">
                             <img class="w-full h-full object-cover" :alt="product.name"
@@ -159,7 +150,7 @@ watch(() => route.params.id, () => {
                         </div>
                     </div>
                     <div class="space-y-6 mb-10">
-                        <div v-if="product.variants?.length > 0">
+                        <div v-if="product.variants && product.variants.length > 0">
                             <span class="block text-sm font-bold uppercase mb-3">Select Size</span>
                             <div class="grid grid-cols-4 gap-2">
                                 <button v-for="variant in product.variants" :key="variant.id"
@@ -179,7 +170,7 @@ watch(() => route.params.id, () => {
                         </div>
                     </div>
                     <!-- Technical Specs Table -->
-                    <div v-if="product.specs?.length > 0" class="mt-auto">
+                    <div v-if="product.specs && product.specs.length > 0" class="mt-auto">
                         <div class="border-t border-outline-variant/30 pt-8">
                             <h3 class="font-headline font-bold text-xl mb-6">Technical Specifications</h3>
                             <div class="grid grid-cols-2 gap-y-4 gap-x-12">
@@ -243,7 +234,8 @@ watch(() => route.params.id, () => {
                         </DialogContent>
                     </Dialog>
                 </div>
-                <div v-if="product.reviews?.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-if="product.reviews && product.reviews.length > 0"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div v-for="review in product.reviews" :key="review.id"
                         class="bg-surface-container-low p-6 rounded-3xl border border-outline-variant/10">
                         <div class="flex items-center gap-2 mb-4">
@@ -253,7 +245,7 @@ watch(() => route.params.id, () => {
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm">{{ review.user?.name || review.author_name || 'Anonymous'
-                                }}
+                                    }}
                                 </h4>
                                 <p class="text-xs text-on-surface-variant">{{ formatDate(review.created_at) }}</p>
                             </div>

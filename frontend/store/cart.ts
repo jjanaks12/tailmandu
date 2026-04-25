@@ -1,47 +1,65 @@
 import { defineStore } from 'pinia'
-
-export interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  qty: number;
-  image: string;
-}
+import { toast } from 'vue-sonner'
+import type { CartItem, Product, ProductVariant } from '~/lib/types';
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
 
-  const cartCount = computed(() => items.value.reduce((acc, item) => acc + item.qty, 0))
-  const cartTotal = computed(() => items.value.reduce((acc, item) => acc + item.price * item.qty, 0))
+  const cartCount = computed(() => items.value.reduce((acc, item) => acc + item.variants?.reduce((acc, variant) => acc + variant.quantity, 0), 0))
+  const cartTotal = computed(() => items.value.reduce((acc, item) => acc + Number(item.variants.reduce((acc, variant) => acc + Number(variant.price) * variant.quantity, 0)), 0))
 
-  const addToCart = (product: any) => {
-    const existing = items.value.find(item => item.id === product.id)
+  const addToCart = (product: Product, variant: ProductVariant) => {
+    const cartItemId = product.id
+    const existing = items.value.find(item => item.id === cartItemId)
     if (existing) {
-      existing.qty++
+      const existingVariant = existing.variants.find(v => v.id === variant.id)
+      if (existingVariant) {
+        existingVariant.quantity++
+      } else {
+        existing.variants.push({ ...variant, quantity: 1 })
+      }
     } else {
-      items.value.push({
-        id: product.id,
-        name: product.name,
-        price: parseFloat(product.price),
-        qty: 1,
-        image: product.image
-      })
+      if (variant.stock > 0) {
+        items.value.push({
+          id: cartItemId,
+          product: product,
+          variants: [{ ...variant, quantity: 1 }]
+        })
+      } else {
+        toast.error(`${product.name} is out of stock`)
+      }
     }
   }
 
-  const increaseQuantity = (id: number) => {
+  const increaseQuantity = (id: string, variantId: string) => {
     const item = items.value.find(item => item.id === id)
-    if (item) item.qty++
-  }
-
-  const decreaseQuantity = (id: number) => {
-    const item = items.value.find(item => item.id === id)
-    if (item && item.qty > 1) {
-      item.qty--
+    if (item) {
+      const existingVariant = item.variants.find(v => v.id === variantId)
+      if (existingVariant) {
+        if (existingVariant.quantity < existingVariant.stock) {
+          existingVariant.quantity++
+        } else {
+          toast.error(`Only ${existingVariant.stock} items available in stock`)
+        }
+      }
     }
   }
 
-  const removeFromCart = (id: number) => {
+  const decreaseQuantity = (id: string, variantId: string) => {
+    const item = items.value.find(item => item.id === id)
+    if (item) {
+      const existingVariant = item.variants.find(v => v.id === variantId)
+      if (existingVariant) {
+        if (existingVariant.quantity > 1) {
+          existingVariant.quantity--
+        } else {
+          toast.error(`${item.product.name} is already at minimum quantity`)
+        }
+      }
+    }
+  }
+
+  const removeFromCart = (id: string) => {
     items.value = items.value.filter(item => item.id !== id)
   }
 

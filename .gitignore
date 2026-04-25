@@ -14,6 +14,8 @@ doc.md
 
 package-lock.json
 .agents
+.agent/
+graphify-out/
 skills-lock.json
 
 scripts
