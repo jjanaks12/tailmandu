@@ -57,16 +57,29 @@ export const useMenu = () => {
             permissions: 'manage_trek'
         }, {
             title: 'Products',
-            icon: 'Box',
-            slug: 'products',
-            path: '/dashboard/product',
-            permissions: 'manage_product'
-        }, {
-            title: 'Product categories',
-            icon: 'Box',
-            slug: 'product_categories',
-            path: '/dashboard/product/category',
-            permissions: 'manage_product_category'
+            icon: 'Store',
+            slug: 'product',
+            path: '',
+            permissions: 'manage_product',
+            subMenu: [{
+                title: 'Lists',
+                icon: 'Box',
+                path: '/dashboard/product',
+                slug: 'products',
+                permissions: 'manage_product'
+            }, {
+                title: 'Categories',
+                icon: 'ListTree',
+                path: '/dashboard/product/category',
+                slug: 'product_categories',
+                permissions: 'manage_product_category'
+            }, {
+                title: 'Store Settings',
+                icon: 'Settings',
+                path: '/dashboard/product/store_setting',
+                slug: 'store_setting',
+                permissions: 'manage_product_store_setting'
+            }]
         }]
     }, {
         title: 'Miscellanous',

@@ -247,5 +247,36 @@
             "subtotal": "Subtotal",
             "checkout": "Proceed to Checkout"
         }
+    },
+    "checkout": {
+        "title": "Expedition Details",
+        "description": "Configure your logistics for the upcoming journey.",
+        "shipping_address": "Shipping Address",
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "address": "Address",
+        "city": "City",
+        "zip_code": "Zip Code",
+        "payment_method": "Payment Method",
+        "credit_card": "Credit Card",
+        "bank_transfer": "Bank Transfer",
+        "cardholder_name": "Cardholder Name",
+        "card_number": "Card Number",
+        "expiry": "Expiry",
+        "cvc": "CVC",
+        "order_summary": "Order Summary",
+        "basecamp_mission": "Basecamp Mission",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "tax": "Tax",
+        "total": "Total",
+        "place_order": "Place Order",
+        "confirm_order": "Confirm Order",
+        "confirm_order_text": "By confirming, you agree to our Expedition Terms of Service and Environmental Ethics Policy.",
+        "expedition_shipping": "Expedition Shipping",
+        "altitude_tax": "Altitude Tax",
+        "total_investment": "Total Investment",
+        "empty_cart": "Your cart is empty.",
+        "gear_subtotal": "Gear Subtotal"
     }
 }

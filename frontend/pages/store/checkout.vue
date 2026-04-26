@@ -1,18 +1,28 @@
 <script setup lang="ts">
-import {
-    CreditCardIcon, LandmarkIcon, BitcoinIcon,
-    MountainIcon, BadgeCheckIcon, RocketIcon,
-    SnowflakeIcon
-} from 'lucide-vue-next'
+import { CreditCardIcon, MountainIcon, BadgeCheckIcon, RocketIcon } from 'lucide-vue-next'
+import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
+import * as Y from 'yup'
 import { useCartStore } from '~/store/cart'
+import { showImage } from '~/lib/filters'
 
 const cartStore = useCartStore()
 
+const form = useTemplateRef<FormContext>('checkoutForm')
 const paymentMethods = ref([
-    { id: 'card', name: 'Credit Card', icon: CreditCardIcon, active: true },
-    { id: 'bank', name: 'Bank Transfer', icon: LandmarkIcon, active: false },
-    { id: 'crypto', name: 'Crypto', icon: BitcoinIcon, active: false }
+    { id: 'card', name: 'Credit Card', icon: CreditCardIcon, active: true }
 ])
+
+const checkoutFormSchema = Y.object({
+    firstName: Y.string().required('First Name is required'),
+    lastName: Y.string().required('Last Name is required'),
+    address: Y.string().required('Address is required'),
+    city: Y.string().required('City is required'),
+    zipCode: Y.string().required('Zip Code is required'),
+    cardholderName: Y.string().required('Cardholder Name is required'),
+    cardNumber: Y.string().required('Card Number is required'),
+    expiry: Y.string().required('Expiry is required'),
+    cvc: Y.string().required('CVC is required')
+})
 
 const summary = computed(() => {
     const subtotal = cartStore.cartTotal
@@ -31,15 +41,20 @@ const selectPaymentMethod = (id: string) => {
         method.active = method.id === id
     })
 }
+
+const submitHandler = (values: any) => {
+    console.log(values)
+}
 </script>
 
 <template>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-24 px-6 pb-32 max-w-screen-2xl mx-auto">
+    <Form ref="checkoutForm" :validation-schema="checkoutFormSchema" @submit="submitHandler"
+        class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-24 px-6 pb-32 max-w-screen-2xl mx-auto">
         <!-- Left Column: Checkout Forms -->
         <div class="lg:col-span-7 space-y-8">
             <header class="mb-8">
-                <h1 class="text-4xl font-black tracking-tight mb-2">Expedition Details</h1>
-                <p class="text-on-surface-variant font-body">Configure your logistics for the upcoming journey.
+                <h1 class="text-4xl font-black tracking-tight mb-2">{{ $t("checkout.title") }}</h1>
+                <p class="text-on-surface-variant font-body">{{ $t("checkout.description") }}
                 </p>
             </header>
             <!-- Section: Shipping Address -->
@@ -47,32 +62,44 @@ const selectPaymentMethod = (id: string) => {
                 <div class="flex items-center gap-3 mb-2">
                     <span
                         class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</span>
-                    <h2 class="text-xl font-bold tracking-tight">Shipping Address</h2>
+                    <h2 class="text-xl font-bold tracking-tight">{{ $t("checkout.shipping_address") }}</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">First
-                            Name</Label>
-                        <Input type="text" />
-                    </div>
-                    <div class="space-y-2">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Last
-                            Name</Label>
-                        <Input type="text" />
-                    </div>
-                    <div class="md:col-span-2 space-y-2">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Basecamp
-                            Address</Label>
-                        <Input type="text" />
-                    </div>
-                    <div class="space-y-2">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">City</Label>
-                        <Input type="text" />
-                    </div>
-                    <div class="space-y-2">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Zip Code</Label>
-                        <Input type="text" />
-                    </div>
+                    <Field name="firstName" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.first_name") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="firstName" class="text-error" />
+                    </Field>
+                    <Field name="lastName" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.last_name") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="lastName" class="text-error" />
+                    </Field>
+                    <Field name="address" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.address") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="address" class="text-error" />
+                    </Field>
+                    <Field name="city" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.city") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="city" class="text-error" />
+                    </Field>
+                    <Field name="zipCode" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.zip_code") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="zipCode" class="text-error" />
+                    </Field>
                 </div>
             </section>
             <!-- Section: Payment Method -->
@@ -80,7 +107,9 @@ const selectPaymentMethod = (id: string) => {
                 <div class="flex items-center gap-3 mb-2">
                     <span
                         class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</span>
-                    <h2 class="text-xl font-bold tracking-tight">Payment Method</h2>
+                    <h2 class="text-xl font-bold tracking-tight">
+                        {{ $t("checkout.payment_method") }}
+                    </h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <button v-for="method in paymentMethods" :key="method.id" @click="selectPaymentMethod(method.id)"
@@ -93,13 +122,15 @@ const selectPaymentMethod = (id: string) => {
                 </div>
                 <div class="space-y-6 pt-4">
                     <div class="space-y-2">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">Cardholder
-                            Name</Label>
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.cardholder_name") }}
+                        </Label>
                         <Input type="text" />
                     </div>
                     <div class="relative">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline block mb-2">Card
-                            Number</Label>
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline block mb-2">
+                            {{ $t("checkout.card_number") }}
+                        </Label>
                         <div class="relative">
                             <Input type="text" placeholder="XXXX XXXX XXXX XXXX" />
                             <CreditCardIcon class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-outline" />
@@ -107,11 +138,15 @@ const selectPaymentMethod = (id: string) => {
                     </div>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">Expiry</Label>
+                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                                {{ $t("checkout.expiry") }}
+                            </Label>
                             <Input type="text" placeholder="MM/YY" />
                         </div>
                         <div class="space-y-2">
-                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">CVC</Label>
+                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                                {{ $t("checkout.cvc") }}
+                            </Label>
                             <Input type="password" placeholder="***" />
                         </div>
                     </div>
@@ -126,45 +161,56 @@ const selectPaymentMethod = (id: string) => {
                     <div class="absolute -right-10 -bottom-10 opacity-10">
                         <MountainIcon class="w-64 h-64" />
                     </div>
-                    <h2 class="text-2xl font-black mb-6 brand-font tracking-tight">Order summary</h2>
+                    <h2 class="text-2xl font-black mb-6 brand-font tracking-tight">
+                        {{ $t("checkout.order_summary") }}
+                    </h2>
                     <div class="space-y-6 mb-8 relative z-10">
                         <!-- Summary Items -->
                         <div v-if="cartStore.items.length === 0" class="text-center text-surface-variant/70 py-8">
-                            Your cart is empty.
+                            {{ $t("checkout.empty_cart") }}
                         </div>
                         <div v-for="item in cartStore.items" :key="item.id" class="flex gap-4">
                             <div
                                 class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-highest">
-                                <img class="w-full h-full object-cover" :src="item.image" :alt="item.name" />
+                                <img class="w-full h-full object-cover"
+                                    :src="showImage(item.product.thumbnail?.file_name as string)"
+                                    :alt="item.product.name" />
                             </div>
                             <div class="flex-grow">
-                                <h3 class="font-bold text-lg leading-tight">{{ item.name }}</h3>
-                                <p class="text-surface-variant/70 text-sm">{{ item?.category }}</p>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span class="font-bold text-primary">${{ item.price }}</span>
-                                    <span class="text-xs font-medium uppercase tracking-widest opacity-60">Qty:
-                                        {{ item.qty }}</span>
+                                <h3 class="font-bold text-base leading-tight">{{ item.product.name }}</h3>
+                                <p class="text-surface-variant/70 text-xs">{{ item.product.category?.name }}</p>
+                                <div class="mt-2 space-y-1">
+                                    <div v-for="variant in item.variants" :key="variant.id"
+                                        class="flex justify-between items-center">
+                                        <span class="text-xs font-bold uppercase tracking-wider opacity-70">
+                                            {{ variant.size?.name || variant.sku }} × {{ variant.quantity }}
+                                        </span>
+                                        <span class="text-sm font-bold text-primary">
+                                            ${{ (Number(variant.price) * variant.quantity).toFixed(2) }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="border-t border-surface-variant/10 pt-6 space-y-4 relative z-10">
                         <div class="flex justify-between text-surface-variant/80">
-                            <span>Gear Subtotal</span>
+                            <span>{{ $t("checkout.gear_subtotal") }}</span>
                             <span class="font-bold">${{ summary.subtotal }}</span>
                         </div>
                         <div class="flex justify-between text-surface-variant/80">
-                            <span>Expedition Shipping</span>
+                            <span>{{ $t("checkout.expedition_shipping") }}</span>
                             <span class="font-bold">{{ summary.shipping }}</span>
                         </div>
                         <div class="flex justify-between text-surface-variant/80">
-                            <span>Altitude Tax</span>
+                            <span>{{ $t("checkout.altitude_tax") }}</span>
                             <span class="font-bold">${{ summary.tax }}</span>
                         </div>
                         <div class="pt-4 border-t border-surface-variant/20 flex justify-between items-end">
                             <div>
-                                <span class="text-xs font-black uppercase tracking-[0.2em] text-primary">Total
-                                    Investment</span>
+                                <span class="text-xs font-black uppercase tracking-[0.2em] text-primary">
+                                    {{ $t("checkout.total_investment") }}
+                                </span>
                                 <div class="text-4xl font-black brand-font tracking-tighter mt-1">${{ summary.total }}
                                 </div>
                             </div>
@@ -174,24 +220,13 @@ const selectPaymentMethod = (id: string) => {
                 </div>
                 <Button :disabled="cartStore.items.length === 0"
                     class="w-full py-7 rounded-full bg-gradient-to-tr from-[#a53d00] to-[#f06723] border-0 text-white font-black text-lg tracking-widest uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
-                    Confirm Order
+                    {{ $t("checkout.confirm_order") }}
                     <RocketIcon class="w-5 h-5" />
                 </Button>
                 <p class="text-center text-xs text-outline font-medium px-8">
-                    By confirming, you agree to our Expedition Terms of Service and Environmental Ethics Policy.
+                    {{ $t("checkout.confirm_order_text") }}
                 </p>
             </div>
         </aside>
-    </div>
-    <!-- Success Modal Background Pulse Mockup (Glassmorphism Detail) -->
-    <div
-        class="fixed bottom-8 left-8 p-4 bg-surface-bright/60 backdrop-blur-xl rounded-2xl flex items-center gap-4 shadow-xl border border-white/20 md:flex">
-        <div class="w-12 h-12 rounded-full bg-secondary-container text-secondary flex items-center justify-center">
-            <SnowflakeIcon class="w-6 h-6" />
-        </div>
-        <div>
-            <div class="text-xs font-bold uppercase tracking-tighter text-secondary">Trail Condition</div>
-            <div class="text-sm font-black">Clear skies at Basecamp</div>
-        </div>
-    </div>
+    </Form>
 </template>
