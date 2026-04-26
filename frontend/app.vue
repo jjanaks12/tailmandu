@@ -9,7 +9,7 @@ import { useEventStore } from './store/event'
 const { isLoggedin } = storeToRefs(useAuthStore())
 const { imagePreview } = storeToRefs(useAppStore())
 const { fetch } = useAuthStore()
-const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany, fetchShirtSizes } = useAppStore()
+const { fetchGender, fetchCountries, fetchAgeCategory, fetchCompany, fetchShirtSizes, fetchStoreSetting } = useAppStore()
 const { fetch: fetchRole } = useRoleStore()
 const { fetch: fetchPermission } = usePermissionStore()
 const { fetch: fetchEvent } = useEventStore()
@@ -18,7 +18,7 @@ const isLoading = ref(true)
 const job = new Jobs()
 
 const initPage = async () => {
-  const jobList: Function[] = [fetchCompany, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes]
+  const jobList: Function[] = [fetchCompany, fetchGender, fetchCountries, fetchAgeCategory, fetchShirtSizes, fetchStoreSetting]
 
   if (isLoggedin.value)
     jobList.push(fetch, fetchPermission, fetchRole, fetchEvent)

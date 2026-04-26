@@ -9,6 +9,7 @@ import {
     XIcon
 } from 'lucide-vue-next'
 import { useAxios } from "~/services/axios"
+import { useAppStore } from "~/store/app"
 
 definePageMeta({
     layout: 'admin',
@@ -171,6 +172,10 @@ const saveSettings = async () => {
             const { data } = await axios.post('/products/store-setting', payload)
             settingId.value = data.id
         }
+        
+        const appStore = useAppStore()
+        await appStore.fetchStoreSetting()
+        
         saved.value = true
         setTimeout(() => (saved.value = false), 2500)
     } catch (error) {

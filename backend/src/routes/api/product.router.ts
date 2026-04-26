@@ -18,6 +18,17 @@ router.delete('/categories/:id', [verifyAccessToken], ProductCategoryController.
 router.get('/list', ProductController.publicIndex)
 router.get('/details/:id', ProductController.publicShow)
 
+// Product Review Routes
+router.post('/reviews', [verifyAccessToken], ProductReviewController.create)
+router.delete('/reviews/:id', [verifyAccessToken], ProductReviewController.delete)
+
+
+// Store Setting Routes
+router.get('/store-setting', StoreSettingController.show)
+router.post('/store-setting', [verifyAccessToken], StoreSettingController.create)
+router.put('/store-setting/:id', [verifyAccessToken], StoreSettingController.update)
+router.delete('/store-setting/:id', [verifyAccessToken], StoreSettingController.delete)
+
 // Product Routes
 router.get('/recommended', ProductController.recommended)
 router.get('/', [verifyAccessToken], ProductController.index)
@@ -26,16 +37,5 @@ router.post('/', [verifyAccessToken], ProductController.create)
 router.put('/:id', [verifyAccessToken], ProductController.update)
 router.patch('/:id/publish', [verifyAccessToken], ProductController.togglePublish)
 router.delete('/:id', [verifyAccessToken], ProductController.delete)
-
-// Product Review Routes
-router.post('/reviews', [verifyAccessToken], ProductReviewController.create)
-router.delete('/reviews/:id', [verifyAccessToken], ProductReviewController.delete)
-
-
-// Store Setting Routes
-router.get('/store-setting', [verifyAccessToken], StoreSettingController.show)
-router.post('/store-setting', [verifyAccessToken], StoreSettingController.create)
-router.put('/store-setting/:id', [verifyAccessToken], StoreSettingController.update)
-router.delete('/store-setting/:id', [verifyAccessToken], StoreSettingController.delete)
 
 export default router

@@ -5,6 +5,8 @@ import * as Y from 'yup'
 import { useCartStore } from '~/store/cart'
 import { showImage } from '~/lib/filters'
 
+const { formatCurrency } = useCurrency()
+
 const cartStore = useCartStore()
 
 const form = useTemplateRef<FormContext>('checkoutForm')
@@ -156,7 +158,7 @@ const submitHandler = (values: any) => {
         <!-- Right Column: Mission Manifest (Order Summary) -->
         <aside class="lg:col-span-5">
             <div class="sticky top-24 space-y-6">
-                <div class="bg-on-background text-surface-bright rounded-2xl p-6 md:p-8 overflow-hidden relative">
+                <div class="bg-secondary/20 text-secondary rounded-2xl p-6 md:p-8 overflow-hidden relative">
                     <!-- Subtle Background Element -->
                     <div class="absolute -right-10 -bottom-10 opacity-10">
                         <MountainIcon class="w-64 h-64" />
@@ -177,7 +179,11 @@ const submitHandler = (values: any) => {
                                     :alt="item.product.name" />
                             </div>
                             <div class="flex-grow">
-                                <h3 class="font-bold text-base leading-tight">{{ item.product.name }}</h3>
+                                <h3 class="font-bold text-base leading-tight">
+                                    <NuxtLink :to="$localePath({ path: `/store/${item.product.slug}` })">
+                                        {{ item.product.name }}
+                                    </NuxtLink>
+                                </h3>
                                 <p class="text-surface-variant/70 text-xs">{{ item.product.category?.name }}</p>
                                 <div class="mt-2 space-y-1">
                                     <div v-for="variant in item.variants" :key="variant.id"
@@ -186,7 +192,7 @@ const submitHandler = (values: any) => {
                                             {{ variant.size?.name || variant.sku }} × {{ variant.quantity }}
                                         </span>
                                         <span class="text-sm font-bold text-primary">
-                                            ${{ (Number(variant.price) * variant.quantity).toFixed(2) }}
+                                            {{ formatCurrency((Number(variant.price) * variant.quantity).toFixed(2)) }}
                                         </span>
                                     </div>
                                 </div>
@@ -196,7 +202,7 @@ const submitHandler = (values: any) => {
                     <div class="border-t border-surface-variant/10 pt-6 space-y-4 relative z-10">
                         <div class="flex justify-between text-surface-variant/80">
                             <span>{{ $t("checkout.gear_subtotal") }}</span>
-                            <span class="font-bold">${{ summary.subtotal }}</span>
+                            <span class="font-bold">{{ formatCurrency(summary.subtotal) }}</span>
                         </div>
                         <div class="flex justify-between text-surface-variant/80">
                             <span>{{ $t("checkout.expedition_shipping") }}</span>
@@ -204,14 +210,15 @@ const submitHandler = (values: any) => {
                         </div>
                         <div class="flex justify-between text-surface-variant/80">
                             <span>{{ $t("checkout.altitude_tax") }}</span>
-                            <span class="font-bold">${{ summary.tax }}</span>
+                            <span class="font-bold">{{ formatCurrency(summary.tax) }}</span>
                         </div>
                         <div class="pt-4 border-t border-surface-variant/20 flex justify-between items-end">
                             <div>
                                 <span class="text-xs font-black uppercase tracking-[0.2em] text-primary">
                                     {{ $t("checkout.total_investment") }}
                                 </span>
-                                <div class="text-4xl font-black brand-font tracking-tighter mt-1">${{ summary.total }}
+                                <div class="text-4xl font-black brand-font tracking-tighter mt-1">{{
+                                    formatCurrency(summary.total) }}
                                 </div>
                             </div>
                             <BadgeCheckIcon class="text-primary w-10 h-10" />

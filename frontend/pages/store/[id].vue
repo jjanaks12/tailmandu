@@ -61,6 +61,7 @@ const submitReview = async () => {
         isSubmittingReview.value = false
     }
 }
+const { formatCurrency } = useCurrency()
 
 const addToCart = () => {
     if (!product.value) return
@@ -76,9 +77,7 @@ const addToCart = () => {
 
 onMounted(fetchProduct)
 
-watch(() => route.params.id, () => {
-    fetchProduct()
-})
+watch(() => route.params.id, fetchProduct)
 </script>
 
 <template>
@@ -137,8 +136,7 @@ watch(() => route.params.id, () => {
                     </div>
                     <h1 class="text-5xl font-headline font-black text-on-background tracking-tight mb-4 leading-none">
                         {{ product.name }}</h1>
-                    <p class="text-2xl font-headline font-bold text-primary mb-8">${{ selectedSize?.price ||
-                        product.base_price }}</p>
+                    <p class="text-2xl font-headline font-bold text-primary mb-8">{{ formatCurrency(selectedSize?.price || product.base_price) }}</p>
                     <div class="bg-primary/10 rounded-3xl p-6 mb-8 relative overflow-hidden">
                         <div class="absolute top-0 right-0 opacity-5 -translate-y-1/4 translate-x-1/4">
                             <MountainIcon class="w-64 h-64" />
@@ -245,7 +243,7 @@ watch(() => route.params.id, () => {
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm">{{ review.user?.name || review.author_name || 'Anonymous'
-                                    }}
+                                }}
                                 </h4>
                                 <p class="text-xs text-on-surface-variant">{{ formatDate(review.created_at) }}</p>
                             </div>

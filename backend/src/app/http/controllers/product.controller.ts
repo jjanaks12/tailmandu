@@ -5,6 +5,7 @@ import { APIQuery } from '@/app/lib/types'
 import { productSchema } from '@/app/lib/schema/product.schema'
 import createHttpError from 'http-errors'
 import moment from 'moment'
+import jwt from 'jsonwebtoken'
 
 export class ProductController {
 
@@ -463,6 +464,29 @@ export class ProductController {
     public static async publicShow(request: Request, response: Response, next: NextFunction) {
         try {
             const { id } = request.params
+            let showUnpublished = false
+
+            const authHeader = request.headers['authorization']
+            if (authHeader) {
+                const token = authHeader.split(' ')[1]
+                if (token && process.env.ACCESS_TOKEN_SECRET) {
+                    try {
+                        const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET) as any
+                        if (payload && payload.aud) {
+                            const user = await prisma.user.findFirst({
+                                where: { id: payload.aud as string },
+                                include: { role: { include: { permissions: true } } }
+                            })
+                            if (user?.role?.permissions.some(p => p.name === 'product_view' || p.name === '*')) {
+                                showUnpublished = true
+                            }
+                        }
+                    } catch (e) {
+                        // ignore invalid token
+                    }
+                }
+            }
+
             const product = await prisma.product.findFirst({
                 where: {
                     OR: [
@@ -470,7 +494,7 @@ export class ProductController {
                         { slug: id }
                     ],
                     deleted_at: null,
-                    published_at: { not: null }
+                    ...(showUnpublished ? {} : { published_at: { not: null } })
                 },
                 include: {
                     category: true,
