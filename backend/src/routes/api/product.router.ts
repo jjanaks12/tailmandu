@@ -3,6 +3,7 @@ import { Router } from 'express'
 import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.middleware'
 import { ProductController } from '@/app/http/controllers/product.controller'
 import { ProductCategoryController } from '@/app/http/controllers/product_category.controller'
+import { StoreSettingController } from '@/app/http/controllers/store_setting.controller'
 import { ProductReviewController } from '@/app/http/controllers/productReview.controller'
 
 const router = Router()
@@ -29,5 +30,12 @@ router.delete('/:id', [verifyAccessToken], ProductController.delete)
 // Product Review Routes
 router.post('/reviews', [verifyAccessToken], ProductReviewController.create)
 router.delete('/reviews/:id', [verifyAccessToken], ProductReviewController.delete)
+
+
+// Store Setting Routes
+router.get('/store-setting', [verifyAccessToken], StoreSettingController.show)
+router.post('/store-setting', [verifyAccessToken], StoreSettingController.create)
+router.put('/store-setting/:id', [verifyAccessToken], StoreSettingController.update)
+router.delete('/store-setting/:id', [verifyAccessToken], StoreSettingController.delete)
 
 export default router

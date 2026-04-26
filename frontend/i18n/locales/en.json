@@ -278,5 +278,128 @@
         "total_investment": "Total Investment",
         "empty_cart": "Your cart is empty.",
         "gear_subtotal": "Gear Subtotal"
+    },
+    "store_setting": {
+        "title": "Store Settings",
+        "description": "Configure how your store operates globally.",
+        "save_changes": "Save Changes",
+        "saved": "Saved!",
+        "save_all_settings": "Save All Settings",
+        "general_localization": {
+            "title": "General & Localization",
+            "description": "Currency, units, and timezone for your storefront."
+        },
+        "currency": {
+            "title": "Store Currency",
+            "placeholder": "Select currency",
+            "description": "Currency, units, and timezone for your storefront."
+        },
+        "units": {
+            "title": "Units of Measurement",
+            "description": "Units of Measurement",
+            "metric": "Metric (kg, cm)",
+            "imperial": "Imperial (lb, in)"
+        },
+        "timezone": {
+            "title": "Store Timezone",
+            "description": "Timezone for your storefront.",
+            "placeholder": "Select timezone"
+        },
+        "shipping": {
+            "title": "Shipping & Fulfillment",
+            "description": "Configure shipping zones, rates, and package presets."
+        },
+        "shipping_zones": {
+            "title": "Shipping Zones",
+            "description": "Set up custom shipping zones for different regions and configure the delivery methods and rates for each zone.",
+            "add_zone": "Add Zone",
+            "zone_name": "Zone Name",
+            "regions": "Regions Covered",
+            "method": "Shipping Method",
+            "rate": "Rate",
+            "flat_rate": "Flat Rate",
+            "by_weight": "Based on Weight",
+            "free": "Free Shipping"
+        },
+        "calculation_method": {
+            "title": "Shipping Calculation Method",
+            "description": "Determines whether shipping costs are calculated based on the total weight of the gear, the order's price, or a flat rate per shipment.",
+            "by_price": "By Order Price",
+            "by_weight": "By Order Weight"
+        },
+        "free_shipping_above": "Free Shipping Above",
+        "package_library": {
+            "title": "Package Library",
+            "description": "Predefine package dimensions and weights for accurate shipping cost calculations.",
+            "add_package": "Add Package",
+            "name": "Package Name",
+            "weight": "Weight",
+            "dimensions": "Dimensions"
+        },
+        "tax": {
+            "title": "Tax Settings",
+            "description": "Configure tax rates and application rules.",
+            "tax_inclusion": "Tax Inclusive",
+            "tax_exclusive": "Tax Exclusive",
+            "tax_free": "Tax Free",
+            "apply_tax_shipping": "Apply tax to shipping costs",
+            "add_nexus_region": "Add Nexus Region",
+            "country": "Country",
+            "region": "Region",
+            "tax_rate": "Tax Rate"
+        },
+        "nexus": {
+            "title": "Nexus Regions",
+            "description": "Nexus regions are areas where you have a physical presence (e.g., office, warehouse) and are therefore required to collect and remit sales tax on sales made to customers in those regions.  Nexus can also be triggered by certain economic activities, such as having employees or hosting a tradeshow in a state.",
+            "add_region": "Add Nexus Region",
+            "region": "Region",
+            "country": "Country",
+            "tax_rate": "Tax Rate"
+        },
+        "checkout": {
+            "title": "Checkout & Customer Privacy",
+            "description": "Control how customers check out and interact with your store.",
+            "guest_checkout": "Guest Checkout",
+            "guest_checkout_description": "Allow customers to complete purchases without creating an account.",
+            "abandoned_cart_recovery": "Abandoned Cart Recovery",
+            "abandoned_cart_recovery_description": "Send automated reminders to customers who leave items in their cart.",
+            "abandoned_cart_delay": "Abandoned Cart Delay",
+            "abandoned_cart_delay_description": "Delay before sending the first abandoned cart reminder (in minutes).",
+            "send_after": "Send After",
+            "minutes": "Minutes",
+            "policy_pages": "Policy Pages",
+            "policy_pages_description": "Configure policy pages that will be displayed on your store.",
+            "privacy_policy": "Privacy Policy",
+            "privacy_policy_description": "Link to your store's privacy policy.",
+            "refund_policy": "Refund Policy",
+            "refund_policy_description": "Link to your store's refund policy.",
+            "terms_conditions": "Terms & Conditions",
+            "terms_conditions_description": "Link to your store's terms and conditions."
+        },
+        "inventory": {
+            "title": "Inventory Management",
+            "description": "Configure inventory tracking and order numbering settings.",
+            "oversell_protection": {
+                "title": "Oversell Protection",
+                "description": "Prevent selling out-of-stock items."
+            },
+            "allow_backorder": {
+                "title": "Allow Backorders",
+                "description": "Let customers order out-of-stock items."
+            },
+            "order_numbering": {
+                "title": "Order Numbering",
+                "description": "Set custom prefix and starting number for orders."
+            },
+            "order_id_prefix": {
+                "title": "Order ID Prefix",
+                "description": "Prefix added to every order ID (e.g., TM-)."
+            },
+            "low_stock_threshold": {
+                "title": "Low Stock Threshold",
+                "description": "Number of items remaining before marking as low stock.",
+                "units_remaining": "Units Remaining"
+            }
+        }
     }
 }

@@ -705,9 +705,32 @@ model TrekBookingTraveler {
   @@map("trek_booking_travelers")
 }
 
-// ==========================================
-// STORE / E-COMMERCE MODELS
-// ==========================================
+// Added enums and model for store settings
+
+enum ShippingCalculationMethod {
+  PRICE_BASED
+  PACKAGE_LIBRARY
+}
+
+model StoreSetting {
+  id                         String                     @id @default(cuid())
+  currency                   String                     @default("USD")
+  unit_of_measurement        String                     @default("metric")
+  timezone                   String                     @default("UTC")
+  shipping_zones             Json?
+  shipping_calculation_method ShippingCalculationMethod   @default(PRICE_BASED)
+  tax_inclusion               Boolean                  @default(false)
+  nexus_regions               Json?
+  guest_checkout              Boolean                  @default(true)
+  abandoned_cart_recovery      Boolean                  @default(false)
+  policy_pages                Json?
+  oversell_protection         Boolean                  @default(false)
+  order_id_prefix             String?                    @default("ORD-")
+  created_at                  DateTime                  @default(now())
+  updated_at                  DateTime?
+
+  @@map("store_settings")
+}
 
 model ProductCategory {
   id          String    @id @default(cuid())
