@@ -14,6 +14,8 @@ import trekRouter from '@/routes/api/trek.router'
 import trekCategoryRouter from '@/routes/api/trek_category.router'
 import bookingRouter from '@/routes/api/booking.router'
 import productRouter from '@/routes/api/product.router'
+import orderRouter from '@/routes/api/order.router'
+import couponRouter from '@/routes/api/coupon.router'
 
 const router = Router()
 
@@ -31,5 +33,7 @@ router.use('/treks', trekRouter)
 router.use('/trek-categories', trekCategoryRouter)
 router.use('/bookings', bookingRouter)
 router.use('/products', productRouter)
+router.use('/orders', orderRouter)
+router.use('/coupons', couponRouter)
 
 export default router

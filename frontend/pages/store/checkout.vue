@@ -4,10 +4,15 @@ import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
 import * as Y from 'yup'
 import { useCartStore } from '~/store/cart'
 import { showImage } from '~/lib/filters'
+import { useAppStore } from '~/store/app'
+import { useAxios } from '~/services/axios'
+import { toast } from 'vue-sonner'
 
 const { formatCurrency } = useCurrency()
 
+const { countries } = storeToRefs(useAppStore())
 const cartStore = useCartStore()
+const { axios } = useAxios()
 
 const form = useTemplateRef<FormContext>('checkoutForm')
 const paymentMethods = ref([
@@ -15,15 +20,24 @@ const paymentMethods = ref([
 ])
 
 const checkoutFormSchema = Y.object({
-    firstName: Y.string().required('First Name is required'),
-    lastName: Y.string().required('Last Name is required'),
-    address: Y.string().required('Address is required'),
-    city: Y.string().required('City is required'),
-    zipCode: Y.string().required('Zip Code is required'),
-    cardholderName: Y.string().required('Cardholder Name is required'),
-    cardNumber: Y.string().required('Card Number is required'),
-    expiry: Y.string().required('Expiry is required'),
-    cvc: Y.string().required('CVC is required')
+    firstName: Y.string().required(),
+    lastName: Y.string().required(),
+    address: Y.string().required(),
+    city: Y.string().required(),
+    zipCode: Y.string().required(),
+    cardholderName: Y.string().required(),
+    cardNumber: Y.string().required(),
+    expiry: Y.string().required(),
+    cvc: Y.string().required(),
+    items: Y.array().of(Y.object({
+        product_id: Y.string().required(),
+        quantity: Y.number().required(),
+        variant_id: Y.string().required()
+    })).required(),
+    country: Y.string().required(),
+    state: Y.string().required(),
+    street: Y.string().required(),
+    couponCode: Y.string().optional()
 })
 
 const summary = computed(() => {
@@ -44,8 +58,31 @@ const selectPaymentMethod = (id: string) => {
     })
 }
 
-const submitHandler = (values: any) => {
-    console.log(values)
+onMounted(() => {
+    const a = cartStore.items.flatMap(cartItem => cartItem.variants.map(variant => ({
+        product_id: cartItem.product.id,
+        variant_id: variant.id,
+        quantity: variant.quantity
+    })))
+
+    form.value?.setFieldValue('items', a)
+})
+
+const router = useRouter()
+
+const submitHandler = async (values: any) => {
+    try {
+        const payload = { ...values }
+        const { data: order } = await axios.post('/orders', payload)
+        // Navigate to order success page
+        router.push(`/store/order/${order.id}`)
+    } catch (e: any) {
+        if (e.response.data.message) {
+            toast.error(e.response.data.message)
+        } else {
+            toast.error('Failed to place order')
+        }
+    }
 }
 </script>
 
@@ -95,12 +132,42 @@ const submitHandler = (values: any) => {
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
                         <ErrorMessage name="city" class="text-error" />
                     </Field>
+                    <Field name="street" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.street") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="street" class="text-error" />
+                    </Field>
+                    <Field name="state" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.state") }}
+                        </Label>
+                        <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="state" class="text-error" />
+                    </Field>
                     <Field name="zipCode" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.zip_code") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
                         <ErrorMessage name="zipCode" class="text-error" />
+                    </Field>
+                    <Field name="country" class="space-y-2" as="div" v-slot="{ field, handleChange }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.country") }}
+                        </Label>
+                        <Select @update:model-value="handleChange" :model-value="field.value" id="cf__country">
+                            <SelectTrigger class="w-full">
+                                <SelectValue placeholder="Country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem v-for="country in countries" :value="country.id">
+                                    {{ country.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <ErrorMessage name="country" class="text-error" />
                     </Field>
                 </div>
             </section>
@@ -123,35 +190,41 @@ const submitHandler = (values: any) => {
                     </button>
                 </div>
                 <div class="space-y-6 pt-4">
-                    <div class="space-y-2">
+                    <Field name="cardholderName" as="div" class="space-y-2" v-slot="{ field }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.cardholder_name") }}
                         </Label>
-                        <Input type="text" />
-                    </div>
-                    <div class="relative">
-                        <Label class="text-xs font-bold uppercase tracking-widest text-outline block mb-2">
+                        <Input type="text" v-bind="field" />
+                        <ErrorMessage name="cardholderName" class="text-red-600 text-xs" />
+                    </Field>
+                    <Field name="cardNumber" class="space-y-2" v-slot="{ field }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.card_number") }}
                         </Label>
-                        <div class="relative">
-                            <Input type="text" placeholder="XXXX XXXX XXXX XXXX" />
-                            <CreditCardIcon class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-outline" />
-                        </div>
-                    </div>
+                        <InputGroup>
+                            <InputGroupInput v-bind="field" placeholder="XXXX XXXX XXXX XXXX" />
+                            <InputGroupAddon>
+                                <CreditCardIcon class="size-5" />
+                            </InputGroupAddon>
+                        </InputGroup>
+                        <ErrorMessage name="cardNumber" class="text-red-600 text-xs" />
+                    </Field>
                     <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-2">
+                        <Field name="expiry" as="div" class="space-y-2" v-slot="{ field }">
                             <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                                 {{ $t("checkout.expiry") }}
                             </Label>
-                            <Input type="text" placeholder="MM/YY" />
-                        </div>
-                        <div class="space-y-2">
-                            <Label class="text-xs font-bold uppercase tracking-widest text-outline">
-                                {{ $t("checkout.cvc") }}
-                            </Label>
-                            <Input type="password" placeholder="***" />
-                        </div>
+                            <Input type="text" v-bind="field" placeholder="MM/YY" />
+                            <ErrorMessage name="expiry" class="text-red-600 text-xs" />
+                        </Field>
                     </div>
+                    <Field name="cvc" as="div" class="space-y-2" v-slot="{ field }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            {{ $t("checkout.cvc") }}
+                        </Label>
+                        <Input v-bind="field" placeholder="***" />
+                        <ErrorMessage name="cvc" class="text-red-600 text-xs" />
+                    </Field>
                 </div>
             </section>
         </div>
@@ -225,7 +298,7 @@ const submitHandler = (values: any) => {
                         </div>
                     </div>
                 </div>
-                <Button :disabled="cartStore.items.length === 0"
+                <Button
                     class="w-full py-7 rounded-full bg-gradient-to-tr from-[#a53d00] to-[#f06723] border-0 text-white font-black text-lg tracking-widest uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
                     {{ $t("checkout.confirm_order") }}
                     <RocketIcon class="w-5 h-5" />

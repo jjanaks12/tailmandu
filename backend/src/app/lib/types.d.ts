@@ -1,3 +1,5 @@
+import { User } from "@prisma/client"
+
 export type APIError = {
     [propName: string]: string[]
 }
@@ -39,8 +41,7 @@ type TrekStats = {
     grade: string
 }
 
-declare global {
-    namespace PrismaJson {
-        type TrekDetail = TrekStats | Record<string, Record<string, string>[]>
-    }
+
+export interface APIRequest extends Request {
+    auth_user?: User
 }
