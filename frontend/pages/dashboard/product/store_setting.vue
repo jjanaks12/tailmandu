@@ -8,6 +8,7 @@ import {
     SaveIcon, CheckIcon,
     XIcon
 } from 'lucide-vue-next'
+import { useAxios } from "~/services/axios"
 
 definePageMeta({
     layout: 'admin',
@@ -85,10 +86,96 @@ const timezones = [
     { value: 'Asia/Tokyo', label: 'Asia/Tokyo (UTC+9)' },
 ]
 
-const saveSettings = () => {
-    // TODO: wire to API
-    saved.value = true
-    setTimeout(() => (saved.value = false), 2500)
+const { axios } = useAxios()
+const settingId = ref<string | null>(null)
+
+onMounted(async () => {
+    try {
+        const { data } = await axios.get('/products/store-setting')
+        if (data && data.id) {
+            settingId.value = data.id
+            
+            // Populate General
+            if (data.currency) general.value.currency = data.currency
+            if (data.unit_of_measurement) general.value.measurement = data.unit_of_measurement
+            if (data.timezone) general.value.timezone = data.timezone
+            
+            // Populate Shipping
+            if (data.shipping_zones) shipping.value.zones = data.shipping_zones
+            if (data.shipping_packages) shipping.value.packages = data.shipping_packages
+            if (data.shipping_calculation_method) {
+                shipping.value.calculationMethod = data.shipping_calculation_method === 'PRICE_BASED' ? 'price' : data.shipping_calculation_method === 'WEIGHT_BASED' ? 'weight' : 'flat'
+            }
+            if (data.free_shipping_threshold !== null) shipping.value.freeShippingThreshold = data.free_shipping_threshold
+            
+            // Populate Tax
+            tax.value.inclusion = data.tax_inclusion ? 'inclusive' : 'exclusive'
+            tax.value.applyToShipping = data.tax_apply_to_shipping || false
+            if (data.nexus_regions) tax.value.nexusRegions = data.nexus_regions
+            
+            // Populate Checkout
+            if (data.guest_checkout !== undefined) checkout.value.guestCheckout = data.guest_checkout
+            if (data.abandoned_cart_recovery !== undefined) checkout.value.abandonedCartRecovery = data.abandoned_cart_recovery
+            if (data.abandoned_cart_delay) checkout.value.abandonedCartDelay = data.abandoned_cart_delay
+            if (data.policy_pages) {
+                checkout.value.privacyPolicyUrl = data.policy_pages.privacy || ''
+                checkout.value.refundPolicyUrl = data.policy_pages.refund || ''
+                checkout.value.termsUrl = data.policy_pages.terms || ''
+            }
+            
+            // Populate Inventory
+            if (data.oversell_protection !== undefined) inventory.value.oversellProtection = data.oversell_protection
+            if (data.allow_backorder !== undefined) inventory.value.allowBackorder = data.allow_backorder
+            if (data.order_id_prefix) inventory.value.orderIdPrefix = data.order_id_prefix
+            if (data.low_stock_threshold !== undefined) inventory.value.lowStockThreshold = data.low_stock_threshold
+        }
+    } catch (error) {
+        console.error("Failed to load store settings", error)
+    }
+})
+
+const saveSettings = async () => {
+    const payload = {
+        currency: general.value.currency,
+        unit_of_measurement: general.value.measurement,
+        timezone: general.value.timezone,
+        
+        shipping_zones: shipping.value.zones,
+        shipping_packages: shipping.value.packages,
+        shipping_calculation_method: shipping.value.calculationMethod === 'price' ? 'PRICE_BASED' : shipping.value.calculationMethod === 'weight' ? 'WEIGHT_BASED' : 'FLAT_RATE',
+        free_shipping_threshold: shipping.value.freeShippingThreshold,
+        
+        tax_inclusion: tax.value.inclusion === 'inclusive',
+        tax_apply_to_shipping: tax.value.applyToShipping,
+        nexus_regions: tax.value.nexusRegions,
+        
+        guest_checkout: checkout.value.guestCheckout,
+        abandoned_cart_recovery: checkout.value.abandonedCartRecovery,
+        abandoned_cart_delay: checkout.value.abandonedCartDelay,
+        policy_pages: {
+            privacy: checkout.value.privacyPolicyUrl,
+            refund: checkout.value.refundPolicyUrl,
+            terms: checkout.value.termsUrl,
+        },
+        
+        oversell_protection: inventory.value.oversellProtection,
+        allow_backorder: inventory.value.allowBackorder,
+        order_id_prefix: inventory.value.orderIdPrefix,
+        low_stock_threshold: inventory.value.lowStockThreshold,
+    }
+
+    try {
+        if (settingId.value) {
+            await axios.put(`/products/store-setting/${settingId.value}`, payload)
+        } else {
+            const { data } = await axios.post('/products/store-setting', payload)
+            settingId.value = data.id
+        }
+        saved.value = true
+        setTimeout(() => (saved.value = false), 2500)
+    } catch (error) {
+        console.error("Failed to save store settings", error)
+    }
 }
 
 const addNexusRegion = () => {
@@ -394,7 +481,7 @@ const removeNexusRegion = (id: number) => {
                         </Label>
                         <Button modifier="outline" size="sm" @click="addNexusRegion">+ {{
                             $t("store_setting.nexus.add_region")
-                        }}</Button>
+                            }}</Button>
                     </div>
                     <p class="text-xs text-muted-foreground">{{ $t("store_setting.nexus.description") }}</p>
                     <Table>
@@ -448,7 +535,7 @@ const removeNexusRegion = (id: number) => {
                             <p class="text-sm font-medium">{{ $t("store_setting.checkout.guest_checkout") }}</p>
                             <p class="text-xs text-muted-foreground mt-0.5">{{
                                 $t("store_setting.checkout.guest_checkout_description")
-                            }}</p>
+                                }}</p>
                         </div>
                     </div>
                     <Checkbox v-model:checked="checkout.guestCheckout" />
@@ -465,7 +552,7 @@ const removeNexusRegion = (id: number) => {
                                 $t("store_setting.checkout.abandoned_cart_recovery_description") }}</p>
                             <div v-if="checkout.abandonedCartRecovery" class="flex items-center gap-2 mt-3">
                                 <Label class="text-xs whitespace-nowrap">{{ $t("store_setting.checkout.send_after")
-                                }}</Label>
+                                    }}</Label>
                                 <Input v-model.number="checkout.abandonedCartDelay" type="number"
                                     class="h-7 w-20 text-xs" />
                                 <Label class="text-xs">{{ $t("store_setting.checkout.minutes") }}</Label>
@@ -487,12 +574,12 @@ const removeNexusRegion = (id: number) => {
                     <div class="grid grid-cols-1 gap-3">
                         <div class="space-y-1.5">
                             <Label class="text-xs text-muted-foreground">{{ $t("store_setting.checkout.privacy_policy")
-                                }}</Label>
+                            }}</Label>
                             <Input v-model="checkout.privacyPolicyUrl" placeholder="https://example.com/privacy" />
                         </div>
                         <div class="space-y-1.5">
                             <Label class="text-xs text-muted-foreground">{{ $t("store_setting.checkout.refund_policy")
-                                }}</Label>
+                            }}</Label>
                             <Input v-model="checkout.refundPolicyUrl" placeholder="https://example.com/refunds" />
                         </div>
                         <div class="space-y-1.5">

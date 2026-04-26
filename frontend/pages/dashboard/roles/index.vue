@@ -1,33 +1,31 @@
 <script lang="ts" setup>
-    import { EllipsisVerticalIcon, PlusIcon, PencilIcon, SlidersVerticalIcon, TrashIcon } from 'lucide-vue-next'
+import { EllipsisVerticalIcon, PlusIcon, PencilIcon, SlidersVerticalIcon, TrashIcon } from 'lucide-vue-next'
 
-    import { useRoleStore } from '~/store/role'
+import { useRoleStore } from '~/store/role'
 
-    import RoleForm from './_components/form.vue'
-    import { humanize } from '~/lib/filters'
-    import type { Role } from '~/lib/types'
+import RoleForm from './_components/form.vue'
+import { humanize } from '~/lib/filters'
+import type { Role } from '~/lib/types'
 
-    useHead({
-        title: 'Roles'
-    })
+useHead({
+    title: 'Roles'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: ['role_create', 'role_edit', 'role_view', 'role_delete']
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['role_create', 'role_edit', 'role_view', 'role_delete']
+})
 
-    const { can } = useAuthorization()
-    const { roles } = storeToRefs(useRoleStore())
-    const { fetch, destory } = useRoleStore()
+const { can } = useAuthorization()
+const { roles } = storeToRefs(useRoleStore())
+const { fetch, destory } = useRoleStore()
 
-    const openEditRoleDialog = ref(false)
-    const actionRole = ref<Role | null>(null)
-    const openDeleteRoleDialog = ref(false)
+const openEditRoleDialog = ref(false)
+const actionRole = ref<Role | null>(null)
+const openDeleteRoleDialog = ref(false)
 
-    onMounted(() => {
-        fetch()
-    })
+onMounted(fetch)
 </script>
 
 <template>

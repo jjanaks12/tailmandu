@@ -713,19 +713,25 @@ enum ShippingCalculationMethod {
 }
 
 model StoreSetting {
-  id                         String                     @id @default(cuid())
-  currency                   String                     @default("USD")
-  unit_of_measurement        String                     @default("metric")
-  timezone                   String                     @default("UTC")
-  shipping_zones             Json?
-  shipping_calculation_method ShippingCalculationMethod   @default(PRICE_BASED)
-  tax_inclusion               Boolean                  @default(false)
+  id                          String                    @id @default(cuid())
+  currency                    String                    @default("USD")
+  unit_of_measurement         String                    @default("metric")
+  timezone                    String                    @default("UTC")
+  shipping_zones              Json?
+  shipping_packages           Json?
+  shipping_calculation_method ShippingCalculationMethod @default(PRICE_BASED)
+  free_shipping_threshold     Float?                    @default(0)
+  tax_inclusion               Boolean                   @default(false)
+  tax_apply_to_shipping       Boolean                   @default(false)
   nexus_regions               Json?
-  guest_checkout              Boolean                  @default(true)
-  abandoned_cart_recovery      Boolean                  @default(false)
+  guest_checkout              Boolean                   @default(true)
+  abandoned_cart_recovery     Boolean                   @default(false)
+  abandoned_cart_delay        Int                       @default(60)
   policy_pages                Json?
-  oversell_protection         Boolean                  @default(false)
-  order_id_prefix             String?                    @default("ORD-")
+  oversell_protection         Boolean                   @default(false)
+  allow_backorder             Boolean                   @default(false)
+  low_stock_threshold         Int                       @default(5)
+  order_id_prefix             String?                   @default("ORD-")
   created_at                  DateTime                  @default(now())
   updated_at                  DateTime?
 

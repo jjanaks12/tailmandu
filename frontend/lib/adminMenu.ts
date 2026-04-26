@@ -1,5 +1,7 @@
 import type { Menu } from "~/lib/types"
 import { useAuthStore } from "~/store/auth"
+import { ref, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 
 export const useMenu = () => {
     const menus = ref<Menu[]>([{
@@ -78,7 +80,7 @@ export const useMenu = () => {
                 icon: 'Settings',
                 path: '/dashboard/product/store_setting',
                 slug: 'store_setting',
-                permissions: 'manage_product_store_setting'
+                permissions: 'manage_store_setting'
             }]
         }]
     }, {
@@ -162,20 +164,43 @@ export const useMenu = () => {
     const { can } = useAuthorization()
     const { user } = storeToRefs(useAuthStore())
 
-    // @ts-expect-error
-    const menuList = computed<Menu[]>(() => menus.value.map(menu => menu.role
-        ? menu.role == user.value?.role?.name ? menu : null
-        : menu.permissions.length > 0
-            ? can(menu.permissions) ? menu : null
-            : {
-                ...menu,
-                subMenu: menu.subMenu?.map(submenu => can(submenu.permissions) ? { ...submenu } : null)
-                    .filter(submenu => submenu != null)
-            })
-        .filter(menu => menu == null
-            ? false
-            : menu.subMenu && menu.subMenu.length > 0
-        )
+    const filterMenu = (menu: Menu): Menu | null => {
+        // Role check if defined on the menu item
+        if (menu.role) {
+            if (menu.role !== user.value?.role?.name) return null
+        }
+
+        // Permissions check; '*' means allow all
+        if (menu.permissions && menu.permissions !== '*') {
+            // permissions can be string or string[]
+            const perms = Array.isArray(menu.permissions) ? menu.permissions : [menu.permissions]
+            if (perms.length > 0) {
+                // Assuming can() expects string or string[]
+                if (!can(menu.permissions)) return null
+            }
+        }
+
+        // If there are submenus, process them recursively
+        if (menu.subMenu && menu.subMenu.length > 0) {
+            const filteredSub = menu.subMenu
+                .map(filterMenu)
+                .filter((sub): sub is Menu => sub !== null)
+
+            // If no submenus remain and the current menu has no path, exclude it
+            if (filteredSub.length === 0 && (!menu.path || menu.path === "")) {
+                return null
+            }
+            return { ...menu, subMenu: filteredSub }
+        }
+
+        // No submenus, keep the menu as is
+        return menu
+    }
+
+    const menuList = computed<Menu[]>(() =>
+        menus.value
+            .map(filterMenu)
+            .filter((m): m is Menu => m !== null)
     )
 
     return { menuList }

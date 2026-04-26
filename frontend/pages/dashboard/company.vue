@@ -156,7 +156,7 @@ onMounted(init)
                     <Field as="div" name="address.countryId" v-slot="{ field, handleChange }"
                         class="flex flex-col gap-2">
                         <Label for="cf__country">Country</Label>
-                        <Select @change="handleChange" :model-value="field.value" id="cf__country">
+                        <Select @update:model-value="handleChange" :model-value="field.value" id="cf__country">
                             <SelectTrigger>
                                 <SelectValue placeholder="Country" />
                             </SelectTrigger>
