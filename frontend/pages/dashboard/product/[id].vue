@@ -465,14 +465,12 @@ definePageMeta({
                                     </div>
                                     <p class="text-sm text-muted-foreground mb-2">{{ review.content }}</p>
                                     <div class="text-xs flex items-center gap-2">
-                                        <span class="font-medium text-foreground">
-                                            {{ review.author_name || (review.user?.personal?.first_name + ' ' +
-                                                review.user?.personal?.last_name) }}
+                                        <span class="font-medium text-foreground" v-if="review.user.personal">
+                                            {{ review.user?.personal?.first_name + ' ' +
+                                            review.user?.personal?.last_name }}
                                         </span>
                                         <span v-if="review.author_role" class="text-muted-foreground">
-                                            | {{
-                                                review.author_role
-                                            }}
+                                            | {{ review.author_role }}
                                         </span>
                                     </div>
                                 </div>

@@ -327,7 +327,14 @@ export class ProductController {
                     specs: true,
                     reviews: {
                         include: {
-                            user: true
+                            user: {
+                                omit: {
+                                    password: true
+                                },
+                                include: {
+                                    personal: true
+                                }
+                            }
                         },
                         orderBy: {
                             created_at: 'desc'

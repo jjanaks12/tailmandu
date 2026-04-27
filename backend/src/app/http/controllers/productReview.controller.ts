@@ -16,10 +16,7 @@ export class ProductReviewController {
                     rating: validationData.rating,
                     title: validationData.title,
                     content: validationData.content,
-                    product_id: validationData.product_id,
-                    user_id: userId || null,
-                    // If not authenticated, we could potentially take author_name from body
-                    author_name: userId ? undefined : (request.body.author_name || 'Anonymous')
+                    product_id: validationData.product_id
                 },
                 include: {
                     user: {
