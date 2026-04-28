@@ -141,9 +141,7 @@ onMounted(() => {
                             <h3 class="text-4xl font-display font-bold mb-4">Join as a Runner</h3>
                             <p class="mb-8 max-w-sm text-slate-200">Push your limits and experience the majesty of the
                                 Himalayas from the front row.</p>
-                            <button
-                                class="bg-primary hover:bg-white hover:text-primary transition-all px-8 py-3 rounded-xl font-bold">Start
-                                Your Journey</button>
+                            <Button size="xl">Start Your Journey</Button>
                         </div>
                     </div>
                     <div
@@ -158,9 +156,7 @@ onMounted(() => {
                             <h3 class="text-4xl font-display font-bold mb-4">Become a Volunteer</h3>
                             <p class="mb-8 max-w-sm text-slate-200">Support the community, manage aid stations, and be
                                 part of the race spirit without the miles.</p>
-                            <button
-                                class="bg-white text-earth-brown hover:bg-primary hover:text-white transition-all px-8 py-3 rounded-xl font-bold">Sign
-                                Up Now</button>
+                            <Button size="xl" variant="light">Sign Up Now</Button>
                         </div>
                     </div>
                 </div>
