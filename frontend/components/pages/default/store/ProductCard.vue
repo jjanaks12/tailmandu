@@ -49,9 +49,9 @@ const handleAddToCart = () => {
                     ${{ product.original_price }}
                 </span>
             </p>
-            <Button @click="handleAddToCart" class="w-full mt-auto">
+            <!-- <Button @click="handleAddToCart" class="w-full mt-auto">
                 <ShoppingCartIcon class="w-4 h-4 mr-2" /> {{ $t('store.catalog.add_to_cart') }}
-            </Button>
+            </Button> -->
         </div>
     </div>
 </template>

@@ -67,7 +67,7 @@ export const useMenu = () => {
     }, {
         title: 'Store',
         path: '/store',
-        icon: 'Store',
+        icon: 'ShoppingCart',
         slug: 'store',
         permissions: '*',
         showIcon: true

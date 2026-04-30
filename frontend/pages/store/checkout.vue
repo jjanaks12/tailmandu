@@ -25,10 +25,10 @@ const checkoutFormSchema = Y.object({
     address: Y.string().required(),
     city: Y.string().required(),
     zipCode: Y.string().required(),
-    cardholderName: Y.string().required(),
+    /* cardholderName: Y.string().required(),
     cardNumber: Y.string().required(),
     expiry: Y.string().required(),
-    cvc: Y.string().required(),
+    cvc: Y.string().required(), */
     items: Y.array().of(Y.object({
         product_id: Y.string().required(),
         quantity: Y.number().required(),
@@ -75,8 +75,11 @@ const submitHandler = async (values: any) => {
         const payload = { ...values }
         const { data: order } = await axios.post('/orders', payload)
         // Navigate to order success page
+        cartStore.resetCart()
         router.push(`/store/order/${order.id}`)
     } catch (e: any) {
+        console.log(e);
+
         if (e.response.data.message) {
             toast.error(e.response.data.message)
         } else {
@@ -172,7 +175,7 @@ const submitHandler = async (values: any) => {
                 </div>
             </section>
             <!-- Section: Payment Method -->
-            <section class="bg-primary/5 rounded-xl p-6 md:p-8 space-y-6">
+            <!-- <section class="bg-primary/5 rounded-xl p-6 md:p-8 space-y-6">
                 <div class="flex items-center gap-3 mb-2">
                     <span
                         class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</span>
@@ -226,7 +229,7 @@ const submitHandler = async (values: any) => {
                         <ErrorMessage name="cvc" class="text-red-600 text-xs" />
                     </Field>
                 </div>
-            </section>
+            </section> -->
         </div>
         <!-- Right Column: Mission Manifest (Order Summary) -->
         <aside class="lg:col-span-5">

@@ -6,6 +6,7 @@ import { useMediaStore } from '~/store/media'
 import { toast } from 'vue-sonner'
 import { useRouteQuery } from '@vueuse/router'
 import { formatDate, showImage } from '~/lib/filters'
+import { useAxios } from '~/services/axios'
 
 const route = useRoute()
 const store = useProductStore()
@@ -20,6 +21,38 @@ const productTags = ref<string[]>([])
 const isLoading = ref(true)
 const isSaving = ref(false)
 const activeTab = useRouteQuery('tab', 'general')
+
+const orderModalOpen = ref(false)
+const selectedOrder = ref<any>(null)
+const isUpdatingStatus = ref(false)
+const { axios } = useAxios()
+
+const openOrderModal = async (orderId: number) => {
+    try {
+        const { data } = await axios.get(`/orders/${orderId}`)
+        selectedOrder.value = data
+        orderModalOpen.value = true
+    } catch (e) {
+        toast.error('Failed to load order details')
+    }
+}
+
+const updateOrderStatus = async (newStatus: string) => {
+    if (!selectedOrder.value) return
+    isUpdatingStatus.value = true
+    try {
+        await axios.patch(`/orders/${selectedOrder.value.id}/status`, {
+            status: newStatus
+        })
+        toast.success('Order status updated')
+        selectedOrder.value.status = newStatus
+        await fetchProduct()
+    } catch (e) {
+        toast.error('Failed to update order status')
+    } finally {
+        isUpdatingStatus.value = false
+    }
+}
 
 const fetchProduct = async () => {
     isLoading.value = true
@@ -406,7 +439,8 @@ definePageMeta({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow v-for="item in product.order_items" :key="item.id">
+                                <TableRow v-for="item in product.order_items" :key="item.id"
+                                    class="cursor-pointer hover:bg-muted/50" @click="openOrderModal(item.order.id)">
                                     <TableCell class="font-medium">#{{ item.order.order_number }}</TableCell>
                                     <TableCell>{{ item.order.user?.personal?.first_name || 'Guest' }} {{
                                         item.order.user?.personal?.last_name }}</TableCell>
@@ -467,7 +501,7 @@ definePageMeta({
                                     <div class="text-xs flex items-center gap-2">
                                         <span class="font-medium text-foreground" v-if="review.user.personal">
                                             {{ review.user?.personal?.first_name + ' ' +
-                                            review.user?.personal?.last_name }}
+                                                review.user?.personal?.last_name }}
                                         </span>
                                         <span v-if="review.author_role" class="text-muted-foreground">
                                             | {{ review.author_role }}
@@ -483,5 +517,74 @@ definePageMeta({
                 </div>
             </TabsContent>
         </Tabs>
+
+        <Dialog v-model:open="orderModalOpen">
+            <DialogContent class="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Order Details #{{ selectedOrder?.order_number }}</DialogTitle>
+                    <DialogDescription>
+                        View and manage order information
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div v-if="selectedOrder" class="space-y-6 py-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <Label class="text-xs text-muted-foreground">Status</Label>
+                            <Select :model-value="selectedOrder.status" @update:model-value="updateOrderStatus">
+                                <SelectTrigger class="w-full mt-1">
+                                    <SelectValue :placeholder="selectedOrder.status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="PENDING">Pending</SelectItem>
+                                    <SelectItem value="PROCESSING">Processing</SelectItem>
+                                    <SelectItem value="SHIPPED">Shipped</SelectItem>
+                                    <SelectItem value="DELIVERED">Delivered</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <Label class="text-xs text-muted-foreground">Total Amount</Label>
+                            <div class="text-lg font-bold mt-1">${{ selectedOrder.total }}</div>
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                        <h4 class="font-semibold mb-2">Customer Information</h4>
+                        <p class="text-sm">{{ selectedOrder.user?.personal?.first_name }} {{
+                            selectedOrder.user?.personal?.last_name }}</p>
+                        <p class="text-sm text-muted-foreground">{{ selectedOrder.user?.email }}</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold mb-2">Shipping Address</h4>
+                        <div v-if="selectedOrder.shipping_address" class="text-sm text-muted-foreground">
+                            <p>{{ selectedOrder.shipping_address.street }}</p>
+                            <p>{{ selectedOrder.shipping_address.address }}</p>
+                            <p>{{ selectedOrder.shipping_address.city }}, {{ selectedOrder.shipping_address.state }} {{
+                                selectedOrder.shipping_address.zipCode }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold mb-2">Order Items</h4>
+                        <div class="space-y-2">
+                            <div v-for="item in selectedOrder.items" :key="item.id"
+                                class="flex justify-between text-sm border-b pb-2">
+                                <span>{{ item.product?.name }} (x{{ item.quantity }})</span>
+                                <span>${{ item.unit_price * item.quantity }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button modifier="outline" @click="orderModalOpen = false">Close</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

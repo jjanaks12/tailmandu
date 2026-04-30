@@ -63,14 +63,13 @@ export const useCartStore = defineStore('cart', () => {
     items.value = items.value.filter(item => item.id !== id)
   }
 
+  const resetCart = () => {
+    items.value = []
+  }
+
   return {
-    items,
-    cartCount,
-    cartTotal,
-    addToCart,
-    increaseQuantity,
-    decreaseQuantity,
-    removeFromCart
+    items, cartCount, cartTotal,
+    addToCart, increaseQuantity, decreaseQuantity, removeFromCart, resetCart
   }
 }, {
   persist: {

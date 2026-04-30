@@ -179,7 +179,23 @@ export class OrderController {
         }
     }
 
-    // Existing create method remains unchanged above
+    public static async updateStatus(req: Request, res: Response, next: NextFunction) {
+        try {
+            const orderId = req.params.id as string;
+            const { status } = req.body;
+            if (!status) throw createHttpError[400]('Status is required');
+            const allowed = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+            if (!allowed.includes(status)) throw createHttpError[400]('Invalid status');
+            const order = await prisma.order.update({
+                where: { id: orderId },
+                data: { status },
+                include: { items: true, shipping_address: true, coupon: true, user: true }
+            });
+            res.status(200).json({ message: 'Order status updated', data: order });
+        } catch (error: any) {
+            next(error);
+        }
+    }
     // New method to fetch order details
     public static async get(req: Request, res: Response, next: NextFunction) {
         try {
