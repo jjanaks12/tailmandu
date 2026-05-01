@@ -26,7 +26,8 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
                         you a more personal experience while adventuring on our hand picked and tailored trails.</p>
                     <div class="flex space-x-4">
                         <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all"
-                            :href="link.url" v-for="link in company?.social_links" :key="link.id" target="_blank">
+                            :href="$localePath(link.url)" v-for="link in company?.social_links" :key="link.id"
+                            target="_blank">
                             <Icon :name="SocialLinkMapper[link.name.toLowerCase()]" />
                         </a>
                     </div>

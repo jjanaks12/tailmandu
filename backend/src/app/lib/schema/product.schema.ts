@@ -4,7 +4,6 @@ export const productSchema = Y.object({
     name: Y.string().required('Name is required'),
     excerpt: Y.string().required('Excerpt is required'),
     description: Y.string(),
-    base_price: Y.number().typeError('Price must be a number').required('Price is required'),
     category_id: Y.string().required('Category is required'),
     tags: Y.array().of(Y.string()),
     thumbnail_id: Y.string().nullable(),
@@ -18,7 +17,8 @@ export const productSchema = Y.object({
     variants: Y.array().of(Y.object({
         id: Y.string().optional(),
         sku: Y.string().required(),
-        price: Y.number().nullable(),
+        price: Y.number().typeError('Price must be a number').required('Variant price is required'),
+        original_price: Y.number().typeError('Price must be a number').nullable(),
         stock: Y.number().default(0),
         size_id: Y.string().nullable()
     })).nullable()

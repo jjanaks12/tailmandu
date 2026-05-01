@@ -499,8 +499,6 @@ export type Product = {
     badge?: string
     excerpt?: string
     description: string
-    base_price: string
-    original_price?: string
     published_at?: string
     created_at: string
     updated_at?: string
@@ -540,7 +538,11 @@ export type ProductVariant = {
     id: string
     sku: string
     price: number
+    original_price?: number
     stock: number
+    sold: number
+    returned: number
+    restock_threshold: number
     product_id: string
     product: Product
     size_id: string

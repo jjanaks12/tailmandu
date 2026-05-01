@@ -48,7 +48,8 @@ export class ProductController {
                 include: {
                     category: true,
                     thumbnail: true,
-                    gallery: true
+                    gallery: true,
+                    variants: true
                 }
             })
 
@@ -106,46 +107,15 @@ export class ProductController {
                 }
             }
 
-            // Handle Gallery Images
-            let galleryId = validationData.gallery_id
-            if (!galleryId && validationData.gallery_images?.length) {
-                const gallery = await prisma.gallery.create({
-                    data: {
-                        name: `${validationData.name} Gallery`,
-                        images: {
-                            connect: validationData.gallery_images.map(id => ({ id }))
-                        }
-                    }
-                })
-                galleryId = gallery.id
-            }
-
             const product = await prisma.product.create({
                 data: {
                     name: validationData.name,
                     slug,
                     excerpt: validationData.excerpt,
                     description: validationData.description || '',
-                    base_price: validationData.base_price,
-                    category_id: validationData.category_id,
-                    thumbnail_id: validationData.thumbnail_id || null,
-                    gallery_id: galleryId || null,
+                    category: { connect: { id: validationData.category_id } },
                     tags: {
                         connect: tags
-                    },
-                    specs: {
-                        create: (validationData.specs || []).map(s => ({
-                            label: s.label as string,
-                            value: s.value as string
-                        }))
-                    },
-                    variants: {
-                        create: (validationData.variants || []).map(v => ({
-                            sku: v.sku,
-                            price: v.price,
-                            stock: v.stock,
-                            size_id: v.size_id || null
-                        }))
                     }
                 }
             })
@@ -218,10 +188,9 @@ export class ProductController {
                     name: validationData.name,
                     excerpt: validationData.excerpt,
                     description: validationData.description,
-                    base_price: validationData.base_price,
-                    category_id: validationData.category_id,
-                    thumbnail_id: validationData.thumbnail_id || null,
-                    gallery_id: galleryId || null,
+                    category: { connect: { id: validationData.category_id } },
+                    thumbnail: validationData.thumbnail_id ? { connect: { id: validationData.thumbnail_id } } : { disconnect: true },
+                    gallery: galleryId ? { connect: { id: galleryId } } : { disconnect: true },
                     updated_at: moment().toISOString(),
                     tags: {
                         connect: tags,
@@ -247,12 +216,14 @@ export class ProductController {
                             update: {
                                 sku: v.sku,
                                 price: v.price,
+                                original_price: v.original_price,
                                 stock: v.stock,
                                 size_id: v.size_id || null
                             },
                             create: {
                                 sku: v.sku,
                                 price: v.price,
+                                original_price: v.original_price,
                                 stock: v.stock,
                                 size_id: v.size_id || null
                             }
@@ -435,7 +406,8 @@ export class ProductController {
                 include: {
                     category: true,
                     thumbnail: true,
-                    gallery: { include: { images: true } }
+                    gallery: { include: { images: true } },
+                    variants: true
                 }
             })
 

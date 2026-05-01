@@ -25,7 +25,6 @@ const init = async () => {
         form.value?.setValues({
             name: props.product.name,
             excerpt: props.product.excerpt,
-            base_price: props.product.base_price,
             category_id: props.product.category_id,
             description: props.product.description,
             tags: props.product.tags?.map(tag => tag.name) || []
@@ -67,7 +66,7 @@ onMounted(init)
             <Input v-bind="field" placeholder="Product Name" />
             <ErrorMessage class="text-xs text-destructive" name="name" />
         </Field>
-        
+
         <Field name="excerpt" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Label>Excerpt</Label>
             <Textarea v-bind="field" placeholder="Short description" />
@@ -88,12 +87,6 @@ onMounted(init)
                     </SelectContent>
                 </Select>
                 <ErrorMessage class="text-xs text-destructive" name="category_id" />
-            </Field>
-
-            <Field name="base_price" v-slot="{ field }" as="div" class="flex flex-col gap-2">
-                <Label>Price</Label>
-                <Input v-bind="field" type="number" step="0.01" placeholder="0.00" />
-                <ErrorMessage class="text-xs text-destructive" name="base_price" />
             </Field>
         </div>
 

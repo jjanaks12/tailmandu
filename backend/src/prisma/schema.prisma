@@ -763,9 +763,6 @@ model Product {
   badge          String? // e.g., "Bestseller", "New"
   excerpt        String?  @db.Text
   description    String   @db.LongText
-  base_price     Decimal  @db.Decimal(10, 2)
-  original_price Decimal? @db.Decimal(10, 2) // For promotions / strike-through pricing
-
   published_at DateTime?
   created_at   DateTime  @default(now())
   updated_at   DateTime?
@@ -791,8 +788,12 @@ model Product {
 model ProductVariant {
   id    String   @id @default(cuid())
   sku   String   @unique
-  price Decimal? @db.Decimal(10, 2) // Overrides product base_price if set
-  stock Int      @default(0)
+  price          Decimal  @db.Decimal(10, 2)
+  original_price Decimal? @db.Decimal(10, 2) // For promotions / strike-through pricing
+  stock             Int      @default(0)
+  sold              Int      @default(0)
+  returned          Int      @default(0)
+  restock_threshold Int      @default(5)
 
   product_id String
   product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
@@ -877,6 +878,8 @@ model Order {
   id           String      @id @default(cuid())
   order_number String      @unique
   status       OrderStatus @default(PENDING)
+  email        String?
+  phone        String?
 
   subtotal       Decimal @db.Decimal(10, 2)
   tax            Decimal @db.Decimal(10, 2)

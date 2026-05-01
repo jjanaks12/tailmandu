@@ -33,3 +33,10 @@
 
 ## races 
 [ ] UI updates
+
+
+-- 30 April 2026
+[ ] server update for products
+[ ] stock update
+[ ] 
+[ ] blogs

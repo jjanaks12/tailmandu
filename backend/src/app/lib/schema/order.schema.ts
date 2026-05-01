@@ -6,6 +6,8 @@ export const orderSchema = Y.object({
     address: Y.string().required(),
     city: Y.string().required(),
     zipCode: Y.string().required(),
+    email: Y.string().email().required(),
+    phone: Y.string().required(),
     /* cardholderName: Y.string().required(),
     cardNumber: Y.string().required(),
     expiry: Y.string().required(),

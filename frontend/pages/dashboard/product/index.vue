@@ -11,7 +11,7 @@ useHead({
 definePageMeta({
     layout: "admin",
     middleware: 'auth',
-    authorization: ['product_create', 'product_update', 'product_view', 'product_delete']
+    authorization: ['product_create', 'product_edit', 'product_view', 'product_delete']
 })
 
 const store = useProductStore()
@@ -97,7 +97,17 @@ onMounted(() => fetchProducts(true))
                     </NuxtLink>
                 </TableCell>
                 <TableCell>{{ product.category?.name || 'N/A' }}</TableCell>
-                <TableCell>{{ product.base_price }}</TableCell>
+                <TableCell>
+                    <template v-if="product.variants && product.variants.length > 0">
+                        <span v-if="new Set(product.variants.map(v => v.price)).size > 1">
+                            From NPR {{Math.min(...product.variants.map(v => Number(v.price)))}}
+                        </span>
+                        <span v-else>
+                            NPR {{ product.variants[0].price }}
+                        </span>
+                    </template>
+                    <span v-else class="text-muted-foreground italic text-xs">No price</span>
+                </TableCell>
                 <TableCell>
                     <Badge v-if="product.published_at">published</Badge>
                     <Badge variant="outline" v-else>draft</Badge>

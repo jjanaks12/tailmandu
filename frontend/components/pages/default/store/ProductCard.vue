@@ -42,13 +42,23 @@ const handleAddToCart = () => {
             <h3 class="font-bold text-lg mb-1 leading-tight flex-grow">
                 <NuxtLink :to="'/store/' + product.id">{{ product.name }}</NuxtLink>
             </h3>
-            <p class="text-primary font-extrabold text-xl mb-4 mt-2">
-                ${{ product.base_price }}
-                <span v-if="product.original_price"
-                    class="text-sm font-normal text-on-surface-variant line-through ml-2">
-                    ${{ product.original_price }}
-                </span>
-            </p>
+            <div class="text-primary font-extrabold text-xl mb-4 mt-2">
+                <template v-if="product.variants && product.variants.length > 0">
+                    <span v-if="new Set(product.variants.map(v => v.price)).size > 1">
+                        From ${{ Math.min(...product.variants.map(v => Number(v.price))) }}
+                    </span>
+                    <span v-else>
+                        ${{ product.variants[0].price }}
+                    </span>
+                    <span v-if="product.variants.some(v => v.original_price)"
+                        class="text-sm font-normal text-on-surface-variant line-through ml-2">
+                        ${{ Math.max(...product.variants.map(v => Number(v.original_price || v.price))) }}
+                    </span>
+                </template>
+                <template v-else>
+                    Price TBD
+                </template>
+            </div>
             <!-- <Button @click="handleAddToCart" class="w-full mt-auto">
                 <ShoppingCartIcon class="w-4 h-4 mr-2" /> {{ $t('store.catalog.add_to_cart') }}
             </Button> -->

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `product_variants` ADD COLUMN `restock_threshold` INTEGER NOT NULL DEFAULT 5,
+    ADD COLUMN `returned` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `sold` INTEGER NOT NULL DEFAULT 0;

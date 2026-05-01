@@ -37,7 +37,7 @@ const openOrderModal = async (orderId: number) => {
     }
 }
 
-const updateOrderStatus = async (newStatus: string) => {
+const updateOrderStatus = async (newStatus: any) => {
     if (!selectedOrder.value) return
     isUpdatingStatus.value = true
     try {
@@ -91,12 +91,29 @@ const handleUpdate = async () => {
     }
 }
 
+const handleTogglePublish = async () => {
+    if (!product.value) return
+    isSaving.value = true
+    try {
+        await store.togglePublish(product.value.id)
+        await fetchProduct()
+        toast.success(product.value.published_at ? 'Product unpublished' : 'Product published')
+    } catch (error) {
+        toast.error('Failed to update product status')
+    } finally {
+        isSaving.value = false
+    }
+}
+
 const addVariant = () => {
     if (!product.value.variants) product.value.variants = []
     product.value.variants.push({
         sku: '',
-        price: null,
+        price: 0,
         stock: 0,
+        sold: 0,
+        returned: 0,
+        restock_threshold: 10,
         size_id: ''
     })
 }
@@ -162,7 +179,7 @@ definePageMeta({
                 </div>
             </div>
             <div class="flex gap-2 shrink-0">
-                <Button variant="secondary">
+                <Button variant="secondary" @click="handleTogglePublish" :disabled="isSaving">
                     {{ product.published_at ? 'Unpublish' : 'Publish' }}
                 </Button>
                 <NuxtLink as-child :to="`/store/${product.slug}`" target="_blank">
@@ -255,14 +272,7 @@ definePageMeta({
                             <CardTitle>Pricing & Status</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
-                            <div class="space-y-2">
-                                <Label>Base Price</Label>
-                                <Input v-model="product.base_price" type="number" />
-                            </div>
-                            <div class="space-y-2">
-                                <Label>Original Price (Optional)</Label>
-                                <Input v-model="product.original_price" type="number" />
-                            </div>
+
                             <div class="space-y-2">
                                 <Label>Badge</Label>
                                 <Input v-model="product.badge" placeholder="e.g. New, Bestseller" />
@@ -378,8 +388,12 @@ definePageMeta({
                                 <TableRow>
                                     <TableHead>Size</TableHead>
                                     <TableHead>SKU</TableHead>
-                                    <TableHead>Price (Optional)</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Original Price</TableHead>
                                     <TableHead>Stock</TableHead>
+                                    <TableHead>Sold</TableHead>
+                                    <TableHead>Returned</TableHead>
+                                    <TableHead>Status</TableHead>
                                     <TableHead class="text-right">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -402,11 +416,26 @@ definePageMeta({
                                         <Input v-model="variant.sku" placeholder="SKU" class="w-[150px]" />
                                     </TableCell>
                                     <TableCell>
-                                        <Input v-model="variant.price" type="number" placeholder="Override price"
+                                        <Input v-model="variant.price" type="number" placeholder="Price"
                                             class="w-[120px]" />
                                     </TableCell>
                                     <TableCell>
-                                        <Input v-model="variant.stock" type="number" class="w-[100px]" />
+                                        <Input v-model="variant.original_price" type="number" placeholder="Original price"
+                                            class="w-[120px]" />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Input v-model="variant.stock" type="number" class="w-[80px]" />
+                                    </TableCell>
+                                    <TableCell>
+                                        <div class="text-center font-bold text-primary">{{ variant.sold || 0 }}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div class="text-center font-bold text-destructive">{{ variant.returned || 0 }}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge :variant="variant.stock <= (variant.restock_threshold || 5) ? 'destructive' : 'secondary'">
+                                            {{ variant.stock <= (variant.restock_threshold || 5) ? 'Restock' : 'OK' }}
+                                        </Badge>
                                     </TableCell>
                                     <TableCell class="text-right">
                                         <Button variant="ghost" size="icon" @click="product.variants.splice(index, 1)">

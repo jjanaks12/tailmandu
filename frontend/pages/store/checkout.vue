@@ -13,6 +13,7 @@ const { formatCurrency } = useCurrency()
 const { countries } = storeToRefs(useAppStore())
 const cartStore = useCartStore()
 const { axios } = useAxios()
+const router = useRouter()
 
 const form = useTemplateRef<FormContext>('checkoutForm')
 const paymentMethods = ref([
@@ -25,6 +26,8 @@ const checkoutFormSchema = Y.object({
     address: Y.string().required(),
     city: Y.string().required(),
     zipCode: Y.string().required(),
+    email: Y.string().email().required(),
+    phone: Y.string().required(),
     /* cardholderName: Y.string().required(),
     cardNumber: Y.string().required(),
     expiry: Y.string().required(),
@@ -58,18 +61,6 @@ const selectPaymentMethod = (id: string) => {
     })
 }
 
-onMounted(() => {
-    const a = cartStore.items.flatMap(cartItem => cartItem.variants.map(variant => ({
-        product_id: cartItem.product.id,
-        variant_id: variant.id,
-        quantity: variant.quantity
-    })))
-
-    form.value?.setFieldValue('items', a)
-})
-
-const router = useRouter()
-
 const submitHandler = async (values: any) => {
     try {
         const payload = { ...values }
@@ -87,6 +78,16 @@ const submitHandler = async (values: any) => {
         }
     }
 }
+
+onMounted(() => {
+    const a = cartStore.items.flatMap(cartItem => cartItem.variants.map(variant => ({
+        product_id: cartItem.product.id,
+        variant_id: variant.id,
+        quantity: variant.quantity
+    })))
+
+    form.value?.setFieldValue('items', a)
+})
 </script>
 
 <template>
@@ -99,12 +100,11 @@ const submitHandler = async (values: any) => {
                 <p class="text-on-surface-variant font-body">{{ $t("checkout.description") }}
                 </p>
             </header>
-            <!-- Section: Shipping Address -->
             <section class="bg-primary/5 rounded-xl p-6 md:p-8 space-y-6">
                 <div class="flex items-center gap-3 mb-2">
                     <span
                         class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</span>
-                    <h2 class="text-xl font-bold tracking-tight">{{ $t("checkout.shipping_address") }}</h2>
+                    <h2 class="text-xl font-bold tracking-tight">{{ $t("checkout.personal_detail") }}</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Field name="firstName" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
@@ -112,49 +112,73 @@ const submitHandler = async (values: any) => {
                             {{ $t("checkout.first_name") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="firstName" class="text-error" />
+                        <ErrorMessage name="firstName" class="text-red-300" />
                     </Field>
                     <Field name="lastName" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.last_name") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="lastName" class="text-error" />
+                        <ErrorMessage name="lastName" class="text-red-300" />
                     </Field>
+                    <Field name="email" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            Email Address
+                        </Label>
+                        <Input type="email" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="email" class="text-red-300" />
+                    </Field>
+                    <Field name="phone" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
+                        <Label class="text-xs font-bold uppercase tracking-widest text-outline">
+                            Phone Number
+                        </Label>
+                        <Input type="tel" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
+                        <ErrorMessage name="phone" class="text-red-300" />
+                    </Field>
+                </div>
+            </section>
+            <!-- Section: Shipping Address -->
+            <section class="bg-primary/5 rounded-xl p-6 md:p-8 space-y-6">
+                <div class="flex items-center gap-3 mb-2">
+                    <span
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</span>
+                    <h2 class="text-xl font-bold tracking-tight">{{ $t("checkout.shipping_address") }}</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Field name="address" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.address") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="address" class="text-error" />
+                        <ErrorMessage name="address" class="text-red-300" />
                     </Field>
                     <Field name="city" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.city") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="city" class="text-error" />
+                        <ErrorMessage name="city" class="text-red-300" />
                     </Field>
                     <Field name="street" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.street") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="street" class="text-error" />
+                        <ErrorMessage name="street" class="text-red-300" />
                     </Field>
                     <Field name="state" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.state") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="state" class="text-error" />
+                        <ErrorMessage name="state" class="text-red-300" />
                     </Field>
                     <Field name="zipCode" class="space-y-2" as="div" v-slot="{ field, errorMessage }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
                             {{ $t("checkout.zip_code") }}
                         </Label>
                         <Input type="text" v-bind="field" :class="errorMessage ? 'is-invalid' : ''" />
-                        <ErrorMessage name="zipCode" class="text-error" />
+                        <ErrorMessage name="zipCode" class="text-red-300" />
                     </Field>
                     <Field name="country" class="space-y-2" as="div" v-slot="{ field, handleChange }">
                         <Label class="text-xs font-bold uppercase tracking-widest text-outline">
@@ -170,7 +194,7 @@ const submitHandler = async (values: any) => {
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <ErrorMessage name="country" class="text-error" />
+                        <ErrorMessage name="country" class="text-red-300" />
                     </Field>
                 </div>
             </section>
@@ -275,31 +299,33 @@ const submitHandler = async (values: any) => {
                             </div>
                         </div>
                     </div>
-                    <div class="border-t border-surface-variant/10 pt-6 space-y-4 relative z-10">
-                        <div class="flex justify-between text-surface-variant/80">
-                            <span>{{ $t("checkout.gear_subtotal") }}</span>
-                            <span class="font-bold">{{ formatCurrency(summary.subtotal) }}</span>
-                        </div>
-                        <div class="flex justify-between text-surface-variant/80">
-                            <span>{{ $t("checkout.expedition_shipping") }}</span>
-                            <span class="font-bold">{{ summary.shipping }}</span>
-                        </div>
-                        <div class="flex justify-between text-surface-variant/80">
-                            <span>{{ $t("checkout.altitude_tax") }}</span>
-                            <span class="font-bold">{{ formatCurrency(summary.tax) }}</span>
-                        </div>
-                        <div class="pt-4 border-t border-surface-variant/20 flex justify-between items-end">
-                            <div>
-                                <span class="text-xs font-black uppercase tracking-[0.2em] text-primary">
-                                    {{ $t("checkout.total_investment") }}
-                                </span>
-                                <div class="text-4xl font-black brand-font tracking-tighter mt-1">{{
-                                    formatCurrency(summary.total) }}
-                                </div>
+                    <ClientOnly>
+                        <div class="border-t border-surface-variant/10 pt-6 space-y-4 relative z-10">
+                            <div class="flex justify-between text-surface-variant/80">
+                                <span>{{ $t("checkout.gear_subtotal") }}</span>
+                                <span class="font-bold">{{ formatCurrency(summary.subtotal) }}</span>
                             </div>
-                            <BadgeCheckIcon class="text-primary w-10 h-10" />
+                            <div class="flex justify-between text-surface-variant/80">
+                                <span>{{ $t("checkout.expedition_shipping") }}</span>
+                                <span class="font-bold">{{ summary.shipping }}</span>
+                            </div>
+                            <div class="flex justify-between text-surface-variant/80">
+                                <span>{{ $t("checkout.altitude_tax") }}</span>
+                                <span class="font-bold">{{ formatCurrency(summary.tax) }}</span>
+                            </div>
+                            <div class="pt-4 border-t border-surface-variant/20 flex justify-between items-end">
+                                <div>
+                                    <span class="text-xs font-black uppercase tracking-[0.2em] text-primary">
+                                        {{ $t("checkout.total_investment") }}
+                                    </span>
+                                    <div class="text-4xl font-black brand-font tracking-tighter mt-1">{{
+                                        formatCurrency(summary.total) }}
+                                    </div>
+                                </div>
+                                <BadgeCheckIcon class="text-primary w-10 h-10" />
+                            </div>
                         </div>
-                    </div>
+                    </ClientOnly>
                 </div>
                 <Button
                     class="w-full py-7 rounded-full bg-gradient-to-tr from-[#a53d00] to-[#f06723] border-0 text-white font-black text-lg tracking-widest uppercase shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">

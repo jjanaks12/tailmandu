@@ -251,6 +251,7 @@
     "checkout": {
         "title": "Expedition Details",
         "description": "Configure your logistics for the upcoming journey.",
+        "personal_detail": "Personal Details",
         "shipping_address": "Shipping Address",
         "first_name": "First Name",
         "last_name": "Last Name",

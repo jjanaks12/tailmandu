@@ -28,26 +28,40 @@ export class OrderController {
                         throw new Error(`Product not found: ${item.product_id}`)
                     }
 
-                    let unitPrice = Number(product.base_price)
+                    if (!item.variant_id) {
+                        throw new Error(`Variant ID is required for product ${product.name}`)
+                    }
 
-                    if (item.variant_id) {
-                        const variant = await tx.productVariant.findUnique({
-                            where: { id: item.variant_id }
-                        })
-                        if (!variant || variant.product_id !== product.id) {
-                            throw new Error(`Invalid variant for product ${product.name}`)
-                        }
-                        if (variant.price) {
-                            unitPrice = Number(variant.price)
-                        }
+                    const variant = await tx.productVariant.findUnique({
+                        where: { id: item.variant_id }
+                    })
+
+                    if (!variant || variant.product_id !== product.id) {
+                        throw new Error(`Invalid variant for product ${product.name}`)
                     }
 
                     const quantity = Number(item.quantity)
+                    
+                    // Check stock
+                    if (variant.stock < quantity) {
+                        throw new Error(`Insufficient stock for ${product.name} (SKU: ${variant.sku}). Available: ${variant.stock}`)
+                    }
+
+                    const unitPrice = Number(variant.price)
                     subtotal += unitPrice * quantity
 
+                    // Deduct stock and update sold count
+                    await tx.productVariant.update({
+                        where: { id: variant.id },
+                        data: {
+                            stock: { decrement: quantity },
+                            sold: { increment: quantity }
+                        }
+                    })
+
                     orderItemsData.push({
-                        product_id: product.id,
-                        variant_id: item.variant_id || null,
+                        product: { connect: { id: product.id } },
+                        variant: item.variant_id ? { connect: { id: item.variant_id } } : undefined,
                         quantity: quantity,
                         unit_price: unitPrice
                     })
@@ -139,7 +153,7 @@ export class OrderController {
                         city: validationData.city,
                         state: validationData.state,
                         zipCode: validationData.zipCode,
-                        country_id: validationData.country,
+                        country: { connect: { id: validationData.country } },
                         type: 'SHIPPING'
                     }
                 })
@@ -149,17 +163,19 @@ export class OrderController {
                     data: {
                         order_number: orderNumber,
                         status: 'PENDING',
+                        email: validationData.email,
+                        phone: validationData.phone,
                         subtotal,
                         tax,
                         shipping_fee: shippingFee,
                         discount_total: discountTotal,
                         total,
-                        user_id: userId,
-                        coupon_id: couponId,
+                        user: userId ? { connect: { id: userId } } : undefined,
+                        coupon: couponId ? { connect: { id: couponId } } : undefined,
                         items: {
                             create: orderItemsData
                         },
-                        shipping_address_id: shippingAddress.id
+                        shipping_address: { connect: { id: shippingAddress.id } }
                     },
                     include: {
                         items: true
@@ -182,15 +198,67 @@ export class OrderController {
     public static async updateStatus(req: Request, res: Response, next: NextFunction) {
         try {
             const orderId = req.params.id as string;
-            const { status } = req.body;
-            if (!status) throw createHttpError[400]('Status is required');
+            const { status: newStatus } = req.body;
+            if (!newStatus) throw createHttpError[400]('Status is required');
             const allowed = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
-            if (!allowed.includes(status)) throw createHttpError[400]('Invalid status');
-            const order = await prisma.order.update({
-                where: { id: orderId },
-                data: { status },
-                include: { items: true, shipping_address: true, coupon: true, user: true }
+            if (!allowed.includes(newStatus)) throw createHttpError[400]('Invalid status');
+
+            const order = await prisma.$transaction(async (tx) => {
+                const currentOrder = await tx.order.findUnique({
+                    where: { id: orderId },
+                    include: { items: true }
+                });
+
+                if (!currentOrder) throw createHttpError[404]('Order not found');
+
+                const oldStatus = currentOrder.status;
+
+                // Handle Stock Logic
+                if (oldStatus !== 'CANCELLED' && newStatus === 'CANCELLED') {
+                    // Order is being CANCELLED: Return stock
+                    for (const item of currentOrder.items) {
+                        if (item.variant_id) {
+                            await tx.productVariant.update({
+                                where: { id: item.variant_id },
+                                data: {
+                                    stock: { increment: item.quantity },
+                                    sold: { decrement: item.quantity },
+                                    returned: { increment: item.quantity }
+                                }
+                            });
+                        }
+                    }
+                } else if (oldStatus === 'CANCELLED' && newStatus !== 'CANCELLED') {
+                    // Order is being RESTORED: Deduct stock again
+                    for (const item of currentOrder.items) {
+                        if (item.variant_id) {
+                            const variant = await tx.productVariant.findUnique({
+                                where: { id: item.variant_id }
+                            });
+
+                            if (!variant || variant.stock < item.quantity) {
+                                throw new Error(`Cannot restore order: Insufficient stock for variant ${item.variant_id}`);
+                            }
+
+                            await tx.productVariant.update({
+                                where: { id: item.variant_id },
+                                data: {
+                                    stock: { decrement: item.quantity },
+                                    sold: { increment: item.quantity },
+                                    returned: { decrement: item.quantity }
+                                }
+                            });
+                        }
+                    }
+                }
+
+                return await tx.order.update({
+                    where: { id: orderId },
+                    data: { status: newStatus },
+                    include: { items: true, shipping_address: true, coupon: true, user: true }
+                });
             });
+
             res.status(200).json({ message: 'Order status updated', data: order });
         } catch (error: any) {
             next(error);
