@@ -37,6 +37,8 @@ interface Order {
   items: OrderItem[]
   shipping_address: ShippingAddress
   coupon?: { code: string }
+  first_name?: string
+  last_name?: string
 }
 
 const order = ref<Order | null>(null)
@@ -62,6 +64,7 @@ onMounted(async () => {
     <div v-else-if="order" class="space-y-8">
       <header class="border-b pb-4">
         <h1 class="text-3xl font-black">Order {{ order.order_number }}</h1>
+        <p class="text-lg font-bold" v-if="order.first_name">Customer: {{ order.first_name }} {{ order.last_name }}</p>
         <p class="text-on-surface-variant">Status: {{ order.status }}</p>
       </header>
 

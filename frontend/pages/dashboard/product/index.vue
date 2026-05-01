@@ -18,6 +18,8 @@ const store = useProductStore()
 const { fetchProducts, deleteProduct, togglePublish } = store
 const { products, params, isLoading } = storeToRefs(store)
 
+const { formatCurrency } = useCurrency()
+
 const showForm = ref(false)
 const showDeleteDialog = ref(false)
 const selectedProduct = ref<Product | null>(null)
@@ -100,10 +102,10 @@ onMounted(() => fetchProducts(true))
                 <TableCell>
                     <template v-if="product.variants && product.variants.length > 0">
                         <span v-if="new Set(product.variants.map(v => v.price)).size > 1">
-                            From NPR {{Math.min(...product.variants.map(v => Number(v.price)))}}
+                            From {{ formatCurrency(Math.min(...product.variants.map(v => Number(v.price)))) }}
                         </span>
                         <span v-else>
-                            NPR {{ product.variants[0].price }}
+                            {{ formatCurrency(product.variants[0].price) }}
                         </span>
                     </template>
                     <span v-else class="text-muted-foreground italic text-xs">No price</span>

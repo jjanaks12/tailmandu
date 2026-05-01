@@ -61,6 +61,13 @@ const submitReview = async () => {
         isSubmittingReview.value = false
     }
 }
+const startingPrice = computed(() => {
+    if (product.value?.variants && product.value.variants.length > 0) {
+        return Math.min(...product.value.variants.map(v => Number(v.price)))
+    }
+    return 0
+})
+
 const { formatCurrency } = useCurrency()
 
 const addToCart = () => {
@@ -136,7 +143,14 @@ watch(() => route.params.id, fetchProduct)
                     </div>
                     <h1 class="text-5xl font-headline font-black text-on-background tracking-tight mb-4 leading-none">
                         {{ product.name }}</h1>
-                    <p class="text-2xl font-headline font-bold text-primary mb-8">{{ formatCurrency(selectedSize?.price || product.base_price) }}</p>
+                    <p class="text-2xl font-headline font-bold text-primary mb-8">
+                        <template v-if="!selectedSize">
+                            From {{ formatCurrency(startingPrice) }}
+                        </template>
+                        <template v-else>
+                            {{ formatCurrency(selectedSize.price) }}
+                        </template>
+                    </p>
                     <div class="bg-primary/10 rounded-3xl p-6 mb-8 relative overflow-hidden">
                         <div class="absolute top-0 right-0 opacity-5 -translate-y-1/4 translate-x-1/4">
                             <MountainIcon class="w-64 h-64" />

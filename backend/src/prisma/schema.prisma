@@ -880,6 +880,8 @@ model Order {
   status       OrderStatus @default(PENDING)
   email        String?
   phone        String?
+  first_name   String?
+  last_name    String?
 
   subtotal       Decimal @db.Decimal(10, 2)
   tax            Decimal @db.Decimal(10, 2)

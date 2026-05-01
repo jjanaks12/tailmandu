@@ -20,6 +20,8 @@ const tagMapping: Record<string, string> = {
     'short trail': 'bg-primary'
 }
 
+const { formatCurrency } = useCurrency()
+
 const startingPrice = computed(() => {
     if (props.item.details?.pricing?.length > 0) {
         return Math.min(...props.item.details.pricing.map((p: any) => p.price))
@@ -48,7 +50,7 @@ const duration = computed(() => {
             </div>
             <div
                 class="absolute top-3 right-3 z-20 bg-primary px-2.5 py-1 rounded-lg text-white font-bold text-sm shadow-lg">
-                {{ startingPrice > 0 ? `$${startingPrice.toLocaleString()}+` : 'Call for Price' }}
+                {{ startingPrice > 0 ? `${formatCurrency(startingPrice)}+` : 'Call for Price' }}
             </div>
             <div class="absolute bottom-4 left-4 right-4 z-20">
                 <h3 class="text-xl font-extrabold text-white tracking-tight leading-tight mb-2">

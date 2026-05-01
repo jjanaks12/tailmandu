@@ -55,6 +55,8 @@ const startingPrice = computed(() => {
     return Number(trek.value?.price) || 0
 })
 
+const { formatCurrency } = useCurrency()
+
 onMounted(init)
 </script>
 
@@ -194,7 +196,7 @@ onMounted(init)
                                     Trip packages
                                 </h2>
                                 <p class="text-text-muted font-bold text-[14px] uppercase tracking-widest mt-1">Starting
-                                    from <span class="text-primary">NPR{{ startingPrice }}</span> per person</p>
+                                    from <span class="text-primary">{{ formatCurrency(startingPrice) }}</span> per person</p>
                             </div>
                         </div>
 
@@ -219,7 +221,7 @@ onMounted(init)
                                             <span>{{ tier.min }}{{ tier.max ? `-${tier.max}` : '+' }} Persons</span>
                                         </td>
                                         <td class="px-6 py-4 text-right text-primary font-black">
-                                            ${{ tier.price }}
+                                            {{ formatCurrency(tier.price) }}
                                         </td>
                                     </tr>
                                 </tbody>

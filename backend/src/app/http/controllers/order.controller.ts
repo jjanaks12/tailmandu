@@ -41,7 +41,7 @@ export class OrderController {
                     }
 
                     const quantity = Number(item.quantity)
-                    
+
                     // Check stock
                     if (variant.stock < quantity) {
                         throw new Error(`Insufficient stock for ${product.name} (SKU: ${variant.sku}). Available: ${variant.stock}`)
@@ -143,7 +143,7 @@ export class OrderController {
 
                 // Generate order number (e.g., ORD-timestamp-random)
                 const orderNumber = storeSetting?.order_id_prefix
-                    ? `${storeSetting.order_id_prefix}-${Date.now()}`
+                    ? `${storeSetting.order_id_prefix}${Date.now()}`
                     : `ORD-${Date.now()}`
 
                 const shippingAddress = await tx.address.create({
@@ -165,6 +165,8 @@ export class OrderController {
                         status: 'PENDING',
                         email: validationData.email,
                         phone: validationData.phone,
+                        first_name: validationData.firstName,
+                        last_name: validationData.lastName,
                         subtotal,
                         tax,
                         shipping_fee: shippingFee,
@@ -271,7 +273,12 @@ export class OrderController {
             const order = await prisma.order.findUnique({
                 where: { id: orderId },
                 include: {
-                    items: true,
+                    items: {
+                        include: {
+                            variant: true,
+                            product: true
+                        }
+                    },
                     shipping_address: {
                         include: {
                             country: true

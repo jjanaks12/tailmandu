@@ -17,6 +17,8 @@ watch(activeCategory, () => {
 watch([activeCategory, currentPage], ([newCat, newPage]) => {
     productStore.listProducts(newCat === 'all' ? undefined : newCat, Number(newPage) ?? 1)
 }, { immediate: true })
+
+const { formatCurrency } = useCurrency()
 </script>
 
 <template>
@@ -84,15 +86,20 @@ watch([activeCategory, currentPage], ([newCat, newPage]) => {
                         <DropdownMenuContent>
                             <DropdownMenuLabel>{{ $t('store.filter.label') }}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuCheckboxItem :checked="true">{{ $t('store.filter.all') }}
+                            <DropdownMenuCheckboxItem :checked="true">
+                                {{ $t('store.filter.all') }}
                             </DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem :checked="false">Under NPR 5000
+                            <DropdownMenuCheckboxItem :checked="false">
+                                Under {{ formatCurrency(5000) }}
                             </DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem :checked="false">NPR 5000 - NPR 10000
+                            <DropdownMenuCheckboxItem :checked="false">
+                                {{ formatCurrency(5000) }} - {{ formatCurrency(10000) }}
                             </DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem :checked="false">NPR 10000 - NPR 15000
+                            <DropdownMenuCheckboxItem :checked="false">
+                                {{ formatCurrency(10000) }} - {{ formatCurrency(15000) }}
                             </DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem :checked="false">Above NPR 15000
+                            <DropdownMenuCheckboxItem :checked="false">
+                                Above {{ formatCurrency(15000) }}
                             </DropdownMenuCheckboxItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

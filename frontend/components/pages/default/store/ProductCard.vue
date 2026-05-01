@@ -18,6 +18,7 @@ const handleAddToCart = () => {
     }
     cartStore.addToCart(props.product, props.product.variants[0])
 }
+const { formatCurrency } = useCurrency()
 </script>
 
 <template>
@@ -45,14 +46,14 @@ const handleAddToCart = () => {
             <div class="text-primary font-extrabold text-xl mb-4 mt-2">
                 <template v-if="product.variants && product.variants.length > 0">
                     <span v-if="new Set(product.variants.map(v => v.price)).size > 1">
-                        From ${{ Math.min(...product.variants.map(v => Number(v.price))) }}
+                        From {{ formatCurrency(Math.min(...product.variants.map(v => Number(v.price)))) }}
                     </span>
                     <span v-else>
-                        ${{ product.variants[0].price }}
+                        {{ formatCurrency(product.variants[0].price) }}
                     </span>
                     <span v-if="product.variants.some(v => v.original_price)"
                         class="text-sm font-normal text-on-surface-variant line-through ml-2">
-                        ${{ Math.max(...product.variants.map(v => Number(v.original_price || v.price))) }}
+                        {{ formatCurrency(Math.max(...product.variants.map(v => Number(v.original_price || v.price)))) }}
                     </span>
                 </template>
                 <template v-else>

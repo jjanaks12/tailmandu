@@ -190,6 +190,8 @@ onMounted(init)
 
 const stepLabels = ['Selection', 'Guest Info', 'Review']
 
+const { formatCurrency } = useCurrency()
+
 const inputClass = (errorKey: string) => [
     'w-full px-4 py-2.5 border rounded-lg text-sm font-medium bg-white outline-none transition-all',
     formErrors.value[errorKey]
@@ -229,7 +231,7 @@ const inputClass = (errorKey: string) => [
                 </div>
                 <div class="flex justify-between text-sm border-t border-gray-100 pt-3">
                     <span class="text-gray-500 font-medium">Total</span>
-                    <span class="font-bold text-primary text-base">NPR {{ totalPrice.toLocaleString() }}</span>
+                    <span class="font-bold text-primary text-base">{{ formatCurrency(totalPrice) }}</span>
                 </div>
             </div>
             <NuxtLink :to="`/fastpacking/${trek?.slug}`"
@@ -556,7 +558,7 @@ const inputClass = (errorKey: string) => [
                                             :class="['w-5 h-5', gearOption === 'pro' ? 'text-primary' : 'text-gray-400']" />
                                         <div class="flex-1">
                                             <p class="text-sm font-bold text-gray-900">Pro Gear Kit</p>
-                                            <p class="text-xs text-gray-500">+$90/person upgrade</p>
+                                            <p class="text-xs text-gray-500">+{{ formatCurrency(90) }}/person upgrade</p>
                                         </div>
                                         <span v-if="gearOption === 'pro'"
                                             class="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -571,7 +573,7 @@ const inputClass = (errorKey: string) => [
                                     <CarIcon class="w-4 h-4 text-gray-400" />
                                     <div class="flex-1">
                                         <p class="text-sm font-bold text-gray-900">Airport Pickup – Kathmandu Intl</p>
-                                        <p class="text-xs text-gray-500">+$45 one way transfer</p>
+                                        <p class="text-xs text-gray-500">+{{ formatCurrency(45) }} one way transfer</p>
                                     </div>
                                 </label>
                             </div>
@@ -803,7 +805,7 @@ const inputClass = (errorKey: string) => [
                                             Base Trek Cost ({{ totalTravelers }} Traveler{{ totalTravelers > 1 ? 's' :
                                                 '' }})
                                         </span>
-                                        <span class="font-bold text-gray-900">NPR {{ subtotal.toLocaleString() }}</span>
+                                        <span class="font-bold text-gray-900">{{ formatCurrency(subtotal) }}</span>
                                     </div>
                                     <div v-for="(item, i) in dynamicInclusions" :key="i" class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
@@ -811,7 +813,7 @@ const inputClass = (errorKey: string) => [
                                             {{ item.title }}
                                         </span>
                                         <span class="font-bold text-gray-900">
-                                            {{ item.isIncluded ? 'Included' : `NPR ${item.cost.toLocaleString()}` }}
+                                            {{ item.isIncluded ? 'Included' : formatCurrency(item.cost) }}
                                         </span>
                                     </div>
                                     <div v-if="gearOption === 'pro'" class="flex items-center justify-between text-sm">
@@ -819,23 +821,21 @@ const inputClass = (errorKey: string) => [
                                             <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
                                             Pro Gear Upgrade
                                         </span>
-                                        <span class="font-bold text-gray-900">NPR {{ gearCost.toLocaleString() }}</span>
+                                        <span class="font-bold text-gray-900">{{ formatCurrency(gearCost) }}</span>
                                     </div>
                                     <div v-if="airportPickup" class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
                                             <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
                                             Airport Pickup
                                         </span>
-                                        <span class="font-bold text-gray-900">NPR {{ pickupCost.toLocaleString()
-                                        }}</span>
+                                        <span class="font-bold text-gray-900">{{ formatCurrency(pickupCost) }}</span>
                                     </div>
                                     <div class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
                                             <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
                                             Local Taxes (VAT 13%)
                                         </span>
-                                        <span class="font-bold text-gray-900">NPR {{ vatAmount.toLocaleString()
-                                        }}</span>
+                                        <span class="font-bold text-gray-900">{{ formatCurrency(vatAmount) }}</span>
                                     </div>
                                 </div>
 
@@ -843,9 +843,7 @@ const inputClass = (errorKey: string) => [
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs text-gray-500 font-medium">Total (Taxes & Fees
                                             inclusive)</span>
-                                        <span class="text-xl font-bold text-primary">NPR {{ (totalPrice +
-                                            vatAmount).toLocaleString()
-                                        }}</span>
+                                        <span class="text-xl font-bold text-primary">{{ formatCurrency(totalPrice + vatAmount) }}</span>
                                     </div>
                                 </div>
 

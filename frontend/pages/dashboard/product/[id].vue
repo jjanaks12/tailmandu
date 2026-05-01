@@ -420,8 +420,8 @@ definePageMeta({
                                             class="w-[120px]" />
                                     </TableCell>
                                     <TableCell>
-                                        <Input v-model="variant.original_price" type="number" placeholder="Original price"
-                                            class="w-[120px]" />
+                                        <Input v-model="variant.original_price" type="number"
+                                            placeholder="Original price" class="w-[120px]" />
                                     </TableCell>
                                     <TableCell>
                                         <Input v-model="variant.stock" type="number" class="w-[80px]" />
@@ -430,12 +430,14 @@ definePageMeta({
                                         <div class="text-center font-bold text-primary">{{ variant.sold || 0 }}</div>
                                     </TableCell>
                                     <TableCell>
-                                        <div class="text-center font-bold text-destructive">{{ variant.returned || 0 }}</div>
+                                        <div class="text-center font-bold text-destructive">{{ variant.returned || 0 }}
+                                        </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge :variant="variant.stock <= (variant.restock_threshold || 5) ? 'destructive' : 'secondary'">
+                                        <Badge
+                                            :variant="variant.stock <= (variant.restock_threshold || 5) ? 'destructive' : 'secondary'">
                                             {{ variant.stock <= (variant.restock_threshold || 5) ? 'Restock' : 'OK' }}
-                                        </Badge>
+                                                </Badge>
                                     </TableCell>
                                     <TableCell class="text-right">
                                         <Button variant="ghost" size="icon" @click="product.variants.splice(index, 1)">
@@ -583,9 +585,16 @@ definePageMeta({
 
                     <div>
                         <h4 class="font-semibold mb-2">Customer Information</h4>
-                        <p class="text-sm">{{ selectedOrder.user?.personal?.first_name }} {{
-                            selectedOrder.user?.personal?.last_name }}</p>
-                        <p class="text-sm text-muted-foreground">{{ selectedOrder.user?.email }}</p>
+                        <dl class="grid grid-cols-3 gap-1">
+                            <dt class="text-muted-foreground text-sm">Name</dt>
+                            <dd class="col-span-2">{{ selectedOrder?.first_name }} {{ selectedOrder?.last_name }}</dd>
+
+                            <dt class="text-muted-foreground text-sm">Email</dt>
+                            <dd class="col-span-2">{{ selectedOrder?.email }}</dd>
+
+                            <dt class="text-muted-foreground text-sm">Phone</dt>
+                            <dd>{{ selectedOrder?.phone }}</dd>
+                        </dl>
                     </div>
 
                     <div>
