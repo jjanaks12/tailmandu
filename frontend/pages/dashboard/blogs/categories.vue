@@ -1,0 +1,144 @@
+<script setup lang="ts">
+import { EllipsisVerticalIcon, PencilIcon, PlusIcon, RefreshCwIcon, TrashIcon } from 'lucide-vue-next'
+import { Field, Form, ErrorMessage } from 'vee-validate'
+import { blogCategorySchema } from '~/lib/schema/blog.schema'
+import type { BlogCategory } from '~/lib/types'
+import { useBlogStore } from '~/store/blog'
+
+useHead({
+    title: 'Blog Categories'
+})
+
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: ['manage_user']
+})
+
+const { fetchCategories, createCategory, updateCategory, deleteCategory } = useBlogStore()
+const { categories, isLoading } = storeToRefs(useBlogStore())
+
+const showForm = ref(false)
+const selectedCategory = ref<BlogCategory | null>(null)
+const form = useTemplateRef('categoryForm')
+
+const init = () => fetchCategories()
+
+const handleSubmit = async (values: any) => {
+    if (selectedCategory.value) {
+        await updateCategory(selectedCategory.value.id, values)
+    } else {
+        await createCategory(values)
+    }
+    showForm.value = false
+    selectedCategory.value = null
+}
+
+const editCategory = (category: BlogCategory) => {
+    selectedCategory.value = category
+    showForm.value = true
+    nextTick(() => {
+        form.value?.setValues({
+            name: category.name,
+            slug: category.slug,
+            description: category.description
+        })
+    })
+}
+
+onMounted(init)
+</script>
+
+<template>
+    <div class="flex items-center justify-between mb-12">
+        <h1 class="text-2xl">{{ $t('dashboard.blog_categories.title') }}</h1>
+        <div class="flex gap-2">
+            <Button @click="selectedCategory = null; showForm = true">
+                <PlusIcon />
+                {{ $t('dashboard.blog_categories.add_btn') }}
+            </Button>
+            <Button @click="fetchCategories" :disabled="isLoading" modifier="link">
+                <RefreshCwIcon />
+            </Button>
+        </div>
+    </div>
+
+    <Table>
+        <TableHeader>
+            <TableRow>
+                <TableHead>SN</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Slug</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead class="text-right">Action</TableHead>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            <TableRow v-for="(category, index) in categories" :key="category.id">
+                <TableCell>{{ index + 1 }}</TableCell>
+                <TableCell class="font-bold">{{ category.name }}</TableCell>
+                <TableCell>{{ category.slug }}</TableCell>
+                <TableCell class="max-w-xs truncate">{{ category.description }}</TableCell>
+                <TableCell class="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button modifier="link" size="sm">
+                                <EllipsisVerticalIcon />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem @click="editCategory(category)">
+                                <PencilIcon />
+                                Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem @click="deleteCategory(category.id)" class="text-destructive">
+                                <TrashIcon />
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </TableCell>
+            </TableRow>
+        </TableBody>
+    </Table>
+
+    <Dialog :open="showForm" @update:open="showForm = $event; selectedCategory = null">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>
+                    {{ selectedCategory ? $t('dashboard.blog_categories.modal.edit.title') :
+                        $t('dashboard.blog_categories.modal.add.title') }}
+                </DialogTitle>
+                <DialogDescription>
+                    {{ selectedCategory ? $t('dashboard.blog_categories.modal.edit.description') :
+                        $t('dashboard.blog_categories.modal.add.description') }}
+                </DialogDescription>
+            </DialogHeader>
+
+            <Form :validation-schema="blogCategorySchema" @submit="handleSubmit" class="space-y-4" ref="categoryForm">
+                <Field name="name" v-slot="{ field }" as="div" class="flex flex-col gap-2">
+                    <Label>Name</Label>
+                    <Input v-bind="field" placeholder="Category Name" />
+                    <ErrorMessage class="error__message" name="name" />
+                </Field>
+
+                <Field name="slug" v-slot="{ field }" as="div" class="flex flex-col gap-2">
+                    <Label>Slug (Optional)</Label>
+                    <Input v-bind="field" placeholder="category-slug" />
+                    <ErrorMessage class="error__message" name="slug" />
+                </Field>
+
+                <Field name="description" v-slot="{ field }" as="div" class="flex flex-col gap-2">
+                    <Label>Description</Label>
+                    <Textarea v-bind="field" placeholder="Brief description..." rows="3" />
+                    <ErrorMessage class="error__message" name="description" />
+                </Field>
+
+                <div class="flex justify-end gap-2 pt-4">
+                    <Button type="button" modifier="outline" @click="showForm = false">Cancel</Button>
+                    <Button type="submit">Save Category</Button>
+                </div>
+            </Form>
+        </DialogContent>
+    </Dialog>
+</template>

@@ -589,3 +589,52 @@ export interface CartItem {
     product: Product
     variants: CartVariant[]
 }
+
+export type SeoMetadata = {
+    id: string
+    meta_title?: string
+    meta_description?: string
+    meta_keywords?: string
+    canonical_url?: string
+    og_title?: string
+    og_description?: string
+    og_image_id?: string
+    og_image?: Image
+}
+
+export type BlogCategory = {
+    id: string
+    name: string
+    slug: string
+    description?: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+}
+
+export type BlogPost = {
+    id: string
+    title: string
+    slug: string
+    content: string
+    excerpt?: string
+    published_at?: string
+    is_featured: boolean
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+
+    seo_id?: string
+    seo?: SeoMetadata
+
+    author_id: string
+    author?: User
+
+    category_id?: string
+    category?: BlogCategory
+
+    featured_image_id?: string
+    featured_image?: Image
+
+    tags?: Tag[]
+}

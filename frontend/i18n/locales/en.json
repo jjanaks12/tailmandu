@@ -186,6 +186,74 @@
                     "confirm": "Yes, delete"
                 }
             }
+        },
+        "blogs": {
+            "title": "Blogs",
+            "add_btn": "Add new Post",
+            "form": {
+                "title": "Post Title",
+                "title_placeholder": "Enter post title",
+                "slug": "Slug",
+                "slug_placeholder": "post-slug",
+                "content": "Content",
+                "excerpt": "Excerpt",
+                "excerpt_placeholder": "Enter brief summary",
+                "category": "Category",
+                "featured_image": "Featured Image",
+                "is_featured": "Is Featured?",
+                "tags": "Tags",
+                "submit": "Save Post",
+                "seo": {
+                    "title": "SEO Metadata",
+                    "meta_title": "Meta Title",
+                    "meta_description": "Meta Description",
+                    "meta_keywords": "Meta Keywords",
+                    "canonical_url": "Canonical URL",
+                    "og_title": "OG Title",
+                    "og_description": "OG Description"
+                }
+            },
+            "listing": {
+                "table": {
+                    "title": "Title",
+                    "category": "Category",
+                    "author": "Author",
+                    "status": "Status",
+                    "published_at": "Published At",
+                    "edit": "Edit",
+                    "delete": "Delete"
+                }
+            },
+            "modal": {
+                "add": {
+                    "title": "Add Post",
+                    "description": "Create a new blog post"
+                },
+                "edit": {
+                    "title": "Edit Post",
+                    "description": "Modify existing blog post"
+                },
+                "delete": {
+                    "title": "Are you sure?",
+                    "description": "This action cannot be undone. This will permanently delete your blog post.",
+                    "cancel": "No, cancel",
+                    "confirm": "Yes, delete"
+                }
+            }
+        },
+        "blog_categories": {
+            "title": "Blog Categories",
+            "add_btn": "Add Category",
+            "modal": {
+                "add": {
+                    "title": "Add Category",
+                    "description": "Create a new blog category"
+                },
+                "edit": {
+                    "title": "Edit Category",
+                    "description": "Modify blog category"
+                }
+            }
         }
     },
     "tm_clicks": {

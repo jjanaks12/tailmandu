@@ -223,6 +223,15 @@ form .error__message {
     @apply text-xs italic pl-4 border-l-4 border-solid;
   }
 
+  p {
+    @apply mb-4;
+
+    &:empty,
+    &:has(.ProseMirror-trailingBreak) {
+      @apply hidden;
+    }
+  }
+
   ul {
     @apply list-disc pl-4 mb-4;
 

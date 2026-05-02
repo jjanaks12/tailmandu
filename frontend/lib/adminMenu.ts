@@ -82,6 +82,12 @@ export const useMenu = () => {
                 slug: 'store_setting',
                 permissions: 'manage_store_setting'
             }]
+        }, {
+            title: 'Blogs',
+            icon: 'Pencil',
+            slug: 'blogs',
+            path: '/dashboard/blogs',
+            permissions: 'manage_user'
         }]
     }, {
         title: 'Miscellanous',
