@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SearchIcon, SlidersHorizontalIcon, ChevronRightIcon } from 'lucide-vue-next'
+import { SlidersHorizontalIcon, ChevronRightIcon } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import { useBlogStore } from '~/store/blog'
 
@@ -56,19 +56,13 @@ onMounted(async () => {
         <!-- Categories & Filter -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 mb-16">
             <div class="flex flex-wrap items-center justify-center gap-3">
-                <button @click="filterByCategory(null)" :class="[
-                    'px-6 py-2.5 rounded-full text-sm font-bold transition-all border',
-                    !selectedCategory ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'bg-white dark:bg-deep-slate border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary/50'
-                ]">
+                <Button @click="filterByCategory(null)" :modifier="!selectedCategory ? 'default' : 'outline'">
                     All Stories
-                </button>
-                <button v-for="category in categories" :key="category.id" @click="filterByCategory(category.slug)"
-                    :class="[
-                        'px-6 py-2.5 rounded-full text-sm font-bold transition-all border',
-                        selectedCategory === category.slug ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'bg-white dark:bg-deep-slate border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary/50'
-                    ]">
+                </Button>
+                <Button v-for="category in categories" :key="category.id" @click="filterByCategory(category.slug)"
+                    :modifier="selectedCategory === category.slug ? 'default' : 'outline'">
                     {{ category.name }}
-                </button>
+                </Button>
             </div>
         </div>
 
@@ -76,11 +70,11 @@ onMounted(async () => {
         <section v-if="featuredPost && !selectedCategory" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
             <div
                 class="group relative bg-white dark:bg-deep-slate rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col lg:flex-row min-h-[500px]">
-                <div class="lg:w-1/2 relative overflow-hidden">
-                    <img :src="featuredPost.featured_image ? showImage(featuredPost.featured_image.file_name) : 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80'"
+                <figure v-if="featuredPost.featured_image" class="lg:w-1/2 relative overflow-hidden">
+                    <img :src="showImage(featuredPost.featured_image.file_name)" loading="eager"
                         class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                     <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
-                </div>
+                </figure>
                 <div class="lg:w-1/2 p-12 lg:p-20 flex flex-col justify-center">
                     <Badge
                         class="w-fit mb-6 bg-amber-400 text-amber-950 font-black px-4 py-1.5 uppercase tracking-tighter">

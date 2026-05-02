@@ -32,12 +32,6 @@ onMounted(init)
 
 <template>
     <div class="mb-8">
-        <div class="flex items-center gap-4 mb-2">
-            <Button modifier="outline" size="sm" @click="router.push('/dashboard/blogs')">
-                <ArrowLeftIcon class="w-4 h-4 mr-2" />
-                Back to Blogs
-            </Button>
-        </div>
         <h1 class="text-2xl font-bold">Edit Blog Post</h1>
     </div>
 
@@ -45,5 +39,17 @@ onMounted(init)
         <Loader2Icon class="w-8 h-8 animate-spin text-primary" />
     </div>
 
-    <PagesDashboardBlogsForm v-else-if="post" :post="post" @fetch="init" />
+    <PagesDashboardBlogsForm v-else-if="post" :post="post" @fetch="init">
+        <template #sidebar-start>
+            <div class="flex items-center justify-end gap-2">
+                <Button modifier="link" size="sm" @click="router.push('/dashboard/blogs')">
+                    <ArrowLeftIcon class="w-4 h-4 mr-2" />
+                    Back
+                </Button>
+                <Button as-child>
+                    <NuxtLink :to="$localePath(`/blogs/${post.slug}`)" target="_blank">Preview</NuxtLink>
+                </Button>
+            </div>
+        </template>
+    </PagesDashboardBlogsForm>
 </template>

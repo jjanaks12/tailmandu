@@ -104,7 +104,8 @@ onMounted(init)
 
                         <Field name="content" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
                             <Label>Content</Label>
-                            <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange" />
+                            <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange"
+                                :toolbar-height="80" />
                             <ErrorMessage class="error__message" name="content" />
                         </Field>
 
@@ -117,7 +118,8 @@ onMounted(init)
                     </div>
 
                     <!-- Sidebar -->
-                    <div class="md:col-span-4 space-y-6 text-left">
+                    <aside class="md:col-span-4 space-y-6 text-left">
+                        <slot name="sidebar-start" />
                         <div class="bg-muted/30 p-4 rounded-lg space-y-6 border border-border">
                             <Field name="category_id" v-slot="{ value, handleChange }" as="div"
                                 class="flex flex-col gap-2">
@@ -161,7 +163,7 @@ onMounted(init)
                                 </TagsInput>
                             </div>
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </TabsContent>
 

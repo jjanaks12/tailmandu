@@ -32,6 +32,7 @@ export const buttonVariants = cva(
         iconxl: 'size-14 rounded-full',
       },
       modifier: {
+        default: [''],
         outline: ['bg-transparent text-[var(--i-c-btn-color)] border border-[var(--i-c-btn-color)] hover:bg-[var(--i-c-btn-color)]', 'hover:text-black'],
         link: "bg-transparent text-[var(--i-c-btn-color)] underline h-auto underline-offset-4 hover:bg-transparent hover:underline p-0  shadow-none border-none"
       }
@@ -39,6 +40,7 @@ export const buttonVariants = cva(
     defaultVariants: {
       variant: 'default',
       size: 'default',
+      modifier: 'default',
     },
   },
 )

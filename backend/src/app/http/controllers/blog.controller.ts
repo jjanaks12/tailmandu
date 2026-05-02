@@ -5,6 +5,7 @@ import { APIQuery } from '@/app/lib/types'
 import { blogPostSchema } from '@/app/lib/schema/blog.schema'
 import createHttpError from 'http-errors'
 import moment from 'moment'
+import jwt from 'jsonwebtoken'
 
 export class BlogController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
@@ -307,11 +308,24 @@ export class BlogController {
     public static async publicShow(request: Request, response: Response, next: NextFunction) {
         try {
             const { slug } = request.params
+            const authHeader = request.headers['authorization']
+            let isLoggedIn = false
+
+            if (authHeader) {
+                const token = authHeader.split(' ')[1]
+                try {
+                    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!)
+                    isLoggedIn = true
+                } catch (e) {
+                    // Ignore invalid token for public show
+                }
+            }
+
             const post = await prisma.blogPost.findFirst({
                 where: {
                     slug,
                     deleted_at: null,
-                    published_at: { not: null }
+                    ...(isLoggedIn ? {} : { published_at: { not: null } })
                 },
                 include: {
                     category: true,

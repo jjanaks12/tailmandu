@@ -71,7 +71,7 @@ onMounted(init)
                     <NuxtLink to="/blogs"
                         class="inline-flex items-center gap-2 text-slate-400 hover:text-primary mb-8 transition-colors group">
                         <ArrowLeftIcon class="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                        Back to Dispatch
+                        Back to blogs
                     </NuxtLink>
 
                     <div v-if="post.category" class="mb-6">
@@ -100,12 +100,12 @@ onMounted(init)
             </header>
 
             <!-- Featured Image -->
-            <div class="max-w-6xl mx-auto px-4 mb-16">
-                <div
+            <div class="max-w-6xl mx-auto px-4 mb-16" v-if="post.featured_image">
+                <figure
                     class="aspect-video lg:aspect-[21/9] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10">
-                    <img :src="post.featured_image ? showImage(post.featured_image.file_name) : 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80'"
-                        :alt="post.title" class="w-full h-full object-cover" />
-                </div>
+                    <img :src="showImage(post.featured_image.file_name)" :alt="post.title"
+                        class="w-full h-full object-cover" />
+                </figure>
             </div>
 
             <!-- Content Area -->
@@ -183,7 +183,7 @@ onMounted(init)
             <h2 class="text-3xl font-black mb-4">Post Not Found</h2>
             <p class="text-slate-500 mb-8">The story you're looking for has moved to higher altitudes.</p>
             <Button as-child>
-                <NuxtLink to="/blogs">Back to Dispatch</NuxtLink>
+                <NuxtLink to="/blogs">Back to Blogs</NuxtLink>
             </Button>
         </div>
     </div>
