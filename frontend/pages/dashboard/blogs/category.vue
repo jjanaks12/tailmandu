@@ -12,7 +12,7 @@ useHead({
 definePageMeta({
     layout: 'admin',
     middleware: 'auth',
-    authorization: ['manage_user']
+    authorization: ['manage_blog_category']
 })
 
 const { fetchCategories, createCategory, updateCategory, deleteCategory } = useBlogStore()

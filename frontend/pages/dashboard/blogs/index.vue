@@ -11,7 +11,7 @@ useHead({
 definePageMeta({
     layout: 'admin',
     middleware: 'auth',
-    authorization: ['manage_user'] // Assuming this permission for now
+    authorization: ['manage_blog']
 })
 
 const router = useRouter()

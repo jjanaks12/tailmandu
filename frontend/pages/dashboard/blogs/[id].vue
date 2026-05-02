@@ -11,7 +11,10 @@ const isLoading = ref(true)
 definePageMeta({
     layout: 'admin',
     middleware: 'auth',
-    authorization: ['manage_user']
+    authorization: ['manage_blog'],
+    validate: (route) => {
+        return !['category', 'categories'].includes(route.params.id as string)
+    }
 })
 
 const init = async () => {

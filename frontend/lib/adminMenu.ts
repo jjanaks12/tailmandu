@@ -86,8 +86,21 @@ export const useMenu = () => {
             title: 'Blogs',
             icon: 'Pencil',
             slug: 'blogs',
-            path: '/dashboard/blogs',
-            permissions: 'manage_user'
+            path: '',
+            permissions: 'manage_blog',
+            subMenu: [{
+                title: 'Lists',
+                icon: 'Box',
+                path: '/dashboard/blogs',
+                slug: 'blogs',
+                permissions: 'manage_blog'
+            }, {
+                title: 'Categories',
+                icon: 'ListTree',
+                path: '/dashboard/blogs/category',
+                slug: 'blog_categories',
+                permissions: 'manage_blog_category'
+            }]
         }]
     }, {
         title: 'Miscellanous',

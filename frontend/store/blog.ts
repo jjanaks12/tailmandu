@@ -13,8 +13,8 @@ export const useBlogStore = defineStore('blog', () => {
         isLoading.value = true
         showDraft.value = draft ?? showDraft.value
 
-        const { data: { data, ...p } } = await axios.get('/blogs', { 
-            params: { ...params.value, show_draft: showDraft.value, category } 
+        const { data: { data, ...p } } = await axios.get('/blogs', {
+            params: { ...params.value, show_draft: showDraft.value, category }
         })
         posts.value = data
         params.value = p
@@ -23,8 +23,8 @@ export const useBlogStore = defineStore('blog', () => {
 
     const fetchPublicPosts = async (category?: string) => {
         isLoading.value = true
-        const { data: { data, ...p } } = await axios.get('/blogs/public', { 
-            params: { ...params.value, category } 
+        const { data: { data, ...p } } = await axios.get('/blogs/public', {
+            params: { ...params.value, category }
         })
         posts.value = data
         params.value = p
