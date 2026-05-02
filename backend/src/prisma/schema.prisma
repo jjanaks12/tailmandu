@@ -206,6 +206,8 @@ model Image {
   galleryId               String?
   treks                   Trek[]
   product_thumbnails      Product[]              @relation("product_thumbnail")
+  blog_posts              BlogPost[]             @relation("blog_featured_image")
+  seo_og_images           SeoMetadata[]          @relation("seo_og_image")
 
   @@map("images")
 }
@@ -490,6 +492,7 @@ model User {
   companyId       String?
   product_reviews ProductReview[]
   orders          Order[]
+  blog_posts      BlogPost[]
 
   @@map("users")
 }
@@ -576,6 +579,7 @@ model Tag {
   galleries  Gallery[]
   treks      Trek[]
   products   Product[]
+  blog_posts BlogPost[]
 
   @@map("tags")
 }
@@ -922,4 +926,66 @@ model OrderItem {
   variant    ProductVariant? @relation(fields: [variant_id], references: [id])
 
   @@map("order_items")
+}
+
+model SeoMetadata {
+  id               String    @id @default(cuid())
+  meta_title       String?   @db.VarChar(255)
+  meta_description String?   @db.Text
+  meta_keywords    String?   @db.Text
+  canonical_url    String?   @db.VarChar(255)
+  og_title         String?   @db.VarChar(255)
+  og_description   String?   @db.Text
+  og_image_id      String?
+  og_image         Image?    @relation("seo_og_image", fields: [og_image_id], references: [id])
+
+  blog_post        BlogPost?
+  // Future-proofing for other tables
+  // product       Product?
+  // trek          Trek?
+
+  @@map("seo_metadata")
+}
+
+model BlogCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  posts       BlogPost[]
+
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  content           String    @db.LongText
+  excerpt           String?   @db.Text
+  published_at      DateTime?
+  is_featured       Boolean   @default(false)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime?
+  deleted_at        DateTime?
+
+  // SEO Relation
+  seo_id            String?   @unique
+  seo               SeoMetadata? @relation(fields: [seo_id], references: [id])
+
+  // Other Relations
+  author_id         String
+  author            User      @relation(fields: [author_id], references: [id])
+  category_id       String?
+  category          BlogCategory? @relation(fields: [category_id], references: [id])
+  featured_image_id String?
+  featured_image    Image?    @relation("blog_featured_image", fields: [featured_image_id], references: [id])
+
+  tags              Tag[]
+
+  @@map("blog_posts")
 }
