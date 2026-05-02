@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express"
+import { Prisma } from "@prisma/client"
 
 import { APIQuery } from "@/app/lib/types"
 import { eventSchema } from "@/app/lib/schema/event.schema"
@@ -34,7 +35,51 @@ export class EventController {
                 orderBy: [{ created_at: 'desc' }],
             })
 
-            const total = await prisma.trailRace.count()
+            const total = await prisma.trailRace.count({ where: { deleted_at: null } })
+
+            response.send({
+                per_page: Number(per_page),
+                current: Number(current),
+                sort,
+                total,
+                total_page: Math.ceil(total / per_page),
+                data: events
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async publicIndex(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
+        try {
+            const { per_page = 10, current = 1, s = '', sort } = request.query
+            const skip = (current - 1) * per_page
+
+            const where: Prisma.TrailRaceWhereInput = {
+                deleted_at: null
+            }
+
+            if (s) {
+                where.OR = [
+                    { name: { contains: s } },
+                    { excerpt: { contains: s } }
+                ]
+            }
+
+            const events = await prisma.trailRace.findMany({
+                skip,
+                take: parseInt(per_page.toString()),
+                include: {
+                    thumbnail: true,
+                    _count: {
+                        select: { stages: true, runners: true }
+                    }
+                },
+                where,
+                orderBy: [{ start: 'desc' }],
+            })
+
+            const total = await prisma.trailRace.count({ where })
 
             response.send({
                 per_page: Number(per_page),

@@ -22,6 +22,20 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
+    const fetchPublic = async () => {
+        isLoading.value = true
+        const { data } = await axios.get<APIRequest<TrailRace[]>>('/events/public', {
+            params: params.value
+        })
+
+        if (data) {
+            const { data: d, ...p } = data
+            events.value = d
+            params.value = p
+        }
+        isLoading.value = false
+    }
+
     const save = async (formData: any) => {
         const method = formData.id ? 'put' : 'post'
         const url = formData.id ? `/events/${formData.id}` : 'events'
@@ -70,6 +84,6 @@ export const useEventStore = defineStore('event', () => {
     return {
         isLoading, params, events,
         currentRace,
-        fetch, save, get, saveDescription, saveMap, getBySlug, saveRunner, saveVoluteer
+        fetch, fetchPublic, save, get, saveDescription, saveMap, getBySlug, saveRunner, saveVoluteer
     }
 })

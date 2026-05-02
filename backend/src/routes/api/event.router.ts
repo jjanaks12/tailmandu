@@ -15,6 +15,7 @@ import { ResultController } from '@/app/http/controllers/result.controller'
 const router = Router()
 
 router.get('/', [verifyAccessToken], EventController.index)
+router.get('/public', [], EventController.publicIndex)
 router.get('/current', [], EventController.currentRace)
 router.get('/list', [], EventController.eventList)
 router.post('/', [verifyAccessToken], EventController.create)

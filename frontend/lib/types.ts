@@ -136,6 +136,10 @@ export type TrailRace = {
     stages: Stage[]
     runners: EventRunner[]
     tags: Tag[]
+    _count?: {
+        stages: number
+        runners: number
+    }
 }
 
 export type Checkpoint = {
