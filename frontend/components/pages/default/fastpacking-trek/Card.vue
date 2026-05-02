@@ -32,6 +32,9 @@ const startingPrice = computed(() => {
 const duration = computed(() => {
     return props.item.details?.itinerary?.length || 0
 })
+
+const route = useRoute()
+const type = computed(() => route.params.type || 'fastpacking')
 </script>
 
 <template>
@@ -77,7 +80,7 @@ const duration = computed(() => {
             </p>
             <div class="flex gap-2 mt-auto">
                 <Button as-child modifier="outline">
-                    <NuxtLink :to="`/fastpacking/${item.slug}`">
+                    <NuxtLink :to="`/${type}/${item.slug}`">
                         Details
                     </NuxtLink>
                 </Button>

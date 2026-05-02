@@ -13,13 +13,13 @@ const adventureList = computed(() => {
         id: trek.id,
         name: trek.name,
         price: trek.price ? `$${trek.price}` : '---',
-        image: trek.thumbnail ? showImage(trek.thumbnail.file_name) : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBDGQ1o7fn6qVhEaeZFJS8cc8Mgbm36hpWCT66_l6mUYsZwyGQ4mSiBkkRhXGJgYE3K5icooXK5JVwt93yiQbZyn0xtj4SATTYoU59P5JdpFDUmobsJu5XUlzuzAgM3xKUW9PLzM0AGlrfQ_AfT5BtnRb6P4lHl1LYq0TEhSunOAbXQHR-tqoVPFek2DYeq1fYvzYRnafbMYLMdSQJwMLUuVEfanhObN8icE49f1VHNztwjC0byYH9gDDoccOeC_nz-9xPUFl-_8JY',
+        image: trek.thumbnail ? showImage(trek.thumbnail.file_name) : '',
         description: trek.excerpt || (trek.description ? trek.description.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...' : 'No description available.'),
         distance: trek.details?.stats?.distance || '---',
         duration: trek.details?.itinerary?.length ? `${trek.details.itinerary.length} Days` : '---',
         elevation: trek.details?.stats?.maxElevation || '---',
-        buttonLink: `/fastpacking/${trek.slug}/booking`,
-        viewItineraryLink: `/fastpacking/${trek.slug}`,
+        buttonLink: `/${trek.category?.name.toLowerCase() || 'fastpacking'}/${trek.slug}/booking`,
+        viewItineraryLink: `/${trek.category?.name.toLowerCase() || 'fastpacking'}/${trek.slug}`,
     }))
 })
 

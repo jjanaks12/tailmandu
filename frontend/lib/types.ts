@@ -479,7 +479,7 @@ export type Trek = {
     gallery_id?: string
     gallery?: Gallery
     category_id?: string
-    category?: TrekCategory
+    category?: any
     tags: Tag[]
 }
 

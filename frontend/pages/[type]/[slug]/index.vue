@@ -17,6 +17,14 @@ const { getTrekBySlug } = useTrekStore()
 const route = useRoute()
 const { setImageForPreview } = useAppStore()
 
+definePageMeta({
+    validate: async (route) => {
+        return ['treks', 'fastpacking'].includes(route.params.type as string)
+    }
+})
+
+const type = computed(() => route.params.type as string)
+
 const securityProtocolIconMapping: Record<string, any> = {
     'First Aid Kit': BriefcaseMedicalIcon,
     'Altitude Awareness': ActivityIcon,
@@ -30,7 +38,7 @@ const loading = ref(true)
 const init = async () => {
     loading.value = true
     try {
-        trek.value = await getTrekBySlug(route.params.id as string)
+        trek.value = await getTrekBySlug(route.params.slug as string)
     } finally {
         loading.value = false
     }
@@ -360,7 +368,7 @@ onMounted(init)
                             today. Expert guides, premium gear, and unforgettable views await.</p>
                     </div>
                     <div class="flex flex-col gap-4">
-                        <NuxtLink :to="`/fastpacking/${trek.slug}/booking`"
+                        <NuxtLink :to="`/${type}/${trek.slug}/booking`"
                             class="bg-primary text-center text-white px-10 py-5 font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
                             Secure Your Spot
                         </NuxtLink>
@@ -388,7 +396,7 @@ onMounted(init)
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <NuxtLink :to="`/fastpacking/${trek.slug}/booking`"
+                    <NuxtLink :to="`/${type}/${trek.slug}/booking`"
                         class="bg-primary text-white px-6 md:px-10 py-3 rounded-sm font-black text-[12px] md:text-[14px] uppercase tracking-widest hover:bg-black transition-all shadow-md">
                         Secure Your Spot
                     </NuxtLink>

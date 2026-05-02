@@ -13,6 +13,7 @@ import { useAxios } from '~/services/axios'
 import { parseDate } from '@internationalized/date'
 
 const route = useRoute()
+const type = computed(() => route.params.type as string)
 const { getTrekBySlug } = useTrekStore()
 const { axios } = useAxios()
 
@@ -181,7 +182,7 @@ const submitBooking = async () => {
 const init = async () => {
     loading.value = true
     try {
-        trek.value = await getTrekBySlug(route.params.id as string)
+        trek.value = await getTrekBySlug(route.params.slug as string)
     } finally {
         loading.value = false
     }
@@ -234,7 +235,7 @@ const inputClass = (errorKey: string) => [
                     <span class="font-bold text-primary text-base">{{ formatCurrency(totalPrice) }}</span>
                 </div>
             </div>
-            <NuxtLink :to="`/fastpacking/${trek?.slug}`"
+            <NuxtLink :to="`/${type}/${trek?.slug}`"
                 class="inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-black transition-all">
                 Back to Trek
             </NuxtLink>
@@ -332,7 +333,7 @@ const inputClass = (errorKey: string) => [
                                             <button @click="children = Math.max(0, children - 1)"
                                                 class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 font-bold text-lg transition-colors">−</button>
                                             <div class="flex-1 text-center font-bold text-gray-900 text-sm">{{ children
-                                            }}</div>
+                                                }}</div>
                                             <button @click="children = Math.min(10, children + 1)"
                                                 class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 font-bold text-lg transition-colors">+</button>
                                         </div>
@@ -558,7 +559,8 @@ const inputClass = (errorKey: string) => [
                                             :class="['w-5 h-5', gearOption === 'pro' ? 'text-primary' : 'text-gray-400']" />
                                         <div class="flex-1">
                                             <p class="text-sm font-bold text-gray-900">Pro Gear Kit</p>
-                                            <p class="text-xs text-gray-500">+{{ formatCurrency(90) }}/person upgrade</p>
+                                            <p class="text-xs text-gray-500">+{{ formatCurrency(90) }}/person upgrade
+                                            </p>
                                         </div>
                                         <span v-if="gearOption === 'pro'"
                                             class="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -807,7 +809,8 @@ const inputClass = (errorKey: string) => [
                                         </span>
                                         <span class="font-bold text-gray-900">{{ formatCurrency(subtotal) }}</span>
                                     </div>
-                                    <div v-for="(item, i) in dynamicInclusions" :key="i" class="flex items-center justify-between text-sm">
+                                    <div v-for="(item, i) in dynamicInclusions" :key="i"
+                                        class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
                                             <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
                                             {{ item.title }}
@@ -843,7 +846,8 @@ const inputClass = (errorKey: string) => [
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs text-gray-500 font-medium">Total (Taxes & Fees
                                             inclusive)</span>
-                                        <span class="text-xl font-bold text-primary">{{ formatCurrency(totalPrice + vatAmount) }}</span>
+                                        <span class="text-xl font-bold text-primary">{{ formatCurrency(totalPrice +
+                                            vatAmount) }}</span>
                                     </div>
                                 </div>
 
