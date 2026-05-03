@@ -653,3 +653,13 @@ export type BlogPost = {
 
     tags?: Tag[]
 }
+
+export type EnquiryCategory = {
+    id: string
+    name: string
+    slug: string
+    description?: string
+    created_at: string
+    updated_at?: string
+    deleted_at?: string
+}

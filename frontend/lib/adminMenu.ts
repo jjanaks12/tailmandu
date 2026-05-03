@@ -157,6 +157,25 @@ export const useMenu = () => {
                 slug: 'newsletter_topics',
                 permissions: ''
             }]
+        }, {
+            title: 'Enquiries',
+            path: '/dashboard/enquiry',
+            slug: 'enquiry',
+            icon: 'Mail',
+            permissions: 'manage_enquiry',
+            subMenu: [{
+                title: 'Lists',
+                icon: 'Box',
+                path: '/dashboard/enquiry',
+                slug: 'enquiries',
+                permissions: 'manage_enquiry'
+            }, {
+                title: 'Categories',
+                icon: 'ListTree',
+                path: '/dashboard/enquiry/category',
+                slug: 'enquiry_categories',
+                permissions: 'manage_enquiry_category'
+            }]
         }]
     }, {
         title: 'Settings',

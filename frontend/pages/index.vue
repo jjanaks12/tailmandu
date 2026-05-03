@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import img01 from '@/assets/images/review-img01.jpg'
-import { ChevronLeftIcon, ChevronRightIcon, GlobeIcon, MoonIcon, StarIcon, SunIcon } from 'lucide-vue-next'
+import { GlobeIcon, MoonIcon, SunIcon } from 'lucide-vue-next'
 
 definePageMeta({
     layout: 'default'
@@ -37,92 +37,8 @@ onMounted(() => {
         <section class="py-24 bg-slate-50 dark:bg-deep-slate/30" id="contact">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-16 items-start">
-                    <div>
-                        <h2 class="font-display text-4xl font-bold mb-8">Voices from the Trail</h2>
-                        <div class="relative">
-                            <div
-                                class="bg-white dark:bg-deep-slate p-10 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800">
-                                <div class="flex items-center space-x-1 mb-6">
-                                    <StarIcon class="text-primary text-2xl fill-1" />
-                                    <StarIcon class="text-primary text-2xl fill-1" />
-                                    <StarIcon class="text-primary text-2xl fill-1" />
-                                    <StarIcon class="text-primary text-2xl fill-1" />
-                                    <StarIcon class="text-primary text-2xl fill-1" />
-                                </div>
-                                <p class="text-xl italic text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
-                                    "Trail Mandu isn't just a race organizer; they are guardians of a true Himalayan
-                                    experience. The Mustang trail was the hardest and most beautiful thing I've ever
-                                    done. The support was world-class."
-                                </p>
-                                <div class="flex items-center space-x-4">
-                                    <img alt="Runner profile"
-                                        class="w-16 h-16 rounded-full object-cover ring-4 ring-primary/10"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4CFZyaizmlgUrzCe-QtRExAoNvZ-2bkDFoLe-zXjoh4CZ7fOJo-YfaiCPd8Q59jx1rMUGi7gyBnwXvQU3_NZcXcV-t71SXF5hsSQXbySZq9OrYaN3u1rOoklkp0Ks4Mph5vk0glUXNsulT9WkJFJkNXTgISLvz8W83ydFGuc_1zd-Y4-9XnN2OvfhYVaHFJCXsPk8PGuVXtQD8xG0jbNm5hYyCFzBv9G-7oFS75ePtpjFaxw6NbWfp87YbsIsYV2f_LtH5qLk-JI" />
-                                    <div>
-                                        <h4 class="font-bold text-lg">Marcus Sterling</h4>
-                                        <p class="text-sm opacity-60">Ultra-runner, United Kingdom</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex space-x-3 mt-8">
-                                <button
-                                    class="w-12 h-12 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all">
-                                    <ChevronLeftIcon />
-                                </button>
-                                <button
-                                    class="w-12 h-12 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all">
-                                    <ChevronRightIcon />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="bg-white dark:bg-deep-slate p-10 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800">
-                        <h3 class="text-2xl font-display font-bold mb-2">Custom Trips &amp; Inquiries</h3>
-                        <p class="text-slate-500 dark:text-slate-400 mb-8">Have questions about a race or want a custom
-                            adventure for your group? Reach out to our team.</p>
-                        <form class="space-y-6">
-                            <div class="grid grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Full
-                                        Name</label>
-                                    <input
-                                        class="w-full bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-primary focus:border-primary transition-all"
-                                        placeholder="John Doe" type="text" />
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Email
-                                        Address</label>
-                                    <input
-                                        class="w-full bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-primary focus:border-primary transition-all"
-                                        placeholder="john@example.com" type="email" />
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label
-                                    class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Subject</label>
-                                <select
-                                    class="w-full bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-primary focus:border-primary transition-all">
-                                    <option>Custom Trip Inquiry</option>
-                                    <option>Race Registration Question</option>
-                                    <option>Volunteer Opportunities</option>
-                                    <option>Sponsorship</option>
-                                </select>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Your
-                                    Message</label>
-                                <textarea
-                                    class="w-full bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-primary focus:border-primary transition-all"
-                                    placeholder="Tell us about your goals..." rows="4"></textarea>
-                            </div>
-                            <button
-                                class="w-full bg-primary hover:bg-[#d8561a] text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20"
-                                type="submit">
-                                Send Inquiry
-                            </button>
-                        </form>
-                    </div>
+                    <PagesDefaultHomeReviews />
+                    <PagesDefaultHomeEnquiry />
                 </div>
             </div>
         </section>

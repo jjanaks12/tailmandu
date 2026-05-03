@@ -507,6 +507,7 @@ model User {
   product_reviews ProductReview[]
   orders          Order[]
   blog_posts      BlogPost[]
+  enquiries       Enquiry[]
 
   @@map("users")
 }
@@ -1002,4 +1003,52 @@ model BlogPost {
   tags              Tag[]
 
   @@map("blog_posts")
+}
+
+// ==========================================
+// ENQUIRIES & FEEDBACK
+// ==========================================
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  IGNORED
+}
+
+model EnquiryCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  enquiries   Enquiry[]
+
+  @@map("enquiry_categories")
+}
+
+model Enquiry {
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  subject      String?
+  message      String        @db.LongText
+  
+  status       EnquiryStatus @default(NEW)
+  
+  rating       Float?
+  is_published Boolean       @default(false)
+
+  category_id  String
+  category     EnquiryCategory @relation(fields: [category_id], references: [id])
+  
+  user_id      String?
+  user         User?         @relation(fields: [user_id], references: [id])
+
+  created_at   DateTime      @default(now())
+  updated_at   DateTime?
+
+  @@map("enquiries")
 }
