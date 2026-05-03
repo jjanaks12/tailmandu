@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
-import { ErrorMessage, Field, Form } from 'vee-validate'
 import { toast } from 'vue-sonner'
-import * as yup from 'yup'
 import { formatDate } from '~/lib/filters'
 import type { NewsletterTopic } from '~/lib/types'
 import { useNewsletterTopicStore } from '~/store/newsletterTopic'
@@ -18,16 +16,10 @@ definePageMeta({
 })
 
 const { topics, isLoading } = storeToRefs(useNewsletterTopicStore())
-const { fetch, store, update, destroy } = useNewsletterTopicStore()
+const { fetch, destroy } = useNewsletterTopicStore()
 
 const isModalOpen = ref(false)
-const isSubmitting = ref(false)
 const editingTopic = ref<NewsletterTopic | null>(null)
-
-const schema = yup.object().shape({
-    name: yup.string().required('Name is required'),
-    description: yup.string().nullable()
-})
 
 onMounted(fetch)
 
@@ -39,26 +31,6 @@ const openCreateModal = () => {
 const openEditModal = (topic: NewsletterTopic) => {
     editingTopic.value = { ...topic }
     isModalOpen.value = true
-}
-
-const formHandler = async (values: any) => {
-    isSubmitting.value = true
-    try {
-        if (editingTopic.value?.id) {
-            await update(editingTopic.value.id, values)
-            toast.success('Topic Updated', { description: 'The newsletter topic was updated successfully.' })
-        } else {
-            await store(values)
-            toast.success('Topic Created', { description: 'The new newsletter topic was created successfully.' })
-        }
-        isModalOpen.value = false
-    } catch (e: any) {
-        toast.error('Action Failed', {
-            description: e.response?.data?.message || 'Something went wrong.'
-        })
-    } finally {
-        isSubmitting.value = false
-    }
 }
 
 const isDeleting = ref<string | null>(null)
@@ -151,29 +123,7 @@ const deleteTopic = async (id: string) => {
                 </DialogDescription>
             </DialogHeader>
 
-            <Form @submit="formHandler" :validation-schema="schema" :initial-values="editingTopic || {}"
-                class="space-y-4">
-                <Field name="name" v-slot="{ field }" as="div" class="space-y-1">
-                    <Label for="name">Topic Name <span class="text-red-500">*</span></Label>
-                    <Input id="name" v-bind="field" placeholder="e.g. Treks" />
-                    <ErrorMessage name="name" class="text-sm text-red-500" />
-                </Field>
-
-                <Field name="description" v-slot="{ field }" as="div" class="space-y-1">
-                    <Label for="description">Description (Optional)</Label>
-                    <Textarea id="description" v-bind="field" placeholder="What kind of content will this topic send?"
-                        rows="3" />
-                    <ErrorMessage name="description" class="text-sm text-red-500" />
-                </Field>
-
-                <DialogFooter class="pt-4">
-                    <Button type="button" modifier="outline" @click="isModalOpen = false">Cancel</Button>
-                    <Button type="submit" :disabled="isSubmitting">
-                        <Loader2Icon v-if="isSubmitting" class="w-4 h-4 mr-2 animate-spin" />
-                        {{ editingTopic ? 'Save Changes' : 'Create Topic' }}
-                    </Button>
-                </DialogFooter>
-            </Form>
+            <PagesDashboardNewsletterTopicFormModal :topic="editingTopic" />
         </DialogContent>
     </Dialog>
 </template>
