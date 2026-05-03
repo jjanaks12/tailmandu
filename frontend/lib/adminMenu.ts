@@ -143,7 +143,20 @@ export const useMenu = () => {
             path: '/dashboard/newsletter',
             slug: 'newsletter',
             icon: 'NewspaperIcon',
-            permissions: ''
+            permissions: '',
+            subMenu: [{
+                title: 'Lists',
+                icon: 'Box',
+                path: '/dashboard/newsletter',
+                slug: 'newsletters',
+                permissions: ''
+            }, {
+                title: 'Topics',
+                icon: 'ListTree',
+                path: '/dashboard/newsletter/topics',
+                slug: 'newsletter_topics',
+                permissions: ''
+            }]
         }]
     }, {
         title: 'Settings',

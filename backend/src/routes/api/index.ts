@@ -17,6 +17,7 @@ import productRouter from '@/routes/api/product.router'
 import orderRouter from '@/routes/api/order.router'
 import couponRouter from '@/routes/api/coupon.router'
 import blogRouter from '@/routes/api/blog.router'
+import newsletterRouter from '@/routes/api/newsletter.router'
 
 const router = Router()
 
@@ -37,5 +38,6 @@ router.use('/products', productRouter)
 router.use('/orders', orderRouter)
 router.use('/coupons', couponRouter)
 router.use('/blogs', blogRouter)
+router.use('/newsletters', newsletterRouter)
 
 export default router

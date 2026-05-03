@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import Newsletter from '@/components/pages/default/newsletter.vue'
 import img01 from '@/assets/images/review-img01.jpg'
-import { ChevronLeftIcon, ChevronRightIcon, GlobeIcon, MailIcon, MoonIcon, StarIcon, SunIcon } from 'lucide-vue-next'
+import { ChevronLeftIcon, ChevronRightIcon, GlobeIcon, MoonIcon, StarIcon, SunIcon } from 'lucide-vue-next'
 
 definePageMeta({
     layout: 'default'
@@ -162,28 +161,7 @@ onMounted(() => {
                 </div>
             </div>
         </section>
-        <section class="py-24">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-deep-slate rounded-3xl p-12 md:p-20 relative overflow-hidden text-center text-white">
-                    <div class="absolute top-0 right-0 p-12 opacity-10">
-                        <MailIcon class="size-[200px]" />
-                    </div>
-                    <div class="relative z-10">
-                        <h2 class="text-4xl font-display font-bold mb-6">Stay Updated</h2>
-                        <p class="text-slate-400 max-w-2xl mx-auto mb-10 text-lg">Get race alerts, training tips, and
-                            early-bird registration links directly in your inbox.</p>
-                        <form class="max-w-md mx-auto flex flex-col sm:flex-row gap-4">
-                            <input
-                                class="flex-grow rounded-xl bg-white/10 border-white/20 text-white placeholder-slate-400 focus:ring-primary focus:border-primary px-6 py-4"
-                                placeholder="Your email address" type="email" />
-                            <button
-                                class="bg-primary hover:bg-[#d8561a] text-white font-bold px-8 py-4 rounded-xl transition-all whitespace-nowrap"
-                                type="submit">Subscribe</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <PagesDefaultHomeNewsletter />
         <section class="py-16 border-y border-slate-200 dark:border-slate-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <p class="text-center text-sm font-bold uppercase tracking-widest text-slate-400 mb-10">Supported By

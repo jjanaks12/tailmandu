@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useTrekStore } from '~/store/trek'
-import { MountainIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, CompassIcon, TentIcon, FootprintsIcon } from 'lucide-vue-next'
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon, CompassIcon, TentIcon, FootprintsIcon } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 
 interface Props {
@@ -158,35 +158,7 @@ watch(() => props.category, () => {
         </section>
 
         <!-- Newsletter / Footer CTA -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-            <div
-                class="bg-primary p-12 md:p-20 rounded-[3rem] relative overflow-hidden group shadow-2xl shadow-primary/20">
-                <div
-                    class="absolute -right-20 -bottom-20 opacity-10 group-hover:scale-110 transition-transform duration-1000">
-                    <MountainIcon class="w-96 h-96 text-white" />
-                </div>
-
-                <div class="relative z-10 max-w-3xl">
-                    <h2 class="text-4xl md:text-6xl font-display font-black text-white leading-none mb-6">
-                        Ready for the <span class="text-slate-900">Adventure</span> of a Lifetime?
-                    </h2>
-                    <p class="text-primary-foreground/80 text-lg font-medium mb-10 leading-relaxed">
-                        Join our community of Himalayan explorers. Get exclusive trail reports, expert packing lists,
-                        and early
-                        access to seasonal departures.
-                    </p>
-
-                    <form @submit.prevent class="flex flex-col sm:flex-row gap-4 max-w-xl">
-                        <input type="email" placeholder="your@email.com"
-                            class="flex-1 bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 backdrop-blur-md" />
-                        <Button
-                            class="bg-white text-primary hover:bg-slate-900 hover:text-white rounded-2xl px-10 py-4 font-black uppercase tracking-widest text-xs h-auto shadow-xl">
-                            Subscribe
-                        </Button>
-                    </form>
-                </div>
-            </div>
-        </section>
+        <PagesDefaultFastpackingTrekNewsletter :topic="category" />
     </div>
 </template>
 

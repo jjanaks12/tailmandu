@@ -1,23 +1,31 @@
 <script lang="ts" setup>
-    import { formatDate } from '~/lib/filters'
-    import { useNewsletterStore } from '~/store/newsletter'
+import { formatDate } from '~/lib/filters'
+import { useNewsletterStore } from '~/store/newsletter'
+import { PencilIcon, RefreshCwIcon } from 'lucide-vue-next'
+import type { Newsletter } from '~/lib/types'
 
-    useHead({
-        title: 'Newsletters'
-    })
+useHead({
+    title: 'Newsletters'
+})
 
-    definePageMeta({
-        layout: 'admin',
-        middleware: 'auth',
-        authorization: '*'
-    })
+definePageMeta({
+    layout: 'admin',
+    middleware: 'auth',
+    authorization: '*'
+})
 
-    const { newsletters, params } = storeToRefs(useNewsletterStore())
-    const { fetch } = useNewsletterStore()
+const { newsletters, params } = storeToRefs(useNewsletterStore())
+const { fetch } = useNewsletterStore()
 
-    onMounted(() => {
-        fetch()
-    })
+const isModalOpen = ref(false)
+const editingSubscriber = ref<Newsletter | null>(null)
+
+onMounted(fetch)
+
+const openEditModal = (subscriber: Newsletter) => {
+    editingSubscriber.value = subscriber
+    isModalOpen.value = true
+}
 </script>
 
 <template>
@@ -25,6 +33,10 @@
         <div class="flex-grow">
             <h1 class="text-primary text-2xl mb-4">Newsletters</h1>
         </div>
+        <Button variant="secondary" @click="fetch" size="sm">
+            <RefreshCwIcon class="size-4 animate-spin" />
+            Refresh
+        </Button>
     </div>
     <Table>
         <TableHeader>
@@ -33,6 +45,8 @@
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Subscribed at</TableHead>
+                <TableHead>Topics</TableHead>
+                <TableHead class="text-right">Actions</TableHead>
             </TableRow>
         </TableHeader>
         <TableBody>
@@ -44,6 +58,17 @@
                 </TableCell>
                 <TableCell>{{ newsletter.email }}</TableCell>
                 <TableCell>{{ formatDate(newsletter.subscribed_at) }}</TableCell>
+                <TableCell>
+                    <div class="flex flex-wrap gap-2">
+                        <Badge v-for="topic in newsletter.topics" :key="topic.id">{{ topic.name }}</Badge>
+                    </div>
+                </TableCell>
+                <TableCell class="text-right">
+                    <Button modifier="outline" size="sm" @click="openEditModal(newsletter)">
+                        <PencilIcon class="w-4 h-4 mr-2" />
+                        Edit Topics
+                    </Button>
+                </TableCell>
             </TableRow>
         </TableBody>
     </Table>
@@ -68,4 +93,16 @@
             </Pagination>
         </div>
     </div>
+    <Dialog :open="isModalOpen" @update:open="isModalOpen = $event">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Manage Subscriptions</DialogTitle>
+                <DialogDescription>
+                    Update the topic subscriptions for <strong>{{ editingSubscriber?.email }}.</strong>
+                </DialogDescription>
+            </DialogHeader>
+            <PagesDashboardNewsletterEditTopicsModal :subscriber="editingSubscriber" v-model:open="isModalOpen"
+                @saved="fetch" />
+        </DialogContent>
+    </Dialog>
 </template>

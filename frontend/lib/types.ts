@@ -367,6 +367,17 @@ export type Newsletter = {
     deleted_at?: string
     user_id?: string
     user?: Personal
+    topics: NewsletterTopic[]
+}
+
+export type NewsletterTopic = {
+    id: string
+    name: string
+    description?: string
+    created_at: string
+    updated_at: string
+    deleted_at?: string
+    newsletters: Newsletter[]
 }
 
 export type Sponsor = {

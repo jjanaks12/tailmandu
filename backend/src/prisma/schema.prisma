@@ -221,7 +221,21 @@ model Newsletter {
   user_id String?
   user    Personal? @relation(fields: [user_id], references: [id])
 
+  topics NewsletterTopic[]
+
   @@map("newsletters")
+}
+
+model NewsletterTopic {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+
+  subscribers Newsletter[]
+
+  @@map("newsletter_topics")
 }
 
 model Permission {

@@ -9,7 +9,7 @@ export const useNewsletterStore = defineStore('newsletters', () => {
     const { axios } = useAxios()
 
     const fetch = async () => {
-        const { data: { data, ...p } } = await axios.get<APIRequest<Newsletter[]>>('/newsletter', {
+        const { data: { data, ...p } } = await axios.get<APIRequest<Newsletter[]>>('/newsletters', {
             params: params.value
         })
 
@@ -23,8 +23,13 @@ export const useNewsletterStore = defineStore('newsletters', () => {
             fetch()
     })
 
+    const update = async (id: string, payload: any) => {
+        await axios.put(`/newsletters/${id}`, payload)
+        await fetch()
+    }
+
     return {
         newsletters, isLoading, params,
-        fetch
+        fetch, update
     }
 })

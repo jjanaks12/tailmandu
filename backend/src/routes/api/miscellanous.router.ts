@@ -33,10 +33,6 @@ router.get('/image_health_check', [verifyAccessToken, hasAdminAccess], MediaCont
 router.get('/age_categories', [], AgeCategoryController.index)
 router.get('/shirtSizes', [], ShirtSizeController.index)
 
-router.get('/newsletter', [], NewsletterController.index)
-router.post('/newsletter', [], NewsletterController.store)
-router.patch('/newsletter/:email/unsubscribe', [], NewsletterController.unsubscribe)
-
 // SPONSOR_TYPES
 router.get('/sponsor_types', [], SponsorTypeController.index)
 router.post('/sponsor_types', [], SponsorTypeController.create)
