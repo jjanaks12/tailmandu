@@ -35,7 +35,11 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
                 <div>
                     <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
                     <ul class="space-y-4 text-sm">
-                        <li><a class="hover:text-primary transition-colors" href="#">Our Story</a></li>
+                        <li>
+                            <NuxtLink :to="localePath('/about_us')" class="hover:text-primary transition-colors">
+                                Our Story
+                            </NuxtLink>
+                        </li>
                         <li><a class="hover:text-primary transition-colors" href="#">Safety Protocols</a></li>
                         <li><a class="hover:text-primary transition-colors" href="#">Elite Program</a></li>
                         <li><a class="hover:text-primary transition-colors" href="#">Past Results</a></li>
@@ -50,11 +54,13 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
                     <ul class="space-y-4 text-sm">
                         <li class="flex items-start">
                             <MapPinIcon class="text-primary text-sm mr-2" />
-                            {{ company?.address?.address }},
-                            {{ company?.address?.street }},
-                            {{ company?.address?.city }},
-                            {{ company?.address?.state }},
-                            {{ company?.address?.country.name }}
+                            <address class="not-italic">
+                                {{ company?.address?.address }},
+                                {{ company?.address?.street }},
+                                {{ company?.address?.city }},
+                                {{ company?.address?.state }},
+                                {{ company?.address?.country.name }}
+                            </address>
                         </li>
                         <li class="flex items-center">
                             <PhoneIcon class="text-primary text-sm mr-2" />
