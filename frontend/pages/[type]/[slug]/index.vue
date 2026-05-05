@@ -123,7 +123,7 @@ onMounted(init)
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                        }}</p>
+                                    }}</p>
                                 </div>
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Distance</p>
@@ -204,7 +204,8 @@ onMounted(init)
                                     Trip packages
                                 </h2>
                                 <p class="text-text-muted font-bold text-[14px] uppercase tracking-widest mt-1">Starting
-                                    from <span class="text-primary">{{ formatCurrency(startingPrice) }}</span> per person</p>
+                                    from <span class="text-primary">{{ formatCurrency(startingPrice) }}</span> per
+                                    person</p>
                             </div>
                         </div>
 
@@ -286,7 +287,7 @@ onMounted(init)
                                 <div class="space-y-6">
                                     <div v-for="(item, itemIndex) in section.items" :key="itemIndex">
                                         <h4 class="text-[14px] font-bold uppercase text-[#1A1A1A] mb-1"
-                                            v-if="trek.details?.importantDetails?.length > 2">
+                                            v-if="trek.details?.importantDetails?.length > 1">
                                             {{ item.title }}
                                         </h4>
                                         <p class="text-[14px] text-text-muted leading-relaxed">{{ item.description }}

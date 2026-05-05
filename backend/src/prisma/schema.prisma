@@ -644,7 +644,7 @@ model Trek {
   deleted_at   DateTime?
 
   image_id   String?
-  thumbnail  Image?   @relation(fields: [image_id], references: [id], onDelete: Cascade)
+  thumbnail  Image?   @relation(fields: [image_id], references: [id], onDelete: SetNull)
   gallery_id String?
   gallery    Gallery? @relation(fields: [gallery_id], references: [id], onDelete: Cascade)
 
