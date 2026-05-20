@@ -37,7 +37,7 @@ const isGroupActive = (subMenuItems: any[]) =>
                                     :default-open="isGroupActive(subMenu.subMenu)">
                                     <SidebarGroupLabel as-child>
                                         <CollapsibleTrigger :class="[
-                                            'group/label w-full text-left text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                                            'group/label w-full text-left hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                                             isGroupActive(subMenu.subMenu)
                                                 ? 'text-primary font-semibold'
                                                 : 'text-sidebar-foreground'

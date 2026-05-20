@@ -209,6 +209,13 @@ export const useMenu = () => {
             icon: 'HandHeart',
             role: 'Admin',
             permissions: 'manage_company'
+        }, {
+            title: 'Locales',
+            path: '/dashboard/locales',
+            slug: 'locales',
+            icon: 'Globe',
+            role: 'Admin',
+            permissions: '*'
         }]
     }])
 
