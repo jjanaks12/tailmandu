@@ -101,6 +101,13 @@ export const useMenu = () => {
                 slug: 'blog_categories',
                 permissions: 'manage_blog_category'
             }]
+        }, {
+            title: 'Pages',
+            icon: 'NotebookText',
+            slug: 'pages',
+            path: '/dashboard/pages',
+            permissions: '*',
+            role: 'Admin'
         }]
     }, {
         title: 'Miscellanous',

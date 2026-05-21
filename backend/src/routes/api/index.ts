@@ -20,6 +20,7 @@ import blogRouter from '@/routes/api/blog.router'
 import newsletterRouter from '@/routes/api/newsletter.router'
 import enquiryCategoryRouter from '@/routes/api/enquiry_category.router'
 import enquiryRouter from '@/routes/api/enquiry.router'
+import pageRouter from '@/routes/api/page.router'
 
 const router = Router()
 
@@ -43,5 +44,6 @@ router.use('/blogs', blogRouter)
 router.use('/newsletters', newsletterRouter)
 router.use('/enquiry-categories', enquiryCategoryRouter)
 router.use('/enquiries', enquiryRouter)
+router.use('/pages', pageRouter)
 
 export default router
