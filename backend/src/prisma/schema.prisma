@@ -209,6 +209,7 @@ model Image {
   blog_posts              BlogPost[]             @relation("blog_featured_image")
   seo_og_images           SeoMetadata[]          @relation("seo_og_image")
   static_pages_featured   StaticPage[]           @relation("page_featured_image")
+  team_members_image      TeamMember[]           @relation("team_member_image")
 
   @@map("images")
 }
@@ -1073,4 +1074,22 @@ model StaticPage {
   featured_image    Image?       @relation("page_featured_image", fields: [featured_image_id], references: [id])
 
   @@map("static_pages")
+}
+
+model TeamMember {
+  id          String    @id @default(cuid())
+  name        String
+  positions   Json
+  social      Json?
+  text        String?   @db.LongText
+  links       Json?
+  order       Int       @default(0)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  image_id    String?
+  image       Image?    @relation("team_member_image", fields: [image_id], references: [id])
+
+  @@map("team_members")
 }

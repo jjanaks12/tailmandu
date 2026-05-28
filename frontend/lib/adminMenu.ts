@@ -101,13 +101,6 @@ export const useMenu = () => {
                 slug: 'blog_categories',
                 permissions: 'manage_blog_category'
             }]
-        }, {
-            title: 'Pages',
-            icon: 'NotebookText',
-            slug: 'pages',
-            path: '/dashboard/pages',
-            permissions: '*',
-            role: 'Admin'
         }]
     }, {
         title: 'Miscellanous',
@@ -164,6 +157,32 @@ export const useMenu = () => {
                 slug: 'newsletter_topics',
                 permissions: ''
             }]
+        }]
+    }, {
+        title: 'Company',
+        path: '',
+        slug: 'company',
+        permissions: [],
+        subMenu: [{
+            title: 'About us',
+            path: '/dashboard/company',
+            slug: 'company',
+            icon: 'Building',
+            permissions: 'manage_company'
+        }, {
+            title: 'Pages',
+            icon: 'NotebookText',
+            slug: 'pages',
+            path: '/dashboard/pages',
+            permissions: '*',
+            role: 'Admin'
+        }, {
+            title: 'Team',
+            path: '/dashboard/teams',
+            slug: 'team',
+            icon: 'Users',
+            permissions: '*',
+            role: 'Admin'
         }, {
             title: 'Enquiries',
             path: '/dashboard/enquiry',

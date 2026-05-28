@@ -58,7 +58,7 @@ onMounted(init)
 </script>
 
 <template>
-    <Form :validation-schema="pageFormSchema" @submit="handleSubmit" class="space-y-8" ref="form" keep-values>
+    <Form :validation-schema="pageFormSchema" @submit="handleSubmit" class="space-y-8" ref="form" :keep-values="true">
         <Tabs default-value="content">
             <TabsList>
                 <TabsTrigger value="content">
@@ -71,7 +71,7 @@ onMounted(init)
                 </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="content" class="mt-0">
+            <TabsContent value="content" class="mt-0" force-mount>
                 <div class="grid grid-cols-2 md:grid-cols-12 gap-8">
                     <!-- Main Content -->
                     <div class="md:col-span-8 space-y-6 text-left">
@@ -128,7 +128,7 @@ onMounted(init)
                 </div>
             </TabsContent>
 
-            <TabsContent value="seo" class="mt-0">
+            <TabsContent value="seo" class="mt-0" force-mount>
                 <div class="grid grid-cols-2 md:grid-cols-12 gap-8">
                     <div class="md:col-span-8 space-y-6 text-left">
                         <Alert variant="info">

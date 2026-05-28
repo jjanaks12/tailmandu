@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { MailIcon, MapPinIcon, PhoneIcon } from 'lucide-vue-next';
+import { MailIcon, MapPinIcon, PhoneIcon } from 'lucide-vue-next'
 import { useAppStore } from '~/store/app'
+import { usePageStore } from '~/store/page'
 import * as Icons from 'lucide-vue-next'
-import Icon from '~/components/icon.vue';
+import Icon from '~/components/icon.vue'
 
 const { company } = storeToRefs(useAppStore())
+const { pages } = storeToRefs(usePageStore())
+const { fetchPublicPages } = usePageStore()
 const localePath = useLocalePath()
 
 const SocialLinkMapper: Record<string, keyof typeof Icons> = {
@@ -14,6 +17,8 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
     linkedin: 'LinkedinIcon',
     youtube: 'YoutubeIcon',
 }
+
+onMounted(fetchPublicPages)
 </script>
 
 <template>
@@ -35,15 +40,11 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
                 <div>
                     <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
                     <ul class="space-y-4 text-sm">
-                        <li>
-                            <NuxtLink :to="localePath('/about_us')" class="hover:text-primary transition-colors">
-                                Our Story
+                        <li v-for="page in pages" :key="page.id">
+                            <NuxtLink :to="`/info/${page.slug}`" class="hover:text-primary transition-colors">
+                                {{ page.title }}
                             </NuxtLink>
                         </li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Safety Protocols</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Elite Program</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Past Results</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
                         <li>
                             <NuxtLink class="hover:text-primary transition-colors" to="/our_team">Our team</NuxtLink>
                         </li>

@@ -1,3 +1,4 @@
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import tailwindcss from "@tailwindcss/vite"
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -58,7 +59,10 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [
-      tailwindcss()
+      tailwindcss(),
+      nodePolyfills({
+        include: ["url"]
+      })
     ],
     server: {
       allowedHosts: (process.env.NUXT_ALLOWED_HOSTS ?? []) as string[]

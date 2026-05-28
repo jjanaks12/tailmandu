@@ -663,3 +663,21 @@ export type EnquiryCategory = {
     updated_at?: string
     deleted_at?: string
 }
+
+export type TeamMember = {
+    id: string
+    name: string
+    positions: string[]
+    social: Record<string, string> | null
+    text: string | null
+    links: string[] | null
+    order: number
+    image_id: string | null
+    image?: {
+        file_name: string
+        [key: string]: any
+    } | null
+    created_at: string
+    updated_at: string | null
+    deleted_at: string | null
+}
