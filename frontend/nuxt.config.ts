@@ -61,7 +61,10 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
       nodePolyfills({
-        include: ["url"]
+        include: ["url"],
+        globals: {
+          process: true
+        }
       })
     ],
     server: {
