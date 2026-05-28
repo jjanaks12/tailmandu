@@ -3,8 +3,8 @@
 - madatory gears
 
 ## new changes
-dynamic teams
-dynamic pages such as contact us
+[X] dynamic teams
+[X] dynamic pages such as contact us
 
 
 #

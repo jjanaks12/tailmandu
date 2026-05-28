@@ -269,6 +269,7 @@ export class EventController {
                             thumbnail: true,
                             stage_categories: {
                                 include: {
+                                    map_file: true,
                                     checkpoints: true,
                                     payment: {
                                         include: {

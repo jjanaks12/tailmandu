@@ -1,34 +1,25 @@
 <script lang="ts" setup>
-import {
-    CalendarIcon,
-    MapPinIcon,
-    MountainIcon,
-    ZapIcon,
-    ChevronRightIcon,
-    MapIcon,
-    ActivityIcon,
-    ArrowUpIcon,
-    ArrowDownIcon,
-    TimerIcon,
-    TrophyIcon,
-} from 'lucide-vue-next'
-import { formatDate, showImage } from '~/lib/filters'
-import type { TrailRace, Stage } from '~/lib/types'
+import { CalendarIcon, MapPinIcon, MountainIcon, ZapIcon, ChevronRightIcon, MapIcon, ActivityIcon, TrophyIcon } from 'lucide-vue-next'
+import { formatDate, getGPXFile, showImage } from '~/lib/filters'
+import type { TrailRace, Stage, StageCategory } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 import moment from 'moment'
 
 const route = useRoute()
 const trailRace = ref<TrailRace | null>(null)
 const selectedStage = ref<Stage | null>(null)
+const selectedStageCategory = ref<StageCategory | null>(null)
 const { getBySlug } = useEventStore()
 
 const isFinished = computed(() => moment().isAfter(moment(trailRace.value?.end as string)))
 const isUpcoming = computed(() => moment().isBefore(moment(trailRace.value?.start as string)))
 
 const totalDistance = computed(() => {
-    if (!trailRace.value?.stages) return 0
-    return trailRace.value.stages.reduce((acc, stage) => acc + (parseFloat(stage.distance) || 0), 0)
+    // if (!trailRace.value?.stages) return 0
+    return (trailRace.value?.stages?.reduce((acc, stage) => acc + stage.stage_categories.reduce((t, st) => t + parseFloat(st.distance), 0), 0) || 0) / 1000
 })
+
+const totatDistanceSelectedStage = computed(() => selectedStage.value ? selectedStage.value?.stage_categories.reduce((acc, stage) => acc + parseFloat(stage.distance), 0) / 1000 : 0)
 
 const totalElevationGain = computed(() => {
     if (!trailRace.value?.stages) return 0
@@ -40,7 +31,8 @@ const totalElevationGain = computed(() => {
 onBeforeMount(async () => {
     trailRace.value = await getBySlug(route.params.slug as string)
     if (trailRace.value && trailRace.value.stages.length > 0) {
-        selectedStage.value = trailRace.value.stages[0]
+        selectedStage.value = trailRace.value.stages[0] ?? null
+        selectedStageCategory.value = selectedStage.value?.stage_categories[0] ?? null
     }
 
     if (trailRace.value) {
@@ -67,11 +59,66 @@ const selectedStageStartTime = computed(() => {
 
 const selectStage = (stage: Stage) => {
     selectedStage.value = stage
+    selectedStageCategory.value = selectedStage.value?.stage_categories[0] ?? null
 }
+
+const { y } = useWindowScroll()
+const isSticky = computed(() => y.value > 450)
 </script>
 
 <template>
     <div v-if="trailRace" class="bg-background-light dark:bg-background-dark min-h-screen">
+        <!-- Sticky Header Bar -->
+        <div class="fixed left-0 right-0 z-40 bg-white/95 dark:bg-deep-slate/95 border-b border-slate-200 dark:border-slate-800 shadow-md backdrop-blur-md transition-all duration-300 top-20"
+            :class="isSticky ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4 min-w-0">
+                    <Badge v-if="isUpcoming" size="sm"
+                        class="bg-primary/20 text-primary border-primary/30 uppercase tracking-widest font-black text-[10px]">
+                        Upcoming
+                    </Badge>
+                    <Badge v-else-if="!isFinished" size="sm"
+                        class="bg-red-500 text-white border-none uppercase tracking-widest font-black text-[10px] animate-pulse">
+                        Going on
+                    </Badge>
+                    <Badge v-else size="sm"
+                        class="bg-slate-500/50 text-white border-none uppercase tracking-widest font-black text-[10px]">
+                        Completed
+                    </Badge>
+                    <h2 class="text-slate-900 dark:text-white font-display font-black text-lg sm:text-xl truncate">
+                        {{ trailRace.name }}
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-4 shrink-0">
+                    <div
+                        class="hidden md:flex items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                        <div class="flex items-center gap-1.5" v-if="!isFinished">
+                            <CalendarIcon class="w-4 h-4 text-primary" />
+                            <span>{{ formatDate(trailRace.start) }} — {{ formatDate(trailRace.end) }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5" v-if="selectedStage">
+                            <MapPinIcon class="w-4 h-4 text-primary" />
+                            <span>{{ selectedStage.location }}</span>
+                        </div>
+                    </div>
+
+                    <Button size="sm" as-child v-if="isUpcoming">
+                        <NuxtLink
+                            :to="$localePath({ name: 'races-slug-runner', params: { slug: route.params.slug }, query: { stage_id: selectedStage?.id } })">
+                            Register
+                        </NuxtLink>
+                    </Button>
+                    <Button size="sm" as-child v-else>
+                        <NuxtLink
+                            :to="$localePath({ name: 'races-id-stage-stage_id-result', params: { id: trailRace.id, stage_id: selectedStage?.id } })">
+                            View Results
+                        </NuxtLink>
+                    </Button>
+                </div>
+            </div>
+        </div>
+
         <!-- Hero Section -->
         <div class="relative w-full">
             <div class="flex min-h-[500px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 lg:px-40 pb-16 relative overflow-hidden"
@@ -84,7 +131,7 @@ const selectStage = (stage: Stage) => {
                     </Badge>
                     <Badge v-else-if="!isFinished"
                         class="bg-red-500 text-white border-none px-4 py-1.5 uppercase tracking-widest font-black w-fit animate-pulse">
-                        Live Now
+                        Going on
                     </Badge>
                     <Badge v-else
                         class="bg-slate-500/50 text-white border-none px-4 py-1.5 uppercase tracking-widest font-black w-fit">
@@ -101,9 +148,9 @@ const selectStage = (stage: Stage) => {
                             <CalendarIcon class="w-5 h-5 text-primary" />
                             <span>{{ formatDate(trailRace.start) }} — {{ formatDate(trailRace.end) }}</span>
                         </div>
-                        <div class="flex items-center gap-2.5" v-if="trailRace.stages?.length > 0">
+                        <div class="flex items-center gap-2.5" v-if="selectedStage">
                             <MapPinIcon class="w-5 h-5 text-primary" />
-                            <span>{{ trailRace.stages[0].location }}</span>
+                            <span>{{ selectedStage.location }}</span>
                         </div>
                     </div>
                 </div>
@@ -157,22 +204,7 @@ const selectStage = (stage: Stage) => {
                     </div>
 
                     <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12"
-                        v-html="trailRace.description">
-                    </div>
-
-                    <!-- Map Section -->
-                    <div v-if="trailRace.map_file"
-                        class="relative rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl aspect-video group">
-                        <img :src="showImage(trailRace.map_file.file_name)" alt="Race Map"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                        <div
-                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                            <Button size="lg" class="rounded-2xl gap-3 text-lg font-black px-10 py-8">
-                                <MapIcon class="w-6 h-6" />
-                                View Full Map
-                            </Button>
-                        </div>
-                    </div>
+                        v-html="trailRace.description" />
                 </section>
 
                 <!-- Detailed Stage View -->
@@ -203,9 +235,11 @@ const selectStage = (stage: Stage) => {
                         <div
                             class="bg-slate-50 dark:bg-deep-slate/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800/50">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Distance</p>
-                            <p class="text-2xl font-black">{{ selectedStage.distance }} KM</p>
+                            <p class="text-2xl font-black">
+                                {{ totatDistanceSelectedStage }} KM
+                            </p>
                         </div>
-                        <div
+                        <!-- <div
                             class="bg-slate-50 dark:bg-deep-slate/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800/50">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vert Gain
                             </p>
@@ -228,16 +262,21 @@ const selectStage = (stage: Stage) => {
                             <p class="text-2xl font-black flex items-center gap-2 text-primary">
                                 <TimerIcon class="w-4 h-4" /> 4.5 - 7h
                             </p>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Stage Categories -->
-                    <div v-if="selectedStage.stage_categories?.length > 0">
-                        <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-8">Available
-                            Categories</h4>
+                    <div class="border border-primary p-4 rounded-xl" v-if="selectedStage.stage_categories?.length > 0">
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12"
+                            v-html="selectedStage.description" />
+                        <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-8">
+                            Available Categories
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
                             <div v-for="cat in selectedStage.stage_categories" :key="cat.id"
-                                class="bg-white dark:bg-deep-slate rounded-3xl p-8 border-l-8 border-primary shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1 transition-all duration-300">
+                                class="bg-white dark:bg-deep-slate rounded-3xl p-8 border-primary shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1 transition-all duration-300"
+                                @click="selectedStageCategory = cat"
+                                :class="selectedStageCategory?.id === cat.id ? 'border-l-8' : ''">
                                 <div class="flex justify-between items-start mb-6">
                                     <h5 class="font-black text-xl">{{ cat.name }}</h5>
                                     <TrophyIcon class="w-5 h-5 text-primary" />
@@ -249,7 +288,7 @@ const selectStage = (stage: Stage) => {
                                     </div>
                                     <div class="flex justify-between text-sm font-bold">
                                         <span class="text-slate-400">Distance</span>
-                                        <span>{{ cat.distance }} KM</span>
+                                        <span>{{ (parseFloat(cat.distance) / 1000) }} KM</span>
                                     </div>
                                     <div class="pt-4">
                                         <div
@@ -264,6 +303,45 @@ const selectStage = (stage: Stage) => {
                                 </div>
                             </div>
                         </div>
+                        <!-- Map Section -->
+                        <div v-if="selectedStageCategory?.map_file" class="mb-4">
+                            <Dialog>
+                                <DialogTrigger as-child>
+                                    <div
+                                        class="relative rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl aspect-video group cursor-pointer bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+
+                                        <!-- Decorative map pattern background -->
+                                        <div
+                                            class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-400 to-transparent background-size-4">
+                                        </div>
+
+                                        <MapIcon
+                                            class="w-16 h-16 mb-4 opacity-50 group-hover:scale-110 transition-transform duration-500" />
+                                        <span class="font-bold text-lg">Click to View Route Map</span>
+
+                                        <div
+                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                            <Button size="lg" variant="secondary" class="pointer-events-none">
+                                                <MapIcon class="w-6 h-6 mr-2" />
+                                                View Full Map
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </DialogTrigger>
+                                <DialogContent class="w-[80%] p-0 bg-transparent border-none shadow-none">
+                                    <DialogTitle class="sr-only">Race Route Map</DialogTitle>
+                                    <div
+                                        class="w-full h-[80vh] rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 shadow-2xl relative">
+                                        <ClientOnly>
+                                            <Map :gpx-file="getGPXFile(selectedStageCategory.map_file.file_name)"
+                                                class="w-full h-full" />
+                                        </ClientOnly>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12"
+                            v-if="selectedStageCategory" v-html="selectedStageCategory.description" />
                     </div>
 
                     <!-- Elevation Profile SVG Placeholder (adapted from design) -->
@@ -352,18 +430,33 @@ const selectStage = (stage: Stage) => {
                             class="absolute -right-12 -bottom-12 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <MountainIcon class="w-64 h-64" />
                         </div>
-                        <h4 class="text-3xl font-display font-black mb-4 relative z-10 leading-tight">Ready
-                            to Conquer?</h4>
-                        <p class="mb-10 relative z-10 leading-relaxed font-medium">
-                            Early bird registration is currently open. Secure your bib for the ultimate Himalayan
-                            challenge.
-                        </p>
-                        <Button size="xl" as-child>
-                            <NuxtLink
-                                :to="$localePath({ name: 'races-slug-runner', params: { slug: route.params.slug }, query: { stage_id: selectedStage?.id } })">
-                                Register Now
-                            </NuxtLink>
-                        </Button>
+                        <template v-if="isUpcoming">
+                            <h4 class="text-3xl font-display font-black mb-4 relative z-10 leading-tight">Ready
+                                to Conquer?</h4>
+                            <p class="mb-10 relative z-10 leading-relaxed font-medium">
+                                Early bird registration is currently open. Secure your bib for the ultimate Himalayan
+                                challenge.
+                            </p>
+                            <Button size="xl" as-child>
+                                <NuxtLink
+                                    :to="$localePath({ name: 'races-slug-runner', params: { slug: route.params.slug }, query: { stage_id: selectedStage?.id } })">
+                                    Register Now
+                                </NuxtLink>
+                            </Button>
+                        </template>
+                        <template v-else>
+                            <h4 class="text-3xl font-display font-black mb-4 relative z-10 leading-tight">Race Results
+                            </h4>
+                            <p class="mb-10 relative z-10 leading-relaxed font-medium">
+                                Check the official timings, stage updates, and final standings for all categories.
+                            </p>
+                            <Button size="xl" as-child>
+                                <NuxtLink
+                                    :to="$localePath({ name: 'races-id-stage-stage_id-result', params: { id: trailRace.id, stage_id: selectedStage?.id } })">
+                                    View Results
+                                </NuxtLink>
+                            </Button>
+                        </template>
                     </div>
 
                     <!-- Organizers Info (Bonus) -->

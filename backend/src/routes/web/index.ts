@@ -23,14 +23,15 @@ router.get('/', async (_: Request, response: Response) => {
     })
 })
 
-router.get('/resources/:filetype/:filename', async (request: Request, response: Response) => {
+router.get('/resources/:filetype/:filename', async (request: Request, response: Response, next) => {
     const uploadPath = path.join(__basedir, '/uploads/', request.params.filetype as string, request.params.filename as string)
 
     fs.readFile(uploadPath, (err, data) => {
-        if (err)
-            createHttpError.InternalServerError(err.message)
+        if (err) {
+            return next(createHttpError.NotFound('File not found'))
+        }
 
-        response.set('Content-Type', contentType[request.params.filetype as keyof typeof contentType])
+        response.set('Content-Type', contentType[request.params.filetype as keyof typeof contentType] || 'application/octet-stream')
         response.send(data)
     })
 })

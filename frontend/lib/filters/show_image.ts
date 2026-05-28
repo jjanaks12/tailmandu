@@ -2,13 +2,13 @@
 export const showImage = (fileName: string) => {
     const { public: { serverUrl } } = useRuntimeConfig()
 
-    return fileName ? serverUrl + 'resources/images/' + fileName : ''
+    return fileName ? serverUrl + 'resources/images/' + fileName : '/images/not-found.png'
 }
 
 export const getGPXFile = (fileName: string) => {
     const { public: { serverUrl } } = useRuntimeConfig()
 
-    return fileName ? serverUrl + 'resources/gpx/' + fileName : '/images/not-found.png'
+    return fileName ? serverUrl + 'resources/gpx/' + fileName : ''
 }
 
 export const strToTest = ['data', 'base64']
