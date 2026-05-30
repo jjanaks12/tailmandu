@@ -173,6 +173,10 @@
   }
 }
 
+img {
+  @apply border-none;
+}
+
 .nav--active:not(.default) {
   @apply text-primary;
 }

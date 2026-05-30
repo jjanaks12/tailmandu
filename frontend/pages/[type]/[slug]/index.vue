@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useElementVisibility } from '@vueuse/core'
+import { useElementVisibility, useWindowScroll } from '@vueuse/core'
 import type { Trek } from '~/lib/types'
 import {
     ActivityIcon, BanIcon, BriefcaseMedicalIcon, ChartNoAxesCombinedIcon, CircleCheckIcon, ClockIcon, DumbbellIcon, StarIcon, Loader2Icon,
@@ -46,11 +46,22 @@ const init = async () => {
 
 const bookingBar = useTemplateRef('booking-bar')
 const isBookingBarVisible = useElementVisibility(bookingBar)
+const { y: scrollY } = useWindowScroll()
 
-const swiperRef = ref()
-const { isEnd, isBeginning } = useSwiper(swiperRef, {
-    modules: [Navigation]
-})
+const swiperInstance = ref<any>(null)
+const isBeginning = ref(true)
+const isEnd = ref(false)
+
+const onSwiper = (swiper: any) => {
+    swiperInstance.value = swiper
+    isBeginning.value = swiper.isBeginning
+    isEnd.value = swiper.isEnd
+}
+
+const onSlideChange = (swiper: any) => {
+    isBeginning.value = swiper.isBeginning
+    isEnd.value = swiper.isEnd
+}
 
 const duration = computed(() => {
     return trek.value?.details ? trek.value?.details.itinerary?.length || 0 : 0
@@ -62,6 +73,7 @@ const startingPrice = computed(() => {
     }
     return Number(trek.value?.price) || 0
 })
+const isScrolled = computed(() => scrollY.value > 20)
 
 const { formatCurrency } = useCurrency()
 
@@ -102,7 +114,8 @@ onMounted(init)
             <!-- Hero Section -->
             <!-- Quick Facts Bar -->
             <section class="relative z-30 mb-16">
-                <div class="bg-white border border-black/5 p-1 shadow-xl -mt-[100px]">
+                <div class="bg-white border border-black/5 p-1 shadow-xl -mt-[100px] transition-opacity"
+                    :class="isScrolled ? 'opacity-100' : 'opacity-0'">
                     <div class="md:flex divide-y md:divide-y-0 md:divide-x divide-black/5">
                         <div class="md:w-1/3 p-8 space-y-6">
                             <h3
@@ -123,7 +136,7 @@ onMounted(init)
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                    }}</p>
+                                        }}</p>
                                 </div>
                                 <div>
                                     <p class="text-[12px] uppercase text-text-muted font-bold mb-1">Distance</p>
@@ -174,15 +187,15 @@ onMounted(init)
                                     <p class="text-[14px] text-text-muted">{{ protocol.description }}</p>
                                 </div>
                             </div>
-                            <Swiper ref="swiperRef" :modules="[Navigation]" :slides-per-view="2.2" :space-between="10">
+                            <Swiper @swiper="onSwiper" @slideChange="onSlideChange" :modules="[Navigation]" :slides-per-view="2.2" :space-between="10">
                                 <template v-slot:container-start>
-                                    <Button variant="light" size="icon" @click="swiperRef?.slidePrev()"
+                                    <Button variant="light" size="icon" @click="swiperInstance?.slidePrev()"
                                         :disabled="isBeginning" class="absolute top-1/2 left-2 -translate-y-1/2 z-10">
                                         <ArrowLeftIcon />
                                     </Button>
                                 </template>
                                 <template v-slot:container-end>
-                                    <Button variant="light" size="icon" @click="swiperRef?.slideNext()"
+                                    <Button variant="light" size="icon" @click="swiperInstance?.slideNext()"
                                         :disabled="isEnd" class="absolute top-1/2 right-2 -translate-y-1/2 z-10">
                                         <ArrowRightIcon />
                                     </Button>
@@ -381,8 +394,8 @@ onMounted(init)
             </section>
         </main>
         <div :class="[
-            'sticky bottom-0 left-0 w-full bg-white border-t border-black/10 z-[50] transform transition-all duration-500',
-            !isBookingBarVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+            'fixed bottom-0 left-0 w-full bg-white border-t border-black/10 z-[50] transform transition-all duration-500',
+            (!isBookingBarVisible && scrollY > 300) ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         ]">
             <div class="max-w-7xl mx-auto px-6 md:px-10 py-3 flex items-center justify-between">
                 <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-6">

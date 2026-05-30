@@ -84,9 +84,11 @@ const type = computed(() => route.params.type || 'fastpacking')
                         Details
                     </NuxtLink>
                 </Button>
-                <Button class="flex-[1.5]">
-                    <PhoneIcon class="size-4" />
-                    Book Call
+                <Button class="flex-[1.5]" as-child>
+                    <NuxtLink :to="`/${type}/${item.slug}/booking`">
+                        <PhoneIcon class="size-4" />
+                        Book Call
+                    </NuxtLink>
                 </Button>
             </div>
         </div>

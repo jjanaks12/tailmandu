@@ -4,19 +4,38 @@ import { socialLinkSchema } from '~/lib/schema/account.schema'
 import { useAxios } from '~/services/axios'
 import { useAppStore } from '~/store/app'
 
+const props = defineProps<{
+    socialLink?: { id: number, name: string, url: string, company_id: number }
+}>()
+
 const { company } = storeToRefs(useAppStore())
 const { axios } = useAxios()
-const emit = defineEmits(['fetch'])
+const emit = defineEmits(['fetch', 'success'])
 const form = useTemplateRef<FormContext>('form')
 
 const submitHandler = async (values: any) => {
-    await axios.post('/companies/social-link', values)
+    if (props.socialLink) {
+        await axios.put(`/companies/social-link/${props.socialLink.id}`, values)
+    } else {
+        await axios.post('/companies/social-link', values)
+    }
     emit('fetch')
+    emit('success')
 }
 
 const init = () => {
-    form.value?.setFieldValue('company_id', company.value?.id)
+    if (props.socialLink) {
+        form.value?.setValues({
+            company_id: company.value?.id,
+            name: props.socialLink.name,
+            url: props.socialLink.url
+        })
+    } else {
+        form.value?.setFieldValue('company_id', company.value?.id)
+    }
 }
+
+watch(() => props.socialLink, init)
 
 onMounted(init)
 </script>

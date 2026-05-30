@@ -14,7 +14,11 @@ export class CompanyController {
                         }
                     },
                     logo: true,
-                    social_links: true
+                    social_links: {
+                        where: {
+                            deleted_at: null
+                        }
+                    }
                 }
             }))
         } catch (error) {

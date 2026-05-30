@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { LoaderIcon } from 'lucide-vue-next'
+import { LoaderIcon, Edit2, Trash2 } from 'lucide-vue-next'
 import { ErrorMessage, Field, Form, type FormContext } from 'vee-validate'
 import { abbr, showImage } from '~/lib/filters'
 import { companySchema } from '~/lib/schema/account.schema'
+import { useAxios } from '~/services/axios'
 import { useAppStore } from '~/store/app'
 
 useHead({
@@ -19,7 +20,13 @@ definePageMeta({
 const form = ref<FormContext | null>(null)
 const isLoading = ref(false)
 const { company, countries } = storeToRefs(useAppStore())
-const { saveCompany } = useAppStore()
+const { saveCompany, fetchCompany } = useAppStore()
+const { axios } = useAxios()
+
+const isFormDialogOpen = ref(false)
+const isDeleteDialogOpen = ref(false)
+const editingLink = ref<any>(null)
+const deletingLinkId = ref<number | string | null>(null)
 
 const avatar = computed(() => showImage(company.value?.logo?.file_name as string))
 
@@ -41,6 +48,39 @@ const fileInputHandler = (event: Event) => {
             form.value?.setFieldValue('image', reader.result)
         }
     }
+}
+
+const openCreateForm = () => {
+    editingLink.value = null
+    isFormDialogOpen.value = true
+}
+
+const openEditForm = (link: any) => {
+    editingLink.value = link
+    isFormDialogOpen.value = true
+}
+
+const confirmDelete = (id: number | string) => {
+    deletingLinkId.value = id
+    isDeleteDialogOpen.value = true
+}
+
+const deleteSocialLink = async () => {
+    if (!deletingLinkId.value) return
+    try {
+        await axios.delete(`/companies/social-link/${deletingLinkId.value}`)
+        await fetchCompany()
+    } catch (e) {
+        console.error("Failed to delete social link", e)
+    } finally {
+        isDeleteDialogOpen.value = false
+        deletingLinkId.value = null
+    }
+}
+
+const onFormSuccess = () => {
+    isFormDialogOpen.value = false
+    fetchCompany()
 }
 
 const init = () => {
@@ -206,10 +246,62 @@ onMounted(init)
     </Form>
     <div class="flex justify-between items-center py-4 border-b-2 border-gray-200">
         <h2 class="text-xl font-bold">Social Links</h2>
-        <Button variant="dark">Add Social Links</Button>
+        <Button variant="dark" @click="openCreateForm">Add Social Links</Button>
     </div>
-    <PagesDashboardCompanySocialLinkForm />
-    <ul>
-        <li v-for="social in company?.social_links">{{ social.name }} - {{ social.url }}</li>
-    </ul>
+
+    <!-- Social Links Form Dialog -->
+    <Dialog v-model:open="isFormDialogOpen">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>{{ editingLink ? 'Edit Social Link' : 'Add Social Link' }}</DialogTitle>
+            </DialogHeader>
+            <PagesDashboardCompanySocialLinkForm :socialLink="editingLink" @fetch="fetchCompany"
+                @success="onFormSuccess" />
+        </DialogContent>
+    </Dialog>
+
+    <!-- Social Links List -->
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div v-for="social in company?.social_links" :key="social.id"
+            class="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+            <div class="overflow-hidden">
+                <h3 class="font-bold text-slate-800">{{ social.name }}</h3>
+                <a :href="social.url" target="_blank" class="text-sm text-primary hover:underline truncate block">
+                    {{ social.url }}
+                </a>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 ml-4">
+                <Button variant="ghost" size="icon" class="h-8 w-8 text-slate-500 hover:text-primary"
+                    @click="openEditForm(social)">
+                    <Edit2 class="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" class="h-8 w-8 text-slate-500 hover:text-red-500"
+                    @click="confirmDelete(social.id)">
+                    <Trash2 class="w-4 h-4" />
+                </Button>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="!company?.social_links?.length"
+        class="py-8 text-center text-slate-500 border-2 border-dashed rounded-lg mt-4">
+        No social links added yet.
+    </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <AlertDialog v-model:open="isDeleteDialogOpen">
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your social link.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
+                <AlertDialogAction class="bg-red-500 hover:bg-red-600" @click="deleteSocialLink">Delete
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
 </template>

@@ -5,6 +5,7 @@ import { useMenu } from '../../lib/defaultMenus'
 import { useAppStore } from '~/store/app'
 import { useAuthStore } from '~/store/auth'
 import { useSidebar } from '~/components/ui/sidebar'
+import { useWindowScroll } from '@vueuse/core'
 import Icon from '~/components/icon.vue'
 
 const { menuList: menus } = useMenu()
@@ -12,11 +13,17 @@ const localePath = useLocalePath()
 const { breakpoints } = storeToRefs(useAppStore())
 const { isLoggedin } = storeToRefs(useAuthStore())
 const { toggleSidebar } = useSidebar()
+const { y: scrollY } = useWindowScroll()
+const isScrolled = computed(() => scrollY.value > 20)
 </script>
 
 <template>
-    <header id="header"
-        class="fixed w-full z-50 bg-white/90 dark:bg-deep-slate/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <header id="header" :class="[
+        'fixed w-full z-50 border-b transition-all duration-300',
+        isScrolled
+            ? 'bg-white/95 dark:bg-deep-slate/90 border-slate-200 dark:border-slate-800 shadow-sm opacity-100'
+            : 'border-transparent'
+    ]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <Brand />

@@ -1,10 +1,14 @@
-### updates - race detail page
-- description of stage category
-- madatory gears
-
 ## new changes
-[X] dynamic teams
-[X] dynamic pages such as contact us
+### Events
+[X] Full cover image (uncropped)
+[ ] slide show on events detail page - implement media upload form in edit event page.
+[ ] guide book pdf upload and view
+[ ] more description at the end
+### Fastpacking
+[X] gallery image to show all
+[ ] step slider navigation not working
+### Fastpacking - booking
+[ ] details -> also add -> contact details and passport
 
 
 #
