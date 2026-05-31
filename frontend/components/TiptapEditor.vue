@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref, watch, onBeforeUnmount } from 'vue'
 import TiptapDocument from '@tiptap/extension-document'
 import TiptapParagraph from '@tiptap/extension-paragraph'
 import TiptapText from '@tiptap/extension-text'
@@ -15,11 +16,19 @@ import Underline from '@tiptap/extension-underline'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Link from '@tiptap/extension-link'
 import TiptapImage from '@tiptap/extension-image'
-import { BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon, Heading4Icon, Heading5Icon, Heading6Icon, ImageIcon, ItalicIcon, LinkIcon, ListIcon, ListOrderedIcon, LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon, RotateCcwIcon, StrikethroughIcon, UnderlineIcon, UndoIcon, UnlinkIcon, WrapTextIcon, XIcon } from 'lucide-vue-next'
 
-import { debounce } from '~/lib/filters'
+import {
+  BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon,
+  ItalicIcon, LinkIcon, ListIcon, ListOrderedIcon,
+  LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon,
+  RotateCcwIcon, StrikethroughIcon, UnderlineIcon,
+  UndoIcon, UnlinkIcon, WrapTextIcon, XIcon, ImageIcon
+} from 'lucide-vue-next'
+
 import { useMediaStore } from '~/store/media'
+import { storeToRefs } from 'pinia'
 import { showImage } from '~/lib/filters'
+import { useDebounceFn } from '@vueuse/core'
 
 interface TiptapEditorProps {
   modelValue: string
@@ -32,15 +41,34 @@ const props = withDefaults(defineProps<TiptapEditorProps>(), {
   timer: 1000,
   toolbarHeight: 0
 })
+
 const emit = defineEmits(['update:modelValue'])
-const isChanged = ref(false)
 
 const { media, galleries } = storeToRefs(useMediaStore())
+const isChanged = ref(false)
+
+const stopSpinning = useDebounceFn(() => {
+  isChanged.value = false
+}, props.timer)
 
 const editor = useEditor({
   content: props.modelValue,
+  editable: !props.disabled,
   extensions: [
-    TiptapDocument, TiptapParagraph, TiptapText, TiptapBold, TiptapItalic, TiptapStrike, TiptapBlockquote, TiptapBulletList, TiptapHeading, TiptapListItem, TiptapHistory, TiptapOrderedList, Underline, HorizontalRule,
+    TiptapDocument,
+    TiptapParagraph,
+    TiptapText,
+    TiptapBold,
+    TiptapItalic,
+    TiptapStrike,
+    TiptapBlockquote,
+    TiptapBulletList,
+    TiptapHeading,
+    TiptapListItem,
+    TiptapHistory,
+    TiptapOrderedList,
+    Underline,
+    HorizontalRule,
     Link.configure({
       openOnClick: false,
       defaultProtocol: 'https',
@@ -53,21 +81,35 @@ const editor = useEditor({
     }),
   ],
   onUpdate: ({ editor }) => {
+    emit('update:modelValue', editor.getHTML())
     isChanged.value = true
-    debounce(() => {
-      isChanged.value = false
-      emit('update:modelValue', editor.getHTML())
-    }, props.timer)
+    stopSpinning()
   },
+})
+
+watch(() => props.modelValue, (newVal) => {
+  if (editor.value && newVal !== editor.value.getHTML()) {
+    // If the user is actively typing, ignore external model changes so the cursor never jumps.
+    if (editor.value.isFocused) return
+    editor.value.commands.setContent(newVal, { emitUpdate: false })
+  }
+})
+
+watch(() => props.disabled, (newVal) => {
+  editor.value?.setEditable(!newVal)
+})
+
+onBeforeUnmount(() => {
+  if (editor.value) {
+    editor.value.destroy()
+  }
 })
 
 const setLink = () => {
   const previousUrl = editor.value?.getAttributes('link').href
   const url = window.prompt('URL', previousUrl || '')
 
-  if (url === null) {
-    return
-  }
+  if (url === null) return
 
   if (url === '') {
     editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
@@ -93,139 +135,113 @@ const addImage = () => {
     }
   }
 }
-
-onBeforeUnmount(() => {
-  // @ts-expect-error
-  unref(editor).destroy()
-})
-
-watch(() => props.modelValue, (newVal) => {
-  if (editor.value && newVal !== editor.value.getHTML()) {
-    editor.value.commands.setContent(newVal, { emitUpdate: false })
-  }
-})
-
-watch(() => props.disabled, () => {
-  editor.value?.setEditable(!props.disabled)
-})
-
-onMounted(() => {
-  if (props.modelValue) {
-    editor.value?.commands.setContent(props.modelValue)
-    editor.value?.setEditable(!props.disabled)
-  }
-})
 </script>
 
 <template>
   <div class="editor border border-input rounded-md bg-background" v-if="editor">
-    <div class="flex flex-wrap items-center gap-0.5 p-1 bg-muted/30 border-b border-border sticky z-20 backdrop-blur-md"
+    <div class="flex flex-wrap items-center gap-1 p-2 bg-muted/30 border-b border-border sticky z-20 backdrop-blur-md"
       :style="{ top: `${toolbarHeight}px` }" v-if="!disabled">
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().toggleBold().run()"
-          :disabled="!editor.can().chain().focus().toggleBold().run()" :class="{ 'bg-muted': editor.isActive('bold') }">
+
+      <!-- Text formatting -->
+      <div class="flex items-center bg-background rounded-sm border border-border overflow-hidden">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleBold().run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('bold') }">
           <BoldIcon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus()?.toggleItalic().run()"
-          :disabled="!editor.can().chain().focus()?.toggleItalic().run()"
-          :class="{ 'bg-muted': editor.isActive('italic') }">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleItalic().run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('italic') }">
           <ItalicIcon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus()?.toggleUnderline().run()"
-          :disabled="!editor.can().chain().focus()?.toggleUnderline().run()"
-          :class="{ 'bg-muted': editor.isActive('underline') }">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleUnderline().run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('underline') }">
           <UnderlineIcon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus()?.toggleStrike().run()"
-          :disabled="!editor.can().chain().focus().toggleStrike().run()"
-          :class="{ 'bg-muted': editor.isActive('strike') }">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleStrike().run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('strike') }">
           <StrikethroughIcon :size="16" />
         </Button>
       </div>
 
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="setLink"
-          :class="{ 'bg-muted': editor.isActive('link') }">
-          <LinkIcon :size="16" />
+      <!-- Headings -->
+      <div class="flex items-center bg-background rounded-sm border border-border overflow-hidden">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('heading', { level: 1 }) }">
+          <Heading1Icon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().unsetLink().run()"
-          :disabled="!editor.isActive('link')">
-          <UnlinkIcon :size="16" />
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('heading', { level: 2 }) }">
+          <Heading2Icon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="addImage">
-          <ImageIcon :size="16" />
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('heading', { level: 3 }) }">
+          <Heading3Icon :size="16" />
         </Button>
-      </div>
-
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().unsetAllMarks().run()">
-          <XIcon :size="16" />
-        </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().clearNodes().run()">
-          <RotateCcwIcon :size="16" />
-        </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().setParagraph().run()" :class="{ 'bg-muted': editor.isActive('paragraph') }">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().setParagraph().run()"
+          :class="{ 'bg-muted text-primary': editor.isActive('paragraph') }">
           <WrapTextIcon :size="16" />
         </Button>
       </div>
 
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-          :class="{ 'bg-muted': editor.isActive('heading', { level: 1 }) }">
-          <Heading1Icon :size="16" />
-        </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-          :class="{ 'bg-muted': editor.isActive('heading', { level: 2 }) }">
-          <Heading2Icon :size="16" />
-        </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
-          @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-          :class="{ 'bg-muted': editor.isActive('heading', { level: 3 }) }">
-          <Heading3Icon :size="16" />
-        </Button>
-      </div>
-
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
+      <!-- Lists & Blocks -->
+      <div class="flex items-center bg-background rounded-sm border border-border overflow-hidden">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
           @click="editor.chain().focus().toggleBulletList().run()"
-          :class="{ 'bg-muted': editor.isActive('bulletList') }">
+          :class="{ 'bg-muted text-primary': editor.isActive('bulletList') }">
           <ListIcon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
           @click="editor.chain().focus().toggleOrderedList().run()"
-          :class="{ 'bg-muted': editor.isActive('orderedList') }">
+          :class="{ 'bg-muted text-primary': editor.isActive('orderedList') }">
           <ListOrderedIcon :size="16" />
         </Button>
-      </div>
-
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
           @click="editor.chain().focus().toggleBlockquote().run()"
-          :class="{ 'bg-muted': editor.isActive('blockquote') }">
+          :class="{ 'bg-muted text-primary': editor.isActive('blockquote') }">
           <QuoteIcon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost"
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
           @click="editor.chain().focus().setHorizontalRule().run()">
           <MinusIcon :size="16" />
         </Button>
       </div>
 
-      <div class="flex items-center gap-0.5 bg-background p-1 rounded-sm border border-border">
-        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().undo().run()"
-          :disabled="!editor.can().chain().focus().undo().run()">
+      <!-- Links & Images -->
+      <div class="flex items-center bg-background rounded-sm border border-border overflow-hidden">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="setLink" :class="{ 'bg-muted text-primary': editor.isActive('link') }">
+          <LinkIcon :size="16" />
+        </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().unsetLink().run()" :disabled="!editor.isActive('link')">
+          <UnlinkIcon :size="16" />
+        </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="addImage">
+          <ImageIcon :size="16" />
+        </Button>
+      </div>
+
+      <!-- History & Clear -->
+      <div class="flex items-center bg-background rounded-sm border border-border overflow-hidden">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().undo().run()" :disabled="!editor.can().chain().focus().undo().run()">
           <UndoIcon :size="16" />
         </Button>
-        <Button tabindex="-1" type="button" size="sm" variant="ghost" @click="editor.chain().focus().redo().run()"
-          :disabled="!editor.can().chain().focus().redo().run()">
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().redo().run()" :disabled="!editor.can().chain().focus().redo().run()">
           <RedoIcon :size="16" />
+        </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="editor.chain().focus().unsetAllMarks().clearNodes().run()">
+          <RotateCcwIcon :size="16" />
         </Button>
       </div>
 
@@ -233,22 +249,71 @@ onMounted(() => {
         <LoaderCircleIcon class="text-primary animate-spin" :size="16" v-if="isChanged" />
       </div>
     </div>
-    <TiptapEditorContent class="content_editor focus:outline-none min-h-[300px]" :editor="editor" />
+
+    <TiptapEditorContent class="content_editor min-h-[300px]" :editor="editor" />
   </div>
 </template>
 
-<style lang="css">
-.ProseMirror {
+<style>
+/* Core Tiptap Container */
+.content_editor .ProseMirror {
   min-height: 300px;
   outline: none;
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
-.ProseMirror p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: #adb5bd;
-  pointer-events: none;
-  height: 0;
+/* Fix for collapsed empty paragraphs in Tailwind CSS */
+.content_editor .ProseMirror p {
+  min-height: 1.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+/* This is the magic bullet for empty lines. It guarantees 0px-height paragraphs never happen. */
+.content_editor .ProseMirror p:empty::before {
+  content: "\00a0";
+  /* Non-breaking space */
+}
+
+/* Basic Typography so the editor output actually looks nice */
+.content_editor .ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.content_editor .ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.content_editor .ProseMirror h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.content_editor .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.content_editor .ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.content_editor .ProseMirror blockquote {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #6b7280;
+  margin: 1rem 0;
 }
 </style>

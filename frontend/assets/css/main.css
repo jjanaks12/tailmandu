@@ -229,11 +229,6 @@ form .error__message {
 
   p {
     @apply mb-4;
-
-    &:empty,
-    &:has(.ProseMirror-trailingBreak) {
-      @apply hidden;
-    }
   }
 
   ul {

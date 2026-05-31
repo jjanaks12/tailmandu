@@ -2,6 +2,7 @@
 import { ImageIcon, UploadIcon, XIcon } from 'lucide-vue-next'
 import { useMediaStore } from '~/store/media'
 import { showImage } from '~/lib/filters'
+import { computed } from 'vue'
 
 const props = defineProps<{
     value?: string | null
@@ -12,6 +13,23 @@ const props = defineProps<{
 const emit = defineEmits(['update:value'])
 
 const { media } = storeToRefs(useMediaStore())
+const { fetchImage } = useMediaStore()
+const imagePreview = ref<string | null>(null)
+
+watchEffect(async () => {
+    if (props.value) {
+        const image = await fetchImage(props.value)
+        if (image) {
+            imagePreview.value = showImage(image.file_name)
+            return
+        }
+    }
+    if (props.preview) {
+        imagePreview.value = showImage(props.preview)
+        return
+    }
+    imagePreview.value = null
+})
 
 const openMediaCenter = () => {
     media.value.show = true
@@ -35,8 +53,8 @@ const clear = () => {
         <Label v-if="label">{{ label }}</Label>
         <div
             class="relative aspect-square w-full bg-muted rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center transition-colors group overflow-hidden">
-            <template v-if="preview || value">
-                <img v-if="preview" :src="showImage(preview)" class="w-full h-full object-cover" />
+            <template v-if="imagePreview || value">
+                <img v-if="imagePreview" :src="imagePreview" class="w-full h-full object-cover" />
                 <div v-else
                     class="flex items-center justify-center h-full text-muted-foreground p-4 text-center text-[10px]">
                     Image Selected (ID: {{ value }})

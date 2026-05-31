@@ -416,4 +416,16 @@ export class MediaController {
             next(error)
         }
     }
+
+    public static async getImageById(reqeust: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.image.findFirst({
+                where: {
+                    id: reqeust.params.id as string
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
 }

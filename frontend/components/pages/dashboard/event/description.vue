@@ -1,49 +1,54 @@
 <script setup lang="ts">
-    import { LoaderIcon, SaveIcon } from 'lucide-vue-next'
-    import type { TrailRace } from '~/lib/types'
+import { LoaderIcon, SaveIcon } from 'lucide-vue-next'
+import type { TrailRace } from '~/lib/types'
 
-    import { useEventStore } from '~/store/event'
+import { useEventStore } from '~/store/event'
+import { useDebounceFn } from '@vueuse/core'
 
-    interface EventDescriptionProps {
-        trailRace: TrailRace
+interface EventDescriptionProps {
+    trailRace: TrailRace
+}
+
+const props = defineProps<EventDescriptionProps>()
+const emit = defineEmits(['update'])
+const route = useRoute()
+const { saveDescription } = useEventStore()
+const { can } = useAuthorization()
+
+const eventDescription = ref('')
+const isLoading = ref(false)
+const isSaved = ref(false)
+const isInitialized = ref(false)
+
+const debouncedSave = useDebounceFn(async (newDescription: string) => {
+    isLoading.value = true
+    await saveDescription(route.params.id as string, newDescription)
+    emit('update')
+    isLoading.value = false
+    isSaved.value = true
+}, 1000)
+
+watch(eventDescription, (newDescription) => {
+    const hasChanged = newDescription !== props.trailRace?.description
+
+    if (hasChanged) {
+        debouncedSave(newDescription)
     }
+})
 
-    const props = defineProps<EventDescriptionProps>()
-    const emit = defineEmits(['update'])
-    const route = useRoute()
-    const { saveDescription } = useEventStore()
-    const { can } = useAuthorization()
+watch(() => props.trailRace, () => {
+    if (props.trailRace && !isInitialized.value) {
+        eventDescription.value = props.trailRace.description || ''
+        isInitialized.value = true
+    }
+}, { immediate: true })
 
-    const eventDescription = ref('')
-    const isLoading = ref(false)
-    const isSaved = ref(false)
+watch(isSaved, () => {
+    if (isSaved.value)
+        setTimeout(() => { isSaved.value = false }, 2000)
+})
 
-    watch(eventDescription, async (newDescription) => {
-        const hasChanged = newDescription !== props.trailRace?.description
 
-        if (hasChanged) {
-            isLoading.value = true
-            await saveDescription(route.params.id as string, eventDescription.value)
-            emit('update')
-            isLoading.value = false
-            isSaved.value = true
-        }
-    })
-
-    watch(() => props.trailRace, () => {
-        if (props.trailRace)
-            eventDescription.value = props.trailRace.description || ''
-    })
-
-    watch(isSaved, () => {
-        if (isSaved.value)
-            setTimeout(() => { isSaved.value = false }, 2000)
-    })
-
-    onMounted(() => {
-        if (props.trailRace)
-            eventDescription.value = props.trailRace.description || ''
-    })
 </script>
 
 <template>

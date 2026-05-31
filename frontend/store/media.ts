@@ -43,6 +43,11 @@ export const useMediaStore = defineStore('media', () => {
         await fetch()
     }
 
+    const fetchImage = async (id: string) => {
+        const { data } = await axios.get<Image>(`/medias/get_image/${id}`)
+        return data
+    }
+
     const resetMedia = () => {
         media.show = false
         media.selectedGallery = null
@@ -54,6 +59,6 @@ export const useMediaStore = defineStore('media', () => {
 
     return {
         galleries, isLoading, params, galleryList, media,
-        fetch, fetchGalleryList, createGallery, deleteGallery, resetMedia, updateGallery
+        fetch, fetchGalleryList, createGallery, deleteGallery, resetMedia, updateGallery, fetchImage
     }
 })
