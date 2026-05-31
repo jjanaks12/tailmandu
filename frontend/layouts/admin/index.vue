@@ -64,7 +64,7 @@ const selectedCount = computed(() => {
                             </DialogClose>
                             <Button @click="() => {
                                 if (media.action) {
-                                    media.action(media)
+                                    media.action({ ...media })
                                     resetMedia()
                                 }
                             }">

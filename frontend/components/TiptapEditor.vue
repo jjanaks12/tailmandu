@@ -44,7 +44,8 @@ const props = withDefaults(defineProps<TiptapEditorProps>(), {
 
 const emit = defineEmits(['update:modelValue'])
 
-const { media, galleries } = storeToRefs(useMediaStore())
+const { media } = storeToRefs(useMediaStore())
+const { fetchImage } = useMediaStore()
 const isChanged = ref(false)
 
 const stopSpinning = useDebounceFn(() => {
@@ -123,10 +124,9 @@ const addImage = () => {
   media.value.show = true
   media.value.mode = 'image'
   media.value.isMultiple = false
-  media.value.action = (state: any) => {
+  media.value.action = async (state: any) => {
     if (state.selectedImages.length > 0) {
-      const imageId = state.selectedImages[0]
-      const image = galleries.value.find((i: any) => i.id === imageId)
+      const image = await fetchImage(state.selectedImages[0])
       if (image) {
         const url = showImage(image.file_name)
         editor.value?.chain().focus().setImage({ src: url }).run()

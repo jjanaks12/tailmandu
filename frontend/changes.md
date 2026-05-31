@@ -6,7 +6,7 @@
 [ ] more description at the end
 ### Fastpacking
 [X] gallery image to show all
-[ ] step slider navigation not working
+[X] step slider navigation not working
 ### Fastpacking - booking
 [ ] details -> also add -> contact details and passport
 
