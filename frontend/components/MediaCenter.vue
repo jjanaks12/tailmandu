@@ -106,6 +106,16 @@ onMounted(init)
                         Create New
                     </span>
                 </div>
+                <!-- Uncategorized Images Placeholder -->
+                <div class="group relative cursor-pointer rounded-xl overflow-hidden border border-border bg-card flex flex-col items-center justify-center p-6 transition-all hover:bg-muted min-h-[220px]"
+                    v-if="media?.mode === 'image'"
+                    @click="media.selectedGallery = ({ id: 'uncategorized', name: 'Uncategorized Images', images: [], tags: [] } as any)">
+                    <ImagePlusIcon
+                        class="size-10 mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span class="font-headline font-bold text-sm text-muted-foreground group-hover:text-primary">
+                        Uncategorized
+                    </span>
+                </div>
                 <!-- Gallery Card: Selected -->
                 <PagesDashboardMediaGallery v-for="gallery in filteredGallery" :key="gallery.id" :gallery="gallery"
                     :selected="media?.selectedGalleries?.includes(gallery.id)" @selected="media?.mode === 'gallery'

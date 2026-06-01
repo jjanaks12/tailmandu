@@ -48,34 +48,7 @@ export class MediaController {
             })
             response.send({
                 galleries,
-                uncategories: await prisma.image.findMany({
-                    where: {
-                        galleryId: null
-                    },
-                    include: {
-                        product_thumbnails: {
-                            select: { id: true, name: true, slug: true }
-                        },
-                        treks: {
-                            select: { id: true, name: true, slug: true }
-                        },
-                        events: {
-                            select: { id: true, name: true, slug: true }
-                        },
-                        maps: {
-                            select: { id: true, name: true, slug: true }
-                        },
-                        companies: {
-                            select: { id: true, name: true }
-                        },
-                        personal: {
-                            select: { id: true, first_name: true, last_name: true }
-                        },
-                        thumbnail_stages: {
-                            select: { id: true, name: true }
-                        }
-                    }
-                })
+                uncategories: [] // We return empty array here to avoid breaking frontend immediately, or we can just omit it. Let's omit it and update the frontend.
             })
         } catch (error) {
             next(error)
@@ -204,6 +177,22 @@ export class MediaController {
         }
     }
 
+    public static async addUncategorizedImages(request: Request, response: Response, next: NextFunction) {
+        try {
+            const images = []
+
+            for (const image of request.body.images) {
+                const fileHandler = new FileHandler('images')
+                const savedImage = await fileHandler.saveFile(image)
+                images.push(savedImage)
+            }
+            
+            response.send(images)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async removeGallery(request: Request, response: Response, next: NextFunction) {
         try {
             const gallery = await prisma.gallery.update({
@@ -324,13 +313,12 @@ export class MediaController {
         try {
             const { per_page = 10, current = 1, s = '', sort } = request.query
             const skip = (current - 1) * per_page
+            
+            const galleryIdCondition = request.params.id === 'uncategorized' ? null : (request.params.id || { not: null })
+
             const total = await prisma.image.count({
                 where: {
-                    galleryId: request.params.id
-                        ? request.params.id
-                        : {
-                            not: null
-                        }
+                    galleryId: galleryIdCondition
                 }
             })
 
@@ -340,11 +328,7 @@ export class MediaController {
                 include: {
                 },
                 where: {
-                    galleryId: request.params.id
-                        ? request.params.id
-                        : {
-                            not: null
-                        }
+                    galleryId: galleryIdCondition
                 },
                 orderBy: [{ created_at: 'desc' }],
             })

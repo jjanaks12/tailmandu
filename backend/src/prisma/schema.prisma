@@ -462,9 +462,9 @@ model TrailRace {
   deleted_at  DateTime?
 
   image_id    String?
-  thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
+  thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: SetNull)
   map_file_id String?
-  map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: Cascade)
+  map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: SetNull)
 
   stages     Stage[]
   runners    EventRunner[]

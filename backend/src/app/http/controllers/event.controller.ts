@@ -150,7 +150,8 @@ export class EventController {
                     description: '',
                     start,
                     end,
-                    excerpt: validationData.excerpt
+                    excerpt: validationData.excerpt,
+                    details: {}
                 }
             }))
         } catch (error) {

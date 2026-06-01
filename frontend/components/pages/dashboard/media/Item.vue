@@ -75,7 +75,8 @@ onMounted(init)
 
 <template>
     <div class="relative space-y-5">
-        <div class="flex items-center justify-between relative pb-4 border-b border-dashed border-gray-200">
+        <div
+            class="flex items-center justify-between sticky top-[75px] py-5 px-1 bg-white z-10 border-b border-dashed border-gray-200">
             <div class="grow">
                 <strong class="text-xl block mb-3">{{ gallery.name }}</strong>
                 <div class="flex gap-2">

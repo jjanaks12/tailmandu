@@ -19,15 +19,12 @@ const showGalleryForm = ref(false)
 const showDeleteGalleryDialog = ref(false)
 
 const galleries = ref<Gallery[]>([])
-const uncategories = ref<Image[]>([])
 
 const fetch = async () => {
     galleries.value = []
-    uncategories.value = []
 
     const { data } = await axios.get('/medias')
     galleries.value = data.galleries
-    uncategories.value = data.uncategories
 }
 
 const removeGallery = async () => {
@@ -56,7 +53,7 @@ onMounted(fetch)
             </Button>
         </div>
     </div>
-    <PagesDashboardMediaList :galleries="galleries" :uncategories="uncategories"
+    <PagesDashboardMediaList :galleries="galleries"
         @edit="selectedGallery = $event; showGalleryForm = true"
         @delete="selectedGallery = $event; showDeleteGalleryDialog = true" @fetch="fetch" />
     <Dialog v-model:open="showGalleryForm" @update:open="showGalleryForm = false; selectedGallery = null">

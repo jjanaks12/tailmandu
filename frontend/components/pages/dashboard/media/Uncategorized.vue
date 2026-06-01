@@ -5,12 +5,9 @@ import { useAxios } from '~/services/axios'
 import { useMediaStore } from '~/store/media'
 import { toast } from 'vue-sonner'
 
-interface UncategorizedProps {
-    uncategories: Image[]
-}
+import { useInfiniteScroll } from '@vueuse/core'
 
 const emit = defineEmits(['refresh'])
-const props = defineProps<UncategorizedProps>()
 const { axios } = useAxios()
 const mediaStore = useMediaStore()
 const { galleryList } = storeToRefs(mediaStore)
@@ -21,17 +18,89 @@ const isMoving = ref(false)
 const selectedGalleryId = ref('')
 const isNewGallery = ref(false)
 const newGalleryName = ref('')
+const isLoading = ref(false)
+const scrollContainer = ref<HTMLElement | null>(null)
+
+const uncategories = ref<Image[]>([])
+const params = ref({
+    current: 1,
+    per_page: 30,
+    total_page: 1,
+    total: 0
+})
+
+const fetchImages = async (append = false) => {
+    if (!append) {
+        params.value.current = 1
+        uncategories.value = []
+    }
+    const { data } = await axios.get('/medias/images/uncategorized', {
+        params: {
+            current: params.value.current,
+            per_page: params.value.per_page
+        }
+    })
+    
+    if (append) {
+        uncategories.value.push(...data.data)
+    } else {
+        uncategories.value = data.data
+    }
+    
+    params.value.total_page = data.total_page
+    params.value.total = data.total
+    
+    selectedIds.value = uncategories.value.map(() => null)
+}
+
+useInfiniteScroll(document, () => {
+    if (params.value.current < params.value.total_page) {
+        params.value.current++
+        fetchImages(true)
+    }
+}, { distance: 50 })
+
+const handleImageChange = async (e: Event) => {
+    const target = e.target as HTMLInputElement
+    const files = target.files
+    if (!files || files.length === 0) return
+
+    isLoading.value = true
+    const base64Images: string[] = []
+
+    for (const file of files) {
+        const reader = new FileReader()
+        await new Promise(resolve => {
+            reader.onload = (e) => {
+                base64Images.push(e.target?.result as string)
+                resolve(true)
+            }
+            reader.readAsDataURL(file)
+        })
+    }
+
+    try {
+        await axios.post('/medias/uncategorized/images', { images: base64Images })
+        toast.success('Images uploaded successfully')
+        fetchImages()
+        emit('refresh')
+    } catch (error) {
+        toast.error('Failed to upload images')
+    } finally {
+        isLoading.value = false
+    }
+}
 
 const init = () => {
-    selectedIds.value = props.uncategories.map(() => null)
+    fetchImages()
 }
 
 const selectAll = () => {
-    selectedIds.value = props.uncategories.map(i => i.id)
+    selectedIds.value = uncategories.value.map(i => i.id)
 }
 
 const deselectAll = () => {
-    selectedIds.value = props.uncategories.map(() => null)
+    selectedIds.value = uncategories.value.map(() => null)
 }
 
 const hasSelected = computed(() => selectedIds.value.some(id => id !== null))
@@ -45,6 +114,7 @@ const remove = async () => {
             }
         })
         toast.success('Images deleted successfully')
+        fetchImages()
         emit('refresh')
     } catch (error) {
         toast.error('Failed to delete images')
@@ -78,6 +148,7 @@ const handleMove = async () => {
 
         toast.success('Images moved successfully')
         showMoveDialog.value = false
+        fetchImages()
         emit('refresh')
         deselectAll()
         isNewGallery.value = false
@@ -95,13 +166,11 @@ onMounted(() => {
     init()
     mediaStore.fetchGalleryList()
 })
-
-watch(() => props.uncategories, init)
 </script>
 
 <template>
-    <div>
-        <div class="flex items-center justify-between relative mb-4">
+    <div ref="scrollContainer" class="relative">
+        <div class="flex items-center justify-between py-5 px-1 mb-4 sticky top-[75px] bg-white z-10">
             <div class="grow">
                 <strong class="text-xl">Uncategorised</strong>
             </div>
@@ -137,6 +206,20 @@ watch(() => props.uncategories, init)
         <div class="grid grid-cols-4 gap-2">
             <PagesDashboardMediaCard v-for="(image, index) in uncategories" v-model:selected="selectedIds[index]"
                 :key="`uncategories_${index}`" :image="image" @update="emit('refresh')" />
+
+            <label
+                class="relative aspect-square border-2 border-dashed rounded-xl overflow-hidden flex flex-col items-center justify-center text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                <input type="file" multiple @change="handleImageChange" class="hidden" :disabled="isLoading" />
+                <div class="flex flex-col items-center gap-2 p-4 text-muted-foreground">
+                    <Loader2Icon v-if="isLoading" class="animate-spin size-8" />
+                    <FolderInputIcon v-else class="size-8" />
+                    <span class="text-sm font-medium">{{ isLoading ? 'Uploading...' : 'Upload Images' }}</span>
+                </div>
+            </label>
+        </div>
+        
+        <div class="h-10 mt-4 flex items-center justify-center">
+            <Loader2Icon v-if="params.current < params.total_page" class="animate-spin text-muted-foreground" />
         </div>
 
         <Dialog v-model:open="showMoveDialog">
