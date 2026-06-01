@@ -133,8 +133,8 @@ const isSticky = computed(() => y.value > 450)
 
         <!-- Hero Section -->
         <div class="relative w-full">
-            <div class="flex min-h-[500px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 lg:px-40 pb-16 relative overflow-hidden"
-                :style="{ backgroundImage: `linear-gradient(rgba(16, 24, 34, 0.2) 0%, rgba(16, 24, 34, 0.9) 100%), url(${trailRace.thumbnail ? showImage(trailRace.thumbnail.file_name) : 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80'})` }">
+            <div class="flex min-h-screen flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 lg:px-40 pb-16 relative overflow-hidden"
+                :style="{ backgroundImage: `linear-gradient(rgba(16, 24, 34, 0.2) 0%, rgba(16, 24, 34, 0.9) 100%), url(${trailRace.thumbnail ? showImage(trailRace.thumbnail.file_name) : ''})` }">
 
                 <div class="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <Badge v-if="isUpcoming"

@@ -1,9 +1,9 @@
 ## new changes
 ### Events
 [X] Full cover image (uncropped)
-[ ] slide show on events detail page - implement media upload form in edit event page.
+[X] slide show on events detail page - implement media upload form in edit event page.
 [ ] guide book pdf upload and view
-[ ] more description at the end
+[X] more description at the end
 ### Fastpacking
 [X] gallery image to show all
 [X] step slider navigation not working

@@ -27,7 +27,12 @@ export class EventController {
                         }
                     },
                     runners: true,
-                    thumbnail: true
+                    thumbnail: true,
+                    gallery: {
+                        include: {
+                            images: true
+                        }
+                    }
                 },
                 where: {
                     deleted_at: null
