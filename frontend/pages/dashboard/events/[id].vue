@@ -14,6 +14,7 @@ import VolunteerList from '@/components/pages/dashboard/event/volunteer/list.vue
 import RunnerList from '@/components/pages/dashboard/event/runner/list.vue'
 import TrailRaceSponsorList from '@/components/pages/dashboard/event/sponsor/list.vue'
 import TrailRaceSettings from '@/components/pages/dashboard/event/settings/list.vue'
+import TrailRaceDetails from '@/components/pages/dashboard/event/details.vue'
 
 useHead({
     title: 'Events'
@@ -59,8 +60,11 @@ onBeforeMount(() => {
                 </Button>
             </div>
         </div>
-        <Tabs default-value="detail" class="text-gray-600">
+        <Tabs default-value="info" class="text-gray-600">
             <TabsList class="uppercase">
+                <TabsTrigger value="info">
+                    Info
+                </TabsTrigger>
                 <TabsTrigger value="detail">
                     Details
                 </TabsTrigger>
@@ -83,7 +87,7 @@ onBeforeMount(() => {
                     Settings
                 </TabsTrigger>
             </TabsList>
-            <TabsContent value="detail">
+            <TabsContent value="info">
                 <div class="flex flex-col gap-4">
                     <dl class="text-md">
                         <dt>Starts:</dt>
@@ -95,6 +99,9 @@ onBeforeMount(() => {
                     <TrailMapUploadMap :trail-race="trailRace" @update="fetchEventDetail" />
                     <TrailRaceDescription :trail-race="trailRace" @update="fetchEventDetail" />
                 </div>
+            </TabsContent>
+            <TabsContent value="detail">
+                <TrailRaceDetails :trail-race="trailRace" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="stages">
                 <TrailRaceStageList :event-id="(route.params.id as string)" @update="fetchEventDetail" />

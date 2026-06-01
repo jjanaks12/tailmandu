@@ -307,6 +307,21 @@ export class EventController {
         }
     }
 
+    public static async updateDetails(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id as string
+                },
+                data: {
+                    details: request.body.details
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async updateThumbnail(request: Request, response: Response, next: NextFunction) {
         try {
             const fileUpload = new FileHandler('images')

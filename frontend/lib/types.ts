@@ -124,6 +124,7 @@ export type TrailRace = {
     end: string
     excerpt: string
     description: string
+    details?: any
     created_at: string
     updated_at?: string
     deleted_at?: string

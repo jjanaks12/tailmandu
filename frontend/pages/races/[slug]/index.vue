@@ -21,6 +21,18 @@ const totalDistance = computed(() => {
 
 const totatDistanceSelectedStage = computed(() => selectedStage.value ? selectedStage.value?.stage_categories.reduce((acc, stage) => acc + parseFloat(stage.distance), 0) / 1000 : 0)
 
+const parsedDetails = computed(() => {
+    if (!trailRace.value?.details) return []
+    try {
+        let parsed = typeof trailRace.value.details === 'string'
+            ? JSON.parse(trailRace.value.details)
+            : trailRace.value.details
+        return Array.isArray(parsed) ? parsed : []
+    } catch {
+        return []
+    }
+})
+
 const totalElevationGain = computed(() => {
     if (!trailRace.value?.stages) return 0
     // Assuming we might have elevation data in stage_categories or similar, 
@@ -231,7 +243,7 @@ const isSticky = computed(() => y.value > 450)
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+                    <!-- <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
                         <div
                             class="bg-slate-50 dark:bg-deep-slate/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800/50">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Distance</p>
@@ -239,7 +251,7 @@ const isSticky = computed(() => y.value > 450)
                                 {{ totatDistanceSelectedStage }} KM
                             </p>
                         </div>
-                        <!-- <div
+                        <div
                             class="bg-slate-50 dark:bg-deep-slate/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800/50">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vert Gain
                             </p>
@@ -262,8 +274,8 @@ const isSticky = computed(() => y.value > 450)
                             <p class="text-2xl font-black flex items-center gap-2 text-primary">
                                 <TimerIcon class="w-4 h-4" /> 4.5 - 7h
                             </p>
-                        </div> -->
-                    </div>
+                        </div>
+                    </div> -->
 
                     <!-- Stage Categories -->
                     <div class="border border-primary p-4 rounded-xl" v-if="selectedStage.stage_categories?.length > 0">
@@ -388,6 +400,17 @@ const isSticky = computed(() => y.value > 450)
                         </div>
                     </div> -->
                 </section>
+                <!-- Dynamic Topics (Details) -->
+                <div v-if="parsedDetails.length > 0" class="mt-12 space-y-12">
+                    <div v-for="topic in parsedDetails" :key="topic.id">
+                        <h4 class="font-black text-2xl text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                            <span class="w-8 h-1 bg-primary rounded-full"></span>
+                            {{ topic.title }}
+                        </h4>
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400"
+                            v-html="topic.content" />
+                    </div>
+                </div>
             </div>
 
             <!-- Sidebar -->
@@ -464,7 +487,7 @@ const isSticky = computed(() => y.value > 450)
                         <div class="w-px h-8 bg-slate-200 dark:bg-slate-800"></div>
                         <p class="text-[10px] font-bold uppercase tracking-widest">
                             Trailmandu Global Events <br />
-                            Sanctioned Race 2024
+                            Sanctioned Race {{ formatDate(trailRace.start, 'YYYY') }}
                         </p>
                     </div>
                 </div>

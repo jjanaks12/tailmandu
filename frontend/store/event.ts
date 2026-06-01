@@ -63,6 +63,12 @@ export const useEventStore = defineStore('event', () => {
         return status === 200
     }
 
+    const saveDetails = async (id: string, details: any) => {
+        const { status } = await axios.put(`/events/${id}/update_details`, { details })
+
+        return status === 200
+    }
+
     const saveMap = async (id: string, description: string) => {
         const { status } = await axios.put(`/events/${id}/upload_map_file`, { description })
 
@@ -84,6 +90,6 @@ export const useEventStore = defineStore('event', () => {
     return {
         isLoading, params, events,
         currentRace,
-        fetch, fetchPublic, save, get, saveDescription, saveMap, getBySlug, saveRunner, saveVoluteer
+        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, getBySlug, saveRunner, saveVoluteer
     }
 })

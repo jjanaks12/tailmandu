@@ -457,6 +457,7 @@ model TrailRace {
   end         DateTime
   excerpt     String?   @db.Text
   description String    @db.LongText
+  details     Json      @default("{}")
   created_at  DateTime  @default(now())
   updated_at  DateTime?
   deleted_at  DateTime?
@@ -956,7 +957,7 @@ model SeoMetadata {
   og_image_id      String?
   og_image         Image?  @relation("seo_og_image", fields: [og_image_id], references: [id])
 
-  blog_post BlogPost?
+  blog_post   BlogPost?
   static_page StaticPage?
   // Future-proofing for other tables
   // product       Product?
@@ -1057,39 +1058,39 @@ model Enquiry {
 }
 
 model StaticPage {
-  id                String    @id @default(cuid())
-  title             String
-  slug              String    @unique
-  description       String?   @db.Text
-  body              String?   @db.LongText
-  status            String    @default("draft")
-  created_at        DateTime  @default(now())
-  updated_at        DateTime?
-  deleted_at        DateTime?
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String?   @db.Text
+  body        String?   @db.LongText
+  status      String    @default("draft")
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
 
-  seo_id            String?      @unique
-  seo               SeoMetadata? @relation(fields: [seo_id], references: [id])
-  
+  seo_id String?      @unique
+  seo    SeoMetadata? @relation(fields: [seo_id], references: [id])
+
   featured_image_id String?
-  featured_image    Image?       @relation("page_featured_image", fields: [featured_image_id], references: [id])
+  featured_image    Image?  @relation("page_featured_image", fields: [featured_image_id], references: [id])
 
   @@map("static_pages")
 }
 
 model TeamMember {
-  id          String    @id @default(cuid())
-  name        String
-  positions   Json
-  social      Json?
-  text        String?   @db.LongText
-  links       Json?
-  order       Int       @default(0)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime?
-  deleted_at  DateTime?
+  id         String    @id @default(cuid())
+  name       String
+  positions  Json
+  social     Json?
+  text       String?   @db.LongText
+  links      Json?
+  order      Int       @default(0)
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
 
-  image_id    String?
-  image       Image?    @relation("team_member_image", fields: [image_id], references: [id])
+  image_id String?
+  image    Image?  @relation("team_member_image", fields: [image_id], references: [id])
 
   @@map("team_members")
 }
