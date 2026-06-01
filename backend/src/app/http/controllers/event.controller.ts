@@ -251,7 +251,12 @@ export class EventController {
                         }
                     },
                     thumbnail: true,
-                    map_file: true
+                    map_file: true,
+                    gallery: {
+                        include: {
+                            images: true
+                        }
+                    }
                 }
             }))
         } catch (error) {
@@ -332,6 +337,36 @@ export class EventController {
                 where: { id: event.id },
                 data: {
                     image_id: image.id
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async updateImageId(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id as string
+                },
+                data: {
+                    image_id: request.body.image_id
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async updateGalleryId(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id as string
+                },
+                data: {
+                    gallery_id: request.body.gallery_id
                 }
             }))
         } catch (error) {

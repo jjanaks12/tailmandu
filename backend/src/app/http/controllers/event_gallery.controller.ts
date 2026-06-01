@@ -13,16 +13,16 @@ export class GalleryController {
                     id: request.params.event_id as string
                 },
                 include: {
-                    galleries: true
+                    gallery: true
                 }
             })
 
-            response.send(event.galleries)
+            response.send(event.gallery)
         } catch (error) {
             next(error)
         }
     }
-    public static async store(request: Request, response: Response, next: NextFunction) {
+    /* public static async store(request: Request, response: Response, next: NextFunction) {
         try {
             const validationData = await gallerySchema.validate(request.body, { abortEarly: false })
             const fileService = new FileHandler('images')
@@ -37,7 +37,7 @@ export class GalleryController {
                     id: request.params.event_id as string
                 },
                 data: {
-                    galleries: {
+                    gallery: {
                         connect: a.map(img => ({ id: img.id }))
                     }
                 }
@@ -45,9 +45,9 @@ export class GalleryController {
         } catch (error) {
             next(error)
         }
-    }
+    } */
 
-    public static async destory(request: Request, response: Response, next: NextFunction) {
+    /* public static async destory(request: Request, response: Response, next: NextFunction) {
         try {
             const fileHandler = new FileHandler('images')
             await fileHandler.deleteFile(request.params.image_id as string)
@@ -66,5 +66,5 @@ export class GalleryController {
         } catch (error) {
             next(error)
         }
-    }
+    } */
 }

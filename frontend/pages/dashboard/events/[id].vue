@@ -54,7 +54,7 @@ onBeforeMount(() => {
                 <Button @click="fetchEventDetail" variant="secondary" modifier="outline" size="icon">
                     <RefreshCwIcon :class="{ 'animate-spin': isLoading }" />
                 </Button>
-                <Button @click="navigateTo({ name: 'dashboard-events' })">
+                <Button @click="navigateTo('/dashboard/events')">
                     <MoveLeftIcon />
                     Back
                 </Button>
@@ -113,7 +113,7 @@ onBeforeMount(() => {
                 <VolunteerList :stages="trailRace.stages" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="gallery">
-                <TrailRaceGallery :event-id="(route.params.id as string)" />
+                <TrailRaceGallery :trail-race="trailRace" @update="fetchEventDetail" />
             </TabsContent>
             <TabsContent value="sponsor">
                 <TrailRaceSponsorList :event-id="(route.params.id as string)" />

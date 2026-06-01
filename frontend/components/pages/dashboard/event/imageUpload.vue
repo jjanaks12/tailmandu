@@ -2,8 +2,10 @@
     import { LoaderIcon, SaveIcon } from 'lucide-vue-next'
 
     import { showImage } from '~/lib/filters'
-    import type { TrailRace } from '~/lib/types'
+    import type { TrailRace, Image } from '~/lib/types'
     import { useAxios } from '~/services/axios'
+    import { useMediaStore } from '~/store/media'
+    import { storeToRefs } from 'pinia'
 
     interface TrailRaceImageUploadProps {
         trailRace: TrailRace
@@ -13,34 +15,39 @@
     const { axios } = useAxios()
     const emit = defineEmits(['update'])
     const { can } = useAuthorization()
+    const { media } = storeToRefs(useMediaStore())
+    const { fetchImage } = useMediaStore()
 
     const imageToUpload = ref('')
+    const selectedImageIdToSave = ref('')
     const editImage = ref(false)
     const saving = ref(false)
 
-    const fileHandler = (event: Event) => {
-        const files = (event.target as HTMLInputElement).files ?? []
-
-        if (files?.length == 0)
-            return
-
-        const reader = new FileReader()
-        const file = files[0]
-        reader.onload = () => {
-            imageToUpload.value = reader.result as string
+    const openMediaCenter = () => {
+        media.value.show = true
+        media.value.mode = 'image'
+        media.value.isMultiple = false
+        media.value.action = async (state: any) => {
+            if (state.selectedImages.length > 0) {
+                const imageId = state.selectedImages[0]
+                selectedImageIdToSave.value = imageId
+                const img = await fetchImage(imageId)
+                if (img) {
+                    imageToUpload.value = showImage(img.file_name)
+                }
+                media.value.show = false
+            }
         }
-        if (file)
-            reader.readAsDataURL(file)
     }
 
     const saveImage = async () => {
         saving.value = true
 
-        await axios.put(`/events/${props.trailRace.id}/upload_thumbnail`, {
-            image: imageToUpload.value
+        await axios.put(`/events/${props.trailRace.id}/update_image_id`, {
+            image_id: selectedImageIdToSave.value
         })
         saving.value = false
-        editImage.value = true
+        editImage.value = false
         emit('update')
     }
 
@@ -56,14 +63,13 @@
             <img :src="showImage(trailRace?.thumbnail?.file_name as string)" :alt="trailRace.name"
                 class="w-full h-full object-cover absolute top-0 left-0 z-0">
         </figure>
-        <label v-else
+        <div v-else
             class="bg-gray-100 hover:bg-gray-200 h-full flex justify-center items-center cursor-pointer transition-colors overflow-hidden"
-            :diabled="saving">
-            <input type="file" class="hidden" @change="fileHandler" :disabled="saving" accept=".jpg, .jpeg, .png">
+            @click="!saving ? openMediaCenter() : null">
             <img :src="imageToUpload" alt="Trail race preview image" v-if="imageToUpload"
                 class="w-full h-full object-cover absolute top-0 left-0 z-0">
-            <span class="relative" v-else>Upload image</span>
-        </label>
+            <span class="relative" v-else>Select image from Media Center</span>
+        </div>
         <div class="absolute top-2 right-2">
             <template v-if="trailRace.image_id != null && !editImage">
                 <Button @click="editImage = true" permissions="event_edit">Edit image</Button>

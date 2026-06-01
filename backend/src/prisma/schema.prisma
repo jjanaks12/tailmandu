@@ -193,7 +193,6 @@ model Image {
   events                  TrailRace[]            @relation("thumbnail_image")
   maps                    TrailRace[]            @relation("map_image")
   companies               Company[]
-  gallery_event           TrailRace[]            @relation("trail_race_gallery")
   thumbnail_stages        Stage[]                @relation("thumbnail_image")
   payments                Payment[]
   stage_categories        StageCategory[]        @relation("gpx_file")
@@ -467,12 +466,13 @@ model TrailRace {
   map_file_id String?
   map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: Cascade)
 
-  stages    Stage[]
-  runners   EventRunner[]
-  galleries Image[]       @relation("trail_race_gallery")
-  partners  Partner[]
-  sponsors  Sponsor[]
-  tags      Tag[]
+  stages     Stage[]
+  runners    EventRunner[]
+  gallery_id String?
+  gallery    Gallery?      @relation(fields: [gallery_id], references: [id])
+  partners   Partner[]
+  sponsors   Sponsor[]
+  tags       Tag[]
 
   @@map("events")
 }
@@ -612,8 +612,9 @@ model Gallery {
 
   images   Image[]
   tags     Tag[]
+  events   TrailRace[]
   treks    Trek[]
-  products Product[] @relation("product_gallery")
+  products Product[]   @relation("product_gallery")
 
   @@map("galleries")
 }

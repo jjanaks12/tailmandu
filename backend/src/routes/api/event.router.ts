@@ -26,6 +26,8 @@ router.put('/:event_id', [verifyAccessToken], EventController.update)
 router.put('/:event_id/update_description', [verifyAccessToken], EventController.updateDescription)
 router.put('/:event_id/update_details', [verifyAccessToken], EventController.updateDetails)
 router.put('/:event_id/upload_thumbnail', [verifyAccessToken], EventController.updateThumbnail)
+router.put('/:event_id/update_image_id', [verifyAccessToken], EventController.updateImageId)
+router.put('/:event_id/update_gallery_id', [verifyAccessToken], EventController.updateGalleryId)
 router.put('/:event_id/upload_map_file', [verifyAccessToken], EventController.updateGPXFile)
 router.delete('/:event_id', [verifyAccessToken], EventController.destory)
 
@@ -45,8 +47,8 @@ router.delete('/checkpoints/:checkpoint_id', [verifyAccessToken], CheckpointCont
 
 // GALLERIES
 router.get('/:event_id/galleries', [verifyAccessToken], GalleryController.index)
-router.post('/:event_id/galleries', [verifyAccessToken], GalleryController.store)
-router.delete('/:event_id/galleries/:image_id', [verifyAccessToken], GalleryController.destory)
+// router.post('/:event_id/galleries', [verifyAccessToken], GalleryController.store)
+// router.delete('/:event_id/galleries/:image_id', [verifyAccessToken], GalleryController.destory)
 
 // VOLUNTEERS
 router.post('/:event_id/volunteer/register', [], VolunteerController.save)

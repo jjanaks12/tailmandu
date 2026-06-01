@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SearchIcon, FilterIcon, ImagePlusIcon, SquareIcon, SquareCheckIcon } from 'lucide-vue-next'
+import { SearchIcon, FilterIcon, ImagePlusIcon, SquareIcon, SquareCheckIcon, RefreshCwIcon } from 'lucide-vue-next'
 import type { Image } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { useMediaStore } from '~/store/media'
@@ -61,9 +61,9 @@ onMounted(init)
 </script>
 
 <template>
-    <div class="w-full max-h-[calc(100vh-100px)] overflow-y-auto max-w-4xl flex flex-col"
+    <div class="w-full max-h-[calc(100vh-300px)] overflow-y-auto max-w-4xl flex flex-col"
         v-if="!media?.selectedGallery">
-        <div class="flex gap-3 pt-2 mb-5">
+        <div class="flex items-center gap-3 pt-2 mb-5">
             <div class="relative flex-1">
                 <SearchIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input placeholder="Search alpine assets..."
@@ -90,6 +90,10 @@ onMounted(init)
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+            <Button modifier="link" class="flex items-center gap-2" @click="init(true)">
+                <RefreshCwIcon class="w-4 h-4" />
+                Refresh
+            </Button>
         </div>
         <!-- Gallery grid -->
         <div class="flex-1 overflow-y-auto py-2 px-6 gallery-scrollbar">

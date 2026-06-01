@@ -75,6 +75,11 @@ export const useEventStore = defineStore('event', () => {
         return status === 200
     }
 
+    const saveGalleryId = async (id: string, galleryId: string) => {
+        const { status } = await axios.put(`/events/${id}/update_gallery_id`, { gallery_id: galleryId })
+        return status === 200
+    }
+
     const saveRunner = async (formData: InferType<typeof trailRaceRunner>, eventId: string) => {
         const { status } = await axios.post(`/events/${eventId}/runner/register`, formData)
 
@@ -90,6 +95,6 @@ export const useEventStore = defineStore('event', () => {
     return {
         isLoading, params, events,
         currentRace,
-        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, getBySlug, saveRunner, saveVoluteer
+        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer
     }
 })
