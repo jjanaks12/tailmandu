@@ -438,13 +438,13 @@ const isSticky = computed(() => y.value > 450)
                     </div> -->
                 </section>
                 <!-- Dynamic Topics (Details) -->
-                <div v-if="parsedDetails.length > 0" class="mt-12 space-y-12">
+                <div v-if="parsedDetails.length > 0" class="mt-12 space-y-12 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div v-for="topic in parsedDetails" :key="topic.id">
                         <h4 class="font-black text-2xl text-slate-900 dark:text-white mb-6 flex items-center gap-3">
                             <span class="w-8 h-1 bg-primary rounded-full"></span>
                             {{ topic.title }}
                         </h4>
-                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 [&_p]:mb-4"
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:dark:text-white"
                             v-html="topic.content" />
                     </div>
                 </div>

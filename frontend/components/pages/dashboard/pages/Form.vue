@@ -89,7 +89,8 @@ onMounted(init)
 
                         <Field name="body" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
                             <Label>Body Content</Label>
-                            <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange" :toolbar-height="80" />
+                            <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange"
+                                :toolbar-height="80" />
                             <ErrorMessage class="error__message" name="body" />
                         </Field>
 
@@ -120,7 +121,8 @@ onMounted(init)
                             <div class="flex flex-col gap-2">
                                 <Label>Featured Image</Label>
                                 <Field name="featured_image_id" v-slot="{ value, handleChange }">
-                                    <MediaUploader :value="value" :preview="page?.featured_image?.file_name" @update:value="handleChange" />
+                                    <MediaUploader :value="value" :preview="page?.featured_image?.file_name"
+                                        @update:value="handleChange" />
                                 </Field>
                             </div>
                         </div>
@@ -133,7 +135,8 @@ onMounted(init)
                     <div class="md:col-span-8 space-y-6 text-left">
                         <Alert variant="info">
                             <GlobeIcon class="size-5 text-blue-500 shrink-0 mt-0.5" />
-                            <AlertDescription>Optimize how this static page appears in search engines and social media.</AlertDescription>
+                            <AlertDescription>Optimize how this static page appears in search engines and social media.
+                            </AlertDescription>
                         </Alert>
 
                         <div class="grid gap-6">
@@ -161,7 +164,8 @@ onMounted(init)
                             <div class="flex flex-col gap-2">
                                 <Label>OG Image</Label>
                                 <Field name="seo.og_image_id" v-slot="{ value, handleChange }">
-                                    <MediaUploader :value="value" :preview="page?.seo?.og_image?.file_name" @update:value="handleChange" />
+                                    <MediaUploader :value="value" :preview="page?.seo?.og_image?.file_name"
+                                        @update:value="handleChange" />
                                 </Field>
                             </div>
                         </div>
@@ -170,7 +174,11 @@ onMounted(init)
             </TabsContent>
         </Tabs>
 
-        <div class="py-6 border-t border-border flex justify-end sticky bottom-0 bg-background">
+        <div class="py-6 border-t border-border flex justify-end gap-2 sticky bottom-0 bg-background">
+            <Button v-if="page?.slug" modifier="outline" type="button"
+                @click="navigateTo(`/info/${page.slug}?preview=true&id=${page.id}`, { external: true, open: { target: '_blank' } })">
+                Preview
+            </Button>
             <Button type="submit" :disabled="isLoading" class="min-w-[150px]">
                 <Loader2Icon v-if="isLoading" class="animate-spin mr-2" />
                 Save Page

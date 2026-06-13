@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { CalendarIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, ArrowLeftIcon } from 'lucide-vue-next'
 import { usePageStore } from '~/store/page'
+import { useAuthStore } from '~/store/auth'
+import { storeToRefs } from 'pinia'
 import { showImage } from '~/lib/filters'
 
 const route = useRoute()
-const { getPublicPageBySlug } = usePageStore()
+const { getPublicPageBySlug, getPage } = usePageStore()
+const { isLoggedin } = storeToRefs(useAuthStore())
 const page = ref<any>(null)
 const isLoading = ref(true)
 
 const init = async () => {
     isLoading.value = true
     try {
-        const data = await getPublicPageBySlug(route.params.slug as string)
+        let data;
+        if (route.query.preview === 'true' && route.query.id && isLoggedin.value) {
+            data = await getPage(route.query.id as string)
+        } else {
+            data = await getPublicPageBySlug(route.params.slug as string)
+        }
         page.value = data
 
         if (data) {
