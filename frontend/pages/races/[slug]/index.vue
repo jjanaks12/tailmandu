@@ -303,7 +303,7 @@ const isSticky = computed(() => y.value > 450)
                     <div class="border border-primary p-4 rounded-xl" v-if="selectedStage.stage_categories?.length > 0">
                         <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12 [&_p]:mb-4"
                             v-html="selectedStage.description" />
-                        <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-8">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-gray-800 mb-8">
                             Available Categories
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
@@ -312,7 +312,7 @@ const isSticky = computed(() => y.value > 450)
                                 @click="selectedStageCategory = cat"
                                 :class="selectedStageCategory?.id === cat.id ? 'border-l-8' : ''">
                                 <div class="flex justify-between items-start mb-6">
-                                    <h5 class="font-black text-xl">{{ cat.name }}</h5>
+                                    <h5 class="font-black text-xl text-gray-800">{{ cat.name }}</h5>
                                     <TrophyIcon class="w-5 h-5 text-primary" />
                                 </div>
                                 <div class="space-y-4">
@@ -374,21 +374,23 @@ const isSticky = computed(() => y.value > 450)
                         </div>
                         <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12 [&_p]:mb-4"
                             v-if="selectedStageCategory" v-html="selectedStageCategory.description" />
-                        <h3 class="font-black text-xl">
-                            Checkpoints
-                        </h3>
-                        <ul class="grid md:grid-cols-2 gap-4">
-                            <li v-for="(item, index) in selectedStageCategory?.checkpoints" :key="item.id"
-                                class="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 flex items-center justify-between gap-4">
-                                <div>
-                                    <span class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
-                                        {{ `CP ${index + 1}` }}
-                                    </span>
-                                    <h5 class="font-black text-lg">{{ item.name }}</h5>
-                                </div>
-                            </li>
-                        </ul>
-
+                        <template
+                            v-if="selectedStageCategory?.checkpoints && selectedStageCategory?.checkpoints.length > 0">
+                            <h3 class="text-gray-800 font-black text-xl mb-4">
+                                Checkpoints
+                            </h3>
+                            <ul class="grid md:grid-cols-2 gap-4">
+                                <li v-for="(item, index) in selectedStageCategory?.checkpoints" :key="item.id"
+                                    class="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 flex items-center justify-between gap-4">
+                                    <div>
+                                        <span class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
+                                            {{ `CP ${index + 1}` }}
+                                        </span>
+                                        <h5 class="font-black text-lg">{{ item.name }}</h5>
+                                    </div>
+                                </li>
+                            </ul>
+                        </template>
                     </div>
 
                     <!-- Elevation Profile SVG Placeholder (adapted from design) -->

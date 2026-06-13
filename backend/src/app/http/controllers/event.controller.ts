@@ -281,7 +281,11 @@ export class EventController {
                             stage_categories: {
                                 include: {
                                     map_file: true,
-                                    checkpoints: true,
+                                    checkpoints: {
+                                        where: {
+                                            deleted_at: null
+                                        }
+                                    },
                                     payment: {
                                         include: {
                                             screenshot: true

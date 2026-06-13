@@ -92,17 +92,31 @@ const removeItemisedInclusion = (index: number) => {
     saveDetails()
 }
 
-const gearInput = ref('')
-const addGear = () => {
-    if (gearInput.value.trim()) {
-        trek.value?.details.mandatoryGear.push({ title: gearInput.value.trim(), checked: false })
-        gearInput.value = ''
+const mandatoryGearInput = ref('')
+const addMandatoryGear = () => {
+    if (mandatoryGearInput.value.trim()) {
+        trek.value?.details.mandatoryGear.push({ title: mandatoryGearInput.value.trim(), checked: false })
+        mandatoryGearInput.value = ''
         saveDetails()
     }
 }
 
-const removeGear = (index: number) => {
+const removeMandatoryGear = (index: number) => {
     trek.value?.details.mandatoryGear.splice(index, 1)
+    saveDetails()
+}
+
+const optionalGearInput = ref('')
+const addOptionalGear = () => {
+    if (optionalGearInput.value.trim()) {
+        trek.value?.details.optionalGear.push({ title: optionalGearInput.value.trim(), checked: false })
+        optionalGearInput.value = ''
+        saveDetails()
+    }
+}
+
+const removeOptionalGear = (index: number) => {
+    trek.value?.details.optionalGear.splice(index, 1)
     saveDetails()
 }
 
@@ -231,7 +245,8 @@ onMounted(init)
                                     class="fixed top-1/2 right-0 -translate-y-1/2 rotate-90 origin-top-right z-50 flex items-center gap-2 shadow-lg"
                                     @click="fetchBookings(false)">
                                     View Bookings
-                                    <span v-if="pendingBookingsCount > 0" class="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm -rotate-90">
+                                    <span v-if="pendingBookingsCount > 0"
+                                        class="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm -rotate-90">
                                         {{ pendingBookingsCount }}
                                     </span>
                                 </Button>
@@ -254,14 +269,18 @@ onMounted(init)
                                             <div>
                                                 <div class="font-bold text-foreground text-sm flex items-center gap-2">
                                                     {{ booking.lead_name || 'Anonymous' }}
-                                                    <Badge v-if="booking.lead_dietary || booking.lead_fitness_level" variant="secondary" class="text-[8px] px-1 py-0 h-4 bg-amber-100 text-amber-700 hover:bg-amber-100">Has Info</Badge>
+                                                    <Badge v-if="booking.lead_dietary || booking.lead_fitness_level"
+                                                        variant="secondary"
+                                                        class="text-[8px] px-1 py-0 h-4 bg-amber-100 text-amber-700 hover:bg-amber-100">
+                                                        Has Info</Badge>
                                                 </div>
                                                 <div class="text-xs text-muted-foreground mt-0.5">
                                                     {{ booking.lead_passport || 'No Passport Info' }}
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                <Loader2Icon v-if="isUpdatingStatus[booking.id]" class="w-3 h-3 animate-spin text-primary" />
+                                                <Loader2Icon v-if="isUpdatingStatus[booking.id]"
+                                                    class="w-3 h-3 animate-spin text-primary" />
                                                 <select :value="booking.status || 'PENDING'"
                                                     @change="updateBookingStatus(booking.id, ($event.target as HTMLSelectElement).value)"
                                                     :class="[
@@ -271,10 +290,14 @@ onMounted(init)
                                                         booking.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200/80' : '',
                                                         booking.status === 'CANCELLED' ? 'bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200/80' : ''
                                                     ]">
-                                                    <option value="PENDING" class="bg-card text-foreground">Pending</option>
-                                                    <option value="CONFIRMED" class="bg-card text-foreground">Confirmed</option>
-                                                    <option value="COMPLETED" class="bg-card text-foreground">Completed</option>
-                                                    <option value="CANCELLED" class="bg-card text-foreground">Cancelled</option>
+                                                    <option value="PENDING" class="bg-card text-foreground">Pending
+                                                    </option>
+                                                    <option value="CONFIRMED" class="bg-card text-foreground">Confirmed
+                                                    </option>
+                                                    <option value="COMPLETED" class="bg-card text-foreground">Completed
+                                                    </option>
+                                                    <option value="CANCELLED" class="bg-card text-foreground">Cancelled
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
@@ -303,27 +326,42 @@ onMounted(init)
                                             </div>
                                         </div>
                                         <details class="group border-t border-border/50 pt-2 text-xs">
-                                            <summary class="cursor-pointer font-bold text-muted-foreground hover:text-foreground flex items-center justify-between outline-none">
+                                            <summary
+                                                class="cursor-pointer font-bold text-muted-foreground hover:text-foreground flex items-center justify-between outline-none">
                                                 View Traveler Details ({{ booking.travelers?.length || 0 }})
                                                 <PlusIcon class="w-3 h-3 group-open:hidden" />
                                                 <MinusIcon class="w-3 h-3 hidden group-open:block" />
                                             </summary>
                                             <div class="mt-3 space-y-2 pb-1">
-                                                <div v-for="(traveler, idx) in booking.travelers" :key="idx" class="bg-card border border-border rounded-md p-2 hover:bg-muted/10 transition-colors">
+                                                <div v-for="(traveler, idx) in booking.travelers" :key="idx"
+                                                    class="bg-card border border-border rounded-md p-2 hover:bg-muted/10 transition-colors">
                                                     <div class="font-bold flex items-center justify-between">
-                                                        <span>{{ traveler.name || 'Unnamed' }} <Badge v-if="traveler.is_lead" variant="outline" class="ml-1 text-[8px] px-1 py-0 h-4 border-primary text-primary">Lead</Badge></span>
-                                                        <span class="text-xs text-muted-foreground font-normal">{{ traveler.passport || 'No Passport' }}</span>
+                                                        <span>{{ traveler.name || 'Unnamed' }} <Badge
+                                                                v-if="traveler.is_lead" variant="outline"
+                                                                class="ml-1 text-[8px] px-1 py-0 h-4 border-primary text-primary">
+                                                                Lead</Badge></span>
+                                                        <span class="text-xs text-muted-foreground font-normal">{{
+                                                            traveler.passport || 'No Passport' }}</span>
                                                     </div>
-                                                    <div class="mt-1 flex flex-wrap gap-2 text-muted-foreground italic text-[10px] bg-muted/20 px-2 py-1 rounded">
+                                                    <div
+                                                        class="mt-1 flex flex-wrap gap-2 text-muted-foreground italic text-[10px] bg-muted/20 px-2 py-1 rounded">
                                                         <span v-if="traveler.age">Age: {{ traveler.age }}</span>
-                                                        <span v-if="traveler.nationality">From: {{ traveler.nationality }}</span>
-                                                        <span v-if="traveler.dietary" class="w-full">Diet: {{ traveler.dietary }}</span>
+                                                        <span v-if="traveler.nationality">From: {{ traveler.nationality
+                                                            }}</span>
+                                                        <span v-if="traveler.dietary" class="w-full">Diet: {{
+                                                            traveler.dietary }}</span>
                                                     </div>
                                                 </div>
-                                                <div v-if="booking.lead_fitness_level || booking.lead_altitude_exp" class="mt-3 p-2 bg-amber-50/50 border border-amber-100 rounded-md space-y-1">
-                                                    <p class="font-bold text-amber-800 text-[10px] uppercase">Lead Fitness Report</p>
-                                                    <p v-if="booking.lead_fitness_level" class="text-amber-900"><span class="font-semibold">Fitness:</span> {{ booking.lead_fitness_level }}</p>
-                                                    <p v-if="booking.lead_altitude_exp" class="text-amber-900"><span class="font-semibold">Altitude Exp:</span> {{ booking.lead_altitude_exp }}</p>
+                                                <div v-if="booking.lead_fitness_level || booking.lead_altitude_exp"
+                                                    class="mt-3 p-2 bg-amber-50/50 border border-amber-100 rounded-md space-y-1">
+                                                    <p class="font-bold text-amber-800 text-[10px] uppercase">Lead
+                                                        Fitness Report</p>
+                                                    <p v-if="booking.lead_fitness_level" class="text-amber-900"><span
+                                                            class="font-semibold">Fitness:</span> {{
+                                                        booking.lead_fitness_level }}</p>
+                                                    <p v-if="booking.lead_altitude_exp" class="text-amber-900"><span
+                                                            class="font-semibold">Altitude Exp:</span> {{
+                                                        booking.lead_altitude_exp }}</p>
                                                 </div>
                                             </div>
                                         </details>
@@ -643,7 +681,7 @@ onMounted(init)
                                     <span class="text-sm font-medium text-foreground flex-1">
                                         {{ gear.title }}
                                     </span>
-                                    <Button variant="ghost" size="icon" @click="removeGear(index)"
+                                    <Button variant="ghost" size="icon" @click="removeMandatoryGear(index)"
                                         class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive absolute right-0">
                                         <Trash2Icon class="w-4 h-4" />
                                     </Button>
@@ -651,9 +689,39 @@ onMounted(init)
                             </div>
                             <div class="mt-6 pt-4 border-t border-border">
                                 <div class="flex items-center gap-2">
-                                    <Input v-model="gearInput" @keyup.enter="addGear"
-                                        placeholder="Add gear requirement..." type="text" />
-                                    <Button @click="addGear" size="icon"
+                                    <Input v-model="mandatoryGearInput" @keyup.enter="addMandatoryGear"
+                                        placeholder="Add mandatory gear..." type="text" />
+                                    <Button @click="addMandatoryGear" size="icon"
+                                        class="h-9 w-9 bg-foreground text-background hover:bg-foreground/90 transition-all">
+                                        <PlusIcon class="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommended Gear -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-foreground">Recommended Gear</h3>
+                        <div class="bg-card rounded-lg p-6 border border-border shadow-sm">
+                            <div class="space-y-4">
+                                <div v-for="(gear, index) in (trek?.details?.optionalGear as Array<{ title: string, checked: boolean }>)"
+                                    :key="index" class="flex items-center gap-3 group relative">
+                                    <CheckSquareIcon class="w-4 h-4 text-primary" />
+                                    <span class="text-sm font-medium text-foreground flex-1">
+                                        {{ gear.title }}
+                                    </span>
+                                    <Button variant="ghost" size="icon" @click="removeOptionalGear(index)"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive absolute right-0">
+                                        <Trash2Icon class="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-border">
+                                <div class="flex items-center gap-2">
+                                    <Input v-model="optionalGearInput" @keyup.enter="addOptionalGear"
+                                        placeholder="Add recommended gear..." type="text" />
+                                    <Button @click="addOptionalGear" size="icon"
                                         class="h-9 w-9 bg-foreground text-background hover:bg-foreground/90 transition-all">
                                         <PlusIcon class="w-4 h-4" />
                                     </Button>

@@ -17,7 +17,8 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
 <template>
     <div
         class="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 transition-transform hover:-translate-y-2">
-        <div class="h-64 overflow-hidden">
+        <NuxtLink :to="localePath({ name: 'races-slug', params: { slug: eventSlug }, query: { stage_id: stage.id } })"
+            class="h-64 overflow-hidden">
             <img alt="Trail Runner on high mountain"
                 class="w-full h-full object-cover transition-transform group-hover:scale-110"
                 :src="showImage(stage?.thumbnail?.file_name)" />
@@ -26,9 +27,13 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
                     {{ stage?.difficulty }}
                 </span>
             </div> -->
-        </div>
+        </NuxtLink>
         <div class="p-8">
-            <h4 class="text-2xl font-display font-bold mb-2">{{ stage.name }}</h4>
+            <h4 class="text-2xl font-display font-bold mb-2">
+                <NuxtLink
+                    :to="localePath({ name: 'races-slug', params: { slug: eventSlug }, query: { stage_id: stage.id } })">
+                    {{ stage.name }}</NuxtLink>
+            </h4>
             <p class="text-slate-500 dark:text-slate-400 mb-6">
                 {{ stage.excerpt }}
             </p>
