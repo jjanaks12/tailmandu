@@ -23,7 +23,8 @@ const sizeList = {
 
 <template>
     <div class="flex items-center gap-2 py-[3px]" :class="{ 'text-xs': size == 'sm' }">
-        <Avatar class="aspect-square shrink-0" :style="{ 'max-width': sizeList[size] }">
+        <Avatar class="aspect-square shrink-0"
+            :style="{ 'max-width': sizeList[size], width: sizeList[size], height: sizeList[size] }">
             <AvatarImage :src="avatar" class="object-cover" />
             <AvatarFallback>{{ abbr(fullName) }}</AvatarFallback>
         </Avatar>

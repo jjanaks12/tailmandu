@@ -16,13 +16,14 @@ import Underline from '@tiptap/extension-underline'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Link from '@tiptap/extension-link'
 import TiptapImage from '@tiptap/extension-image'
+import { TiptapLucideIcon } from '~/lib/tiptap/TiptapLucideIcon'
 
 import {
   BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon,
   ItalicIcon, LinkIcon, ListIcon, ListOrderedIcon,
   LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon,
   RotateCcwIcon, StrikethroughIcon, UnderlineIcon,
-  UndoIcon, UnlinkIcon, WrapTextIcon, XIcon, ImageIcon
+  UndoIcon, UnlinkIcon, WrapTextIcon, XIcon, ImageIcon, ComponentIcon
 } from 'lucide-vue-next'
 
 import { useMediaStore } from '~/store/media'
@@ -80,6 +81,7 @@ const editor = useEditor({
         class: 'max-w-full h-auto rounded-lg my-4 mx-auto block shadow-md',
       },
     }),
+    TiptapLucideIcon,
   ],
   onUpdate: ({ editor }) => {
     emit('update:modelValue', editor.getHTML())
@@ -133,6 +135,13 @@ const addImage = () => {
       }
       media.value.show = false
     }
+  }
+}
+
+const insertLucideIcon = () => {
+  const iconName = window.prompt('Enter Lucide icon name (e.g. Activity, CheckCircle, MapPin)')
+  if (iconName) {
+    editor.value?.chain().focus().insertContent(`<lucide-icon name="${iconName}"></lucide-icon>&nbsp;`).run()
   }
 }
 </script>
@@ -224,8 +233,12 @@ const addImage = () => {
           <UnlinkIcon :size="16" />
         </Button>
         <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
-          @click="addImage">
+          @click="addImage" title="Insert Image">
           <ImageIcon :size="16" />
+        </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="insertLucideIcon" title="Insert Lucide Icon">
+          <ComponentIcon :size="16" />
         </Button>
       </div>
 
@@ -263,6 +276,10 @@ const addImage = () => {
 }
 
 /* Fix for collapsed empty paragraphs in Tailwind CSS */
+.content_editor .ProseMirror li p {
+  margin-bottom: 0;
+}
+
 .content_editor .ProseMirror p {
   min-height: 1.5rem;
   margin-bottom: 0.75rem;
