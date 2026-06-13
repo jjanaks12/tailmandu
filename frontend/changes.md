@@ -10,12 +10,20 @@
 ### Fastpacking - booking
 [ ] details -> also add -> contact details and passport
 
+### June 09
+[X] increase overall font size 
+[X] home page stage link
+[X] space between paragraphs in stages
+[X] blank map on event detail
+[X] remove vat from fastpacking booking
+[X] remove "Trail-Safe Guarantee" for fastpacking booking
 
 #
 1st 50k
 2nd 50k
 3rd 70k
-total 170
+4th 100k
+total 270
 nameserver - 2500
 hostinger - 4.2*12 - 50.4 = 7782.04
 outstanding 

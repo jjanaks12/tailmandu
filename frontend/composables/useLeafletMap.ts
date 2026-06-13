@@ -78,7 +78,7 @@ export function useLeafletMap(
     }
 
     const createDotIcon = (color: string, size = 16) => L.divIcon({
-        className: '',
+        className: 'custom-dot-icon',
         html: `<div style="background-color: ${color}; width: ${size}px; height: ${size}px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2]
@@ -154,13 +154,15 @@ export function useLeafletMap(
             gpxLayer = null
         }
 
+        const emptyPixel = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+
         gpxLayer = new L.GPX(gpxText, {
             async: true,
             marker_options: {
-                startIconUrl: '',
-                endIconUrl: '',
-                shadowUrl: '',
-                wptIconUrls: { '': '', 'Waypoint': '' }
+                startIconUrl: emptyPixel,
+                endIconUrl: emptyPixel,
+                shadowUrl: emptyPixel,
+                wptIconUrls: { '': emptyPixel, 'Waypoint': emptyPixel }
             },
             polyline_options: {
                 color: '#f06723',
@@ -173,9 +175,10 @@ export function useLeafletMap(
             if (map.value) {
                 map.value.fitBounds(e.target.getBounds(), { padding: [50, 50] })
             }
-            // Strip out all default leaflet-gpx markers
+            // Strip out all default leaflet-gpx markers safely
             e.target.eachLayer((layer: any) => {
-                if (layer instanceof L.Marker) {
+                // Duck-typing: Markers have getLatLng(), Polylines have getLatLngs()
+                if (typeof layer.getLatLng === 'function' && typeof layer.getLatLngs === 'undefined') {
                     e.target.removeLayer(layer)
                 }
             })

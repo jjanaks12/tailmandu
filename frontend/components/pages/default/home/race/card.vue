@@ -29,15 +29,16 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
         </div>
         <div class="p-8">
             <h4 class="text-2xl font-display font-bold mb-2">{{ stage.name }}</h4>
-            <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+            <p class="text-slate-500 dark:text-slate-400 mb-6">
                 {{ stage.excerpt }}
             </p>
-            <div class="flex justify-between items-center text-sm font-semibold">
+            <div class="flex justify-between items-center font-semibold">
                 <!-- <span class="flex items-center text-primary">
                     <TimerIcon class="mr-1 size-4" />
                     {{ stage.cut_off_time }} Cutoff
                 </span> -->
-                <NuxtLink :to="localePath({ name: 'races-slug-stage-id', params: { slug: eventSlug, id: stage.id } })"
+                <NuxtLink
+                    :to="localePath({ name: 'races-slug', params: { slug: eventSlug }, query: { stage_id: stage.id } })"
                     class="text-primary hover:text-[#d8561a] underline cursor-pointer" v-if="showLink">
                     {{ $t('home.stage.learn_more') }}
                     →

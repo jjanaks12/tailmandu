@@ -173,6 +173,10 @@
   }
 }
 
+body {
+  @apply text-lg;
+}
+
 img {
   @apply border-none;
 }
@@ -196,7 +200,7 @@ form .error__message {
 .content_editor,
 .text__holder {
   > * {
-    @apply mb-4
+    @apply mb-4;
   }
 
   h1 {
@@ -245,17 +249,17 @@ form .error__message {
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/20 rounded-full;
+  @apply bg-muted-foreground/20 rounded-full;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/40;
+  @apply bg-muted-foreground/40;
 }

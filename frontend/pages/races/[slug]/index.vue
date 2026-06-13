@@ -19,7 +19,7 @@ const totalDistance = computed(() => {
     return (trailRace.value?.stages?.reduce((acc, stage) => acc + stage.stage_categories.reduce((t, st) => t + parseFloat(st.distance), 0), 0) || 0) / 1000
 })
 
-const totatDistanceSelectedStage = computed(() => selectedStage.value ? selectedStage.value?.stage_categories.reduce((acc, stage) => acc + parseFloat(stage.distance), 0) / 1000 : 0)
+// const totatDistanceSelectedStage = computed(() => selectedStage.value ? selectedStage.value?.stage_categories.reduce((acc, stage) => acc + parseFloat(stage.distance), 0) / 1000 : 0)
 
 const parsedDetails = computed(() => {
     if (!trailRace.value?.details) return []
@@ -43,8 +43,27 @@ const totalElevationGain = computed(() => {
 onBeforeMount(async () => {
     trailRace.value = await getBySlug(route.params.slug as string)
     if (trailRace.value && trailRace.value.stages.length > 0) {
-        selectedStage.value = trailRace.value.stages[0] ?? null
+        let initialStage = trailRace.value.stages[0]
+        if (route.query.stage_id) {
+            const foundStage = trailRace.value.stages.find(s => s.id === route.query.stage_id)
+            if (foundStage) initialStage = foundStage
+        }
+        selectedStage.value = initialStage ?? null
         selectedStageCategory.value = selectedStage.value?.stage_categories[0] ?? null
+
+        if (route.query.stage_id) {
+            nextTick(() => {
+                // Wait for Vue to render the selectedStage section
+                setTimeout(() => {
+                    const el = document.getElementById('stage-details')
+                    if (el) {
+                        const yOffset = -120 // Adjust for sticky header
+                        const y = el.getBoundingClientRect().top + window.scrollY + yOffset
+                        window.scrollTo({ top: y, behavior: 'smooth' })
+                    }
+                }, 100)
+            })
+        }
     }
 
     if (trailRace.value) {
@@ -66,7 +85,7 @@ const selectedStageStartTime = computed(() => {
         moment(a.start).diff(moment(b.start))
     )[0]
 
-    return formatDate(earliestCat.start, 'MMM D, YYYY • hh:mm A')
+    return moment.utc(earliestCat.start).local().format('MMM D, YYYY • hh:mm A')
 })
 
 const selectStage = (stage: Stage) => {
@@ -132,6 +151,7 @@ const isSticky = computed(() => y.value > 450)
         </div>
 
         <!-- Hero Section -->
+        <!-- <pre>{{ trailRace }}</pre> -->
         <div class="relative w-full">
             <div class="flex min-h-screen flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 lg:px-40 pb-16 relative overflow-hidden"
                 :style="{ backgroundImage: `linear-gradient(rgba(16, 24, 34, 0.2) 0%, rgba(16, 24, 34, 0.9) 100%), url(${trailRace.thumbnail ? showImage(trailRace.thumbnail.file_name) : ''})` }">
@@ -178,7 +198,7 @@ const isSticky = computed(() => y.value > 450)
                         <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
                             <MountainIcon class="w-6 h-6 text-primary" />
                         </div>
-                        <h2 class="text-3xl font-display font-black tracking-tight">Race Overview</h2>
+                        <h2 class="text-3xl text-gray-800 font-display font-black tracking-tight">Race Overview</h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
@@ -215,12 +235,13 @@ const isSticky = computed(() => y.value > 450)
                         </div>
                     </div>
 
-                    <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12"
+                    <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12 [&_p]:mb-4"
                         v-html="trailRace.description" />
                 </section>
 
                 <!-- Detailed Stage View -->
-                <section v-if="selectedStage" class="border-t border-slate-100 dark:border-slate-800 pt-16">
+                <section v-if="selectedStage" id="stage-details"
+                    class="border-t border-slate-100 dark:border-slate-800 pt-16">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
                         <div>
                             <div class="flex items-center gap-3 mb-2">
@@ -230,7 +251,8 @@ const isSticky = computed(() => y.value > 450)
                                 </span>
                                 <span class="text-slate-400 font-bold">{{ selectedStageStartTime }}</span>
                             </div>
-                            <h3 class="text-4xl font-display font-black tracking-tight">{{ selectedStage.name }}</h3>
+                            <h3 class="text-4xl text-gray-800 font-display font-black tracking-tight">{{
+                                selectedStage.name }}</h3>
                         </div>
                         <div class="flex gap-3">
                             <Badge v-if="selectedStage.difficulty === 'difficult'"
@@ -279,7 +301,7 @@ const isSticky = computed(() => y.value > 450)
 
                     <!-- Stage Categories -->
                     <div class="border border-primary p-4 rounded-xl" v-if="selectedStage.stage_categories?.length > 0">
-                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12"
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12 [&_p]:mb-4"
                             v-html="selectedStage.description" />
                         <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-8">
                             Available Categories
@@ -316,25 +338,23 @@ const isSticky = computed(() => y.value > 450)
                             </div>
                         </div>
                         <!-- Map Section -->
-                        <div v-if="selectedStageCategory?.map_file" class="mb-4">
+                        <div v-if="selectedStageCategory?.map_file" class="mb-12">
                             <Dialog>
                                 <DialogTrigger as-child>
                                     <div
-                                        class="relative rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl aspect-video group cursor-pointer bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                                        class="relative rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl aspect-video group cursor-pointer bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center transition-colors">
 
-                                        <!-- Decorative map pattern background -->
-                                        <div
-                                            class="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-400 to-transparent background-size-4">
-                                        </div>
-
-                                        <MapIcon
-                                            class="w-16 h-16 mb-4 opacity-50 group-hover:scale-110 transition-transform duration-500" />
-                                        <span class="font-bold text-lg">Click to View Route Map</span>
+                                        <ClientOnly>
+                                            <Map :gpx-file="getGPXFile(selectedStageCategory.map_file.file_name)"
+                                                class="absolute inset-0 w-full h-full pointer-events-none" />
+                                        </ClientOnly>
 
                                         <div
-                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                                            <Button size="lg" variant="secondary" class="pointer-events-none">
-                                                <MapIcon class="w-6 h-6 mr-2" />
+                                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center backdrop-blur-sm z-10">
+                                            <MapIcon
+                                                class="w-12 h-12 mb-4 text-white opacity-90 scale-90 group-hover:scale-100 transition-transform duration-500" />
+                                            <Button size="lg" variant="secondary"
+                                                class="pointer-events-none font-bold shadow-xl">
                                                 View Full Map
                                             </Button>
                                         </div>
@@ -346,14 +366,29 @@ const isSticky = computed(() => y.value > 450)
                                         class="w-full h-[80vh] rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 shadow-2xl relative">
                                         <ClientOnly>
                                             <Map :gpx-file="getGPXFile(selectedStageCategory.map_file.file_name)"
-                                                class="w-full h-full" />
+                                                show-elevation class="w-full h-full" />
                                         </ClientOnly>
                                     </div>
                                 </DialogContent>
                             </Dialog>
                         </div>
-                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12"
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-12 [&_p]:mb-4"
                             v-if="selectedStageCategory" v-html="selectedStageCategory.description" />
+                        <h3 class="font-black text-xl">
+                            Checkpoints
+                        </h3>
+                        <ul class="grid md:grid-cols-2 gap-4">
+                            <li v-for="(item, index) in selectedStageCategory?.checkpoints" :key="item.id"
+                                class="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 flex items-center justify-between gap-4">
+                                <div>
+                                    <span class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
+                                        {{ `CP ${index + 1}` }}
+                                    </span>
+                                    <h5 class="font-black text-lg">{{ item.name }}</h5>
+                                </div>
+                            </li>
+                        </ul>
+
                     </div>
 
                     <!-- Elevation Profile SVG Placeholder (adapted from design) -->
@@ -407,7 +442,7 @@ const isSticky = computed(() => y.value > 450)
                             <span class="w-8 h-1 bg-primary rounded-full"></span>
                             {{ topic.title }}
                         </h4>
-                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400"
+                        <div class="prose prose-slate dark:prose-invert max-w-none text-lg leading-relaxed text-slate-600 dark:text-slate-400 [&_p]:mb-4"
                             v-html="topic.content" />
                     </div>
                 </div>
@@ -419,30 +454,29 @@ const isSticky = computed(() => y.value > 450)
                     <!-- Stage Selector -->
                     <div
                         class="bg-white dark:bg-deep-slate p-4 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
-                        <h3 class="px-6 pt-6 pb-6 text-xs font-black uppercase tracking-widest text-slate-400">
+                        <h3 class="px-6 pt-6 pb-6 text-xs font-black uppercase tracking-widest text-gray-800">
                             Race Stages
                         </h3>
                         <nav class="flex flex-col gap-2">
-                            <button v-for="(stage, index) in trailRace.stages" :key="stage.id"
-                                @click="selectStage(stage)" :class="[
-                                    'group flex items-center justify-between p-6 rounded-[2rem] transition-all duration-500 border-2',
-                                    selectedStage?.id === stage.id
-                                        ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30'
-                                        : 'bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-primary'
-                                ]">
-                                <div class="flex flex-col items-start">
+                            <div class="flex items-center max-w-full justify-between rounded-lg p-4"
+                                v-for="(stage, index) in trailRace.stages" :key="stage.id" @click="selectStage(stage)"
+                                :class="{ 'bg-primary text-white': selectedStage?.id === stage.id }">
+                                <div class="max-w-[90%] flex flex-col items-start shrink">
                                     <span :class="[
                                         'text-[10px] font-black uppercase tracking-widest mb-1 transition-colors',
-                                        selectedStage?.id === stage.id ? 'text-white/80' : 'text-slate-400'
+                                        selectedStage?.id === stage.id ? 'text-white/80' : 'text-gray-800'
                                     ]">
                                         Stage {{ index + 1 }}
                                     </span>
-                                    <span class="font-black text-lg">{{ stage.name }}</span>
+                                    <span
+                                        class="font-black text-lg whitespace-nowrap text-ellipsis inline-block overflow-hidden">
+                                        {{ stage.name }}
+                                    </span>
                                 </div>
                                 <ChevronRightIcon v-if="selectedStage?.id !== stage.id"
-                                    class="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                                <ActivityIcon v-else class="w-6 h-6 animate-pulse" />
-                            </button>
+                                    class="w-5 h-5 transition-transform group-hover:translate-x-1 shrink-0" />
+                                <ActivityIcon v-else class="w-6 h-6 animate-pulse shrink-0" />
+                            </div>
                         </nav>
                     </div>
 
@@ -454,8 +488,9 @@ const isSticky = computed(() => y.value > 450)
                             <MountainIcon class="w-64 h-64" />
                         </div>
                         <template v-if="isUpcoming">
-                            <h4 class="text-3xl font-display font-black mb-4 relative z-10 leading-tight">Ready
-                                to Conquer?</h4>
+                            <h4 class="text-3xl text-gray-900 font-display font-black mb-4 relative z-10 leading-tight">
+                                Ready to Conquer?
+                            </h4>
                             <p class="mb-10 relative z-10 leading-relaxed font-medium">
                                 Early bird registration is currently open. Secure your bib for the ultimate Himalayan
                                 challenge.

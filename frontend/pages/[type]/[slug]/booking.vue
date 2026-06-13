@@ -101,7 +101,7 @@ const dynamicInclusionsCost = computed(() => {
 })
 
 const totalPrice = computed(() => subtotal.value + gearCost.value + pickupCost.value + dynamicInclusionsCost.value)
-const vatAmount = computed(() => Math.round(totalPrice.value * 0.13 * 100) / 100)
+// const vatAmount = computed(() => Math.round(totalPrice.value * 0.13 * 100) / 100)
 
 const departureDates = computed(() => {
     const dates: string[] = []
@@ -243,7 +243,7 @@ const inputClass = (errorKey: string) => [
     </section>
 
     <!-- Main Flow -->
-    <template v-else-if="trek">
+    <div class="py-[81px]" v-else-if="trek">
         <!-- Progress Bar -->
         <div class="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
             <div class="max-w-7xl mx-auto px-6 md:px-10">
@@ -333,7 +333,7 @@ const inputClass = (errorKey: string) => [
                                             <button @click="children = Math.max(0, children - 1)"
                                                 class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 font-bold text-lg transition-colors">−</button>
                                             <div class="flex-1 text-center font-bold text-gray-900 text-sm">{{ children
-                                                }}</div>
+                                            }}</div>
                                             <button @click="children = Math.min(10, children + 1)"
                                                 class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-50 font-bold text-lg transition-colors">+</button>
                                         </div>
@@ -833,21 +833,22 @@ const inputClass = (errorKey: string) => [
                                         </span>
                                         <span class="font-bold text-gray-900">{{ formatCurrency(pickupCost) }}</span>
                                     </div>
-                                    <div class="flex items-center justify-between text-sm">
+                                    <!-- <div class="flex items-center justify-between text-sm">
                                         <span class="flex items-center gap-2 text-gray-700 font-medium">
                                             <CheckCircleIcon class="w-4 h-4 text-primary shrink-0" />
                                             Local Taxes (VAT 13%)
                                         </span>
                                         <span class="font-bold text-gray-900">{{ formatCurrency(vatAmount) }}</span>
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <div class="border-t border-gray-100 pt-4">
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs text-gray-500 font-medium">Total (Taxes & Fees
                                             inclusive)</span>
-                                        <span class="text-xl font-bold text-primary">{{ formatCurrency(totalPrice +
-                                            vatAmount) }}</span>
+                                        <span class="text-xl font-bold text-primary">
+                                            {{ formatCurrency(totalPrice) }}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -872,7 +873,7 @@ const inputClass = (errorKey: string) => [
                             </div>
 
                             <!-- Trail-Safe Guarantee -->
-                            <Alert variant="info">
+                            <!-- <Alert variant="info">
                                 <BadgeCheckIcon class="w-5 h-5 text-primary shrink-0 mt-0.5" />
                                 <AlertTitle>Trail-Safe Guarantee</AlertTitle>
                                 <AlertDescription>
@@ -880,14 +881,14 @@ const inputClass = (errorKey: string) => [
                                     the trek is
                                     cancelled due to weather or political trail closures.
                                 </AlertDescription>
-                            </Alert>
+                            </Alert> -->
                         </div>
                     </div>
 
                 </div>
             </div>
         </div>
-    </template>
+    </div>
 
     <!-- Not found -->
     <div v-else

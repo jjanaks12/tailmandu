@@ -8,12 +8,14 @@ import { useElevationChart } from '../composables/useElevationChart'
 interface MapProps {
     zoom?: number
     controls?: boolean
-    gpxFile: string
+    gpxFile: string,
+    showElevation?: boolean
 }
 
 const props = withDefaults(defineProps<MapProps>(), {
     zoom: 15,
-    controls: true
+    controls: true,
+    showElevation: false
 })
 
 const mapEl = ref<HTMLElement | null>(null)
@@ -78,7 +80,7 @@ const loadGPX = async () => {
             throw new Error('Invalid GPX file format')
         }
 
-        parseGpxText(gpxText)
+        parseGpxText(gpxText, props.showElevation)
         drawCustomMarkers()
         loadGpxTrackLayer(gpxText)
 
@@ -115,8 +117,8 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Elevation Profile -->
-        <div v-if="elevationData.length > 0"
-            class="h-32 lg:h-48 w-full shrink-0 relative bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 select-none py-1 lg:py-2 cursor-crosshair"
+        <div v-if="showElevation && elevationData.length > 0"
+            class="hidden md:block h-32 lg:h-48 w-full shrink-0 relative bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 select-none py-1 lg:py-2 cursor-crosshair"
             @mousemove="onChartMouseMove" @mouseleave="onChartMouseLeave">
 
             <!-- Stats -->
@@ -201,6 +203,12 @@ onBeforeUnmount(() => {
 <style>
 .leaflet-container {
     z-index: 10 !important;
+}
+
+/* Hide all default Leaflet image markers (and their shadows) since we use custom div-based markers */
+img.leaflet-marker-icon,
+img.leaflet-marker-shadow {
+    display: none !important;
 }
 
 .fade-enter-active,
