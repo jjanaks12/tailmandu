@@ -6,7 +6,6 @@ import CategoryList from '@/components/pages/dashboard/event/category/List.vue'
 
 import { useStageStore } from '~/store/stage'
 import type { Stage } from '~/lib/types'
-import { getGPXFile } from '~/lib/filters'
 
 interface TrailRaceStageListProps {
     eventId: string
@@ -18,7 +17,6 @@ const { fetch, destory } = useStageStore()
 const { stages } = storeToRefs(useStageStore())
 
 const showDialog = ref(false)
-const trailRaceStage = ref<Stage | null>(null)
 const editStage = ref<Stage | null>(null)
 
 onMounted(async () => {
@@ -41,11 +39,6 @@ onMounted(async () => {
             <div class="grow">
                 <TabsContent v-for="stage in stages" :value="stage.id">
                     <div class="flex justify-end gap-2 pb-4 mb-8 border-b">
-                        <Button variant="runner" size="icon" @click="() => {
-                            trailRaceStage = stage
-                        }">
-                            <MapIcon />
-                        </Button>
                         <Button variant="destructive" @click="async () => {
                             await destory(stage.id)
                             fetch(eventId)
@@ -86,17 +79,6 @@ onMounted(async () => {
                 fetch(eventId)
                 emit('update')
             }" />
-        </DialogContent>
-    </Dialog>
-    <!-- showing map for stage -->
-    <Dialog :open="trailRaceStage != null" @update:open="trailRaceStage = null">
-        <DialogContent class="sm:max-w-[1000px]">
-            <DialogHeader>
-                <DialogTitle>Map</DialogTitle>
-                <DialogDescription>Some text</DialogDescription>
-            </DialogHeader>
-            <Map map-id="someId" :center="[27.756846786775668, 85.3124535214843]"
-                :gpxFile="getGPXFile(trailRaceStage?.map_file.file_name as string)" v-if="trailRaceStage" />
         </DialogContent>
     </Dialog>
 </template>

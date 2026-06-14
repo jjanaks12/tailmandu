@@ -64,6 +64,7 @@ router.post('/:stage_id/stage_categories', [], StageCategoryController.create)
 router.put('/:stage_id/stage_categories/:stage_category_id', [], StageCategoryController.update)
 router.patch('/stage_categories/:stage_category_id/start', [], StageCategoryController.start)
 router.patch('/stage_categories/:stage_category_id/end', [], StageCategoryController.end)
+router.delete('/stage_categories/:stage_category_id', [], StageCategoryController.destory)
 
 // SPONSORS
 router.get('/:event_id/sponsors', [verifyAccessToken], SponsorController.index)

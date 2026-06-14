@@ -134,4 +134,19 @@ export class StageCategoryController {
             next(error)
         }
     }
+
+    public static async destory(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.stageCategory.update({
+                where: {
+                    id: request.params.stage_category_id as string
+                },
+                data: {
+                    deleted_at: moment().toISOString()
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
 }
