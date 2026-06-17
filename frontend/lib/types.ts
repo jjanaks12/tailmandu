@@ -138,7 +138,7 @@ export type TrailRace = {
     runners: EventRunner[]
     tags: Tag[]
     gallery_id?: string
-    gallery?: any
+    gallery?: Gallery
     _count?: {
         stages: number
         runners: number

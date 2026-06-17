@@ -4,6 +4,8 @@ import { formatDate, getGPXFile, showImage } from '~/lib/filters'
 import type { TrailRace, Stage, StageCategory } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 import moment from 'moment'
+import { Autoplay, Virtual } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/vue'
 
 const route = useRoute()
 const trailRace = ref<TrailRace | null>(null)
@@ -151,12 +153,20 @@ const isSticky = computed(() => y.value > 450)
         </div>
 
         <!-- Hero Section -->
-        <pre>{{ trailRace }}</pre>
         <div class="relative w-full">
-            <div class="flex min-h-screen flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 lg:px-40 pb-16 relative overflow-hidden"
-                :style="{ backgroundImage: `linear-gradient(rgba(16, 24, 34, 0.2) 0%, rgba(16, 24, 34, 0.9) 100%), url(${trailRace.thumbnail ? showImage(trailRace.thumbnail.file_name) : ''})` }">
-
-                <div class="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div class="flex h-screen relative overflow-hidden">
+                <Swiper class="h-full" :modules="[Autoplay, Virtual]" loop
+                    :autoplay="{ delay: 8000, disableOnInteraction: false }" virtual>
+                    <SwiperSlide>
+                        <img :src="trailRace.thumbnail ? showImage(trailRace.thumbnail.file_name) : ''" alt=""
+                            class="w-full h-full object-cover">
+                    </SwiperSlide>
+                    <SwiperSlide v-for="image in trailRace?.gallery?.images" :key="image.id">
+                        <img :src="showImage(image.file_name)" alt="" class="w-full h-full object-cover">
+                    </SwiperSlide>
+                </Swiper>
+                <div
+                    class="container flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 absolute z-10 bottom-16 left-1/2 -translate-x-1/2">
                     <Badge v-if="isUpcoming"
                         class="bg-primary/20 text-primary border-primary/30 px-4 py-1.5 uppercase tracking-widest font-black w-fit">
                         Upcoming Event
