@@ -22,3 +22,5 @@ scripts
 entities.json
 mempalace.yaml
 .mcp
+
+id_rsa.pub
