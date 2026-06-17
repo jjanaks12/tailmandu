@@ -26,6 +26,7 @@ export type APIQuery<T> = {
 
 export type APIParam = {
     s?: string
+    status?: string
     total_page: number
     total: number
     current: number

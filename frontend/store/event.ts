@@ -92,9 +92,18 @@ export const useEventStore = defineStore('event', () => {
         return status === 200
     }
 
+    const remove = async (id: string) => {
+        isLoading.value = true
+        console.log(id);
+
+        await axios.delete(`/events/${id}`)
+        isLoading.value = false
+        fetch()
+    }
+
     return {
         isLoading, params, events,
         currentRace,
-        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer
+        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer, remove
     }
 })

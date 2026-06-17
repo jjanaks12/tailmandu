@@ -10,8 +10,31 @@ import { prisma } from '@/app/lib/services/prisma.service'
 export class EventController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
-            const { per_page = 10, current = 1, s = '', sort } = request.query
+            const { per_page = 10, current = 1, s = '', sort, status } = request.query as any
             const skip = (current - 1) * per_page
+
+            const where: Prisma.TrailRaceWhereInput = {
+                deleted_at: status === 'deleted' ? { not: null } : null
+            }
+
+            if (s) {
+                where.OR = [
+                    { name: { contains: s } },
+                    { excerpt: { contains: s } }
+                ]
+            }
+
+            if (status && status !== 'all') {
+                const now = new Date()
+                if (status === 'completed') {
+                    where.end = { lt: now }
+                } else if (status === 'ongoing') {
+                    where.start = { lte: now }
+                    where.end = { gte: now }
+                } else if (status === 'coming soon') {
+                    where.start = { gt: now }
+                }
+            }
 
             const events = await prisma.trailRace.findMany({
                 skip,
@@ -34,13 +57,11 @@ export class EventController {
                         }
                     }
                 },
-                where: {
-                    deleted_at: null
-                },
+                where,
                 orderBy: [{ created_at: 'desc' }],
             })
 
-            const total = await prisma.trailRace.count({ where: { deleted_at: null } })
+            const total = await prisma.trailRace.count({ where })
 
             response.send({
                 per_page: Number(per_page),

@@ -7,6 +7,17 @@ import { formatDate } from '@/lib/filters'
 import { useEventStore } from '~/store/event'
 import type { TrailRace } from '~/lib/types'
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+
 useHead({
     title: 'Events'
 })
@@ -17,12 +28,13 @@ definePageMeta({
     authorization: ['event_create', 'event_update', 'event_view', 'event_delete']
 })
 
-const statuses = ['completed', 'ongoing', 'coming soon']
+const statuses = ['completed', 'ongoing', 'coming soon', 'deleted']
 const { events, isLoading, params } = storeToRefs(useEventStore())
-const { fetch } = useEventStore()
+const { fetch, remove } = useEventStore()
 
 const showForm = ref(false)
 const trailRace = ref<TrailRace | null>(null)
+const eventToDelete = ref<TrailRace | null>(null)
 
 onMounted(fetch)
 </script>
@@ -40,27 +52,26 @@ onMounted(fetch)
                 <SlidersVertical />
                 Filters
             </div>
-            <Form class="flex flex-wrap gap-2" v-slot="{ values }">
-                <Field as="div" type="radio" name="status" class="w-1/3 flex gap-2" v-slot="{ field }">
-                    <Select v-bind="field">
-                        <SelectTrigger class="w-full">
-                            <SelectValue placeholder="Status" />
+            <div class="flex flex-wrap gap-2">
+                <div class="w-1/3 flex gap-2">
+                    <Select v-model="params.status" @update:modelValue="() => { params.current = 1; fetch(); }">
+                        <SelectTrigger class="w-full capitalize">
+                            <SelectValue placeholder="All Statuses" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="status in statuses" :value="status">{{ status }}</SelectItem>
+                            <SelectItem value="all">All Statuses</SelectItem>
+                            <SelectItem v-for="status in statuses" :value="status" class="capitalize">{{ status }}</SelectItem>
                         </SelectContent>
                     </Select>
-                </Field>
-            </Form>
+                </div>
+            </div>
         </div>
-        <Form class="max-w-[320px] w-full flex items-center gap-2">
-            <Field name="search" v-slot="{ field }">
-                <Input v-bind="field" placeholder="Search Events" />
-            </Field>
-            <Button variant="secondary" size="lg">
+        <form class="max-w-[320px] w-full flex items-center gap-2" @submit.prevent="() => { params.current = 1; fetch(); }">
+            <Input v-model="params.s" placeholder="Search Events" />
+            <Button variant="secondary" size="lg" type="submit">
                 <Search />
             </Button>
-        </Form>
+        </form>
     </div>
     <Table>
         <TableHeader>
@@ -105,7 +116,7 @@ onMounted(fetch)
                                     <Pencil />
                                     <span>Edit</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem @click="eventToDelete = trailEvent">
                                     <Trash />
                                     <span>Delete</span>
                                 </DropdownMenuItem>
@@ -179,4 +190,27 @@ onMounted(fetch)
             }" :trailRace="trailRace" />
         </DialogContent>
     </Dialog>
+    <AlertDialog :open="eventToDelete !== null">
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Are you sure you want to delete the event
+                    <strong v-if="eventToDelete">
+                        {{ eventToDelete.name }}
+                    </strong>?
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="(e: Event) => {
+                    e.preventDefault()
+                    if (eventToDelete?.id) {
+                        remove(eventToDelete.id)
+                        eventToDelete = null
+                    }
+                }">Delete</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
 </template>
