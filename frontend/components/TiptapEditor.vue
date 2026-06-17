@@ -15,7 +15,7 @@ import TiptapOrderedList from '@tiptap/extension-ordered-list'
 import Underline from '@tiptap/extension-underline'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Link from '@tiptap/extension-link'
-import TiptapImage from '@tiptap/extension-image'
+import ImageResize from 'tiptap-extension-resize-image'
 import { TiptapLucideIcon } from '~/lib/tiptap/TiptapLucideIcon'
 
 import {
@@ -75,10 +75,10 @@ const editor = useEditor({
       openOnClick: false,
       defaultProtocol: 'https',
     }),
-    TiptapImage.configure({
+    ImageResize.configure({
       allowBase64: true,
       HTMLAttributes: {
-        class: 'max-w-full h-auto rounded-lg my-4 mx-auto block shadow-md',
+        class: 'max-w-full rounded-lg my-4 shadow-md',
       },
     }),
     TiptapLucideIcon,
@@ -332,5 +332,22 @@ const insertLucideIcon = () => {
   font-style: italic;
   color: #6b7280;
   margin: 1rem 0;
+}
+
+/* Image Resize & Alignment Fixes */
+.content_editor .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+.content_editor .ProseMirror > div[style*="display: flex"] {
+  width: 100%;
+  justify-content: center; /* Default fallback */
+}
+
+/* Tiptap Extension Resize Image applies margin to the inner container. 
+   We ensure the wrapper is 100% width so margin auto can distribute space */
+.content_editor .ProseMirror div > div > img {
+  display: block;
 }
 </style>

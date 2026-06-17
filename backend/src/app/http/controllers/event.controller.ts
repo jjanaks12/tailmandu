@@ -275,6 +275,7 @@ export class EventController {
             response.send(await prisma.trailRace.findFirst({
                 where: { slug: request.params.slug as string },
                 include: {
+                    gallery: true,
                     stages: {
                         include: {
                             thumbnail: true,

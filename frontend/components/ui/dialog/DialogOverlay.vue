@@ -4,16 +4,17 @@ import { reactiveOmit } from '@vueuse/core'
 import { DialogOverlay, type DialogOverlayProps } from 'reka-ui'
 import { cn } from '~/lib/helpers'
 
-const props = defineProps<DialogOverlayProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<DialogOverlayProps & { class?: HTMLAttributes['class'], zIndex?: number }>()
 
-const delegatedProps = reactiveOmit(props, 'class')
+const delegatedProps = reactiveOmit(props, 'class', 'zIndex')
 </script>
 
 <template>
   <DialogOverlay
     data-slot="dialog-overlay"
     v-bind="delegatedProps"
-    :class="cn('data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80', props.class)"
+    :style="{ zIndex: props.zIndex || 50 }"
+    :class="cn('data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 bg-black/80', props.class)"
   >
     <slot />
   </DialogOverlay>

@@ -151,7 +151,7 @@ const isSticky = computed(() => y.value > 450)
         </div>
 
         <!-- Hero Section -->
-        <!-- <pre>{{ trailRace }}</pre> -->
+        <pre>{{ trailRace }}</pre>
         <div class="relative w-full">
             <div class="flex min-h-screen flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 lg:px-40 pb-16 relative overflow-hidden"
                 :style="{ backgroundImage: `linear-gradient(rgba(16, 24, 34, 0.2) 0%, rgba(16, 24, 34, 0.9) 100%), url(${trailRace.thumbnail ? showImage(trailRace.thumbnail.file_name) : ''})` }">
