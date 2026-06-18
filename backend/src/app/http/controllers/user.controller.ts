@@ -57,6 +57,15 @@ export class UserController {
                         include: {
                             avatar: true,
                             country: true,
+                            runners: {
+                                include: {
+                                    event: true,
+                                    stage: true
+                                },
+                                orderBy: {
+                                    created_at: 'desc'
+                                }
+                            }
                         }
                     }
                 }

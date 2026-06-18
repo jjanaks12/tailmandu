@@ -23,8 +23,13 @@ export const useUsersStore = defineStore('users', () => {
             fetch()
     })
 
+    const get = async (id: string) => {
+        const { data } = await axios.get<User>(`/users/${id}`)
+        return data
+    }
+
     return {
         users, isLoading, params,
-        fetch
+        fetch, get
     }
 })

@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-    import { abbr, showImage } from '~/lib/filters'
-    import type { User } from '~/lib/types'
+import { abbr, showImage } from '~/lib/filters'
+import type { User } from '~/lib/types'
 
-    interface UserInfoProps {
-        user: User
-    }
+interface UserInfoProps {
+    user: User
+}
 
-    const props = defineProps<UserInfoProps>()
+const props = defineProps<UserInfoProps>()
 
-    const name = computed(() => [props.user?.personal?.first_name, props.user?.personal?.middle_name, props.user?.personal?.last_name].join(' ').trim())
+const name = computed(() => [props.user?.personal?.first_name, props.user?.personal?.middle_name, props.user?.personal?.last_name].join(' ').trim())
 </script>
 
 <template>
@@ -19,7 +19,7 @@
         </Avatar>
         <div class="flex-grow">
             <!-- <Badge variant="outline">E01BIB02</Badge><br> -->
-            <NuxtLink :to="`/dashboard/users?id=${user.id}`" class="hover:underline">{{ name }}</NuxtLink>
+            <NuxtLink :to="`/dashboard/users/${user.id}`" class="hover:underline">{{ name }}</NuxtLink>
             <em class="not-italic block">{{ user.personal?.email }}</em>
             <Badge variant="secondary" v-if="user.role">{{ user?.role?.name }}</Badge>
         </div>

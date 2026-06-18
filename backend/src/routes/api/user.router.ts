@@ -5,6 +5,7 @@ import { verifyAccessToken } from "@/app/http/middleware/verify_access_token.mid
 const router = Router()
 
 router.get('/', [verifyAccessToken], UserController.index)
+router.get('/:id', [verifyAccessToken], UserController.view)
 router.put('/assignRole', [verifyAccessToken], UserController.assignRole)
 
 export default router
