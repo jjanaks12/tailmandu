@@ -150,7 +150,8 @@ const saveDetails = async () => {
     isSavingDetails.value = true
     try {
         await axios.put(`/treks/${route.params.id}`, { details: trek.value?.details })
-        init()
+        clearAutosave()
+        await init()
     } finally {
         isSavingDetails.value = false
     }
@@ -166,7 +167,8 @@ const saveItinerary = async () => {
                 itinerary: itinerary.value
             }
         })
-        init()
+        clearAutosave()
+        await init()
     } finally {
         isSavingItinerary.value = false
     }
@@ -178,16 +180,46 @@ const saveGeneral = async () => {
     try {
         await axios.put(`/treks/${route.params.id}`, {
             excerpt: excerpt.value,
-            // name: trek.value?.name,
-            // price: trek.value?.price
         })
-        init()
+        clearAutosave()
+        await init()
     } finally {
         isSavingGeneral.value = false
     }
 }
 
+const isTrackingChanges = ref(false)
+const hasUnsavedChanges = ref(false)
+
+watch([trek, excerpt, itinerary], () => {
+    if (!isTrackingChanges.value) return
+    hasUnsavedChanges.value = true
+    try {
+        localStorage.setItem(`trek-autosave-${route.params.id}`, JSON.stringify({
+            trek: trek.value,
+            excerpt: excerpt.value,
+            itinerary: itinerary.value
+        }))
+    } catch (e) {
+        console.error('Failed to autosave to localStorage', e)
+    }
+}, { deep: true })
+
+const discardChanges = async () => {
+    clearAutosave()
+    hasUnsavedChanges.value = false
+    await init() // refetch server state
+}
+
+const clearAutosave = () => {
+    localStorage.removeItem(`trek-autosave-${route.params.id}`)
+    hasUnsavedChanges.value = false
+}
+
+const serverStateData = ref<any>(null)
+
 const init = async () => {
+    isTrackingChanges.value = false
     trek.value = await getTrek(route.params.id as string)
     if (trek.value) {
         useTitle(trek.value.name)
@@ -203,9 +235,41 @@ const init = async () => {
         trek.value.details.optionalGear = trek.value.details?.optionalGear ?? []
         trek.value.details.securityProtocols = trek.value.details?.securityProtocols ?? []
         trek.value.details.importantDetails = trek.value.details?.importantDetails ?? []
+        
+        serverStateData.value = {
+            trek: JSON.parse(JSON.stringify(trek.value)),
+            excerpt: excerpt.value,
+            itinerary: JSON.parse(JSON.stringify(itinerary.value))
+        }
     }
+
+    const savedState = localStorage.getItem(`trek-autosave-${route.params.id}`)
+    if (savedState) {
+        try {
+            const savedStateData = JSON.parse(savedState)
+            trek.value = savedStateData.trek
+            excerpt.value = savedStateData.excerpt
+            itinerary.value = savedStateData.itinerary
+            hasUnsavedChanges.value = true
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    setTimeout(() => { isTrackingChanges.value = true }, 100)
+
     fetchBookings(true) // Fetch in background for notification badge
 }
+
+const isHighlightsDirty = computed(() => JSON.stringify(trek.value?.details?.highlights) !== JSON.stringify(serverStateData.value?.trek?.details?.highlights))
+const isIncludedDirty = computed(() => JSON.stringify(trek.value?.details?.included) !== JSON.stringify(serverStateData.value?.trek?.details?.included))
+const isItemisedInclusionsDirty = computed(() => JSON.stringify(trek.value?.details?.itemisedInclusions) !== JSON.stringify(serverStateData.value?.trek?.details?.itemisedInclusions))
+const isExcludedDirty = computed(() => JSON.stringify(trek.value?.details?.excluded) !== JSON.stringify(serverStateData.value?.trek?.details?.excluded))
+const isMandatoryGearDirty = computed(() => JSON.stringify(trek.value?.details?.mandatoryGear) !== JSON.stringify(serverStateData.value?.trek?.details?.mandatoryGear))
+const isOptionalGearDirty = computed(() => JSON.stringify(trek.value?.details?.optionalGear) !== JSON.stringify(serverStateData.value?.trek?.details?.optionalGear))
+const isImportantDetailsDirty = computed(() => JSON.stringify(trek.value?.details?.importantDetails) !== JSON.stringify(serverStateData.value?.trek?.details?.importantDetails))
+const isItineraryDirty = computed(() => JSON.stringify(itinerary.value) !== JSON.stringify(serverStateData.value?.itinerary))
+const isExcerptDirty = computed(() => excerpt.value !== serverStateData.value?.excerpt)
 
 const showPricingDialog = ref(false)
 const showStatsDialog = ref(false)
@@ -347,7 +411,7 @@ onMounted(init)
                                                         class="mt-1 flex flex-wrap gap-2 text-muted-foreground italic text-[10px] bg-muted/20 px-2 py-1 rounded">
                                                         <span v-if="traveler.age">Age: {{ traveler.age }}</span>
                                                         <span v-if="traveler.nationality">From: {{ traveler.nationality
-                                                            }}</span>
+                                                        }}</span>
                                                         <span v-if="traveler.dietary" class="w-full">Diet: {{
                                                             traveler.dietary }}</span>
                                                     </div>
@@ -358,10 +422,10 @@ onMounted(init)
                                                         Fitness Report</p>
                                                     <p v-if="booking.lead_fitness_level" class="text-amber-900"><span
                                                             class="font-semibold">Fitness:</span> {{
-                                                        booking.lead_fitness_level }}</p>
+                                                                booking.lead_fitness_level }}</p>
                                                     <p v-if="booking.lead_altitude_exp" class="text-amber-900"><span
                                                             class="font-semibold">Altitude Exp:</span> {{
-                                                        booking.lead_altitude_exp }}</p>
+                                                                booking.lead_altitude_exp }}</p>
                                                 </div>
                                             </div>
                                         </details>
@@ -370,9 +434,17 @@ onMounted(init)
                             </SheetContent>
                         </Sheet>
                     </div>
-                    <h2 class="text-5xl font-black text-foreground tracking-tight">
-                        {{ trek?.name }}
-                    </h2>
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-5xl font-black text-foreground tracking-tight">
+                            {{ trek?.name }}
+                        </h2>
+                        <div v-if="hasUnsavedChanges" class="flex items-center gap-2 mt-2">
+                            <Badge variant="destructive" class="animate-pulse">Unsaved Changes</Badge>
+                            <Button modifier="outline" size="sm" @click="discardChanges" class="h-6 text-xs px-2">
+                                Discard Unsaved
+                            </Button>
+                        </div>
+                    </div>
                     <p class="text-xl text-muted-foreground font-light leading-relaxed">
                         A high-altitude skyrunning challenge through the sacred lakes of Langtang.
                     </p>
@@ -556,10 +628,11 @@ onMounted(init)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- What's Included -->
                     <div class="bg-card rounded-lg overflow-hidden border border-border shadow-sm">
-                        <div class="p-5 bg-primary/5 border-b border-border">
+                        <div class="p-5 bg-primary/5 border-b border-border flex items-center justify-between">
                             <h4 class="text-sm font-bold text-primary uppercase flex items-center gap-2">
                                 <CheckCircle2Icon class="w-4 h-4" /> What's Included
                             </h4>
+                            <Badge v-if="isIncludedDirty" variant="outline" class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved</Badge>
                         </div>
                         <div class="p-4 space-y-2">
                             <div v-for="(item, index) in (trek?.details?.included as Array<string>)" :key="index"
@@ -580,10 +653,11 @@ onMounted(init)
 
                     <!-- Excluded Items -->
                     <div class="bg-card rounded-lg overflow-hidden border border-border shadow-sm">
-                        <div class="p-5 bg-destructive/5 border-b border-border">
+                        <div class="p-5 bg-destructive/5 border-b border-border flex items-center justify-between">
                             <h4 class="text-sm font-bold text-destructive uppercase flex items-center gap-2">
                                 <MinusCircleIcon class="w-4 h-4" /> What's NOT Included
                             </h4>
+                            <Badge v-if="isExcludedDirty" variant="outline" class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved</Badge>
                         </div>
                         <div class="p-4 space-y-2">
                             <div v-for="(item, index) in trek?.details?.excluded" :key="index"
@@ -762,7 +836,10 @@ onMounted(init)
             <section class="space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
+                    <div class="flex items-center justify-between">
                         <h3 class="text-xl font-bold text-foreground">Important Details</h3>
+                        <Badge v-if="isImportantDetailsDirty" variant="outline" class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved</Badge>
+                    </div>
                         <p class="text-sm text-muted-foreground">Information like Food, Water, Toilets, etc.</p>
                     </div>
                     <div class="flex gap-2">

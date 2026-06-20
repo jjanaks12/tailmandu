@@ -14,6 +14,7 @@ const form = useTemplateRef('form')
 const tags = ref<string[]>([])
 const categories = ref<TrekCategory[]>([])
 const isLoading = ref(false)
+const isCategoriesLoaded = ref(false)
 
 const { axios } = useAxios()
 const emit = defineEmits(['fetch'])
@@ -24,6 +25,8 @@ const init = async () => {
         categories.value = response.data?.data || []
     } catch(e) {
         console.error(e)
+    } finally {
+        isCategoriesLoaded.value = true
     }
 
     if (props.trek) {
@@ -75,16 +78,21 @@ onMounted(init)
         </Field>
         <Field name="category_id" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
             <Label>Category</Label>
-            <Select :model-value="value" @update:modelValue="handleChange">
-                <SelectTrigger>
-                    <SelectValue placeholder="Select Category" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem v-for="category in categories" :key="category.id" :value="category.id">
-                        {{ category.name }}
-                    </SelectItem>
-                </SelectContent>
-            </Select>
+            <template v-if="isCategoriesLoaded">
+                <Select :model-value="value" @update:modelValue="handleChange">
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem v-for="category in categories" :key="category.id" :value="category.id">
+                            {{ category.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </template>
+            <div v-else class="h-10 w-full rounded-md border border-input bg-muted/50 px-3 py-2 flex items-center text-sm text-muted-foreground animate-pulse">
+                Loading categories...
+            </div>
             <ErrorMessage class="error__message" name="category_id" />
         </Field>
         <Field name="price" v-slot="{ field }" as="div" class="flex flex-col gap-2">
