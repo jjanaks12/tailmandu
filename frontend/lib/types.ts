@@ -27,6 +27,7 @@ export type APIQuery<T> = {
 export type APIParam = {
     s?: string
     status?: string
+    role?: string
     total_page: number
     total: number
     current: number
@@ -251,6 +252,7 @@ export type Volunteer = {
     personal: Personal
     checkpoints: Checkpoint[]
     stages: Stage[]
+    volunteer_on_checkpoints: VolunteerCheckpoint[]
 }
 
 export type User = {

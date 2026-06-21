@@ -7,8 +7,20 @@ import { prisma } from '@/app/lib/services/prisma.service'
 export class UserController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
-            const { per_page = 10, current = 1, s = '', sort } = request.query
+            const { per_page = 10, current = 1, s = '', sort, role } = request.query
             const skip = (current - 1) * per_page
+
+            const searchFilter = s ? {
+                OR: [
+                    { personal: { first_name: { contains: s.toString() } } },
+                    { personal: { last_name: { contains: s.toString() } } },
+                    { personal: { email: { contains: s.toString() } } }
+                ]
+            } : {}
+
+            const roleFilter = role && role !== 'all' ? {
+                role: { is: { id: role.toString() } }
+            } : {}
 
             const users = await prisma.user.findMany({
                 skip,
@@ -25,12 +37,20 @@ export class UserController {
                     role: true
                 },
                 where: {
-                    deleted_at: null
+                    deleted_at: null,
+                    ...searchFilter,
+                    ...roleFilter
                 },
                 orderBy: [{ created_at: 'desc' }],
             })
 
-            const total = await prisma.user.count()
+            const total = await prisma.user.count({
+                where: {
+                    deleted_at: null,
+                    ...searchFilter,
+                    ...roleFilter
+                }
+            })
 
             response.send({
                 per_page: Number(per_page),
@@ -64,6 +84,23 @@ export class UserController {
                                 },
                                 orderBy: {
                                     created_at: 'desc'
+                                }
+                            },
+                            volunteers: {
+                                include: {
+                                    checkpoints: {
+                                        include: {
+                                            stage_category: {
+                                                include: {
+                                                    stage: {
+                                                        include: {
+                                                            event: true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

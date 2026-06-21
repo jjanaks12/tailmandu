@@ -14,8 +14,10 @@ export const useUsersStore = defineStore('users', () => {
         })
 
         users.value = data
-        params.value = p
-        users.value = data
+        if (p.total !== undefined) params.value.total = p.total
+        if (p.total_page !== undefined) params.value.total_page = p.total_page
+        if (p.current !== undefined) params.value.current = p.current
+        if (p.per_page !== undefined) params.value.per_page = p.per_page
     }
 
     watch(params, (oldValue, newValue) => {

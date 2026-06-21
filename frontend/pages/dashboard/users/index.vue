@@ -4,6 +4,7 @@ import { Form, Field } from 'vee-validate'
 
 import type { User } from '~/lib/types'
 import { useUsersStore } from '~/store/user'
+import { useRoleStore } from '~/store/role'
 
 import ChangeRoleForm from './_components/roleForm.vue'
 
@@ -24,25 +25,38 @@ const { fetch } = useUsersStore()
 const isUserRoleChangeDialogOpen = ref(false)
 const tempUser = ref<User | null>(null)
 
-onMounted(fetch)
+const { roles } = storeToRefs(useRoleStore())
+const searchStr = ref(params.value.s || '')
+
+onMounted(() => {
+    fetch()
+    useRoleStore().fetch()
+})
 </script>
 
 <template>
-    <div class="flex gap-4 mb-20">
+    <div class="flex gap-4 mb-20 items-end">
         <div class="flex-grow">
-            <div class="flex gap-2 mb-4">
-                <SlidersVertical />
+            <div class="flex gap-2 mb-2 font-medium">
+                <SlidersVertical class="w-5 h-5" />
                 Filters
             </div>
+            <Select v-model="params.role" @update:model-value="fetch()">
+                <SelectTrigger class="w-[200px]">
+                    <SelectValue placeholder="Filter by Role" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    <SelectItem v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
-        <Form class="max-w-[320px] w-full flex items-center gap-2">
-            <Field name="search" v-slot="{ field }">
-                <Input v-bind="field" placeholder="Search users" />
-            </Field>
-            <Button variant="secondary" size="lg">
-                <Search />
+        <form class="max-w-[320px] w-full flex items-center gap-2" @submit.prevent="params.s = searchStr; fetch()">
+            <Input v-model="searchStr" placeholder="Search users" />
+            <Button variant="secondary" size="icon" type="submit">
+                <Search class="w-4 h-4" />
             </Button>
-        </Form>
+        </form>
     </div>
     <Table>
         <TableHeader>

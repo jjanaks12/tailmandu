@@ -38,8 +38,8 @@
 [ ] scroll lock on select
 
 ### user detail
-[ ] email
-[ ] emergency detail
+[X] email
+[X] emergency detail
 
 #
 1st 50k

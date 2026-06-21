@@ -32,6 +32,7 @@ export type APIQuery = {
     filter: Record<string, string>
     show_draft?: string
     category?: string
+    role?: string
 }
 
 type TrekStats = {
