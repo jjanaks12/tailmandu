@@ -35,7 +35,7 @@
 [X] accordion on itenery
 
 ### Media
-[ ] scroll lock on select
+[X] scroll lock on select
 
 ### user detail
 [X] email

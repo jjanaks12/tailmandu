@@ -175,7 +175,7 @@ onMounted(() => {
                 <strong class="text-xl">Uncategorised</strong>
             </div>
             <div class="flex gap-2">
-                <DropdownMenu :open="selectedIds.some(id => id != null)">
+                <DropdownMenu :open="selectedIds.some(id => id != null)" :modal="false">
                     <DropdownMenuTrigger as-child>
                         <Button variant="secondary" size="icon" :disabled="!hasSelected">
                             <EllipsisVerticalIcon class="size-4" />

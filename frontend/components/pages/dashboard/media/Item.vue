@@ -100,7 +100,7 @@ onMounted(init)
                         <TrashIcon class="w-4 h-4" />
                     </Button>
                 </template>
-                <DropdownMenu :open="selectedImages.filter(id => id != null).length > 0">
+                <DropdownMenu :open="selectedImages.filter(id => id != null).length > 0" :modal="false">
                     <DropdownMenuTrigger as-child>
                         <Button size="icon" variant="secondary">
                             <EllipsisVerticalIcon class="size-4" />
