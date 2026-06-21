@@ -659,6 +659,8 @@ export type BlogPost = {
 
     next?: { title: string, slug: string }
     prev?: { title: string, slug: string }
+    recent?: BlogPost[]
+    recommended?: BlogPost[]
 }
 
 export type EnquiryCategory = {

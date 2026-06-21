@@ -20,12 +20,13 @@
 
 ## June 20
 [ ] page caching
+
 ### Blogs detail
 [X] prev / next
 [ ] review / reply (comments)
 [X] sharable
-[ ] recommended
-[ ] recent post
+[X] recommended
+[X] recent post
 
 ### home page
 [X] uniform height on slider

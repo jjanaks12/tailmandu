@@ -185,6 +185,21 @@ onMounted(init)
                         </NuxtLink>
                         <div v-else class="flex-1"></div>
                     </div>
+
+                    <!-- Recommended Blogs -->
+                    <div v-if="post.recommended && post.recommended.length > 0" class="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <h3 class="font-display font-bold text-2xl mb-8">Recommended Reading</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <NuxtLink v-for="rec in post.recommended" :key="rec.id" :to="`/blogs/${rec.slug}`" class="group block">
+                                <div class="aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-800 relative">
+                                    <img v-if="rec.featured_image" :src="showImage(rec.featured_image.file_name)" :alt="rec.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    <div class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl"></div>
+                                </div>
+                                <h4 class="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2 mb-2">{{ rec.title }}</h4>
+                                <p v-if="rec.excerpt" class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{{ rec.excerpt }}</p>
+                            </NuxtLink>
+                        </div>
+                    </div>
                 </article>
 
                 <!-- Sidebar Right: Author / Related -->
@@ -204,6 +219,22 @@ onMounted(init)
                             </p>
                         </div>
                     </div> -->
+
+                    <!-- Recent Posts Sidebar -->
+                    <div v-if="post.recent && post.recent.length > 0" class="space-y-6">
+                        <h4 class="font-display font-bold text-xl px-2">Recent Posts</h4>
+                        <div class="flex flex-col gap-6 p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <NuxtLink v-for="recent in post.recent" :key="recent.id" :to="`/blogs/${recent.slug}`" class="group flex gap-4 items-start">
+                                <div class="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                    <img v-if="recent.featured_image" :src="showImage(recent.featured_image.file_name)" :alt="recent.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-2">{{ recent.title }}</h5>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ formatDate(recent.published_at || recent.created_at) }}</p>
+                                </div>
+                            </NuxtLink>
+                        </div>
+                    </div>
 
                     <div class="space-y-6">
                         <h4 class="font-display font-bold text-xl px-2">Trailmandu Vision</h4>

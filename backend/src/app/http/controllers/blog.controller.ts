@@ -359,7 +359,31 @@ export class BlogController {
                 select: { title: true, slug: true }
             })
 
-            response.send({ ...post, prev: prevPost, next: nextPost })
+            const recentPosts = await prisma.blogPost.findMany({
+                where: { 
+                    deleted_at: null, 
+                    ...(isLoggedIn ? {} : { published_at: { not: null } })
+                },
+                orderBy: { published_at: 'desc' },
+                take: 5,
+                select: { title: true, slug: true, published_at: true, featured_image: true }
+            })
+
+            const recommendedPosts = await prisma.blogPost.findMany({
+                where: {
+                    id: { not: post.id },
+                    deleted_at: null,
+                    ...(isLoggedIn ? {} : { published_at: { not: null } }),
+                    tags: {
+                        some: { id: { in: post.tags.map(t => t.id) } }
+                    }
+                },
+                orderBy: { published_at: 'desc' },
+                take: 3,
+                include: { featured_image: true, category: true }
+            })
+
+            response.send({ ...post, prev: prevPost, next: nextPost, recent: recentPosts, recommended: recommendedPosts })
         } catch (error) {
             next(error)
         }
