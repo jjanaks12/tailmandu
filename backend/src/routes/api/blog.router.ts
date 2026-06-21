@@ -3,6 +3,7 @@ import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.mid
 import { BlogController } from '@/app/http/controllers/blog.controller'
 import { BlogCategoryController } from '@/app/http/controllers/blog_category.controller'
 import { BlogCommentController } from '@/app/http/controllers/blog_comment.controller'
+import { cacheMiddleware } from '@/app/http/middleware/cache.middleware'
 
 const router = Router()
 
@@ -13,9 +14,9 @@ router.put('/categories/:id', [verifyAccessToken], BlogCategoryController.update
 router.delete('/categories/:id', [verifyAccessToken], BlogCategoryController.delete)
 
 // Public Blog Routes
-router.get('/public', BlogController.publicIndex)
-router.get('/public/:slug', BlogController.publicShow)
-router.get('/public/:slug/comments', BlogCommentController.index)
+router.get('/public', [cacheMiddleware()], BlogController.publicIndex)
+router.get('/public/:slug', [cacheMiddleware()], BlogController.publicShow)
+router.get('/public/:slug/comments', [cacheMiddleware()], BlogCommentController.index)
 router.post('/public/:slug/comments', BlogCommentController.store)
 
 // Admin Blog Routes

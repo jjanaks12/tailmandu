@@ -1,12 +1,13 @@
 import { Router } from 'express'
 import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.middleware'
 import { PageController } from '@/app/http/controllers/page.controller'
+import { cacheMiddleware } from '@/app/http/middleware/cache.middleware'
 
 const router = Router()
 
 // Public Page Routes
-router.get('/public', PageController.publicIndex)
-router.get('/public/:slug', PageController.publicShow)
+router.get('/public', [cacheMiddleware()], PageController.publicIndex)
+router.get('/public/:slug', [cacheMiddleware()], PageController.publicShow)
 
 // Admin Page Routes
 router.get('/', [verifyAccessToken], PageController.index)
