@@ -26,5 +26,29 @@
             "book_adventure": "एडभेन्चर बुक गर्नुहोस्",
             "view_itinerary": "यात्रा कार्यक्रम हेर्नुहोस्"
         }
+    },
+    "public_blogs": {
+        "seo_title": "Trailmandu Blog - Himalayan Stories & Trail Insights",
+        "seo_description": "Explore deep insights into Nepal's trails, ultra-running tips, and stories from the heart of the Himalayas.",
+        "badge_stories": "Stories from the heights",
+        "hero_title": "Trailmandu",
+        "hero_highlight": "Stories",
+        "hero_desc": "Gear reviews, race reports, and deep dives into the culture of Himalayan mountain running.",
+        "all_stories": "All Stories",
+        "must_read": "Must Read",
+        "explore_featured": "Explore this featured story from Trailmandu...",
+        "read_full_story": "Read the full story",
+        "no_stories": "No stories found",
+        "no_stories_desc": "Try checking back later or exploring another category.",
+        "back_to_blogs": "Back to blogs",
+        "share": "Share",
+        "previous_post": "Previous Post",
+        "next_post": "Next Post",
+        "recommended_reading": "Recommended Reading",
+        "recent_posts": "Recent Posts",
+        "vision_title": "Trailmandu Vision",
+        "vision_desc": "\"Our mission is to bring the wild beauty of Nepal's trails to the world, foster a community of conscious runners, and protect the mountains we call home.\"",
+        "post_not_found": "Post Not Found",
+        "post_not_found_desc": "The story you're looking for has moved to higher altitudes."
     }
 }

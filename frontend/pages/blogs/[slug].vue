@@ -97,7 +97,7 @@ onMounted(init)
                     <NuxtLink to="/blogs"
                         class="inline-flex items-center gap-2 text-slate-400 hover:text-primary mb-8 transition-colors group">
                         <ArrowLeftIcon class="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                        Back to blogs
+                        {{ $t('public_blogs.back_to_blogs') }}
                     </NuxtLink>
 
                     <div v-if="post.category" class="mb-6">
@@ -139,7 +139,7 @@ onMounted(init)
                 <!-- Sidebar Left: Social Share -->
                 <div class="hidden lg:block w-20 sticky top-32 h-fit">
                     <div class="flex flex-col gap-4 items-center">
-                        <span class="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-2">Share</span>
+                        <span class="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-2">{{ $t('public_blogs.share') }}</span>
                         <Button v-for="link in socialLinks" :key="link.platform" size="icon" modifier="outline"
                             @click="shareOnSocial(link)"
                             :class="['rounded-full border-slate-200 dark:border-slate-800 transition-colors', link.hoverClass]">
@@ -171,7 +171,7 @@ onMounted(init)
                         <NuxtLink v-if="post.prev" :to="`/blogs/${post.prev.slug}`" class="group flex flex-col items-start text-left flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
                                 <ArrowLeftIcon class="w-3 h-3 transition-transform group-hover:-translate-x-1" />
-                                Previous Post
+                                {{ $t('public_blogs.previous_post') }}
                             </span>
                             <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{ post.prev.title }}</span>
                         </NuxtLink>
@@ -179,7 +179,7 @@ onMounted(init)
 
                         <NuxtLink v-if="post.next" :to="`/blogs/${post.next.slug}`" class="group flex flex-col items-end text-right flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
-                                Next Post
+                                {{ $t('public_blogs.next_post') }}
                                 <ArrowRightIcon class="w-3 h-3 transition-transform group-hover:translate-x-1" />
                             </span>
                             <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{ post.next.title }}</span>
@@ -189,7 +189,7 @@ onMounted(init)
 
                     <!-- Recommended Blogs -->
                     <div v-if="post.recommended && post.recommended.length > 0" class="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
-                        <h3 class="font-display font-bold text-2xl mb-8">Recommended Reading</h3>
+                        <h3 class="font-display font-bold text-2xl mb-8">{{ $t('public_blogs.recommended_reading') }}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <NuxtLink v-for="rec in post.recommended" :key="rec.id" :to="`/blogs/${rec.slug}`" class="group block">
                                 <div class="aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-800 relative">
@@ -226,7 +226,7 @@ onMounted(init)
 
                     <!-- Recent Posts Sidebar -->
                     <div v-if="post.recent && post.recent.length > 0" class="space-y-6">
-                        <h4 class="font-display font-bold text-xl px-2">Recent Posts</h4>
+                        <h4 class="font-display font-bold text-xl px-2">{{ $t('public_blogs.recent_posts') }}</h4>
                         <div class="flex flex-col gap-6 p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
                             <NuxtLink v-for="recent in post.recent" :key="recent.id" :to="`/blogs/${recent.slug}`" class="group flex gap-4 items-start">
                                 <div class="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -241,11 +241,10 @@ onMounted(init)
                     </div>
 
                     <div class="space-y-6">
-                        <h4 class="font-display font-bold text-xl px-2">Trailmandu Vision</h4>
+                        <h4 class="font-display font-bold text-xl px-2">{{ $t('public_blogs.vision_title') }}</h4>
                         <div class="bg-primary/5 p-8 rounded-[2rem] border border-primary/10">
                             <p class="text-sm text-primary/80 leading-relaxed italic">
-                                "Our mission is to bring the wild beauty of Nepal's trails to the world, foster a
-                                community of conscious runners, and protect the mountains we call home."
+                                {{ $t('public_blogs.vision_desc') }}
                             </p>
                         </div>
                     </div>
@@ -254,10 +253,10 @@ onMounted(init)
         </div>
 
         <div v-else class="pt-48 text-center pb-48">
-            <h2 class="text-3xl font-black mb-4">Post Not Found</h2>
-            <p class="text-slate-500 mb-8">The story you're looking for has moved to higher altitudes.</p>
+            <h2 class="text-3xl font-black mb-4">{{ $t('public_blogs.post_not_found') }}</h2>
+            <p class="text-slate-500 mb-8">{{ $t('public_blogs.post_not_found_desc') }}</p>
             <Button as-child>
-                <NuxtLink to="/blogs">Back to Blogs</NuxtLink>
+                <NuxtLink to="/blogs">{{ $t('public_blogs.back_to_blogs') }}</NuxtLink>
             </Button>
         </div>
     </div>

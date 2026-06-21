@@ -4,11 +4,13 @@ import { showImage } from '~/lib/filters'
 import { useBlogStore } from '~/store/blog'
 
 useSeoMeta({
-    title: 'Trailmandu Blog - Himalayan Stories & Trail Insights',
-    description: 'Explore deep insights into Nepal\'s trails, ultra-running tips, and stories from the heart of the Himalayas.',
-    ogTitle: 'Trailmandu Blog - Stories from the Trail',
-    ogDescription: 'Experience the magic of Nepal through our curated trail stories and running guides.',
+    title: computed(() => t('public_blogs.seo_title')),
+    description: computed(() => t('public_blogs.seo_description')),
+    ogTitle: computed(() => t('public_blogs.seo_title')),
+    ogDescription: computed(() => t('public_blogs.seo_description')),
 })
+
+const { t } = useI18n()
 
 const { fetchPublicPosts, fetchCategories } = useBlogStore()
 const { posts, categories, isLoading } = storeToRefs(useBlogStore())
@@ -42,13 +44,13 @@ onMounted(async () => {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <Badge variant="outline"
                     class="mb-6 border-primary/20 text-primary font-bold uppercase tracking-widest px-4 py-1">
-                    Stories from the heights
+                    {{ $t('public_blogs.badge_stories') }}
                 </Badge>
                 <h1 class="text-5xl md:text-7xl font-display font-black tracking-tight mb-6">
-                    Trailmandu <span class="text-primary">Stories</span>
+                    {{ $t('public_blogs.hero_title') }} <span class="text-primary">{{ $t('public_blogs.hero_highlight') }}</span>
                 </h1>
                 <p class="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                    Gear reviews, race reports, and deep dives into the culture of Himalayan mountain running.
+                    {{ $t('public_blogs.hero_desc') }}
                 </p>
             </div>
         </section>
@@ -57,7 +59,7 @@ onMounted(async () => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 mb-16">
             <div class="flex flex-wrap items-center justify-center gap-3">
                 <Button @click="filterByCategory(null)" :modifier="!selectedCategory ? 'default' : 'outline'">
-                    All Stories
+                    {{ $t('public_blogs.all_stories') }}
                 </Button>
                 <Button v-for="category in categories" :key="category.id" @click="filterByCategory(category.slug)"
                     :modifier="selectedCategory === category.slug ? 'default' : 'outline'">
@@ -78,18 +80,18 @@ onMounted(async () => {
                 <div class="lg:w-1/2 p-12 lg:p-20 flex flex-col justify-center">
                     <Badge
                         class="w-fit mb-6 bg-amber-400 text-amber-950 font-black px-4 py-1.5 uppercase tracking-tighter">
-                        Must Read
+                        {{ $t('public_blogs.must_read') }}
                     </Badge>
                     <h2
                         class="text-4xl md:text-5xl font-display font-black mb-6 leading-tight group-hover:text-primary transition-colors">
                         {{ featuredPost.title }}
                     </h2>
                     <p class="text-lg text-slate-500 dark:text-slate-400 mb-10 line-clamp-4 leading-relaxed">
-                        {{ featuredPost.excerpt || 'Explore this featured story from Trailmandu...' }}
+                        {{ featuredPost.excerpt || $t('public_blogs.explore_featured') }}
                     </p>
                     <NuxtLink :to="`/blogs/${featuredPost.slug}`"
                         class="flex items-center gap-3 text-primary font-black text-xl hover:gap-5 transition-all w-fit group/link">
-                        Read the full story
+                        {{ $t('public_blogs.read_full_story') }}
                         <ChevronRightIcon class="w-6 h-6 transition-transform group-hover/link:translate-x-2" />
                     </NuxtLink>
                 </div>
@@ -108,8 +110,8 @@ onMounted(async () => {
                     <div class="mb-6 opacity-20">
                         <SlidersHorizontalIcon class="w-24 h-24 mx-auto" />
                     </div>
-                    <h3 class="text-2xl font-bold mb-2">No stories found</h3>
-                    <p class="text-slate-500">Try checking back later or exploring another category.</p>
+                    <h3 class="text-2xl font-bold mb-2">{{ $t('public_blogs.no_stories') }}</h3>
+                    <p class="text-slate-500">{{ $t('public_blogs.no_stories_desc') }}</p>
                 </div>
 
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
