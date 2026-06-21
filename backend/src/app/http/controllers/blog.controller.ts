@@ -212,7 +212,15 @@ export class BlogController {
                     featured_image: true,
                     author: { include: { personal: true } },
                     seo: { include: { og_image: true } },
-                    tags: true
+                    tags: true,
+                    comments: {
+                        include: { 
+                            user: { include: { personal: true } },
+                            replies: { include: { user: { include: { personal: true } } } }
+                        },
+                        where: { parent_id: null },
+                        orderBy: { created_at: 'desc' }
+                    }
                 }
             })
             if (!post) throw createHttpError(404, 'Blog post not found')

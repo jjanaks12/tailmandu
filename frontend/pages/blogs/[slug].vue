@@ -2,6 +2,7 @@
 import { CalendarIcon, UserIcon, ArrowLeftIcon, ArrowRightIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, TagIcon } from 'lucide-vue-next'
 import { useBlogStore } from '~/store/blog'
 import { showImage } from '~/lib/filters'
+import CommentSection from '~/components/pages/blogs/CommentSection.vue'
 
 const route = useRoute()
 const { getPublicPostBySlug } = useBlogStore()
@@ -200,6 +201,9 @@ onMounted(init)
                             </NuxtLink>
                         </div>
                     </div>
+
+                    <!-- Reviews & Comments -->
+                    <CommentSection :slug="post.slug" />
                 </article>
 
                 <!-- Sidebar Right: Author / Related -->

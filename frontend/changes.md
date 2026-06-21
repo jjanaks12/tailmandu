@@ -23,7 +23,7 @@
 
 ### Blogs detail
 [X] prev / next
-[ ] review / reply (comments)
+[X] review / reply (comments)
 [X] sharable
 [X] recommended
 [X] recent post

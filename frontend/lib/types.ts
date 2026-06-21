@@ -661,6 +661,24 @@ export type BlogPost = {
     prev?: { title: string, slug: string }
     recent?: BlogPost[]
     recommended?: BlogPost[]
+    comments?: BlogComment[]
+}
+
+export type BlogComment = {
+    id: string
+    content: string
+    rating?: number
+    parent_id?: string
+    author_name?: string
+    author_email?: string
+    user_id?: string
+    user?: User
+    post_id: string
+    post?: BlogPost
+    status: string
+    created_at: string
+    updated_at?: string
+    replies?: BlogComment[]
 }
 
 export type EnquiryCategory = {

@@ -510,6 +510,7 @@ model User {
   product_reviews ProductReview[]
   orders          Order[]
   blog_posts      BlogPost[]
+  blog_comments   BlogComment[]
   enquiries       Enquiry[]
 
   @@map("users")
@@ -1006,6 +1007,7 @@ model BlogPost {
   featured_image    Image?        @relation("blog_featured_image", fields: [featured_image_id], references: [id])
 
   tags Tag[]
+  comments BlogComment[]
 
   @@map("blog_posts")
 }
@@ -1094,4 +1096,30 @@ model TeamMember {
   image    Image?  @relation("team_member_image", fields: [image_id], references: [id])
 
   @@map("team_members")
+}
+
+model BlogComment {
+  id           String   @id @default(cuid())
+  content      String   @db.Text
+  rating       Int?     // 1 to 5 stars
+  
+  parent_id    String?
+  parent       BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies      BlogComment[] @relation("CommentReplies")
+
+  author_name  String?
+  author_email String?
+  user_id      String?
+  user         User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  post_id      String
+  post         BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  status       String   @default("approved")
+
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
+
+  @@map("blog_comments")
 }

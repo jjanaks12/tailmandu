@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.middleware'
 import { BlogController } from '@/app/http/controllers/blog.controller'
 import { BlogCategoryController } from '@/app/http/controllers/blog_category.controller'
+import { BlogCommentController } from '@/app/http/controllers/blog_comment.controller'
 
 const router = Router()
 
@@ -14,6 +15,8 @@ router.delete('/categories/:id', [verifyAccessToken], BlogCategoryController.del
 // Public Blog Routes
 router.get('/public', BlogController.publicIndex)
 router.get('/public/:slug', BlogController.publicShow)
+router.get('/public/:slug/comments', BlogCommentController.index)
+router.post('/public/:slug/comments', BlogCommentController.store)
 
 // Admin Blog Routes
 router.get('/', [verifyAccessToken], BlogController.index)
