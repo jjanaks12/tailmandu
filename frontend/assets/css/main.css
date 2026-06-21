@@ -235,6 +235,10 @@ form .error__message {
     @apply mb-4;
   }
 
+  a {
+    @apply text-primary underline;
+  }
+
   ul {
     @apply list-disc pl-4 mb-4;
 

@@ -2,13 +2,18 @@ import type { APIRequest, TrailRace } from "~/lib/types"
 import { useAxios } from "~/services/axios"
 import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
 import type { InferType } from "yup"
+import moment from "moment"
 
 export const useEventStore = defineStore('event', () => {
     const events = ref<TrailRace[]>([])
+
+    const currentRace = ref<TrailRace | null>(null)
     const { isLoading, params } = useModalMeta()
     const { axios } = useAxios()
 
-    const currentRace = computed(() => events.value[0])
+    const currentStage = computed(() => currentRace.value?.stages
+        .filter((stage) => stage.stage_categories.length > 0)
+        .filter((stage) => stage.stage_categories.some((category) => moment.utc(category.start).isAfter(moment.utc())))[0])
 
     const fetch = async () => {
         const { data } = await axios.get<APIRequest<TrailRace[]>>('/events', {
@@ -101,9 +106,16 @@ export const useEventStore = defineStore('event', () => {
         fetch()
     }
 
+    const fetchCurrentRace = async () => {
+        if (!currentRace.value) {
+            const { data } = await axios.get<TrailRace>('/events/current')
+            currentRace.value = data
+        }
+    }
+
     return {
-        isLoading, params, events,
-        currentRace,
-        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer, remove
+        isLoading, params, events, currentRace,
+        currentStage,
+        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer, remove, fetchCurrentRace
     }
 })

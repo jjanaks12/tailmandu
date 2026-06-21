@@ -2,6 +2,7 @@
 import { Autoplay, Navigation } from 'swiper/modules'
 import type { Stage, TrailRace } from '~/lib/types'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
+import { useEventStore } from '~/store/event'
 
 interface SliderProps {
     trailRace: TrailRace
@@ -9,6 +10,7 @@ interface SliderProps {
 }
 
 const props = defineProps<SliderProps>()
+const { currentStage } = storeToRefs(useEventStore())
 
 const swiperRef = ref()
 const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
@@ -44,9 +46,15 @@ const { next, prev, isEnd, isBeginning } = useSwiper(swiperRef, {
                 :space-between="20" :breakpoints="{
                     768: {
                         slidesPerView: 2.2,
+                    },
+                    992: {
+                        slidesPerView: 2.5,
+                    },
+                    1200: {
+                        slidesPerView: Boolean(currentStage) ? 2.2 : 3.2,
                     }
                 }">
-                <swiper-slide v-for="stage in stages">
+                <swiper-slide v-for="stage in stages" class="h-auto">
                     <PagesDefaultHomeRaceCard :stage="stage" :event-slug="trailRace.slug" />
                 </swiper-slide>
             </swiper-container>

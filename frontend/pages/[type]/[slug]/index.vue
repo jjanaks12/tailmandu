@@ -258,7 +258,7 @@ onMounted(init)
                                     What's Included
                                 </h3>
                                 <ul
-                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 font-bold uppercase tracking-tight text-[#1A1A1A]">
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 font-bold tracking-tight text-[#1A1A1A]">
                                     <li v-for="(item, index) in trek.details.included" :key="index"
                                         class="flex items-center gap-3">
                                         <span class="w-1.5 h-1.5 bg-primary rounded-full shrink-0"></span> {{ item }}
@@ -273,7 +273,7 @@ onMounted(init)
                                     What's Not Included
                                 </h3>
                                 <ul
-                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 font-bold uppercase tracking-tight text-text-muted">
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-4 font-bold tracking-tight text-text-muted">
                                     <li v-for="(item, index) in trek.details.excluded" :key="index"
                                         class="flex items-center gap-3">
                                         <span class="w-1.5 h-1.5 bg-black/20 rounded-full shrink-0"></span> {{ item }}
@@ -317,23 +317,30 @@ onMounted(init)
                             <h3 class="font-black uppercase tracking-widest text-primary mb-6">
                                 Itinerary Timeline
                             </h3>
-                            <div
-                                class="max-h-[500px] overflow-y-auto pr-4 border-l-2 border-primary/20 space-y-8 relative">
-                                <div v-for="(day, index) in trek.details.itinerary as any[]" :key="index"
-                                    class="relative pl-8">
-                                    <span :class="[
-                                        'absolute left-[-9px] top-0 w-4 h-4 rounded-full',
-                                        index === 0 ? 'bg-primary ring-4 ring-primary/20' : 'bg-white border-2 border-primary/50'
-                                    ]"></span>
-                                    <p class="text-sm font-black uppercase text-primary mb-1">
-                                        Day {{ index + 1 < 10 ? `0${index + 1}` : index + 1 }} </p>
-                                            <h4 class="font-black uppercase tracking-tight mb-2 text-[#1A1A1A]">
-                                                {{ day.title }}
-                                            </h4>
-                                            <p class="text-text-muted leading-relaxed">{{ day.description }}
+                            <Accordion type="single" collapsible class="w-full" :default-value="`item-0`">
+                                <div class="max-h-[500px] overflow-y-auto pr-4 border-l-2 border-primary/20 relative">
+                                    <AccordionItem v-for="(day, index) in trek.details.itinerary as any[]" :key="index" :value="`item-${index}`" class="relative pl-8 border-none pb-4">
+                                        <span :class="[
+                                            'absolute left-[-9px] top-6 w-4 h-4 rounded-full z-10',
+                                            index === 0 ? 'bg-primary ring-4 ring-primary/20' : 'bg-white border-2 border-primary/50'
+                                        ]"></span>
+                                        <AccordionTrigger class="py-4 hover:no-underline text-left group">
+                                            <div class="flex-1 pr-4">
+                                                <p class="text-sm font-black uppercase text-primary mb-1">Day {{
+                                                    index + 1 < 10 ? `0${index + 1}` : index + 1 }} </p>
+                                                <h4 class="font-black tracking-tight text-[#1A1A1A] transition-colors group-hover:text-primary">
+                                                    {{ day.title }}
+                                                </h4>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <p class="text-text-muted leading-relaxed pb-4">
+                                                {{ day.description }}
                                             </p>
+                                        </AccordionContent>
+                                    </AccordionItem>
                                 </div>
-                            </div>
+                            </Accordion>
                         </section>
                         <!-- Gear -->
                         <section v-if="trek.details?.mandatoryGear?.length || trek.details?.optionalGear?.length"

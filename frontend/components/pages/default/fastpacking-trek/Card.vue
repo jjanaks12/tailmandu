@@ -40,7 +40,7 @@ const type = computed(() => route.params.type || 'fastpacking')
 <template>
     <div
         class="group relative flex flex-col bg-slate-100 dark:bg-[#271f1c] rounded-xl overflow-hidden border border-slate-200 dark:border-border-dark hover:border-primary/50 transition-all duration-300">
-        <div class="relative aspect-[4/3] overflow-hidden">
+        <NuxtLink :to="`/${type}/${item.slug}`" class="block relative aspect-[4/3] overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10">
             </div>
             <img :alt="item.name"
@@ -72,7 +72,7 @@ const type = computed(() => route.params.type || 'fastpacking')
                     </div>
                 </div>
             </div>
-        </div>
+        </NuxtLink>
         <div class="p-5 flex flex-col grow">
             <p
                 class="text-slate-600 dark:text-slate-400 text-xs leading-relaxed line-clamp-2 transition-all duration-300 mb-4">

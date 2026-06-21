@@ -18,6 +18,28 @@
 [X] remove vat from fastpacking booking
 [X] remove "Trail-Safe Guarantee" for fastpacking booking
 
+## June 20
+[ ] page caching
+### Blogs detail
+[X] prev / next
+[ ] review / reply (comments)
+[X] sharable
+[ ] recommended
+[ ] recent post
+
+### home page
+[X] uniform height on slider
+
+### Fastpacking
+[X] accordion on itenery
+
+### Media
+[ ] scroll lock on select
+
+### user detail
+[ ] email
+[ ] emergency detail
+
 #
 1st 50k
 2nd 50k

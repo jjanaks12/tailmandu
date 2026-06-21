@@ -656,6 +656,9 @@ export type BlogPost = {
     featured_image?: Image
 
     tags?: Tag[]
+
+    next?: { title: string, slug: string }
+    prev?: { title: string, slug: string }
 }
 
 export type EnquiryCategory = {

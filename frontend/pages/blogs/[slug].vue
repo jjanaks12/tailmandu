@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarIcon, UserIcon, ArrowLeftIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, TagIcon } from 'lucide-vue-next'
+import { CalendarIcon, UserIcon, ArrowLeftIcon, ArrowRightIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, TagIcon } from 'lucide-vue-next'
 import { useBlogStore } from '~/store/blog'
 import { showImage } from '~/lib/filters'
 
@@ -47,6 +47,31 @@ const formatDate = (date: string) => {
         month: 'long',
         day: 'numeric'
     })
+}
+
+const socialLinks = [
+    {
+        platform: 'facebook',
+        icon: FacebookIcon,
+        hoverClass: 'hover:bg-blue-50 hover:text-blue-600',
+        getShareUrl: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${url}`
+    },
+    {
+        platform: 'linkedin',
+        icon: LinkedinIcon,
+        hoverClass: 'hover:bg-indigo-50 hover:text-indigo-600',
+        getShareUrl: (url: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+    }
+]
+
+const shareOnSocial = (link: typeof socialLinks[0]) => {
+    if (typeof window === 'undefined') return
+    const url = encodeURIComponent(window.location.href)
+    const shareUrl = link.getShareUrl(url)
+
+    if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400')
+    }
 }
 
 onMounted(init)
@@ -109,22 +134,15 @@ onMounted(init)
             </div>
 
             <!-- Content Area -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-16 text-gray-800">
                 <!-- Sidebar Left: Social Share -->
                 <div class="hidden lg:block w-20 sticky top-32 h-fit">
                     <div class="flex flex-col gap-4 items-center">
                         <span class="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-2">Share</span>
-                        <Button size="icon" modifier="outline"
-                            class="rounded-full hover:bg-sky-50 hover:text-sky-500 border-slate-200 dark:border-slate-800">
-                            <TwitterIcon class="w-4 h-4" />
-                        </Button>
-                        <Button size="icon" modifier="outline"
-                            class="rounded-full hover:bg-blue-50 hover:text-blue-600 border-slate-200 dark:border-slate-800">
-                            <FacebookIcon class="w-4 h-4" />
-                        </Button>
-                        <Button size="icon" modifier="outline"
-                            class="rounded-full hover:bg-indigo-50 hover:text-indigo-600 border-slate-200 dark:border-slate-800">
-                            <LinkedinIcon class="w-4 h-4" />
+                        <Button v-for="link in socialLinks" :key="link.platform" size="icon" modifier="outline"
+                            @click="shareOnSocial(link)"
+                            :class="['rounded-full border-slate-200 dark:border-slate-800 transition-colors', link.hoverClass]">
+                            <component :is="link.icon" class="w-4 h-4" />
                         </Button>
                     </div>
                 </div>
@@ -145,6 +163,27 @@ onMounted(init)
                                 {{ tag.name }}
                             </span>
                         </div>
+                    </div>
+
+                    <!-- Prev / Next Navigation -->
+                    <div v-if="post.prev || post.next" class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center gap-4">
+                        <NuxtLink v-if="post.prev" :to="`/blogs/${post.prev.slug}`" class="group flex flex-col items-start text-left flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                                <ArrowLeftIcon class="w-3 h-3 transition-transform group-hover:-translate-x-1" />
+                                Previous Post
+                            </span>
+                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{ post.prev.title }}</span>
+                        </NuxtLink>
+                        <div v-else class="flex-1"></div>
+
+                        <NuxtLink v-if="post.next" :to="`/blogs/${post.next.slug}`" class="group flex flex-col items-end text-right flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                                Next Post
+                                <ArrowRightIcon class="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                            </span>
+                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{ post.next.title }}</span>
+                        </NuxtLink>
+                        <div v-else class="flex-1"></div>
                     </div>
                 </article>
 

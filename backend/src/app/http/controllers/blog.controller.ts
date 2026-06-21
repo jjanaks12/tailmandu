@@ -338,7 +338,28 @@ export class BlogController {
                 }
             })
             if (!post) throw createHttpError(404, 'Blog post not found')
-            response.send(post)
+
+            const prevPost = await prisma.blogPost.findFirst({
+                where: {
+                    published_at: { lt: post.published_at || new Date() },
+                    deleted_at: null,
+                    ...(isLoggedIn ? {} : { published_at: { not: null } })
+                },
+                orderBy: { published_at: 'desc' },
+                select: { title: true, slug: true }
+            })
+
+            const nextPost = await prisma.blogPost.findFirst({
+                where: {
+                    published_at: { gt: post.published_at || new Date() },
+                    deleted_at: null,
+                    ...(isLoggedIn ? {} : { published_at: { not: null } })
+                },
+                orderBy: { published_at: 'asc' },
+                select: { title: true, slug: true }
+            })
+
+            response.send({ ...post, prev: prevPost, next: nextPost })
         } catch (error) {
             next(error)
         }

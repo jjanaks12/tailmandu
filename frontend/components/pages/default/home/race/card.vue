@@ -15,10 +15,9 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
 </script>
 
 <template>
-    <div
-        class="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 transition-transform hover:-translate-y-2">
+    <div class="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 h-full flex flex-col">
         <NuxtLink :to="localePath({ name: 'races-slug', params: { slug: eventSlug }, query: { stage_id: stage.id } })"
-            class="h-64 overflow-hidden">
+            class="h-64 block overflow-hidden shrink-0">
             <img alt="Trail Runner on high mountain"
                 class="w-full h-full object-cover transition-transform group-hover:scale-110"
                 :src="showImage(stage?.thumbnail?.file_name)" />
@@ -28,16 +27,16 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
                 </span>
             </div> -->
         </NuxtLink>
-        <div class="p-8">
+        <div class="p-8 flex-1 flex flex-col">
             <h4 class="text-2xl font-display font-bold mb-2">
                 <NuxtLink
                     :to="localePath({ name: 'races-slug', params: { slug: eventSlug }, query: { stage_id: stage.id } })">
                     {{ stage.name }}</NuxtLink>
             </h4>
-            <p class="text-slate-500 dark:text-slate-400 mb-6">
+            <p class="text-slate-500 dark:text-slate-400 mb-6 flex-1">
                 {{ stage.excerpt }}
             </p>
-            <div class="flex justify-between items-center font-semibold">
+            <div class="flex justify-between items-center font-semibold mt-auto">
                 <!-- <span class="flex items-center text-primary">
                     <TimerIcon class="mr-1 size-4" />
                     {{ stage.cut_off_time }} Cutoff
