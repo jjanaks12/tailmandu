@@ -14,15 +14,20 @@ export const verifyAccessToken = (request: Request, response: Response, next: Ne
             return next(createHttpError.Unauthorized(error.name === 'JsonWebTokenError' ? '' : error.message))
         }
 
-        if (typeof payload != 'string') {
-            const user = await prisma.user.findFirstOrThrow({
-                where: { id: payload.aud as string }, omit: {
-                    password: true
-                }
-            })
-            request.body = { ...request.body, auth_user: user }
+        try {
+            if (typeof payload != 'string') {
+                console.log(payload.aud, "aksjbcansjcakn")
+                const user = await prisma.user.findFirstOrThrow({
+                    where: { id: payload.aud as string },
+                    omit: {
+                        password: true
+                    }
+                })
+                request.body = { ...request.body, auth_user: user }
+            }
+            next()
+        } catch (err) {
+            return next(createHttpError.Unauthorized('User not found or database error'))
         }
-
-        next()
     })
 }

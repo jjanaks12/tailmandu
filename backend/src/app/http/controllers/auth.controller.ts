@@ -31,6 +31,7 @@ export class AuthController {
             if (!user)
                 throw createHttpError.NotFound(`${result.email} has not been registered`)
 
+            console.log(user, ":::::personal detail")
             const isMatch = await Bcrypt.compare(request.body.password, user.password)
             if (!isMatch)
                 throw createHttpError.Unauthorized('email / password not valid')

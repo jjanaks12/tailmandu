@@ -69,8 +69,14 @@ onMounted(() => fetchTreks(true))
             <TableRow v-for="(trek, index) in treks" :key="trek.id">
                 <TableCell>{{ index + 1 }}</TableCell>
                 <TableCell>
-                    <NuxtLink :to="`/dashboard/treks/${trek.id}`">
+                    <NuxtLink :to="`/dashboard/treks/${trek.id}`" class="inline-block align-top mb-2">
                         {{ trek.name }}
+                    </NuxtLink> <br />
+                    <NuxtLink v-if="trek.slug"
+                        :to="`/${(trek.category?.name || 'fastpacking').toLowerCase()}/${trek.slug}`" target="_blank"
+                        class="inline-flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1 transition-colors">
+                        <EyeIcon class="w-3.5 h-3.5" />
+                        Preview
                     </NuxtLink>
                 </TableCell>
                 <TableCell>{{ trek.category?.name || 'N/A' }}</TableCell>

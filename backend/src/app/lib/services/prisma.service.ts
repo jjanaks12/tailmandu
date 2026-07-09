@@ -26,7 +26,7 @@ export const prisma = basePrisma.$extends({
                 const readOperations = ['findUnique', 'findFirst', 'findMany']
                 if (readOperations.includes(operation)) {
                     const cacheKey = `__cache__/${folder}:${operation}:${JSON.stringify(args)}`
-                    
+
                     const cached = await Redis.get(cacheKey)
                     if (cached) {
                         console.log(`[CACHE HIT] ${model}.${operation}`)
@@ -35,8 +35,8 @@ export const prisma = basePrisma.$extends({
 
                     console.log(`[DB QUERY] ${model}.${operation}`)
                     const result = await query(args)
-                    // Cache for 1 hour (3600 seconds)
-                    if (result) await Redis.set(cacheKey, JSON.stringify(result), 3600) 
+                    // Cache for 10 min (600 seconds)
+                    if (result) await Redis.set(cacheKey, JSON.stringify(result), 600)
                     return result
                 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BarChart3Icon, PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon, SparklesIcon } from 'lucide-vue-next'
+import { BarChart3Icon, PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon, SparklesIcon, EyeIcon, CompassIcon } from 'lucide-vue-next'
 import type { Trek } from '~/lib/types'
 import { useTrekStore } from '~/store/trek'
 
@@ -17,7 +17,7 @@ const route = useRoute()
 
 const trek = ref<Trek | null>(null)
 const excerpt = ref('')
-const itinerary = ref<{ day: string, title: string, description: string }[]>([])
+const slug = ref('')
 
 const bookings = ref<any[]>([])
 const isLoadingBookings = ref(false)
@@ -50,28 +50,6 @@ const updateBookingStatus = async (bookingId: string, newStatus: string) => {
     } finally {
         isUpdatingStatus.value[bookingId] = false
     }
-}
-
-const addItineraryDay = () => {
-    const nextDay = String(itinerary.value.length + 1).padStart(2, '0')
-    itinerary.value.push({
-        day: nextDay,
-        title: 'New Day',
-        description: 'Description of the daily activities.'
-    })
-}
-
-const removeItineraryDay = (index: number) => {
-    itinerary.value.splice(index, 1)
-}
-
-const addHighlightItem = () => {
-    trek.value?.details?.highlights.push('')
-}
-
-const removeHighlightItem = (index: number) => {
-    trek.value?.details?.highlights.splice(index, 1)
-    saveDetails()
 }
 
 const addIncludedItem = () => {
@@ -120,31 +98,6 @@ const removeOptionalGear = (index: number) => {
     saveDetails()
 }
 
-const addImportantDetailSection = () => {
-    trek.value?.details?.importantDetails.push({
-        title: 'New Section',
-        items: []
-    })
-}
-
-const removeImportantDetailSection = (index: number) => {
-    trek.value?.details?.importantDetails.splice(index, 1)
-    saveDetails()
-}
-
-const addImportantDetailItem = (sectionIndex: number) => {
-    trek.value?.details?.importantDetails[sectionIndex].items.push({
-        title: 'New Item',
-        description: ''
-    })
-}
-
-const removeImportantDetailItem = (sectionIndex: number, itemIndex: number) => {
-    trek.value?.details?.importantDetails[sectionIndex].items.splice(itemIndex, 1)
-    saveDetails()
-}
-
-
 const isSavingDetails = ref(false)
 const saveDetails = async () => {
     isSavingDetails.value = true
@@ -157,29 +110,13 @@ const saveDetails = async () => {
     }
 }
 
-const isSavingItinerary = ref(false)
-const saveItinerary = async () => {
-    isSavingItinerary.value = true
-    try {
-        await axios.put(`/treks/${route.params.id}`, {
-            details: {
-                ...trek.value?.details,
-                itinerary: itinerary.value
-            }
-        })
-        clearAutosave()
-        await init()
-    } finally {
-        isSavingItinerary.value = false
-    }
-}
-
 const isSavingGeneral = ref(false)
 const saveGeneral = async () => {
     isSavingGeneral.value = true
     try {
         await axios.put(`/treks/${route.params.id}`, {
             excerpt: excerpt.value,
+            slug: slug.value,
         })
         clearAutosave()
         await init()
@@ -191,14 +128,14 @@ const saveGeneral = async () => {
 const isTrackingChanges = ref(false)
 const hasUnsavedChanges = ref(false)
 
-watch([trek, excerpt, itinerary], () => {
+watch([trek, excerpt, slug], () => {
     if (!isTrackingChanges.value) return
     hasUnsavedChanges.value = true
     try {
         localStorage.setItem(`trek-autosave-${route.params.id}`, JSON.stringify({
             trek: trek.value,
             excerpt: excerpt.value,
-            itinerary: itinerary.value
+            slug: slug.value,
         }))
     } catch (e) {
         console.error('Failed to autosave to localStorage', e)
@@ -224,7 +161,7 @@ const init = async () => {
     if (trek.value) {
         useTitle(trek.value.name)
         excerpt.value = trek.value.excerpt
-        itinerary.value = trek.value.details?.itinerary ?? []
+        slug.value = trek.value.slug || ''
         trek.value.details = trek.value.details ?? {}
         trek.value.details.stats = trek.value.details?.stats ?? {}
         trek.value.details.highlights = trek.value.details?.highlights ?? []
@@ -235,11 +172,13 @@ const init = async () => {
         trek.value.details.optionalGear = trek.value.details?.optionalGear ?? []
         trek.value.details.securityProtocols = trek.value.details?.securityProtocols ?? []
         trek.value.details.importantDetails = trek.value.details?.importantDetails ?? []
-        
+        trek.value.details.weather = trek.value.details?.weather ?? { location: '', embedCode: '' }
+        trek.value.details.qa = trek.value.details?.qa ?? []
+
         serverStateData.value = {
             trek: JSON.parse(JSON.stringify(trek.value)),
             excerpt: excerpt.value,
-            itinerary: JSON.parse(JSON.stringify(itinerary.value))
+            slug: slug.value,
         }
     }
 
@@ -249,7 +188,7 @@ const init = async () => {
             const savedStateData = JSON.parse(savedState)
             trek.value = savedStateData.trek
             excerpt.value = savedStateData.excerpt
-            itinerary.value = savedStateData.itinerary
+            slug.value = savedStateData.slug || ''
             hasUnsavedChanges.value = true
         } catch (e) {
             console.error(e)
@@ -261,15 +200,14 @@ const init = async () => {
     fetchBookings(true) // Fetch in background for notification badge
 }
 
-const isHighlightsDirty = computed(() => JSON.stringify(trek.value?.details?.highlights) !== JSON.stringify(serverStateData.value?.trek?.details?.highlights))
 const isIncludedDirty = computed(() => JSON.stringify(trek.value?.details?.included) !== JSON.stringify(serverStateData.value?.trek?.details?.included))
 const isItemisedInclusionsDirty = computed(() => JSON.stringify(trek.value?.details?.itemisedInclusions) !== JSON.stringify(serverStateData.value?.trek?.details?.itemisedInclusions))
 const isExcludedDirty = computed(() => JSON.stringify(trek.value?.details?.excluded) !== JSON.stringify(serverStateData.value?.trek?.details?.excluded))
 const isMandatoryGearDirty = computed(() => JSON.stringify(trek.value?.details?.mandatoryGear) !== JSON.stringify(serverStateData.value?.trek?.details?.mandatoryGear))
 const isOptionalGearDirty = computed(() => JSON.stringify(trek.value?.details?.optionalGear) !== JSON.stringify(serverStateData.value?.trek?.details?.optionalGear))
-const isImportantDetailsDirty = computed(() => JSON.stringify(trek.value?.details?.importantDetails) !== JSON.stringify(serverStateData.value?.trek?.details?.importantDetails))
-const isItineraryDirty = computed(() => JSON.stringify(itinerary.value) !== JSON.stringify(serverStateData.value?.itinerary))
 const isExcerptDirty = computed(() => excerpt.value !== serverStateData.value?.excerpt)
+const isSlugDirty = computed(() => slug.value !== serverStateData.value?.slug)
+
 
 const showPricingDialog = ref(false)
 const showStatsDialog = ref(false)
@@ -279,12 +217,13 @@ onMounted(init)
 </script>
 
 <template>
-    <div class="p-8 max-w-6xl mx-auto space-y-12 pb-24">
+    <div class="p-8 max-w-6xl mx-auto space-y-12 pb-24" v-if="!trek">
         <!-- Loading Skeleton -->
-        <PagesDashboardTreksLoader v-if="!trek" />
-
-        <!-- Actual Content -->
-        <template v-else>
+        <PagesDashboardTreksLoader />
+    </div>
+    <!-- Actual Content -->
+    <template v-else>
+        <div class="p-8 max-w-6xl mx-auto space-y-12 pb-24">
             <!-- Trek Header Section -->
             <section class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
                 <div class="md:col-span-2 space-y-4">
@@ -301,6 +240,14 @@ onMounted(init)
                             class="bg-secondary/10 text-secondary uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1">
                             Draft
                         </Badge>
+
+                        <NuxtLink v-if="trek.slug"
+                            :to="`/${(trek.category?.name || 'fastpacking').toLowerCase()}/${trek.slug}`"
+                            target="_blank"
+                            class="inline-flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1 transition-colors">
+                            <EyeIcon class="w-3.5 h-3.5" />
+                            Preview
+                        </NuxtLink>
 
                         <!-- View Bookings Sheet Toggle -->
                         <Sheet>
@@ -512,23 +459,37 @@ onMounted(init)
             <section class="bg-card border border-border rounded-lg p-8 shadow-sm">
                 <div class="flex justify-between items-end mb-8">
                     <div>
-                        <h3 class="text-2xl font-bold text-foreground">About the Trek</h3>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-2xl font-bold text-foreground">About the Trek</h3>
+                            <Badge v-if="isExcerptDirty || isSlugDirty" variant="outline"
+                                class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved
+                            </Badge>
+                        </div>
                         <p class="text-muted-foreground text-sm">Provide a compelling narrative for potential
                             participants.</p>
                     </div>
-                    <Button @click="saveGeneral" :disabled="isSavingGeneral"
+                    <Button @click="saveGeneral" :disabled="isSavingGeneral || (!isExcerptDirty && !isSlugDirty)"
                         class="shadow-md shadow-primary/20 font-bold px-6">
                         <Loader2Icon v-if="isSavingGeneral" class="w-4 h-4 animate-spin mr-2" />
                         Save General Info
                     </Button>
                 </div>
                 <div class="space-y-6">
-                    <div class="space-y-2">
-                        <label
-                            class="text-xs font-bold text-muted-foreground uppercase ml-1 tracking-widest italic">Trek
-                            Tagline / Excerpt</label>
-                        <Input v-model="excerpt" type="text" placeholder="Short catchy description for cards..."
-                            class="bg-muted/10 border-border/50" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label
+                                class="text-xs font-bold text-muted-foreground uppercase ml-1 tracking-widest italic">Trek
+                                Tagline / Excerpt</label>
+                            <Input v-model="excerpt" type="text" placeholder="Short catchy description for cards..."
+                                class="bg-muted/10 border-border/50" />
+                        </div>
+                        <div class="space-y-2">
+                            <label
+                                class="text-xs font-bold text-muted-foreground uppercase ml-1 tracking-widest italic">Trek
+                                Slug</label>
+                            <Input v-model="slug" type="text" placeholder="slug-path-name"
+                                class="bg-muted/10 border-border/50" />
+                        </div>
                     </div>
                     <div class="space-y-2">
                         <label
@@ -538,82 +499,9 @@ onMounted(init)
                     </div>
                 </div>
             </section>
+            <PagesDashboardTreksWeather :trek="trek" @update="init" />
 
-            <!-- Trip Highlights -->
-            <section class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-foreground">Trip Highlights</h3>
-                    <Button v-if="trek?.details?.highlights?.length > 0" variant="ghost" size="sm" @click="saveDetails"
-                        :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
-                        <Loader2Icon v-if="isSavingDetails" class="w-4 h-4 animate-spin mr-2" />
-                        Save Highlights
-                    </Button>
-                </div>
-                <div class="bg-card rounded-lg p-6 border border-border shadow-sm">
-                    <div class="space-y-3">
-                        <div v-for="(highlight, index) in (trek?.details?.highlights as Array<string>)" :key="index"
-                            class="flex items-center gap-3 group relative">
-                            <SparklesIcon class="w-4 h-4 text-primary shrink-0" />
-                            <Input v-model="trek.details.highlights[index]" type="text" class="flex-1"
-                                placeholder="A key highlight of the trip..." />
-                            <Button variant="ghost" size="icon" @click="removeHighlightItem(index)"
-                                class="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0">
-                                <Trash2Icon class="w-4 h-4" />
-                            </Button>
-                        </div>
-                    </div>
-                    <Button @click="addHighlightItem" variant="ghost"
-                        class="w-full mt-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
-                        <PlusIcon class="w-3.5 h-3.5" /> Add Highlight
-                    </Button>
-                </div>
-            </section>
-
-            <!-- Interactive Itinerary -->
-            <section class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-foreground">Interactive Itinerary</h3>
-                    <div class="flex gap-2">
-                        <Button @click="saveItinerary" :disabled="isSavingItinerary" variant="ghost"
-                            class="font-bold text-primary hover:bg-primary/5">
-                            <Loader2Icon v-if="isSavingItinerary" class="w-4 h-4 animate-spin mr-2" />
-                            Save Itinerary
-                        </Button>
-                        <Button @click="addItineraryDay" variant="secondary"
-                            class="font-bold text-primary bg-primary/10 hover:bg-primary/20 flex items-center gap-2">
-                            <PlusCircleIcon class="w-4 h-4" /> Add Day
-                        </Button>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <div v-for="(day, index) in itinerary" :key="index"
-                        class="bg-card p-6 rounded-lg flex gap-6 shadow-sm border border-border border-l-4 border-l-primary group">
-                        <div class="flex flex-col items-center">
-                            <span class="text-xs font-black text-primary uppercase tracking-tighter">Day</span>
-                            <span class="text-2xl font-black text-foreground">{{ day.day }}</span>
-                        </div>
-                        <div class="flex-1 space-y-2">
-                            <Input v-model="day.title"
-                                class="text-lg font-bold text-foreground bg-transparent border-none p-0 h-auto focus-visible:ring-0 w-full"
-                                type="text" />
-                            <Textarea v-model="day.description"
-                                class="w-full text-sm text-muted-foreground bg-transparent border-none p-0 focus-visible:ring-0 resize-none min-h-[40px]"
-                                rows="2" />
-                        </div>
-                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon"
-                                class="text-muted-foreground hover:text-foreground cursor-grab">
-                                <GripVerticalIcon class="w-4 h-4" />
-                            </Button>
-                            <Button @click="removeItineraryDay(index as number)" variant="ghost" size="icon"
-                                class="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                                <Trash2Icon class="w-4 h-4" />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
+            <PagesDashboardTreksHighlights :trek="trek" @update="init" />
             <!-- Logistics & Mandatory Gear -->
             <section class="space-y-8">
                 <!-- Package Details -->
@@ -632,7 +520,9 @@ onMounted(init)
                             <h4 class="text-sm font-bold text-primary uppercase flex items-center gap-2">
                                 <CheckCircle2Icon class="w-4 h-4" /> What's Included
                             </h4>
-                            <Badge v-if="isIncludedDirty" variant="outline" class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved</Badge>
+                            <Badge v-if="isIncludedDirty" variant="outline"
+                                class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved
+                            </Badge>
                         </div>
                         <div class="p-4 space-y-2">
                             <div v-for="(item, index) in (trek?.details?.included as Array<string>)" :key="index"
@@ -657,7 +547,9 @@ onMounted(init)
                             <h4 class="text-sm font-bold text-destructive uppercase flex items-center gap-2">
                                 <MinusCircleIcon class="w-4 h-4" /> What's NOT Included
                             </h4>
-                            <Badge v-if="isExcludedDirty" variant="outline" class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved</Badge>
+                            <Badge v-if="isExcludedDirty" variant="outline"
+                                class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved
+                            </Badge>
                         </div>
                         <div class="p-4 space-y-2">
                             <div v-for="(item, index) in trek?.details?.excluded" :key="index"
@@ -832,68 +724,9 @@ onMounted(init)
                 </div>
             </section>
 
-            <!-- Important Details Section -->
-            <section class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-foreground">Important Details</h3>
-                        <Badge v-if="isImportantDetailsDirty" variant="outline" class="border-destructive text-destructive h-5 px-1.5 text-[10px] uppercase">Unsaved</Badge>
-                    </div>
-                        <p class="text-sm text-muted-foreground">Information like Food, Water, Toilets, etc.</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <Button v-if="trek?.details?.importantDetails?.length > 0" variant="ghost" size="sm"
-                            @click="saveDetails" :disabled="isSavingDetails" class="text-primary hover:bg-primary/10">
-                            <Loader2Icon v-if="isSavingDetails" class="w-4 h-4 animate-spin mr-2" />
-                            Save Changes
-                        </Button>
-                        <Button @click="addImportantDetailSection" variant="secondary"
-                            class="font-bold text-primary bg-primary/10 hover:bg-primary/20 flex items-center gap-2">
-                            <PlusCircleIcon class="w-4 h-4" /> Add Section
-                        </Button>
-                    </div>
-                </div>
+            <PagesDashboardTreksImportantDetails :trek="trek" @update="init" />
 
-                <div class="space-y-6">
-                    <div v-for="(section, sectionIndex) in (trek?.details?.importantDetails as Array<any>)"
-                        :key="sectionIndex" class="bg-card border border-border rounded-lg p-6 shadow-sm group/section">
-                        <div class="flex justify-between items-center mb-6">
-                            <Input v-model="section.title"
-                                class="text-lg font-bold border-none bg-transparent focus-visible:ring-0 px-0 h-auto w-full md:w-1/2"
-                                placeholder="Section Title (e.g. Food, Water & Toilets)" />
-                            <Button variant="ghost" size="icon"
-                                @click="removeImportantDetailSection(sectionIndex as number)"
-                                class="text-muted-foreground hover:text-destructive shrink-0">
-                                <Trash2Icon class="w-4 h-4" />
-                            </Button>
-                        </div>
-
-                        <div class="space-y-4 pl-4 border-l-2 border-border/50">
-                            <div v-for="(item, itemIndex) in section.items" :key="itemIndex"
-                                class="group/item relative space-y-2 pb-4 mb-4 border-b border-border/50 last:border-0 last:pb-0 last:mb-0">
-                                <div class="flex flex-col md:flex-row justify-between gap-4">
-                                    <div class="flex-1 space-y-2">
-                                        <Input v-model="item.title" class="font-bold"
-                                            placeholder="Item Title (e.g. Food)" />
-                                        <Textarea v-model="item.description" rows="2" placeholder="Item Description..."
-                                            class="resize-none" />
-                                    </div>
-                                    <Button variant="ghost" size="icon"
-                                        @click="removeImportantDetailItem(sectionIndex as number, itemIndex as number)"
-                                        class="opacity-0 group-hover/item:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0 mt-1 self-end md:self-start">
-                                        <Trash2Icon class="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                            <Button @click="addImportantDetailItem(sectionIndex as number)" variant="ghost"
-                                class="w-full text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary transition-all flex items-center justify-center gap-2">
-                                <PlusIcon class="w-3.5 h-3.5" /> Add Item
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <PagesDashboardTreksQA :trek="trek" @update="init" />
 
             <!-- Stats Dialog -->
             <Dialog v-model:open="showStatsDialog">
@@ -934,6 +767,7 @@ onMounted(init)
                     <PagesDashboardTreksPricing :trek="trek" @fetch="init" @close="showPricingDialog = false" />
                 </DialogContent>
             </Dialog>
-        </template>
-    </div>
+        </div>
+        <PagesDashboardTreksItinerary :trek="trek" @update="init" />
+    </template>
 </template>

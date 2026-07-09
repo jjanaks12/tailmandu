@@ -13,6 +13,7 @@ router.post('/:id/publish', [verifyAccessToken], TrekController.publish)
 router.post('/:id/unpublish', [verifyAccessToken], TrekController.unpublish)
 router.put('/:id/add_gallery', [verifyAccessToken], TrekController.addGallery)
 router.put('/:id/description', [verifyAccessToken], TrekController.saveDescription)
+router.put('/:id/upload_map_file', [verifyAccessToken], TrekController.uploadGPXFile)
 router.get('/:slug/by_slug', [], TrekController.showBySlug)
 
 export default router

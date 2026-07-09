@@ -1,6 +1,7 @@
 import { trekSchema } from "@/app/lib/schema/treks.schema"
 import { APIQuery } from "@/app/lib/types"
 import { prisma } from "@/app/lib/services/prisma.service"
+import { FileHandler } from "@/app/lib/services/file.service"
 import { Prisma } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import createHttpError from "http-errors"
@@ -158,6 +159,7 @@ export class TrekController {
                 },
                 data: {
                     name: request.body.name ?? existingTrek.name,
+                    slug: request.body.slug !== undefined ? request.body.slug : existingTrek.slug,
                     excerpt: request.body.excerpt ?? existingTrek.excerpt,
                     description: request.body.description ?? existingTrek.description,
                     image_id: request.body.image_id ?? existingTrek.image_id,
@@ -294,6 +296,36 @@ export class TrekController {
                 },
                 data: {
                     description: request.body.description
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async uploadGPXFile(request: Request, response: Response, next: NextFunction) {
+        try {
+            const fileUpload = new FileHandler('gpx')
+            const trek = await prisma.trek.findUnique({ where: { id: request.params.id as string } })
+            if (!trek) {
+                throw createHttpError(404, 'Trek not found')
+            }
+            
+            const details = (trek.details as any) || {}
+            const existingFileId = details.gpxFile?.id
+            
+            const file = await fileUpload.saveFile(request.body.file, existingFileId, 'gpx')
+            
+            details.gpxFile = {
+                id: file.id,
+                fileName: file.file_name,
+                originalName: request.body.originalName || 'map.gpx'
+            }
+            
+            response.send(await prisma.trek.update({
+                where: { id: trek.id },
+                data: {
+                    details
                 }
             }))
         } catch (error) {

@@ -12,10 +12,15 @@ import { useTrekStore } from '~/store/trek'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { useAppStore } from '~/store/app'
 import { Autoplay, Navigation } from 'swiper/modules'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '~/store/auth'
 
-const { getTrekBySlug } = useTrekStore()
+const trekStore = useTrekStore()
+const { getTrekBySlug } = trekStore
+const { treks } = storeToRefs(trekStore)
 const route = useRoute()
 const { setImageForPreview } = useAppStore()
+const { isLoggedin } = storeToRefs(useAuthStore())
 
 definePageMeta({
     validate: async (route) => {
@@ -35,10 +40,52 @@ const securityProtocolIconMapping: Record<string, any> = {
 const trek = ref<Trek | null>(null)
 const loading = ref(true)
 
+const activeDayKey = ref('item-0')
+const activeDayIndex = computed(() => {
+    if (!activeDayKey.value) return null
+    const parts = activeDayKey.value.split('-')
+    return parts.length > 1 ? Number(parts[1]) : null
+})
+
+const hasLocations = computed(() => {
+    return trek.value?.details?.itinerary?.some((day: any) => day.places && day.places.length > 0) || false
+})
+
+const itineraryMapRef = ref<any>(null)
+const focusOnPlace = (place: any) => {
+    if (itineraryMapRef.value) {
+        itineraryMapRef.value.focusOnPlace(place)
+    }
+}
+
+useSeoMeta({
+    title: () => trek.value ? `${trek.value.name} | Trailmandu` : 'Loading Adventure...',
+    ogTitle: () => trek.value ? `${trek.value.name} | Trailmandu` : 'Trailmandu',
+    description: () => trek.value?.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.',
+    ogDescription: () => trek.value?.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.',
+    ogImage: () => trek.value?.thumbnail?.file_name ? showImage(trek.value.thumbnail.file_name) : '/images/default-og.jpg',
+    twitterCard: 'summary_large_image',
+    twitterTitle: () => trek.value ? `${trek.value.name} | Trailmandu` : 'Trailmandu',
+    twitterDescription: () => trek.value?.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.',
+    twitterImage: () => trek.value?.thumbnail?.file_name ? showImage(trek.value.thumbnail.file_name) : '/images/default-og.jpg',
+})
+
 const init = async () => {
     loading.value = true
     try {
         trek.value = await getTrekBySlug(route.params.slug as string)
+        if (!trek.value) {
+            throw createError({ statusCode: 404, statusMessage: 'Trek not found', fatal: true })
+        }
+        if (!trek.value.published_at && !isLoggedin.value) {
+            trek.value = null
+            throw createError({ statusCode: 404, statusMessage: 'Trek not found', fatal: true })
+        }
+    } catch (err: any) {
+        if (err.statusCode) {
+            throw err
+        }
+        throw createError({ statusCode: 404, statusMessage: 'Trek not found', fatal: true })
     } finally {
         loading.value = false
     }
@@ -73,11 +120,32 @@ const startingPrice = computed(() => {
     }
     return Number(trek.value?.price) || 0
 })
+const hasItineraryMap = computed(() => {
+    return trek.value?.details?.itinerary?.some((day: any) => day.places && day.places.length > 0) || false
+})
 const isScrolled = computed(() => scrollY.value > 20)
 
 const { formatCurrency } = useCurrency()
 
-onMounted(init)
+const categoryName = computed(() => {
+    const t = (route.params.type as string || '').toLowerCase()
+    return t === 'treks' ? 'Treks' : 'Fastpacking'
+})
+
+const recommendedTreks = computed(() => {
+    return treks.value
+        .filter((t) => t.id !== trek.value?.id)
+        .slice(0, 3)
+})
+
+onMounted(async () => {
+    await init()
+    try {
+        await trekStore.fetchTreks(false, categoryName.value)
+    } catch (e) {
+        console.error('Failed to fetch recommended treks', e)
+    }
+})
 </script>
 
 <template>
@@ -135,7 +203,7 @@ onMounted(init)
                                 <div>
                                     <p class="text-sm uppercase text-text-muted font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                        }}</p>
+                                    }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm uppercase text-text-muted font-bold mb-1">Distance</p>
@@ -292,17 +360,17 @@ onMounted(init)
                         <div class="grid grid-cols-1 gap-8">
                             <div v-for="(section, index) in trek.details.importantDetails as any[]" :key="index"
                                 class="bg-white border border-black/5 p-8 shadow-sm">
-                                <h3
-                                    class="text-primary text-[16px] font-black uppercase tracking-widest mb-6 border-b border-black/5 pb-4">
+                                <h3 class="text-primary text-[16px] font-black uppercase tracking-widest mb-6 border-b border-black/5 pb-4"
+                                    v-if="trek.details.importantDetails?.items?.length === 1">
                                     {{ section.title }}
                                 </h3>
                                 <div class="space-y-6">
                                     <div v-for="(item, itemIndex) in section.items" :key="itemIndex">
-                                        <h4 class="font-bold uppercase text-[#1A1A1A] mb-1"
-                                            v-if="trek.details?.importantDetails?.length > 1">
+                                        <h4 class="font-bold uppercase text-[#1A1A1A] mb-1">
                                             {{ item.title }}
                                         </h4>
-                                        <p class="text-text-muted leading-relaxed">{{ item.description }}
+                                        <p class="text-text-muted leading-relaxed">
+                                            {{ item.description }}
                                         </p>
                                     </div>
                                 </div>
@@ -312,36 +380,7 @@ onMounted(init)
                 </div>
                 <div class="lg:col-span-5 space-y-8">
                     <div class="sticky top-28 space-y-8">
-                        <!-- Detailed Itinerary -->
-                        <section v-if="trek.details?.itinerary?.length">
-                            <h3 class="font-black uppercase tracking-widest text-primary mb-6">
-                                Itinerary Timeline
-                            </h3>
-                            <Accordion type="single" collapsible class="w-full" :default-value="`item-0`">
-                                <div class="max-h-[500px] overflow-y-auto pr-4 border-l-2 border-primary/20 relative">
-                                    <AccordionItem v-for="(day, index) in trek.details.itinerary as any[]" :key="index" :value="`item-${index}`" class="relative pl-8 border-none pb-4">
-                                        <span :class="[
-                                            'absolute left-[-9px] top-6 w-4 h-4 rounded-full z-10',
-                                            index === 0 ? 'bg-primary ring-4 ring-primary/20' : 'bg-white border-2 border-primary/50'
-                                        ]"></span>
-                                        <AccordionTrigger class="py-4 hover:no-underline text-left group">
-                                            <div class="flex-1 pr-4">
-                                                <p class="text-sm font-black uppercase text-primary mb-1">Day {{
-                                                    index + 1 < 10 ? `0${index + 1}` : index + 1 }} </p>
-                                                <h4 class="font-black tracking-tight text-[#1A1A1A] transition-colors group-hover:text-primary">
-                                                    {{ day.title }}
-                                                </h4>
-                                            </div>
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                            <p class="text-text-muted leading-relaxed pb-4">
-                                                {{ day.description }}
-                                            </p>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </div>
-                            </Accordion>
-                        </section>
+
                         <!-- Gear -->
                         <section v-if="trek.details?.mandatoryGear?.length || trek.details?.optionalGear?.length"
                             class="space-y-4">
@@ -382,6 +421,19 @@ onMounted(init)
                                 </TabsContent>
                             </Tabs>
                         </section>
+
+                        <!-- Weather Widget -->
+                        <section v-if="trek.details?.weather?.embedCode" class="space-y-4">
+                            <h3 class="font-black uppercase tracking-widest text-primary">
+                                Live Weather {{ trek.details.weather.location ? `at ${trek.details.weather.location}` :
+                                    '' }}
+                            </h3>
+                            <div
+                                class="bg-white border border-black/5 p-4 shadow-sm rounded-lg overflow-hidden flex justify-center items-center">
+                                <div class="w-full" v-html="trek.details.weather.embedCode"></div>
+                            </div>
+                        </section>
+
                         <!-- Safety & Risk -->
                         <!-- <section v-if="trek.details?.securityProtocols?.length" class="space-y-4">
                             <h3 class="font-black uppercase tracking-widest text-primary">Security Protocols
@@ -401,6 +453,115 @@ onMounted(init)
                     </div>
                 </div>
             </div>
+            <!-- Detailed Itinerary & Route Map -->
+            <section v-if="trek.details?.itinerary?.length" class="mb-24 pt-16 border-t border-black/5">
+                <div class="mb-12">
+                    <span class="text-primary font-black uppercase tracking-[0.2em] text-xs block mb-3">Interactive
+                        Route &
+                        Timeline</span>
+                    <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-[#1A1A1A]">Detailed
+                        Itinerary</h2>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    <!-- Left: Itinerary Timeline Accordion -->
+                    <div :class="[hasLocations ? 'lg:col-span-6' : 'lg:col-span-12', 'space-y-6']">
+                        <Accordion type="single" collapsible class="w-full" v-model="activeDayKey">
+                            <div class="max-h-[550px] overflow-y-auto pr-4 border-l-2 border-primary/20 relative">
+                                <AccordionItem v-for="(day, index) in trek.details.itinerary as any[]" :key="index"
+                                    :value="`item-${index}`" class="relative pl-8 border-none pb-6 last:pb-0">
+                                    <span :class="[
+                                        'absolute left-[-9px] top-6 w-4 h-4 rounded-full z-10 transition-all duration-300',
+                                        activeDayIndex === index ? 'bg-primary ring-4 ring-primary/20 scale-125' : 'bg-white border-2 border-primary/50'
+                                    ]"></span>
+                                    <AccordionTrigger class="py-4 hover:no-underline text-left group">
+                                        <div class="flex-1 pr-4">
+                                            <p class="text-sm font-black uppercase text-primary mb-1">Day {{ index + 1 <
+                                                10 ? `0${index + 1}` : index + 1 }} </p>
+                                                    <h4
+                                                        class="font-black tracking-tight text-[#1A1A1A] text-lg transition-colors group-hover:text-primary">
+                                                        {{ day.title }}
+                                                    </h4>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div class="space-y-4 pb-4">
+                                            <p class="text-text-muted leading-relaxed">
+                                                {{ day.description }}
+                                            </p>
+                                            
+                                            <!-- Stopovers / Checkpoints Badges -->
+                                            <div v-if="day.places?.length" class="space-y-2 pt-3 border-t border-black/5">
+                                                <span class="text-[9px] font-black text-primary/70 uppercase tracking-widest block">Route Checkpoints</span>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <button v-for="(place, pIdx) in day.places" :key="pIdx"
+                                                        @click="focusOnPlace(place)"
+                                                        class="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary rounded-full text-xs font-bold transition-all">
+                                                        <span>📍</span>
+                                                        <span>{{ place.name }}</span>
+                                                        <span v-if="place.elevation" class="text-[10px] bg-primary/15 px-1 py-0.5 rounded font-black">{{ place.elevation }}m</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </div>
+                        </Accordion>
+                    </div>
+
+                    <!-- Right: Itinerary Map -->
+                    <div v-if="hasLocations"
+                        class="lg:col-span-6 h-[550px] overflow-hidden shadow-md border border-black/5 bg-slate-50 relative rounded-[2.5rem]">
+                        <ItineraryMap ref="itineraryMapRef" :itinerary="trek.details.itinerary" :routing-mode="trek.details.routingMode || 'route'" :elevation-profile="trek.details.elevationProfile" :active-day-index="activeDayIndex" />
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQs Section -->
+            <section v-if="trek.details?.qa?.length" class="mb-24 pt-16 border-t border-black/5">
+                <div class="mb-12">
+                    <span class="text-primary font-black uppercase tracking-[0.2em] text-xs block mb-3">Questions &
+                        Answers</span>
+                    <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-[#1A1A1A]">Frequently Asked
+                        Questions
+                    </h2>
+                </div>
+                <div class="max-w-4xl">
+                    <Accordion type="single" collapsible class="w-full space-y-4">
+                        <AccordionItem v-for="(item, index) in trek.details.qa as any[]" :key="index"
+                            :value="`faq-${index}`"
+                            class="border border-black/5 bg-white px-8 py-2 shadow-sm rounded-xl">
+                            <AccordionTrigger
+                                class="py-4 hover:no-underline text-left font-black tracking-tight text-lg text-[#1A1A1A] hover:text-primary">
+                                {{ item.question }}
+                            </AccordionTrigger>
+                            <AccordionContent
+                                class="text-text-muted leading-relaxed text-md pt-2 pb-6 border-t border-black/5 mt-2">
+                                {{ item.answer }}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </div>
+            </section>
+
+            <!-- Recommended Treks Section -->
+            <section v-if="recommendedTreks.length > 0" class="mb-24 py-12 border-t border-black/5">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                    <div>
+                        <span class="text-primary font-black uppercase tracking-[0.2em] text-xs block mb-3">More
+                            Adventures</span>
+                        <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-[#1A1A1A]">Recommended
+                            for you</h2>
+                    </div>
+                    <p class="text-text-muted max-w-sm mt-4 md:mt-0 font-medium text-sm leading-relaxed">
+                        Explore other premium {{ categoryName.toLowerCase() }} in the Himalayas curated by our mountain
+                        experts.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <PagesDefaultFastpackingTrekCard v-for="item in recommendedTreks" :key="item.id" :item="item" />
+                </div>
+            </section>
             <section class="mb-24 py-20 border-t-2 border-primary" ref="booking-bar">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div>

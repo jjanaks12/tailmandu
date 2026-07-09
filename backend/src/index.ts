@@ -5,7 +5,7 @@ import morgan from 'morgan'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
 
-import 'module-alias/register'
+import './alias'
 import 'dotenv/config'
 
 import router from '@/routes'

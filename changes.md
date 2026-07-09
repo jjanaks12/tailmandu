@@ -41,6 +41,9 @@
 [X] email
 [X] emergency detail
 
+### for weather widget
+https://weatherwidget.io/
+
 #
 1st 50k
 2nd 50k
