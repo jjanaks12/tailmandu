@@ -9,6 +9,9 @@ export class SponsorTypeController {
             response.send(await prisma.sponsorType.findMany({
                 where: {
                     deleted_at: null
+                },
+                orderBy: {
+                    priority: 'asc'
                 }
             }))
         } catch (error) {
@@ -22,7 +25,8 @@ export class SponsorTypeController {
             response.send(await prisma.sponsorType.create({
                 data: {
                     name: validationData.name,
-                    description: validationData.description
+                    description: validationData.description,
+                    priority: validationData.priority ?? 0
                 }
             }))
         } catch (error) {
@@ -40,6 +44,7 @@ export class SponsorTypeController {
                 data: {
                     name: validationData.name,
                     description: validationData.description,
+                    priority: validationData.priority ?? 0,
                     updated_at: moment().toISOString()
                 }
             }))

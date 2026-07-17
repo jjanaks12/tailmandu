@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import img01 from '@/assets/images/review-img01.jpg'
 import { GlobeIcon, MoonIcon, SunIcon } from 'lucide-vue-next'
+import type { SponsorType } from '~/lib/types'
+import { useAxios } from '~/services/axios'
+import { showImage } from '~/lib/filters'
 
 definePageMeta({
     layout: 'default'
@@ -9,7 +12,7 @@ definePageMeta({
 useHead({
     meta: [{
         name: 'description',
-        content: "From the City to the Peaks: Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes"
+        content: "From the City to the Peaks: Trailmandu's Adventure Runs in Nepal's Natural Scenic Routes"
     }]
 })
 
@@ -17,15 +20,29 @@ const { locales, setLocale } = useI18n()
 
 useSeoMeta({
     title: 'Trailmandu - From The City To The Mountains',
-    description: "From the City to the Peaks: Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes",
+    description: "From the City to the Peaks: Trailmandu's Adventure Runs in Nepal's Natural Scenic Routes",
     ogTitle: 'Trailmandu - From The City To The Mountains',
-    ogDescription: "From the City to the Peaks: Trailmandu’s Adventure Runs in Nepal's Natural Scenic Routes",
+    ogDescription: "From the City to the Peaks: Trailmandu's Adventure Runs in Nepal's Natural Scenic Routes",
     ogImage: img01
 })
 
 onMounted(() => {
     useTitle('Trailmandu - From The City To The Mountains')
 })
+
+const { axios } = useAxios()
+const sponsorGroups = ref<SponsorType[]>([])
+
+const fetchSponsors = async () => {
+    try {
+        const { data } = await axios.get('/home/sponsors')
+        sponsorGroups.value = data
+    } catch (_) {
+        // silently fail — sponsors section is non-critical
+    }
+}
+
+onMounted(fetchSponsors)
 </script>
 
 <template>
@@ -78,26 +95,23 @@ onMounted(() => {
             </div>
         </section>
         <PagesDefaultHomeNewsletter />
-        <section class="py-16 border-y border-slate-200 dark:border-slate-800">
+        <section v-if="sponsorGroups.length" class="py-16 border-y border-slate-200 dark:border-slate-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <p class="text-center text-sm font-bold uppercase tracking-widest text-slate-400 mb-10">Supported By
                     Industry Leaders</p>
-                <div
-                    class="grid grid-cols-2 md:grid-cols-5 gap-12 items-center opacity-40 grayscale hover:grayscale-0 transition-all">
-                    <div class="flex justify-center"><img alt="Sponsor 1" class="h-12 object-contain"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAktgIB8wBrc1UTW2l8PhdWNU7puuBO19YJZxTLuamg-NrQ9JyY3_ynH_4ohdcssSMf0owstFNtLQ6GSnb0VMoTZ_NjwkCqmkuXpcy8gftXZPtcjllHmt3ENi3bHEJtLE2Mpfyv5GJefg5XvBSHE6-Ia4I1auiunvJKhvsJFZgAiIv5x-8u3majFR5j3NkdBAUiJjd1omGd7e_xPhPA5SBRLTjlZPvD1uF_-zROjqejnwHFaSb2oiBZSljQssR_dvDwmA056u-ghHk" />
-                    </div>
-                    <div class="flex justify-center"><img alt="Sponsor 2" class="h-8 object-contain"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4HGS3iam2vGsg0IsO-Iy4Qon5XlTV3w3Dydqir2LDIpSx0f4Ss18PZTNJ0iWjl-Hamj8xxJWYbXDkkmSeglCTZLzGo9_a2q7kV4v4gMouf-PxJdV1FTlnStard1OKyfEsk19PmW6t8pVZ2YxehIhglBFlJ2lMcvZ4PdKapD1bCWrC4s_tCZclmUunYRP1qPoEI7qRtHVdqgkfSP0qdPQq6gDWXfHh2e95eTQ6lMidhGYAtZ4vnFTRTKnrijzOUC1Rvv8Txilnrkw" />
-                    </div>
-                    <div class="flex justify-center"><img alt="Sponsor 3" class="h-10 object-contain"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLPpc7dVfuqgaDJnXLfCQQayc90eH82V8qr1e6xCbuRvsIiiZHGTT0VFMzZ6l5IVo_ePQFtQ5LPF6hd1q5jmWEiIa4vyss0m_1kWUKZeViKcWQHw8EreYqN8yX65rTmis6KIdpal6ratIOfDnJlSrTUVhq2VTFkeQB-XZnMmkL8IGgoLDR1rhmY3xE9evPcBgZbayIdBAIYDwQ80cRovkW0JXktZZuwRm6PJIw1sDt7WjCkkIvkJcY2DVE3zumnPUOiT2bnU8OSmc" />
-                    </div>
-                    <div class="flex justify-center"><img alt="Sponsor 4" class="h-12 object-contain"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN1FCi8w6vulgD76-fyPVOJ33khUZ-RAOQByldmrNUFXp1NTqASK-ZXRVDWZaJvuduWKcO7i7Z4cZz8MpnVJUkq7qdLM3oKnprxmuqk8jqB73MEDDPOngofIHyWfDdHORhBYf5feC-9LnSvwTwdHQ7E4mAAkP3_kUfuYsvgz7dhfQHqHfhcM-VHMh_GRUIFwuTsFUdl1oamTSIJBqtQKlWZrnrPgw-UiIG0bbcPlRmi1Kdt4IO1wmaIjB_ftCKZG2D30eR_AlLaew" />
-                    </div>
-                    <div class="flex justify-center"><img alt="Sponsor 5" class="h-10 object-contain"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_n_LBQCvMFkRSvWvHhg2kBa6w9ug_6Q2kwlymWMd8TvOvcbziSUgraq4k_asONq5-ohH2nG0rkdIbvR0j89SRCyjk4qgZ8MZ85p6xFr_UN1NXpl0geX7A01aImNc1x4jKF2f7B-8XRDWB9WE9RrrmfvwuGJNL_sygYiV8L3uRM4P2vlUY1ZuVqW_2xEMSR2lcuaUlIQUo8kv4kPvjXWHiEpLuBGFbRw-rGlto7S22HcVW6t9vJ9Gjqyt-bLeVIUqipm4ow4sZ8yc" />
+                <div v-for="group in sponsorGroups" :key="group.id" class="mb-10 last:mb-0">
+                    <p class="text-center text-xs font-semibold uppercase tracking-widest text-slate-300 dark:text-slate-600 mb-6">{{ group.name }}</p>
+                    <div
+                        class="flex flex-wrap justify-center gap-12 items-center opacity-40 grayscale hover:grayscale-0 transition-all">
+                        <div v-for="sponsor in group.sponsors" :key="sponsor.id" class="flex justify-center">
+                            <a :href="sponsor.url" target="_blank" rel="noopener noreferrer">
+                                <img
+                                    :alt="sponsor.name"
+                                    class="h-12 object-contain"
+                                    :src="sponsor.thumbnail ? showImage(sponsor.thumbnail.file_name) : ''"
+                                />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

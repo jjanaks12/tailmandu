@@ -45,13 +45,15 @@ const initRunnerChart = () => {
                 ]
             },
             options: {
-                tooltips: {
-                    mode: 'index',
-                    intersect: false
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
                 },
                 hover: {
-                    mode: 'index',
-                    intersect: false
+                    mode: 'nearest',
+                    intersect: true
                 }
             }
         })
@@ -79,7 +81,7 @@ watch(props, () => {
         </Select> -->
         <div class="flex gap-2 items-center justify-end">
             <Select v-model="selectedEvent">
-                <SelectTrigger>
+                <SelectTrigger size="sm">
                     <SelectValue placeholder="Select a event" />
                 </SelectTrigger>
                 <SelectContent>

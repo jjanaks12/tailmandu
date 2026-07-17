@@ -46,6 +46,11 @@ onMounted(init)
             <Textarea id="description" v-bind="field" />
             <ErrorMessage class="error__message" name="description" />
         </Field>
+        <Field name="priority" v-slot="{ field }" as="div" class="space-y-2">
+            <label for="priority">Priority <span class="text-xs text-muted-foreground">(lower = shown first)</span></label>
+            <Input type="number" id="priority" min="0" v-bind="field" />
+            <ErrorMessage class="error__message" name="priority" />
+        </Field>
         <div class="text-right">
             <Button type="submit" :disabled="isLoading">
                 <LoaderIcon v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />

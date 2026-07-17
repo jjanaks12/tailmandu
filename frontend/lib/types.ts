@@ -407,6 +407,7 @@ export type SponsorType = {
     id: string
     name: string
     description: string
+    priority: number
     created_at: string
     updated_at: string
     deleted_at: string

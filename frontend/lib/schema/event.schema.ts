@@ -105,7 +105,8 @@ export const sponsorSchema = Y.object({
 
 export const sponsorTypeSchema = Y.object({
     name: Y.string().required().label('Name'),
-    description: Y.string().required().label('Description')
+    description: Y.string().required().label('Description'),
+    priority: Y.number().integer().min(0).optional().label('Priority')
 })
 
 export const stageCategoryPaymentSchema = Y.object({

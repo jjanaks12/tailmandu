@@ -381,6 +381,7 @@ model SponsorType {
   id          String    @id @default(cuid())
   name        String
   description String?
+  priority    Int?      @default(0)
   created_at  DateTime  @default(now())
   updated_at  DateTime?
   deleted_at  DateTime?

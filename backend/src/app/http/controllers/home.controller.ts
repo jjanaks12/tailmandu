@@ -22,4 +22,31 @@ export class HomeController {
         })
         response.json(data)
     }
+
+    public static async sponsors(request: Request, response: Response, next: NextFunction) {
+        try {
+            const data = await prisma.sponsorType.findMany({
+                where: {
+                    deleted_at: null,
+                    sponsors: {
+                        some: {
+                            deleted_at: null
+                        }
+                    }
+                },
+                include: {
+                    sponsors: {
+                        where: { deleted_at: null },
+                        include: { thumbnail: true }
+                    }
+                },
+                orderBy: {
+                    priority: 'asc'
+                }
+            })
+            response.json(data)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

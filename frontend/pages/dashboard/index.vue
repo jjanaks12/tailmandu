@@ -16,7 +16,7 @@ const { can } = useAuthorization()
         <!-- Event -->
         <PagesDashboardVolunteerEventList v-if="can('timer_view')" />
         <PagesDashboardRunnerEventList v-if="can('runner_view')" />
-        <div class="w-2/3">
+        <div class="w-2/3 space-y-4">
             <PagesDashboardEventStats v-if="can('*', 'Admin')" />
         </div>
         <div class="w-1/3 space-y-4">

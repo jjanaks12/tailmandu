@@ -42,24 +42,28 @@ onMounted(init)
 
 <template>
     <!-- <Button @click="fetch">fetch</Button> -->
-    <div class="w-full grid grid-cols-4 gap-4">
-        <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-sm uppercase">Total Runners</h3>
-            <p class="text-black text-4xl font-bold">{{ total_runners }}</p>
+    <div class="space-y-4">
+        <div class="w-full grid grid-cols-4 gap-4">
+            <div class="p-4 bg-white rounded-lg shadow">
+                <h3 class="text-sm uppercase">Total Runners</h3>
+                <p class="text-black text-4xl font-bold">{{ total_runners }}</p>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow">
+                <h3 class="text-sm uppercase">Total Volunteers</h3>
+                <p class="text-black text-4xl font-bold">{{ stats.total_volunteers }}</p>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow">
+                <h3 class="text-sm uppercase">Total Checkpoints</h3>
+                <p class="text-black text-4xl font-bold">{{ stats.total_checkpoints }}</p>
+            </div>
+            <div class="p-4 bg-white rounded-lg shadow">
+                <h3 class="text-sm uppercase">Total Stages</h3>
+                <p class="text-black text-4xl font-bold">{{ stats.total_stages }}</p>
+            </div>
         </div>
-        <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-sm uppercase">Total Volunteers</h3>
-            <p class="text-black text-4xl font-bold">{{ stats.total_volunteers }}</p>
-        </div>
-        <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-sm uppercase">Total Checkpoints</h3>
-            <p class="text-black text-4xl font-bold">{{ stats.total_checkpoints }}</p>
-        </div>
-        <div class="p-4 bg-white rounded-lg shadow">
-            <h3 class="text-sm uppercase">Total Stages</h3>
-            <p class="text-black text-4xl font-bold">{{ stats.total_stages }}</p>
+        <div class="bg-white rounded-lg shadow">
+            <PagesDashboardEventStatsRunner :runners="stats.runners" v-model:year="selectedYear"
+                v-model:event="selectedEvent" />
         </div>
     </div>
-    <PagesDashboardEventStatsRunner :runners="stats.runners" v-model:year="selectedYear"
-        v-model:event="selectedEvent" />
 </template>
