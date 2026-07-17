@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { prisma } from '@/app/lib/services/prisma.service'
 import createHttpError from 'http-errors'
 import { orderSchema } from '@/app/lib/schema/order.schema'
+import { Prisma } from '@prisma/client'
 
 export class OrderController {
     public static async create(req: Request, res: Response, next: NextFunction) {
@@ -266,6 +267,59 @@ export class OrderController {
             next(error);
         }
     }
+    public static async list(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { per_page = 10, current = 1, s = '', status } = req.query as any
+            const skip = (Number(current) - 1) * Number(per_page)
+
+            const where: Prisma.OrderWhereInput = {}
+
+            if (s) {
+                where.OR = [
+                    { first_name: { contains: s } },
+                    { last_name: { contains: s } },
+                    { email: { contains: s } },
+                    { order_number: { contains: s } },
+                ]
+            }
+
+            if (status) {
+                where.status = status as Prisma.EnumOrderStatusFilter
+            }
+
+            const [orders, total] = await Promise.all([
+                prisma.order.findMany({
+                    skip,
+                    take: parseInt(per_page.toString()),
+                    orderBy: { created_at: 'desc' },
+                    where,
+                    include: {
+                        items: {
+                            include: {
+                                product: { select: { id: true, name: true, slug: true, thumbnail: true } },
+                                variant: { select: { id: true, sku: true, price: true } },
+                            },
+                        },
+                        shipping_address: { include: { country: true } },
+                        coupon: true,
+                        user: { select: { id: true, personal: { select: { first_name: true, last_name: true, email: true } } } },
+                    },
+                }),
+                prisma.order.count({ where }),
+            ])
+
+            res.send({
+                per_page: Number(per_page),
+                current: Number(current),
+                total,
+                total_page: Math.ceil(total / Number(per_page)),
+                data: orders,
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     // New method to fetch order details
     public static async get(req: Request, res: Response, next: NextFunction) {
         try {

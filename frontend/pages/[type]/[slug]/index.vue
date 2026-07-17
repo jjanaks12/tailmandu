@@ -239,20 +239,6 @@ onMounted(async () => {
                         </h2>
                         <div class="prose max-w-none text-text-muted space-y-6 text-[16px] leading-relaxed">
                             <div v-html="trek.description" class="tiptap-content" />
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-                                <div class="bg-primary/[0.08] border-l-4 border-primary p-5"
-                                    v-for="(protocol) in trek?.details?.securityProtocols">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <component :is="securityProtocolIconMapping[protocol.title]"
-                                            class="text-primary" />
-                                        <h4 class="font-black uppercase tracking-widest text-[#1A1A1A]">
-                                            {{ protocol.title }}
-                                        </h4>
-                                    </div>
-                                    <p class="text-text-muted">{{ protocol.description }}</p>
-                                </div>
-                            </div>
                             <Swiper @swiper="onSwiper" @slideChange="onSlideChange" :modules="[Navigation]"
                                 :slides-per-view="2.2" :space-between="10">
                                 <template v-slot:container-start>
@@ -377,6 +363,18 @@ onMounted(async () => {
                             </div>
                         </div>
                     </section>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+                        <div class="bg-primary/[0.08] border-l-4 border-primary p-5"
+                            v-for="(protocol) in trek?.details?.securityProtocols">
+                            <div class="flex items-center gap-2 mb-2">
+                                <component :is="securityProtocolIconMapping[protocol.title]" class="text-primary" />
+                                <h4 class="font-black uppercase tracking-widest text-[#1A1A1A]">
+                                    {{ protocol.title }}
+                                </h4>
+                            </div>
+                            <p class="text-text-muted text-sm">{{ protocol.description }}</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="lg:col-span-5 space-y-8">
                     <div class="sticky top-28 space-y-8">
@@ -488,17 +486,22 @@ onMounted(async () => {
                                             <p class="text-text-muted leading-relaxed">
                                                 {{ day.description }}
                                             </p>
-                                            
+
                                             <!-- Stopovers / Checkpoints Badges -->
-                                            <div v-if="day.places?.length" class="space-y-2 pt-3 border-t border-black/5">
-                                                <span class="text-[9px] font-black text-primary/70 uppercase tracking-widest block">Route Checkpoints</span>
+                                            <div v-if="day.places?.length"
+                                                class="space-y-2 pt-3 border-t border-black/5">
+                                                <span
+                                                    class="text-[9px] font-black text-primary/70 uppercase tracking-widest block">Route
+                                                    Checkpoints</span>
                                                 <div class="flex flex-wrap gap-2">
                                                     <button v-for="(place, pIdx) in day.places" :key="pIdx"
                                                         @click="focusOnPlace(place)"
                                                         class="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary rounded-full text-xs font-bold transition-all">
                                                         <span>📍</span>
                                                         <span>{{ place.name }}</span>
-                                                        <span v-if="place.elevation" class="text-[10px] bg-primary/15 px-1 py-0.5 rounded font-black">{{ place.elevation }}m</span>
+                                                        <span v-if="place.elevation"
+                                                            class="text-[10px] bg-primary/15 px-1 py-0.5 rounded font-black">{{
+                                                                place.elevation }}m</span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -512,7 +515,9 @@ onMounted(async () => {
                     <!-- Right: Itinerary Map -->
                     <div v-if="hasLocations"
                         class="lg:col-span-6 h-[550px] overflow-hidden shadow-md border border-black/5 bg-slate-50 relative rounded-[2.5rem]">
-                        <ItineraryMap ref="itineraryMapRef" :itinerary="trek.details.itinerary" :routing-mode="trek.details.routingMode || 'route'" :elevation-profile="trek.details.elevationProfile" :active-day-index="activeDayIndex" />
+                        <ItineraryMap ref="itineraryMapRef" :itinerary="trek.details.itinerary"
+                            :routing-mode="trek.details.routingMode || 'route'"
+                            :elevation-profile="trek.details.elevationProfile" :active-day-index="activeDayIndex" />
                     </div>
                 </div>
             </section>

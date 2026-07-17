@@ -14,7 +14,7 @@ const { setImageForPreview } = useAppStore()
 <template>
     <div class="collage-span-2-2 group relative overflow-hidden bg-gray-900 cursor-pointer">
         <img alt="Runner on a ridge"
-            class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100"
+            class="w-full h-full object-cover filter transition-all duration-500 scale-105 group-hover:scale-100"
             :src="showImage(image.file_name)" @click="setImageForPreview(showImage(image.file_name))" />
     </div>
 </template>

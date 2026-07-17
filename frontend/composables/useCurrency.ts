@@ -11,7 +11,7 @@ export const useCurrency = () => {
     const formatCurrency = (amount: number | string) => {
         const value = typeof amount === 'string' ? parseFloat(amount) : amount
         if (isNaN(value)) return ''
-        
+
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currencyCode.value,

@@ -4,6 +4,7 @@ import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.mid
 
 const router = Router()
 
+router.get('/', [verifyAccessToken], OrderController.list)
 router.post('/', OrderController.create)
 router.get('/:id', OrderController.get)
 router.patch('/:id/status', [verifyAccessToken], OrderController.updateStatus)

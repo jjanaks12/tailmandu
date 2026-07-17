@@ -46,11 +46,6 @@ const type = computed(() => route.params.type || 'fastpacking')
             <img :alt="item.name"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 :src="showImage(item.thumbnail?.file_name)" v-if="item.thumbnail" />
-            <div class="absolute top-3 left-3 z-20 flex flex-col gap-1.5">
-                <span
-                    class="text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm w-fit"
-                    v-for="tag in item.tags" :class="tagMapping[tag.name] || 'bg-slate-800'">{{ tag.name }}</span>
-            </div>
             <div
                 class="absolute top-3 right-3 z-20 bg-primary px-2.5 py-1 rounded-lg text-white font-bold text-sm shadow-lg">
                 {{ startingPrice > 0 ? `${formatCurrency(startingPrice)}+` : 'Call for Price' }}
@@ -86,8 +81,7 @@ const type = computed(() => route.params.type || 'fastpacking')
                 </Button>
                 <Button class="flex-[1.5]" as-child>
                     <NuxtLink :to="`/${type}/${item.slug}/booking`">
-                        <PhoneIcon class="size-4" />
-                        Book Call
+                        Book now
                     </NuxtLink>
                 </Button>
             </div>
