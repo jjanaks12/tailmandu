@@ -14,6 +14,7 @@ export class MediaController {
                 include: {
                     images: {
                         include: {
+                            tags: true,
                             product_thumbnails: {
                                 select: { id: true, name: true, slug: true }
                             },
@@ -158,10 +159,44 @@ export class MediaController {
         try {
             const images = []
 
-            for (const image of request.body.images) {
+            for (const item of request.body.images) {
+                const imageBase64 = typeof item === 'string' ? item : item.image
                 const fileHandler = new FileHandler('images')
-                const fileName = await fileHandler.saveFile(image)
-                images.push({ id: fileName.id })
+                const savedImage = await fileHandler.saveFile(imageBase64)
+
+                if (typeof item === 'object' && item !== null) {
+                    const updateData: any = {}
+                    if (item.description) {
+                        updateData.description = item.description
+                    }
+                    if (item.tags && Array.isArray(item.tags)) {
+                        const tagsToConnect: { id: string }[] = []
+                        for (const tagName of item.tags) {
+                            const tagExist = await prisma.tag.findFirst({
+                                where: { name: tagName }
+                            })
+                            if (tagExist) {
+                                tagsToConnect.push({ id: tagExist.id })
+                            } else {
+                                const newTag = await prisma.tag.create({
+                                    data: { name: tagName }
+                                })
+                                tagsToConnect.push({ id: newTag.id })
+                            }
+                        }
+                        updateData.tags = {
+                            connect: tagsToConnect
+                        }
+                    }
+                    if (Object.keys(updateData).length > 0) {
+                        await prisma.image.update({
+                            where: { id: savedImage.id },
+                            data: updateData
+                        })
+                    }
+                }
+
+                images.push({ id: savedImage.id })
             }
             const gallery = await prisma.gallery.update({
                 where: {
@@ -351,6 +386,7 @@ export class MediaController {
                 skip,
                 take: parseInt(per_page.toString()),
                 include: {
+                    tags: true
                 },
                 where: whereClause,
                 orderBy: [{ created_at: 'desc' }],
@@ -391,13 +427,47 @@ export class MediaController {
 
     public static async updateImage(request: Request, response: Response, next: NextFunction) {
         try {
-            const { image } = request.body
+            const { image, description, tags: inputTags } = request.body
             const { id } = request.params
 
-            if (!image) throw createHttpError.UnprocessableEntity('Image is required')
+            if (image) {
+                const fileHandler = new FileHandler('images')
+                await fileHandler.saveFile(image, id)
+            }
 
-            const fileHandler = new FileHandler('images')
-            const updatedImage = await fileHandler.saveFile(image, id)
+            const updateData: any = {}
+
+            if (description !== undefined) {
+                updateData.description = description
+            }
+
+            if (inputTags !== undefined && Array.isArray(inputTags)) {
+                const tagsToConnect: { id: string }[] = []
+                for (const tag of inputTags) {
+                    const tagExist = await prisma.tag.findFirst({
+                        where: { name: tag }
+                    })
+                    if (tagExist) {
+                        tagsToConnect.push({ id: tagExist.id })
+                    } else {
+                        const newTag = await prisma.tag.create({
+                            data: { name: tag }
+                        })
+                        tagsToConnect.push({ id: newTag.id })
+                    }
+                }
+                updateData.tags = {
+                    set: tagsToConnect
+                }
+            }
+
+            const updatedImage = await prisma.image.update({
+                where: { id },
+                data: updateData,
+                include: {
+                    tags: true
+                }
+            })
 
             response.send(updatedImage)
         } catch (error) {
