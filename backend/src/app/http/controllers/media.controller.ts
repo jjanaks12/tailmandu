@@ -314,27 +314,39 @@ export class MediaController {
 
     public static async getImageByGallery(request: Request<{ id: string }, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
+            // Get pagination parameters from the query string
             const { per_page = 10, current = 1, s = '', sort } = request.query
             const skip = (current - 1) * per_page
             
+            // Determine the gallery ID query condition:
+            // - If the requested ID is 'uncategorized', look for images with no gallery (galleryId: null).
+            // - If a specific gallery ID is provided, look for that ID.
+            // - If no ID is provided, look for images belonging to any gallery (galleryId: { not: null }).
             const galleryIdCondition = request.params.id === 'uncategorized' ? null : (request.params.id || { not: null })
 
+            // Check if the current request is from an authenticated administrator (via optional token middleware)
             const isAdmin = !!(request.body as any).auth_user
 
+            // Initialize the query filter options
             const whereClause: any = {
                 galleryId: galleryIdCondition
             }
 
-            if (!isAdmin && request.params.id !== 'uncategorized') {
+            // Exclude images from deleted galleries. For public requests (non-admin),
+            // also exclude images from galleries that are marked as hidden (hide_gallery: true).
+            if (request.params.id !== 'uncategorized') {
                 whereClause.gallery = {
-                    hide_gallery: false
+                    deleted_at: null,
+                    ...(isAdmin ? {} : { hide_gallery: false })
                 }
             }
 
+            // Get total count of matching images for pagination calculations
             const total = await prisma.image.count({
                 where: whereClause
             })
 
+            // Query the matching images from the database with pagination and order by creation date
             const images = await prisma.image.findMany({
                 skip,
                 take: parseInt(per_page.toString()),
@@ -343,6 +355,8 @@ export class MediaController {
                 where: whereClause,
                 orderBy: [{ created_at: 'desc' }],
             })
+            
+            // Send the paginated result response
             response.send({
                 per_page: Number(per_page),
                 current: Number(current),
