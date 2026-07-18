@@ -46,22 +46,23 @@ onBeforeMount(() => {
     <NuxtPage :key="$route.fullPath" />
   </NuxtLayout>
   <Dialog :open="!!imagePreview" @update:open="imagePreview = null">
-    <DialogContent class="max-w-[95vw] w-full p-0 overflow-hidden flex flex-col gap-0">
+    <DialogContent
+      class="bg-transparent max-w-[95vw] max-h-[95vh] p-0 overflow-hidden flex items-center justify-center border-none shadow-none">
       <DialogHeader class="sr-only">
         <DialogTitle>Image preview</DialogTitle>
         <DialogDescription>Image details preview</DialogDescription>
       </DialogHeader>
       <template v-if="imagePreview">
-        <figure class="bg-gray-50">
-          <img :src="imagePreview.url" class="h-auto w-full" :alt="imagePreview.description" />
-          <figcaption class="bg-linear-to-b from-black/0 to-black/90 p-4 space-y-4 absolute right-0 bottom-0 left-0 z-1"
+        <figure class="relative max-w-full max-h-full flex items-center justify-center">
+          <img :src="imagePreview.url" class="max-w-full max-h-[90vh] object-contain rounded-md shadow-2xl" :alt="imagePreview.description" />
+          <figcaption class="bg-gradient-to-t from-black/80 via-black/40 to-black/0 p-4 space-y-2 absolute right-0 bottom-0 left-0 z-1 rounded-b-md"
             v-if="imagePreview.description || (imagePreview.tags && imagePreview.tags.length > 0)">
-            <div v-if="imagePreview.description" class="text-sm text-white/80 font-medium leading-relaxed">
+            <div v-if="imagePreview.description" class="text-sm text-white font-medium leading-relaxed">
               {{ imagePreview.description }}
             </div>
             <div v-if="imagePreview.tags && imagePreview.tags.length > 0" class="flex flex-wrap gap-1.5">
               <Badge variant="secondary" v-for="tag in imagePreview.tags" :key="tag.name"
-                class="text-[10px] px-2 py-0.5">
+                class="text-[10px] px-2 py-0.5 bg-white/20 text-white border-transparent hover:bg-white/30">
                 {{ tag.name }}
               </Badge>
             </div>
