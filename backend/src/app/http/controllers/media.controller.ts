@@ -319,11 +319,13 @@ export class MediaController {
             
             const galleryIdCondition = request.params.id === 'uncategorized' ? null : (request.params.id || { not: null })
 
+            const isAdmin = !!(request.body as any).auth_user
+
             const whereClause: any = {
                 galleryId: galleryIdCondition
             }
 
-            if (!request.params.id) {
+            if (!isAdmin && request.params.id !== 'uncategorized') {
                 whereClause.gallery = {
                     hide_gallery: false
                 }

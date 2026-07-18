@@ -31,3 +31,35 @@ export const verifyAccessToken = (request: Request, response: Response, next: Ne
         }
     })
 }
+
+export const optionalVerifyAccessToken = (request: Request, response: Response, next: NextFunction) => {
+    if (!request.headers['authorization']) {
+        return next()
+    }
+
+    const token = request.headers['authorization'].split(' ')[1]
+    if (!token) {
+        return next()
+    }
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (error, payload) => {
+        if (error) {
+            return next()
+        }
+
+        try {
+            if (typeof payload != 'string') {
+                const user = await prisma.user.findFirstOrThrow({
+                    where: { id: payload.aud as string },
+                    omit: {
+                        password: true
+                    }
+                })
+                request.body = { ...request.body, auth_user: user }
+            }
+        } catch (err) {
+            // ignore errors and proceed as guest
+        }
+        next()
+    })
+}

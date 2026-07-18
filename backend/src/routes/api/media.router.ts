@@ -1,11 +1,11 @@
 import { MediaController } from '@/app/http/controllers/media.controller'
-import { verifyAccessToken } from '@/app/http/middleware/verify_access_token.middleware'
+import { verifyAccessToken, optionalVerifyAccessToken } from '@/app/http/middleware/verify_access_token.middleware'
 import { Router } from 'express'
 
 const router = Router()
 
 router.get('/', [], MediaController.index)
-router.get('/images/:id?', [], MediaController.getImageByGallery)
+router.get('/images/:id?', [optionalVerifyAccessToken], MediaController.getImageByGallery)
 
 router.get('/gallery_name', [], MediaController.getGalleryName)
 router.post('/', [verifyAccessToken], MediaController.store)
