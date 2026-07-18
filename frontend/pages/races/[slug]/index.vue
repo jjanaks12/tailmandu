@@ -42,6 +42,112 @@ const totalElevationGain = computed(() => {
     return "8,450" // Placeholder as per design, we can refine this if data is available
 })
 
+useHead(() => {
+    const race = trailRace.value
+    if (!race) return { title: 'Loading Race...' }
+
+    const currentTitle = `${race.name} | Trailmandu`
+    const currentDescription = race.excerpt || 'Participate in premier skyrunning events, trail running marathons, and adventure runs organized by Trailmandu.'
+    const canonical = `https://trailmandu.com/races/${race.slug}`
+    const image = race.thumbnail?.file_name
+        ? showImage(race.thumbnail.file_name)
+        : 'https://trailmandu.com/logo.png'
+
+    return {
+        title: currentTitle,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: currentDescription },
+            { name: 'keywords', content: `${race.name}, trail running nepal, skyrunning race, marathon nepal, trailmandu event` },
+            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+            // Open Graph
+            { property: 'og:title', content: currentTitle },
+            { property: 'og:description', content: currentDescription },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: currentTitle },
+            { name: 'twitter:description', content: currentDescription },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'SportsEvent',
+                    '@id': `${canonical}#event`,
+                    'name': race.name,
+                    'description': currentDescription,
+                    'image': image,
+                    'startDate': race.start,
+                    'endDate': race.end,
+                    'location': {
+                        '@type': 'Place',
+                        'name': 'Nepal',
+                        'address': {
+                            '@type': 'PostalAddress',
+                            'addressCountry': 'NP'
+                        }
+                    },
+                    'organizer': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        }
+                    },
+                    'subEvent': race.stages?.map(stage => ({
+                        '@type': 'SportsEvent',
+                        '@id': `https://trailmandu.com/races/${race.slug}?stage_id=${stage.id}#stage-${stage.id}`,
+                        'name': stage.name,
+                        'description': stage.excerpt || stage.description,
+                        'startDate': stage.start || race.start,
+                        'endDate': stage.end || race.end,
+                        'location': {
+                            '@type': 'Place',
+                            'name': stage.location || 'Nepal',
+                            'address': {
+                                '@type': 'PostalAddress',
+                                'addressCountry': 'NP'
+                            }
+                        }
+                    })),
+                    'offers': (() => {
+                        const payments = race.stages?.flatMap(s => s.stage_categories || [])
+                            .flatMap(c => c.payment || []) || []
+                        const prices = payments.map(p => Number(p.amount)).filter(amt => !isNaN(amt) && amt > 0)
+                        if (prices.length > 0) {
+                            return {
+                                '@type': 'AggregateOffer',
+                                'priceCurrency': payments[0]?.type || 'NPR',
+                                'lowPrice': Math.min(...prices).toString(),
+                                'highPrice': Math.max(...prices).toString(),
+                                'offerCount': prices.length,
+                                'url': canonical,
+                                'availability': 'https://schema.org/InStock'
+                            }
+                        }
+                        return {
+                            '@type': 'Offer',
+                            'url': canonical,
+                            'availability': 'https://schema.org/InStock',
+                            'price': '0',
+                            'priceCurrency': 'USD'
+                        }
+                    })()
+                })
+            } as any
+        ]
+    }
+})
+
 onBeforeMount(async () => {
     trailRace.value = await getBySlug(route.params.slug as string)
     if (trailRace.value && trailRace.value.stages.length > 0) {
@@ -66,16 +172,6 @@ onBeforeMount(async () => {
                 }, 100)
             })
         }
-    }
-
-    if (trailRace.value) {
-        useSeoMeta({
-            title: trailRace.value.name,
-            ogTitle: trailRace.value.name,
-            description: trailRace.value.excerpt,
-            ogDescription: trailRace.value.excerpt,
-            ogImage: trailRace.value.thumbnail ? showImage(trailRace.value.thumbnail.file_name) : undefined
-        })
     }
 })
 

@@ -5,6 +5,12 @@ import tailwindcss from "@tailwindcss/vite"
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://trailmandu.com',
+  },
+  sitemap: {
+    exclude: ['/dashboard/**']
+  },
   modules: [
     '@nuxt/fonts',
     '@pinia/nuxt',
@@ -15,7 +21,8 @@ export default defineNuxtConfig({
     'nuxt-charts',
     'nuxt-tiptap-editor',
     '@nuxtjs/i18n',
-    'nuxt-swiper'
+    'nuxt-swiper',
+    '@nuxtjs/sitemap'
   ],
 
   css: ['@/assets/css/main.css', 'swiper/css', 'vue-sonner/style.css'],

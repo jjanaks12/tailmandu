@@ -45,15 +45,66 @@ const fetchStageCategory = async () => {
 const fetchStage = async () => {
     const { data } = await axios.get<Stage>(`/events/stages/${route.params.stage_id as string}`)
     stage.value = data
-
-    useSeoMeta({
-        title: `${data.name} :: Result`,
-        description: data.description,
-        ogTitle: data.name,
-        ogDescription: data.description,
-        ogImage: showImage(data.thumbnail?.file_name),
-    })
 }
+
+useHead(() => {
+    if (!stage.value) return { title: 'Loading Results...' }
+
+    const currentTitle = `${stage.value.name} Results - Trailmandu`
+    const currentDescription = stage.value.description || `View race results for ${stage.value.name} organized by Trailmandu.`
+    const canonical = `https://trailmandu.com/races/${route.params.id}/stage/${route.params.stage_id}/result`
+    const image = stage.value.thumbnail?.file_name
+        ? showImage(stage.value.thumbnail.file_name)
+        : 'https://trailmandu.com/logo.png'
+
+    return {
+        title: currentTitle,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: currentDescription },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: currentTitle },
+            { property: 'og:description', content: currentDescription },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: currentTitle },
+            { name: 'twitter:description', content: currentDescription },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'SportsEvent',
+                    '@id': `https://trailmandu.com/races/${route.params.id}#event`,
+                    'name': stage.value.name,
+                    'description': currentDescription,
+                    'image': image,
+                    'startDate': stage.value.start || undefined,
+                    'endDate': stage.value.end || undefined,
+                    'organizer': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'url': 'https://trailmandu.com'
+                    },
+                    'recordedIn': {
+                        '@type': 'PropertyValue',
+                        'name': 'Race Results',
+                        'value': `Results for stage: ${stage.value.name}`
+                    }
+                })
+            } as any
+        ]
+    }
+})
 
 const getFinalDuration = (volunteerCheckpoints: VolunteerCheckpoint[]) => {
     const a = volunteerCheckpoints.find(volunteerCheckpoint => volunteerCheckpoint.checkpoint.is_end)

@@ -3,6 +3,7 @@ import { ArrowUpDownIcon, FilterIcon } from 'lucide-vue-next'
 import { useProductStore } from '~/store/product'
 import { useRouteQuery } from '@vueuse/router'
 
+const { t } = useI18n()
 const productStore = useProductStore()
 const activeCategory = useRouteQuery("category", "all")
 const currentPage = useRouteQuery("page", 1)
@@ -19,6 +20,58 @@ watch([activeCategory, currentPage], ([newCat, newPage]) => {
 }, { immediate: true })
 
 const { formatCurrency } = useCurrency()
+
+useHead(() => {
+    const title = t('store.catalog.title') || 'Expedition Gear Shop | Trailmandu'
+    const description = t('store.catalog.description') || 'Curated technical equipment for high-altitude trekking and alpine climbing in Nepal.'
+    const canonical = 'https://trailmandu.com/store'
+    const image = 'https://trailmandu.com/logo.png'
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: 'trail running gear, trekking gear nepal, climbing equipment, trailmandu shop, outdoor gear kathmandu' },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'CollectionPage',
+                    '@id': `${canonical}#webpage`,
+                    'name': title,
+                    'description': description,
+                    'url': canonical,
+                    'publisher': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        }
+                    }
+                })
+            }
+        ]
+    }
+})
 </script>
 
 <template>

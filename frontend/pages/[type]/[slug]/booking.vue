@@ -189,6 +189,16 @@ const init = async () => {
 }
 onMounted(init)
 
+useHead(() => {
+    const trekName = trek.value?.name || 'Trek'
+    return {
+        title: `Book ${trekName} - Trailmandu`,
+        meta: [
+            { name: 'robots', content: 'noindex, nofollow' }
+        ]
+    }
+})
+
 const stepLabels = ['Selection', 'Guest Info', 'Review']
 
 const { formatCurrency } = useCurrency()

@@ -10,20 +10,83 @@ definePageMeta({
 })
 
 useHead({
-    meta: [{
-        name: 'description',
-        content: "From the City to the Peaks: Trailmandu's Adventure Runs in Nepal's Natural Scenic Routes"
-    }]
+    meta: [
+        {
+            name: 'description',
+            content: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes."
+        },
+        {
+            name: 'keywords',
+            content: 'trail running, fastpacking, nepal running, marathon nepal, trailmandu, adventure runs nepal, himalayas race, skyrunning nepal'
+        },
+        {
+            name: 'robots',
+            content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+        }
+    ],
+    script: [
+        {
+            type: 'application/ld+json',
+            innerHTML: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'SportsEventOrganizer',
+                '@id': 'https://trailmandu.com/#organization',
+                'name': 'Trailmandu',
+                'url': 'https://trailmandu.com',
+                'logo': {
+                    '@type': 'ImageObject',
+                    'url': 'https://trailmandu.com/logo.png',
+                    'caption': 'Trailmandu Logo'
+                },
+                'description': "From the City to the Peaks: Trailmandu organizes premier adventure trail runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
+                'address': {
+                    '@type': 'PostalAddress',
+                    'addressLocality': 'Kathmandu',
+                    'addressCountry': 'NP'
+                },
+                'contactPoint': {
+                    '@type': 'ContactPoint',
+                    'contactType': 'customer support',
+                    'email': 'info@trailmandu.com'
+                },
+                'sameAs': [
+                    'https://facebook.com/trailmandu',
+                    'https://instagram.com/trailmandu',
+                    'https://youtube.com/trailmandu'
+                ]
+            })
+        } as any,
+        {
+            type: 'application/ld+json',
+            innerHTML: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'WebSite',
+                '@id': 'https://trailmandu.com/#website',
+                'url': 'https://trailmandu.com',
+                'name': 'Trailmandu',
+                'description': "Trailmandu's Adventure Runs in Nepal",
+                'publisher': {
+                    '@id': 'https://trailmandu.com/#organization'
+                }
+            })
+        } as any
+    ]
 })
 
 const { locales, setLocale } = useI18n()
 
 useSeoMeta({
     title: 'Trailmandu - From The City To The Mountains',
-    description: "From the City to the Peaks: Trailmandu's Adventure Runs in Nepal's Natural Scenic Routes",
+    description: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
     ogTitle: 'Trailmandu - From The City To The Mountains',
-    ogDescription: "From the City to the Peaks: Trailmandu's Adventure Runs in Nepal's Natural Scenic Routes",
-    ogImage: img01
+    ogDescription: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
+    ogImage: img01,
+    ogUrl: 'https://trailmandu.com',
+    ogType: 'website',
+    twitterCard: 'summary_large_image',
+    twitterTitle: 'Trailmandu - From The City To The Mountains',
+    twitterDescription: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
+    twitterImage: img01
 })
 
 onMounted(() => {

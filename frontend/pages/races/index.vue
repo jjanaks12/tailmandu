@@ -2,11 +2,69 @@
 import { MountainIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, SlidersHorizontalIcon } from 'lucide-vue-next'
 import { useEventStore } from '~/store/event'
 
-useSeoMeta({
-    title: 'Trail Races in Nepal - Trailmandu Dispatch',
-    description: 'Join the most challenging and scenic trail races in Nepal. From short trail runs to multi-stage ultras.',
-    ogTitle: 'Trailmandu Races - Challenge Yourself',
-    ogDescription: 'Discover upcoming trail races across Nepal\'s stunning landscapes.',
+import { showImage } from '~/lib/filters'
+
+useHead(() => {
+    const title = 'Trail Races in Nepal - Trailmandu'
+    const description = 'Join the most challenging and scenic trail races in Nepal. From short trail runs to multi-stage ultras.'
+    const canonical = 'https://trailmandu.com/races'
+    const logoUrl = 'https://trailmandu.com/logo.png'
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: 'trail running nepal, skyrunning nepal, running events, himalayas running, ultrarunning nepal, trail races' },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: logoUrl },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: logoUrl }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'ItemList',
+                    'name': 'Upcoming Trail Races in Nepal',
+                    'description': description,
+                    'url': canonical,
+                    'numberOfItems': events.value.length,
+                    'itemListElement': events.value.map((race, index) => ({
+                        '@type': 'ListItem',
+                        'position': index + 1,
+                        'item': {
+                            '@type': 'SportsEvent',
+                            '@id': `https://trailmandu.com/races/${race.slug}#event`,
+                            'name': race.name,
+                            'description': race.excerpt || race.description,
+                            'url': `https://trailmandu.com/races/${race.slug}`,
+                            'startDate': race.start || undefined,
+                            'endDate': race.end || undefined,
+                            'image': race.thumbnail?.file_name ? showImage(race.thumbnail.file_name) : logoUrl,
+                            'organizer': {
+                                '@type': 'SportsEventOrganizer',
+                                '@id': 'https://trailmandu.com/#organization',
+                                'name': 'Trailmandu',
+                                'url': 'https://trailmandu.com'
+                            }
+                        }
+                    }))
+                })
+            } as any
+        ]
+    }
 })
 
 const { fetchPublic } = useEventStore()

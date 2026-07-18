@@ -10,15 +10,65 @@ const trailRace = ref<TrailRace | null>(null)
 
 onBeforeMount(async () => {
     trailRace.value = await getBySlug(route.params.slug as string)
+})
 
-    useTitle(`${trailRace.value.name} - Runner form`)
-    useSeoMeta({
-        title: trailRace.value.name,
-        ogTitle: trailRace.value.name,
-        description: trailRace.value.excerpt,
-        ogDescription: trailRace.value.excerpt,
-        ogImage: showImage(trailRace.value.thumbnail?.file_name as string)
-    })
+useHead(() => {
+    if (!trailRace.value) return { title: 'Register - Trailmandu' }
+
+    const currentTitle = `Register for ${trailRace.value.name} - Runner Form | Trailmandu`
+    const currentDescription = trailRace.value.excerpt || `Register as a runner for ${trailRace.value.name}. Join this premier trail race organized by Trailmandu.`
+    const canonical = `https://trailmandu.com/races/${trailRace.value.slug}/runner`
+    const image = trailRace.value.thumbnail?.file_name
+        ? showImage(trailRace.value.thumbnail.file_name)
+        : 'https://trailmandu.com/logo.png'
+
+    return {
+        title: currentTitle,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: currentDescription },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: currentTitle },
+            { property: 'og:description', content: currentDescription },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: currentTitle },
+            { name: 'twitter:description', content: currentDescription },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'RegisterAction',
+                    'name': `Register as Runner for ${trailRace.value.name}`,
+                    'description': currentDescription,
+                    'target': {
+                        '@type': 'EntryPoint',
+                        'urlTemplate': canonical,
+                        'inLanguage': 'en-US',
+                        'actionPlatform': [
+                            'http://schema.org/DesktopWebPlatform',
+                            'http://schema.org/MobileWebPlatform'
+                        ]
+                    },
+                    'object': {
+                        '@type': 'SportsEvent',
+                        '@id': `https://trailmandu.com/races/${trailRace.value.slug}#event`,
+                        'name': trailRace.value.name,
+                        'url': `https://trailmandu.com/races/${trailRace.value.slug}`
+                    }
+                })
+            } as any
+        ]
+    }
 })
 
 </script>

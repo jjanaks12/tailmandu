@@ -21,25 +21,75 @@ const init = async () => {
             data = await getPublicPageBySlug(route.params.slug as string)
         }
         page.value = data
-
-        if (data) {
-            // Set dynamic SEO meta
-            useSeoMeta({
-                title: data.seo?.meta_title || data.title,
-                description: data.seo?.meta_description || data.description,
-                ogTitle: data.seo?.og_title || data.seo?.meta_title || data.title,
-                ogDescription: data.seo?.og_description || data.seo?.meta_description || data.description,
-                ogImage: data.seo?.og_image ? showImage(data.seo.og_image.file_name) : (data.featured_image ? showImage(data.featured_image.file_name) : undefined),
-                twitterCard: 'summary_large_image',
-                keywords: data.seo?.meta_keywords,
-            })
-        }
     } catch (e) {
         console.error(e)
     } finally {
         isLoading.value = false
     }
 }
+
+useHead(() => {
+    const data = page.value
+    if (!data) {
+        return {
+            title: 'Loading Page | Trailmandu'
+        }
+    }
+
+    const title = data.seo?.meta_title || data.title || 'Info | Trailmandu'
+    const description = data.seo?.meta_description || data.description || 'Information and details from Trailmandu.'
+    const canonical = `https://trailmandu.com/info/${route.params.slug}`
+    const image = data.seo?.og_image
+        ? showImage(data.seo.og_image.file_name)
+        : (data.featured_image ? showImage(data.featured_image.file_name) : 'https://trailmandu.com/logo.png')
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: data.seo?.meta_keywords || 'trailmandu, running, nepal, info' },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: data.seo?.og_title || title },
+            { property: 'og:description', content: data.seo?.og_description || description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: data.seo?.og_title || title },
+            { name: 'twitter:description', content: data.seo?.og_description || description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'WebPage',
+                    '@id': `${canonical}#webpage`,
+                    'name': title,
+                    'description': description,
+                    'url': canonical,
+                    'image': image,
+                    'dateModified': data.updated_at,
+                    'publisher': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        }
+                    }
+                })
+            }
+        ]
+    }
+})
 
 const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {

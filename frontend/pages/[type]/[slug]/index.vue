@@ -58,16 +58,75 @@ const focusOnPlace = (place: any) => {
     }
 }
 
-useSeoMeta({
-    title: () => trek.value ? `${trek.value.name} | Trailmandu` : 'Loading Adventure...',
-    ogTitle: () => trek.value ? `${trek.value.name} | Trailmandu` : 'Trailmandu',
-    description: () => trek.value?.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.',
-    ogDescription: () => trek.value?.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.',
-    ogImage: () => trek.value?.thumbnail?.file_name ? showImage(trek.value.thumbnail.file_name) : '/images/default-og.jpg',
-    twitterCard: 'summary_large_image',
-    twitterTitle: () => trek.value ? `${trek.value.name} | Trailmandu` : 'Trailmandu',
-    twitterDescription: () => trek.value?.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.',
-    twitterImage: () => trek.value?.thumbnail?.file_name ? showImage(trek.value.thumbnail.file_name) : '/images/default-og.jpg',
+useHead(() => {
+    if (!trek.value) return { title: 'Loading Adventure...' }
+
+    const currentTitle = `${trek.value.name} | Trailmandu`
+    const currentDescription = trek.value.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.'
+    const canonical = `https://trailmandu.com/${type.value}/${trek.value.slug}`
+    const image = trek.value.thumbnail?.file_name
+        ? showImage(trek.value.thumbnail.file_name)
+        : 'https://trailmandu.com/logo.png'
+
+    return {
+        title: currentTitle,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: currentDescription },
+            { name: 'keywords', content: `${trek.value.name}, ${type.value} nepal, trekking in nepal, fastpacking route, hike, himalayas` },
+            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+            // Open Graph
+            { property: 'og:title', content: currentTitle },
+            { property: 'og:description', content: currentDescription },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: currentTitle },
+            { name: 'twitter:description', content: currentDescription },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'TouristTrip',
+                    '@id': `${canonical}#trip`,
+                    'name': trek.value.name,
+                    'description': currentDescription,
+                    'image': image,
+                    'touristType': type.value === 'treks' ? 'Trekker' : 'Fastpacker',
+                    'provider': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        }
+                    },
+                    'offers': {
+                        '@type': 'Offer',
+                        'price': startingPrice.value,
+                        'priceCurrency': 'USD',
+                        'url': `${canonical}/booking`,
+                        'availability': 'https://schema.org/InStock',
+                        'validFrom': new Date().toISOString().split('T')[0]
+                    },
+                    'itinerary': trek.value.details?.itinerary?.map((day: any, idx: number) => ({
+                        '@type': 'ListItem',
+                        'position': idx + 1,
+                        'name': day.title || `Day ${idx + 1}`,
+                        'description': day.description || ''
+                    }))
+                })
+            } as any
+        ]
+    }
 })
 
 const init = async () => {

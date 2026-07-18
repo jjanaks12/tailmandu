@@ -85,6 +85,83 @@ const addToCart = () => {
 onMounted(fetchProduct)
 
 watch(() => route.params.id, fetchProduct)
+
+useHead(() => {
+    const prod = product.value
+    if (!prod) {
+        return {
+            title: 'Loading Product | Trailmandu Store'
+        }
+    }
+
+    const title = `${prod.name} | Trailmandu Store`
+    const description = prod.excerpt || prod.description || 'Premium gear for trail running and trekking at Trailmandu.'
+    const canonical = `https://trailmandu.com/store/${prod.id}`
+    const image = prod.thumbnail?.file_name
+        ? showImage(prod.thumbnail.file_name)
+        : 'https://trailmandu.com/logo.png'
+
+    // Formulate offers
+    const offerDetails = prod.variants && prod.variants.length > 0
+        ? {
+            '@type': 'AggregateOffer',
+            'priceCurrency': 'NPR',
+            'lowPrice': Math.min(...prod.variants.map(v => Number(v.price))).toString(),
+            'highPrice': Math.max(...prod.variants.map(v => Number(v.price))).toString(),
+            'offerCount': prod.variants.length.toString(),
+            'availability': prod.variants.some(v => v.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            'url': canonical
+        }
+        : {
+            '@type': 'Offer',
+            'price': '0',
+            'priceCurrency': 'NPR',
+            'availability': 'https://schema.org/OutOfStock',
+            'url': canonical
+        }
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: `${prod.name}, trailmandu gear, running equipment, ${prod.category?.name || 'outdoor gear'}` },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'product' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    '@id': `${canonical}#product`,
+                    'name': prod.name,
+                    'description': description,
+                    'image': image,
+                    'category': prod.category?.name || 'Outdoor Gear',
+                    'brand': {
+                        '@type': 'Brand',
+                        'name': 'Trailmandu'
+                    },
+                    'offers': offerDetails
+                })
+            }
+        ]
+    }
+})
 </script>
 
 <template>

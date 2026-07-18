@@ -11,8 +11,69 @@ definePageMeta({
     layout: 'default'
 })
 
-useHead({
-    title: 'Our Team'
+useHead(() => {
+    const title = 'Our Team | Trailmandu'
+    const description = 'Meet the passionate team behind Trailmandu, organizing premier skyrunning events and adventure runs across Nepal.'
+    const canonical = 'https://trailmandu.com/our_team'
+    const image = img01 || 'https://trailmandu.com/logo.png'
+
+    const members = (teams.value || []).map(member => ({
+        '@type': 'OrganizationRole',
+        'member': {
+            '@type': 'Person',
+            'name': member.name,
+            'image': member.image ? showImage(member.image.file_name) : undefined,
+            'jobTitle': member.positions || [],
+            'sameAs': member.social ? Object.values(member.social).filter(Boolean) : []
+        },
+        'roleName': member.positions?.join(', ') || 'Team Member'
+    }))
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: 'trailmandu team, trail running nepal founders, skyrunning organizers, trailmandu staff' },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'AboutPage',
+                    '@id': `${canonical}#webpage`,
+                    'name': title,
+                    'description': description,
+                    'url': canonical,
+                    'about': {
+                        '@type': 'Organization',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        },
+                        'member': members
+                    }
+                })
+            }
+        ]
+    }
 })
 
 const { fetchPublicTeams } = useTeamStore()

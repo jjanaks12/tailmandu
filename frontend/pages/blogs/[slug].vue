@@ -9,32 +9,76 @@ const { getPublicPostBySlug } = useBlogStore()
 const post = ref<any>(null)
 const isLoading = ref(true)
 
+useHead(() => {
+    if (!post.value) return {}
+
+    const title = post.value.seo?.meta_title || post.value.title
+    const description = post.value.seo?.meta_description || post.value.excerpt
+    const canonical = post.value.seo?.canonical_url || `https://trailmandu.com/blogs/${post.value.slug}`
+    const image = post.value.seo?.og_image
+        ? showImage(post.value.seo.og_image.file_name)
+        : (post.value.featured_image ? showImage(post.value.featured_image.file_name) : 'https://trailmandu.com/logo.png')
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: post.value.seo?.meta_keywords || '' },
+            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+            // Open Graph
+            { property: 'og:title', content: post.value.seo?.og_title || title },
+            { property: 'og:description', content: post.value.seo?.og_description || description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'article' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: post.value.seo?.og_title || title },
+            { name: 'twitter:description', content: post.value.seo?.og_description || description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BlogPosting',
+                    '@id': `${canonical}#blogposting`,
+                    'mainEntityOfPage': canonical,
+                    'headline': post.value.title,
+                    'description': description,
+                    'image': image,
+                    'datePublished': post.value.published_at || post.value.created_at,
+                    'dateModified': post.value.updated_at || post.value.published_at || post.value.created_at,
+                    'author': {
+                        '@type': 'Person',
+                        'name': post.value.author?.personal?.first_name 
+                            ? `${post.value.author.personal.first_name} ${post.value.author.personal.last_name || ''}`.trim()
+                            : 'Trailmandu Team'
+                    },
+                    'publisher': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        }
+                    }
+                })
+            } as any
+        ]
+    }
+})
+
 const init = async () => {
     isLoading.value = true
     try {
         const data = await getPublicPostBySlug(route.params.slug as string)
         post.value = data
-
-        if (data) {
-            // Set dynamic SEO meta
-            useSeoMeta({
-                title: data.seo?.meta_title || data.title,
-                description: data.seo?.meta_description || data.excerpt,
-                ogTitle: data.seo?.og_title || data.seo?.meta_title || data.title,
-                ogDescription: data.seo?.og_description || data.seo?.meta_description || data.excerpt,
-                ogImage: data.seo?.og_image ? showImage(data.seo.og_image.file_name) : (data.featured_image ? showImage(data.featured_image.file_name) : undefined),
-                twitterCard: 'summary_large_image',
-                keywords: data.seo?.meta_keywords,
-            })
-
-            if (data.seo?.canonical_url) {
-                useHead({
-                    link: [
-                        { rel: 'canonical', href: data.seo.canonical_url }
-                    ]
-                })
-            }
-        }
     } catch (e) {
         console.error(e)
     } finally {

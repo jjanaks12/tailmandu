@@ -16,6 +16,12 @@ const selectedCount = computed(() => {
     }
     return media.value.selectedImages.length
 })
+
+useHead({
+    meta: [
+        { name: 'robots', content: 'noindex, nofollow' }
+    ]
+})
 </script>
 
 <template>

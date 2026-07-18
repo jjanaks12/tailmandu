@@ -3,8 +3,55 @@ import { SearchIcon } from 'lucide-vue-next'
 import type { Gallery, WithCount } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
-useHead({
-    title: 'Gallery'
+useHead(() => {
+    const title = 'TM Clicks Gallery | Trailmandu'
+    const description = 'Browse the official photo gallery of Trailmandu events, capturing stunning trail running, skyrunning, and adventure moments in Nepal.'
+    const canonical = 'https://trailmandu.com/tm_clicks'
+    const image = 'https://trailmandu.com/logo.png'
+
+    const collections = (galleries.value || []).map(g => ({
+        '@type': 'ImageGallery',
+        'name': g.name,
+        'url': `${canonical}?gallery=${g.id}`,
+        'description': `Photo gallery for ${g.name} event containing ${g._count?.images || 0} images.`
+    }))
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: 'trailmandu photo gallery, trail running pictures nepal, skyrunning gallery, nepal running photos, tm clicks' },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'CollectionPage',
+                    '@id': `${canonical}#webpage`,
+                    'name': title,
+                    'description': description,
+                    'url': canonical,
+                    'hasPart': collections
+                })
+            }
+        ]
+    }
 })
 
 definePageMeta({

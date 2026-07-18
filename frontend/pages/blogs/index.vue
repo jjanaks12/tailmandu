@@ -3,17 +3,71 @@ import { SlidersHorizontalIcon, ChevronRightIcon } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import { useBlogStore } from '~/store/blog'
 
-useSeoMeta({
-    title: computed(() => t('public_blogs.seo_title')),
-    description: computed(() => t('public_blogs.seo_description')),
-    ogTitle: computed(() => t('public_blogs.seo_title')),
-    ogDescription: computed(() => t('public_blogs.seo_description')),
-})
-
 const { t } = useI18n()
 
 const { fetchPublicPosts, fetchCategories } = useBlogStore()
 const { posts, categories, isLoading } = storeToRefs(useBlogStore())
+
+useHead(() => {
+    const title = t('public_blogs.seo_title') || 'Trailmandu Blogs & Stories'
+    const description = t('public_blogs.seo_description') || 'Read the latest updates, guides, and stories about trail running, skyrunning, and fastpacking in Nepal.'
+    const canonical = 'https://trailmandu.com/blogs'
+    const logoUrl = 'https://trailmandu.com/logo.png'
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: 'trail running nepal, skyrunning nepal, fastpacking, running blogs, himalayas running' },
+            { name: 'robots', content: 'index, follow' },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:image', content: logoUrl },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: logoUrl }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Blog',
+                    '@id': `${canonical}/#blog`,
+                    'name': title,
+                    'description': description,
+                    'url': canonical,
+                    'publisher': {
+                        '@type': 'SportsEventOrganizer',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': logoUrl
+                        }
+                    },
+                    'blogPost': posts.value.map(post => ({
+                        '@type': 'BlogPosting',
+                        '@id': `https://trailmandu.com/blogs/${post.slug}#blogposting`,
+                        'headline': post.title,
+                        'description': post.excerpt || '',
+                        'url': `https://trailmandu.com/blogs/${post.slug}`,
+                        'image': post.featured_image ? showImage(post.featured_image.file_name) : logoUrl,
+                        'datePublished': post.published_at || post.created_at
+                    }))
+                })
+            } as any
+        ]
+    }
+})
 
 const selectedCategory = ref<string | null>(null)
 
