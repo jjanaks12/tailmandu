@@ -611,6 +611,7 @@ model Gallery {
   created_at  DateTime  @default(now())
   updated_at  DateTime?
   deleted_at  DateTime?
+  hide_gallery Boolean   @default(true)
 
   images   Image[]
   tags     Tag[]

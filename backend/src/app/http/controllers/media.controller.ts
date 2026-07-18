@@ -83,6 +83,7 @@ export class MediaController {
                 data: {
                     name: validationData.name,
                     description: validationData.description,
+                    hide_gallery: validationData.hide_gallery,
                     tags: {
                         connect: tags
                     }
@@ -140,6 +141,7 @@ export class MediaController {
                 data: {
                     name: validationData.name,
                     description: validationData.description,
+                    hide_gallery: validationData.hide_gallery,
                     tags: {
                         connect: tags,
                         disconnect: deletedTags
@@ -300,7 +302,8 @@ export class MediaController {
                     }
                 },
                 where: {
-                    deleted_at: null
+                    deleted_at: null,
+                    hide_gallery: false
                 },
                 orderBy: [{ created_at: 'desc' }],
             }))

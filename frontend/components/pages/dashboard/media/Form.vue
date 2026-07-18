@@ -26,10 +26,12 @@ const handleSubmit = async (values: any) => {
 const init = () => {
     form.value?.setFieldValue('tags', [])
     form.value?.setFieldValue('images', [])
+    form.value?.setFieldValue('hide_gallery', true)
     if (props.gallery) {
         form.value?.setFieldValue('id', props.gallery.id)
         form.value?.setFieldValue('name', props.gallery.name)
         form.value?.setFieldValue('description', props.gallery.description ?? '')
+        form.value?.setFieldValue('hide_gallery', props.gallery.hide_gallery)
         tags.value = props.gallery.tags.map(tag => tag.name)
     }
 }
@@ -65,6 +67,10 @@ onMounted(init)
             </TagsInput>
             <ErrorMessage class="error__message" name="tags" />
         </div>
+        <Field name="hide_gallery" type="checkbox" v-slot="{ handleChange, value }" as="div" class="flex items-center gap-2">
+            <Checkbox id="hide_gallery" :model-value="value" @update:model-value="handleChange" />
+            <Label for="hide_gallery">Hide this gallery from public page (TM Clicks)</Label>
+        </Field>
         <Button type="submit">Submit</Button>
     </Form>
 </template>

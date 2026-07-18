@@ -92,7 +92,7 @@ onMounted(fetchOrders)
             <!-- Order list -->
             <div v-else class="divide-y">
                 <NuxtLink v-for="order in orders" :key="order.id"
-                    :to="`/dashboard/product/${order.order_items?.[0]?.product_id || order.product_id || ''}`"
+                    :to="`/dashboard/product/${order.items?.[0]?.product?.id || ''}`"
                     class="flex items-center gap-3 px-6 py-4 hover:bg-muted/50 transition-colors cursor-pointer group">
 
                     <!-- Icon -->
