@@ -5,6 +5,7 @@ import Jobs from '~/lib/jobs'
 import { useRoleStore } from './store/role'
 import { usePermissionStore } from './store/permission'
 import { useEventStore } from './store/event'
+import { showImage } from './lib/filters'
 
 const { isLoggedin } = storeToRefs(useAuthStore())
 const { imagePreview } = storeToRefs(useAppStore())
@@ -45,15 +46,28 @@ onBeforeMount(() => {
     <NuxtPage :key="$route.fullPath" />
   </NuxtLayout>
   <Dialog :open="!!imagePreview" @update:open="imagePreview = null">
-    <DialogContent class="w-fit overflow-hidden p-0">
+    <DialogContent class="max-w-[95vw] w-full p-0 overflow-hidden flex flex-col gap-0">
       <DialogHeader class="sr-only">
         <DialogTitle>Image preview</DialogTitle>
-        <DialogDescription>
-          This action cannot be undone. This will permanently delete your account
-          and remove your data from our servers.
-        </DialogDescription>
+        <DialogDescription>Image details preview</DialogDescription>
       </DialogHeader>
-      <img :src="imagePreview" v-if="imagePreview" class="w-full h-auto">
+      <template v-if="imagePreview">
+        <figure class="bg-gray-50">
+          <img :src="imagePreview.url" class="h-auto w-full" :alt="imagePreview.description" />
+          <figcaption class="bg-linear-to-b from-black/0 to-black/90 p-4 space-y-4 absolute right-0 bottom-0 left-0 z-1"
+            v-if="imagePreview.description || (imagePreview.tags && imagePreview.tags.length > 0)">
+            <div v-if="imagePreview.description" class="text-sm text-white/80 font-medium leading-relaxed">
+              {{ imagePreview.description }}
+            </div>
+            <div v-if="imagePreview.tags && imagePreview.tags.length > 0" class="flex flex-wrap gap-1.5">
+              <Badge variant="secondary" v-for="tag in imagePreview.tags" :key="tag.name"
+                class="text-[10px] px-2 py-0.5">
+                {{ tag.name }}
+              </Badge>
+            </div>
+          </figcaption>
+        </figure>
+      </template>
     </DialogContent>
   </Dialog>
 </template>

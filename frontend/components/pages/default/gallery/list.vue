@@ -23,6 +23,11 @@ const fetch = async () => {
 }
 
 onMounted(fetch)
+
+watch(() => URLParams.gallery, () => {
+    params.value.current = 1
+    fetch()
+})
 </script>
 
 <template>

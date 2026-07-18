@@ -10,13 +10,12 @@ interface MediaItemProps {
     image: Image
 }
 
-const emit = defineEmits(['close', 'select', 'unselect', 'update'])
+const emit = defineEmits(['close', 'select', 'unselect', 'update', 'edit-details'])
 const props = defineProps<MediaItemProps>()
 const selected = defineModel<string | null>('selected', {
     default: null
 })
 const { axios } = useAxios()
-const { setImageForPreview } = useAppStore()
 const hasError = ref(false)
 const isUpdating = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -65,7 +64,7 @@ const handleFileChange = async (e: Event) => {
         </div>
 
         <img v-if="!hasError" :src="showImage(image.file_name)" @error="hasError = true"
-            @click="!hasError ? setImageForPreview(showImage(image.file_name)) : null" />
+            @click="!hasError ? emit('edit-details', image) : null" class="cursor-pointer" />
         <img v-else src="/images/not-found.png" />
 
         <div class="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none [&>*]:pointer-events-auto"

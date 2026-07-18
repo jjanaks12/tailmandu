@@ -89,6 +89,9 @@ export default defineNuxtConfig({
   },
 
   pwa: {
+    workbox: {
+      navigateFallback: null
+    },
     manifest: {
       name: 'Trailmandu Nepal Pvt. Ltd.',
       short_name: 'Trailmandu',

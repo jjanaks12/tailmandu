@@ -223,7 +223,7 @@ export class MediaController {
                 const savedImage = await fileHandler.saveFile(image)
                 images.push(savedImage)
             }
-            
+
             response.send(images)
         } catch (error) {
             next(error)
@@ -352,7 +352,7 @@ export class MediaController {
             // Get pagination parameters from the query string
             const { per_page = 10, current = 1, s = '', sort } = request.query
             const skip = (current - 1) * per_page
-            
+
             // Determine the gallery ID query condition:
             // - If the requested ID is 'uncategorized', look for images with no gallery (galleryId: null).
             // - If a specific gallery ID is provided, look for that ID.
@@ -372,7 +372,7 @@ export class MediaController {
             if (request.params.id !== 'uncategorized') {
                 whereClause.gallery = {
                     deleted_at: null,
-                    ...(isAdmin ? {} : { hide_gallery: false })
+                    hide_gallery: false
                 }
             }
 
@@ -391,7 +391,7 @@ export class MediaController {
                 where: whereClause,
                 orderBy: [{ created_at: 'desc' }],
             })
-            
+
             // Send the paginated result response
             response.send({
                 per_page: Number(per_page),

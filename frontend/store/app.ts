@@ -3,6 +3,7 @@ import { defineStore } from "pinia"
 
 import type { AgeCategory, Company, Country, Gender, Permission, TShirtSize } from "~/lib/types"
 import { useAxios } from "~/services/axios"
+import { showImage } from "~/lib/filters"
 
 export const useAppStore = defineStore('app', () => {
     const breakpoints = ref()
@@ -12,7 +13,11 @@ export const useAppStore = defineStore('app', () => {
     const age_categories = ref<AgeCategory[]>([])
     const company = ref<Company | null>(null)
     const shirtSizes = ref<TShirtSize[]>([])
-    const imagePreview = ref<string | null>(null)
+    const imagePreview = ref<{
+        url: string
+        description?: string
+        tags?: { name: string }[]
+    } | null>(null)
     const mediaCenterDialog = ref(false)
     const storeSetting = ref<any>(null)
 
@@ -64,7 +69,21 @@ export const useAppStore = defineStore('app', () => {
         await fetchCompany()
     }
 
-    const setImageForPreview = (url: string) => imagePreview.value = url
+    const setImageForPreview = (param: string | { file_name: string; description?: string; tags?: { name: string }[] } | null) => {
+        if (!param) {
+            imagePreview.value = null
+            return
+        }
+        if (typeof param === 'string') {
+            imagePreview.value = { url: param }
+        } else {
+            imagePreview.value = {
+                url: showImage(param.file_name),
+                description: param.description,
+                tags: param.tags
+            }
+        }
+    }
 
     onBeforeMount(() => {
         breakpoints.value = useBreakpoints(breakpointsTailwind)
