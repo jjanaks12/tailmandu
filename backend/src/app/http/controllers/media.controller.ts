@@ -319,10 +319,18 @@ export class MediaController {
             
             const galleryIdCondition = request.params.id === 'uncategorized' ? null : (request.params.id || { not: null })
 
-            const total = await prisma.image.count({
-                where: {
-                    galleryId: galleryIdCondition
+            const whereClause: any = {
+                galleryId: galleryIdCondition
+            }
+
+            if (!request.params.id) {
+                whereClause.gallery = {
+                    hide_gallery: false
                 }
+            }
+
+            const total = await prisma.image.count({
+                where: whereClause
             })
 
             const images = await prisma.image.findMany({
@@ -330,9 +338,7 @@ export class MediaController {
                 take: parseInt(per_page.toString()),
                 include: {
                 },
-                where: {
-                    galleryId: galleryIdCondition
-                },
+                where: whereClause,
                 orderBy: [{ created_at: 'desc' }],
             })
             response.send({
