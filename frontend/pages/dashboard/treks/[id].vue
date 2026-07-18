@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BarChart3Icon, PencilIcon, PlusCircleIcon, GripVerticalIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon, SparklesIcon, EyeIcon, CompassIcon } from 'lucide-vue-next'
+import { BarChart3Icon, PencilIcon, Trash2Icon, CheckCircle2Icon, PlusIcon, ShieldCheckIcon, ShieldIcon, CheckSquareIcon, MinusCircleIcon, MinusIcon, Loader2Icon, EyeIcon } from 'lucide-vue-next'
 import type { Trek } from '~/lib/types'
 import { useTrekStore } from '~/store/trek'
 
@@ -167,10 +167,7 @@ const init = async () => {
 }
 
 const isIncludedDirty = computed(() => JSON.stringify(trek.value?.details?.included) !== JSON.stringify(serverStateData.value?.trek?.details?.included))
-const isItemisedInclusionsDirty = computed(() => JSON.stringify(trek.value?.details?.itemisedInclusions) !== JSON.stringify(serverStateData.value?.trek?.details?.itemisedInclusions))
 const isExcludedDirty = computed(() => JSON.stringify(trek.value?.details?.excluded) !== JSON.stringify(serverStateData.value?.trek?.details?.excluded))
-const isMandatoryGearDirty = computed(() => JSON.stringify(trek.value?.details?.mandatoryGear) !== JSON.stringify(serverStateData.value?.trek?.details?.mandatoryGear))
-const isOptionalGearDirty = computed(() => JSON.stringify(trek.value?.details?.optionalGear) !== JSON.stringify(serverStateData.value?.trek?.details?.optionalGear))
 const isExcerptDirty = computed(() => excerpt.value !== serverStateData.value?.excerpt)
 const isSlugDirty = computed(() => slug.value !== serverStateData.value?.slug)
 
@@ -207,13 +204,14 @@ onMounted(init)
                             Draft
                         </Badge>
 
-                        <NuxtLink v-if="trek.slug"
-                            :to="`/${(trek.category?.name || 'fastpacking').toLowerCase()}/${trek.slug}`"
-                            target="_blank"
-                            class="inline-flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 uppercase tracking-wider text-xs font-bold rounded-lg px-3 py-1 transition-colors">
-                            <EyeIcon class="w-3.5 h-3.5" />
-                            Preview
-                        </NuxtLink>
+                        <Button size="sm" as-child>
+                            <NuxtLink v-if="trek.slug"
+                                :to="`/${(trek.category?.name || 'fastpacking').toLowerCase()}/${trek.slug}`"
+                                target="_blank">
+                                <EyeIcon class="w-3.5 h-3.5" />
+                                Preview
+                            </NuxtLink>
+                        </Button>
 
                         <!-- View Bookings Sheet Toggle -->
                         <PagesDashboardTreksBookingsSheet :trek-id="(route.params.id as string)" />
@@ -229,9 +227,7 @@ onMounted(init)
                             </Button>
                         </div>
                     </div>
-                    <p class="text-xl text-muted-foreground font-light leading-relaxed">
-                        A high-altitude skyrunning challenge through the sacred lakes of Langtang.
-                    </p>
+                    <p class="text-xl text-muted-foreground font-light leading-relaxed">{{ trek.excerpt }}</p>
                 </div>
                 <div
                     class="bg-card text-card-foreground shadow-sm rounded-lg p-6 flex flex-col justify-between h-full border border-border">
