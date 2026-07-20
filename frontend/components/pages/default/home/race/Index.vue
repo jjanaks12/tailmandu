@@ -18,7 +18,7 @@ onMounted(fetchCurrentRace)
             <div class="text-right">
                 <Button as-child modifier="link">
                     <NuxtLink :to="$localePath({ name: 'races-slug', params: { slug: currentRace.slug } })">
-                        more details
+                        More details
                     </NuxtLink>
                 </Button>
             </div>

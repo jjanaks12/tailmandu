@@ -97,7 +97,7 @@ onMounted(() => {
             <Button :disabled="isLoading"
                 class="w-full bg-primary hover:bg-[#d8561a] text-white font-bold py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
                 type="submit">
-                {{ isLoading ? 'Sending...' : 'Send Inquiry' }}
+                {{ isLoading ? 'Sending...' : 'Send enquiry' }}
             </Button>
         </form>
     </div>

@@ -49,7 +49,7 @@ const showLink = computed(() => props.stage.stage_categories.some((category) => 
                 </NuxtLink>
                 <NuxtLink
                     :to="localePath({ name: 'races-id-stage-stage_id-result', params: { id: stage.event_id, stage_id: stage.id } })"
-                    v-else as-child>
+                    v-else-if="stage.stage_categories?.length > 0" as-child>
                     <Button variant="secondary" modifier="outline">
                         {{ $t('home.stage.see_result') }}
                     </Button>

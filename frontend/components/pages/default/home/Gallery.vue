@@ -53,7 +53,7 @@ onMounted(fetch)
                 <button
                     class="bg-deep-slate dark:bg-primary text-white px-10 py-4 rounded-xl font-bold hover:scale-105 transition-all"
                     as-child>
-                    <NuxtLink :to="localePath('/tm_clicks')">View Full Gallery</NuxtLink>
+                    <NuxtLink :to="localePath('/tm_clicks')">View full gallery</NuxtLink>
                 </button>
             </div>
         </div>

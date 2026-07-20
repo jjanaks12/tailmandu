@@ -4,6 +4,7 @@ import { GlobeIcon, MoonIcon, SunIcon } from 'lucide-vue-next'
 import type { SponsorType } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { showImage } from '~/lib/filters'
+import { useEventStore } from '~/store/event'
 
 definePageMeta({
     layout: 'default'
@@ -95,6 +96,7 @@ onMounted(() => {
 
 const { axios } = useAxios()
 const sponsorGroups = ref<SponsorType[]>([])
+const { currentRace } = storeToRefs(useEventStore())
 
 const fetchSponsors = async () => {
     try {
@@ -136,14 +138,19 @@ onMounted(fetchSponsors)
                             <h3 class="text-4xl font-display font-bold mb-4">Join as a Runner</h3>
                             <p class="mb-8 max-w-sm text-slate-200">Push your limits and experience the majesty of the
                                 Himalayas from the front row.</p>
-                            <Button size="xl">Start Your Journey</Button>
+                            <Button size="xl" as-child v-if="currentRace">
+                                <NuxtLink
+                                    :to="$localePath({ name: 'races-slug-runner', params: { slug: currentRace.slug } })">
+                                    Start Your Journey
+                                </NuxtLink>
+                            </Button>
                         </div>
                     </div>
                     <div
                         class="relative overflow-hidden rounded-3xl group p-12 h-96 flex flex-col justify-end text-white">
                         <img alt="Volunteers at race"
                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFmSEm7kedjK65KNw1onYDrV1yl5PC7eO-8lPW73UKXJB4nA0w3GMY0fEy_I4rUelXLZvHKc_yIeF1uh2bfUOAoBkdEZcl3oXypSwe5Aup9sStTY9ZUWMARXLiSiNttMIxfC-L3sa0ldvxIgkIv3xmPii5BkcjVNDTw3Ab4ogmFFxzFqDfYFvVY9UOYrV-Zq1i-Raxz4A3TVIXDjDvhxye2y2z0Yz2OH6xgzYewwvPGjXgoBJOnRQKQZygoOkKHGbgA1mKGN9RavA" />
+                            src="/images/home-volunteer.png" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-earth-brown via-earth-brown/40 to-transparent">
                         </div>
@@ -151,7 +158,12 @@ onMounted(fetchSponsors)
                             <h3 class="text-4xl font-display font-bold mb-4">Become a Volunteer</h3>
                             <p class="mb-8 max-w-sm text-slate-200">Support the community, manage aid stations, and be
                                 part of the race spirit without the miles.</p>
-                            <Button size="xl" variant="light">Sign Up Now</Button>
+                            <Button size="xl" variant="light" as-child v-if="currentRace">
+                                <NuxtLink
+                                    :to="$localePath({ name: 'races-slug-volunteer', params: { slug: currentRace.slug } })">
+                                    Sign Up Now
+                                </NuxtLink>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -163,16 +175,15 @@ onMounted(fetchSponsors)
                 <p class="text-center text-sm font-bold uppercase tracking-widest text-slate-400 mb-10">Supported By
                     Industry Leaders</p>
                 <div v-for="group in sponsorGroups" :key="group.id" class="mb-10 last:mb-0">
-                    <p class="text-center text-xs font-semibold uppercase tracking-widest text-slate-300 dark:text-slate-600 mb-6">{{ group.name }}</p>
+                    <p
+                        class="text-center text-xs font-semibold uppercase tracking-widest text-slate-300 dark:text-slate-600 mb-6">
+                        {{ group.name }}</p>
                     <div
                         class="flex flex-wrap justify-center gap-12 items-center opacity-40 grayscale hover:grayscale-0 transition-all">
                         <div v-for="sponsor in group.sponsors" :key="sponsor.id" class="flex justify-center">
                             <a :href="sponsor.url" target="_blank" rel="noopener noreferrer">
-                                <img
-                                    :alt="sponsor.name"
-                                    class="h-12 object-contain"
-                                    :src="sponsor.thumbnail ? showImage(sponsor.thumbnail.file_name) : ''"
-                                />
+                                <img :alt="sponsor.name" class="h-12 object-contain"
+                                    :src="sponsor.thumbnail ? showImage(sponsor.thumbnail.file_name) : ''" />
                             </a>
                         </div>
                     </div>

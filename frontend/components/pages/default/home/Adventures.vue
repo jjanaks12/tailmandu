@@ -106,7 +106,7 @@ onMounted(async () => {
                 </div>
                 <div class="text-right">
                     <Button modifier="link" as-child>
-                        <NuxtLink to="/fastpacking">view all</NuxtLink>
+                        <NuxtLink to="/fastpacking">View all</NuxtLink>
                     </Button>
                 </div>
             </div>
