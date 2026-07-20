@@ -54,7 +54,7 @@ useHead(() => {
                             'endDate': race.end || undefined,
                             'image': race.thumbnail?.file_name ? showImage(race.thumbnail.file_name) : logoUrl,
                             'organizer': {
-                                '@type': 'SportsEventOrganizer',
+                                '@type': 'SportsOrganization',
                                 '@id': 'https://trailmandu.com/#organization',
                                 'name': 'Trailmandu',
                                 'url': 'https://trailmandu.com'

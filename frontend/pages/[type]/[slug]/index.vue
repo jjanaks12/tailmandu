@@ -101,7 +101,7 @@ useHead(() => {
                     'image': image,
                     'touristType': type.value === 'treks' ? 'Trekker' : 'Fastpacker',
                     'provider': {
-                        '@type': 'SportsEventOrganizer',
+                        '@type': 'SportsOrganization',
                         '@id': 'https://trailmandu.com/#organization',
                         'name': 'Trailmandu',
                         'logo': {

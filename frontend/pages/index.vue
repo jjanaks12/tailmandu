@@ -29,7 +29,7 @@ useHead({
             type: 'application/ld+json',
             innerHTML: JSON.stringify({
                 '@context': 'https://schema.org',
-                '@type': 'SportsEventOrganizer',
+                '@type': 'SportsOrganization',
                 '@id': 'https://trailmandu.com/#organization',
                 'name': 'Trailmandu',
                 'url': 'https://trailmandu.com',

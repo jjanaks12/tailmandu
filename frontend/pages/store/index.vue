@@ -59,7 +59,7 @@ useHead(() => {
                     'description': description,
                     'url': canonical,
                     'publisher': {
-                        '@type': 'SportsEventOrganizer',
+                        '@type': 'SportsOrganization',
                         '@id': 'https://trailmandu.com/#organization',
                         'name': 'Trailmandu',
                         'logo': {

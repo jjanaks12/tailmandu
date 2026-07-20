@@ -90,7 +90,7 @@ useHead(() => {
                     'startDate': stage.value.start || undefined,
                     'endDate': stage.value.end || undefined,
                     'organizer': {
-                        '@type': 'SportsEventOrganizer',
+                        '@type': 'SportsOrganization',
                         '@id': 'https://trailmandu.com/#organization',
                         'name': 'Trailmandu',
                         'url': 'https://trailmandu.com'

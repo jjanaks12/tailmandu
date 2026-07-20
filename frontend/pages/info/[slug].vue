@@ -77,7 +77,7 @@ useHead(() => {
                     'image': image,
                     'dateModified': data.updated_at,
                     'publisher': {
-                        '@type': 'SportsEventOrganizer',
+                        '@type': 'SportsOrganization',
                         '@id': 'https://trailmandu.com/#organization',
                         'name': 'Trailmandu',
                         'logo': {

@@ -60,7 +60,7 @@ useHead(() => {
                             : 'Trailmandu Team'
                     },
                     'publisher': {
-                        '@type': 'SportsEventOrganizer',
+                        '@type': 'SportsOrganization',
                         '@id': 'https://trailmandu.com/#organization',
                         'name': 'Trailmandu',
                         'logo': {
