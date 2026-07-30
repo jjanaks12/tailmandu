@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2Icon, SparklesIcon } from 'lucide-vue-next'
+import { Loader2Icon } from 'lucide-vue-next'
 import type { Trek } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 

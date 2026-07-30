@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2Icon, PlusCircleIcon, Trash2Icon } from 'lucide-vue-next'
+import { Loader2Icon, PlusCircleIcon, Trash2Icon, Expand, Shrink, Maximize } from 'lucide-vue-next'
 import type { Trek } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
@@ -12,7 +12,7 @@ interface Place {
     lng: number
     elevation?: number
     offRoad?: boolean
-    routeType?: 'foot' | 'bike' | 'car' | 'offroad'
+    routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
 }
 
 interface Props {
@@ -45,6 +45,30 @@ const searchQuery = ref('')
 const isSearchingLocation = ref(false)
 const searchResults = ref<any[]>([])
 const isMotionEnabled = ref(true)
+
+const isFullScreen = ref(false)
+
+const toggleFullScreen = () => {
+    isFullScreen.value = !isFullScreen.value
+    setTimeout(() => {
+        if (map) map.invalidateSize()
+    }, 300)
+}
+
+const fitMap = () => {
+    if (!map) return
+    const places = itinerary.value.flatMap((day: any) => day.places || [])
+    if (places.length > 0) {
+        const bounds = L.latLngBounds(places.map((p: any) => [p.lat, p.lng] as L.LatLngTuple))
+        map.fitBounds(bounds, { padding: [40, 40] })
+    }
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isFullScreen.value) {
+        toggleFullScreen()
+    }
+}
 const routingMode = ref<'route' | 'direct'>('route')
 
 watch(routingMode, () => {
@@ -150,6 +174,7 @@ onMounted(async () => {
     await nextTick()
     initMap()
     drawRoute()
+    window.addEventListener('keydown', handleKeydown)
 })
 
 onBeforeUnmount(() => {
@@ -164,6 +189,7 @@ onBeforeUnmount(() => {
         hoverMarker.remove()
         hoverMarker = null
     }
+    window.removeEventListener('keydown', handleKeydown)
 })
 
 const initMap = () => {
@@ -242,29 +268,33 @@ const stopAnimation = () => {
     }
 }
 
-const routeBatch = async (batch: Place[], type: 'foot' | 'bike' | 'car'): Promise<L.LatLngTuple[]> => {
-    const fallback = batch.map(p => [p.lat, p.lng] as L.LatLngTuple)
-    if (batch.length < 2) return fallback
-    const osrmProfile = type === 'car' ? 'driving' : (type === 'bike' ? 'bicycle' : 'foot')
-    try {
-        const coordString = batch.map(p => `${p.lng},${p.lat}`).join(';')
-        const res = await fetch(`https://router.project-osrm.org/route/v1/${osrmProfile}/${coordString}?overview=full&geometries=geojson`)
-        const data = await res.json()
-        if (data.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates) {
-            return data.routes[0].geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]] as L.LatLngTuple)
-        }
-    } catch (e) {
-        console.error(`Failed to fetch ${type} route batch, falling back to straight lines`, e)
-    }
-    return fallback
-}
-
 const sampleCoords = (coords: L.LatLngTuple[], maxPoints = 80): L.LatLngTuple[] => {
-    if (coords.length <= maxPoints) return coords
+    if (coords.length === 0) return []
+    if (coords.length === 1) return coords
+    
+    const distances = [0]
+    for (let i = 1; i < coords.length; i++) {
+        distances.push(distances[i-1] + L.latLng(coords[i-1]).distanceTo(L.latLng(coords[i])))
+    }
+    const totalDist = distances[distances.length - 1]
+    
+    if (totalDist === 0) return coords
+    
     const sampled: L.LatLngTuple[] = []
-    const step = (coords.length - 1) / (maxPoints - 1)
+    const step = totalDist / (maxPoints - 1)
+    
     for (let i = 0; i < maxPoints; i++) {
-        sampled.push(coords[Math.round(i * step)])
+        const targetDist = i * step
+        for (let j = 0; j < distances.length - 1; j++) {
+            if (targetDist >= distances[j] && (targetDist <= distances[j+1] || j === distances.length - 2)) {
+                const segmentDist = distances[j+1] - distances[j]
+                const fraction = segmentDist === 0 ? 0 : (targetDist - distances[j]) / segmentDist
+                const lat = coords[j][0] + (coords[j+1][0] - coords[j][0]) * fraction
+                const lng = coords[j][1] + (coords[j+1][1] - coords[j][1]) * fraction
+                sampled.push([lat, lng])
+                break
+            }
+        }
     }
     return sampled
 }
@@ -361,8 +391,10 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
     })
 }
 
-const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad') => {
+const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight') => {
     switch (type) {
+        case 'flight':
+            return { color: '#3b82f6', weight: 3, opacity: 0.8, dashArray: '8, 8' }
         case 'bike':
             return { color: '#10b981', weight: 4, opacity: 0.8, dashArray: '5, 8' }
         case 'car':
@@ -371,7 +403,18 @@ const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad') => {
             return { color: '#ef4444', weight: 4, opacity: 0.8, dashArray: '6, 12' }
         case 'foot':
         default:
-            return { color: '#f06723', weight: 4, opacity: 0.8 }
+            return { color: '#f06723', weight: 4, opacity: 0.8, dashArray: '4, 6' }
+    }
+}
+
+const getRouteIcon = (type: string) => {
+    switch (type) {
+        case 'flight': return '✈️'
+        case 'bike': return '🚴'
+        case 'car': return '🚗'
+        case 'offroad': return '🚙'
+        case 'foot':
+        default: return '🚶'
     }
 }
 
@@ -428,64 +471,46 @@ const drawRoute = async () => {
         return
     }
 
-    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' => {
+    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' => {
         if (place.routeType) return place.routeType
         if (place.offRoad) return 'offroad'
         return 'foot'
     }
 
-    // Try to fetch OSRM route along walking paths, respecting routeType settings
-    let routeCoords: L.LatLngTuple[] = []
+    let routeCoords: L.LatLngTuple[] = places.map(p => [p.lat, p.lng] as L.LatLngTuple)
 
-    if (routingMode.value === 'direct') {
-        routeCoords = places.map(p => [p.lat, p.lng] as L.LatLngTuple)
-        const p = L.polyline(routeCoords, getPolylineOptions('foot')).addTo(map)
+    for (let i = 0; i < places.length - 1; i++) {
+        const fromPlace = places[i]
+        const toPlace = places[i + 1]
+        const type = getRouteType(fromPlace)
+
+        const coords: L.LatLngTuple[] = [
+            [fromPlace.lat, fromPlace.lng],
+            [toPlace.lat, toPlace.lng]
+        ]
+
+        const p = L.polyline(coords, getPolylineOptions(type)).addTo(map)
         polylines.push(p)
-    } else {
-        if (places.length > 1) {
-            let currentBatch: Place[] = [places[0]]
-            let currentType = getRouteType(places[0])
 
-            const drawSegment = async (batch: Place[], type: 'foot' | 'bike' | 'car' | 'offroad') => {
-                let coords: L.LatLngTuple[] = []
-                if (type === 'offroad') {
-                    coords = batch.map(p => [p.lat, p.lng] as L.LatLngTuple)
-                } else {
-                    coords = await routeBatch(batch, type)
-                }
-                if (coords.length > 0) {
-                    // Add to overall coordinate tracking for animations and elevations
-                    if (routeCoords.length > 0) {
-                        routeCoords.push(...coords.slice(1))
-                    } else {
-                        routeCoords.push(...coords)
-                    }
-                    // Add as a styled polyline
-                    const p = L.polyline(coords, getPolylineOptions(type)).addTo(map)
-                    polylines.push(p)
-                }
-            }
-
-            for (let i = 0; i < places.length - 1; i++) {
-                const fromPlace = places[i]
-                const toPlace = places[i + 1]
-                const type = getRouteType(fromPlace)
-
-                if (type !== currentType) {
-                    await drawSegment(currentBatch, currentType)
-                    currentBatch = [fromPlace, toPlace]
-                    currentType = type
-                } else {
-                    currentBatch.push(toPlace)
-                }
-            }
-
-            if (currentBatch.length > 1) {
-                await drawSegment(currentBatch, currentType)
-            }
-        } else {
-            routeCoords = [[places[0].lat, places[0].lng]]
-        }
+        // Add midpoint icon
+        const midLat = (fromPlace.lat + toPlace.lat) / 2
+        const midLng = (fromPlace.lng + toPlace.lng) / 2
+        const iconHtml = `
+            <div style="
+                background: white; 
+                border-radius: 50%; 
+                width: 24px; 
+                height: 24px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-size: 14px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3); 
+                border: 1px solid #e2e8f0;
+            ">${getRouteIcon(type)}</div>`
+        const midIcon = L.divIcon({ html: iconHtml, className: '', iconSize: [24, 24], iconAnchor: [12, 12] })
+        const midMarker = L.marker([midLat, midLng], { icon: midIcon, interactive: false }).addTo(map)
+        markers.push(midMarker)
     }
 
     // Fit map boundaries to contain the path
@@ -852,6 +877,7 @@ watch(() => props.trek, (newTrek) => {
                                         <option value="bike" class="bg-background text-foreground">🚴 Cycle</option>
                                         <option value="car" class="bg-background text-foreground">🚗 Drive</option>
                                         <option value="offroad" class="bg-background text-foreground">📐 Off-road</option>
+                                        <option value="flight" class="bg-background text-foreground">✈️ Flight</option>
                                     </select>
 
                                     <button type="button" @click.stop="removePlace(index, pIdx)"
@@ -878,23 +904,6 @@ watch(() => props.trek, (newTrek) => {
                 <div class="flex items-center justify-between">
                     <h4 class="text-sm font-black text-foreground uppercase tracking-wider">Route Map Preview</h4>
                     <div class="flex items-center gap-2">
-                        <!-- Routing Mode Button Group -->
-                        <div class="flex items-center bg-muted p-0.5 rounded-lg border border-border/40">
-                            <button type="button" @click="routingMode = 'route'"
-                                :class="[
-                                    routingMode === 'route' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground',
-                                    'px-2.5 py-1 rounded-md text-[10px] font-black transition-all flex items-center gap-1'
-                                ]">
-                                <span>🛣️</span> Route
-                            </button>
-                            <button type="button" @click="routingMode = 'direct'"
-                                :class="[
-                                    routingMode === 'direct' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground',
-                                    'px-2.5 py-1 rounded-md text-[10px] font-black transition-all flex items-center gap-1'
-                                ]">
-                                <span>📐</span> Direct
-                            </button>
-                        </div>
                         <span
                             class="text-[10px] bg-primary/10 text-primary px-2.5 py-1 rounded-full font-black uppercase tracking-wider">Interactive</span>
                     </div>
@@ -921,19 +930,39 @@ watch(() => props.trek, (newTrek) => {
                 </div>
 
                 <!-- Map Container -->
-                <div class="h-[480px] rounded-2xl overflow-hidden border border-border shadow-inner relative z-10">
+                <div :class="[
+                    isFullScreen ? 'fixed inset-0 z-[100] h-screen w-screen rounded-none' : 'h-[480px] rounded-2xl relative',
+                    'overflow-hidden border border-border shadow-inner z-10 bg-slate-50 dark:bg-slate-900 transition-all duration-300'
+                ]">
                     <div id="itinerary-editor-map" class="w-full h-full absolute inset-0" />
 
-                    <!-- Toggle Motion Button -->
-                    <button @click.stop="toggleMotion"
-                        class="absolute top-4 right-4 z-20 bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all"
-                        title="Toggle Animation Preview">
-                        <span :class="[
-                            'w-2 h-2 rounded-full',
-                            isMotionEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
-                        ]"></span>
-                        <span>{{ isMotionEnabled ? 'Pause Motion' : 'Play Motion' }}</span>
-                    </button>
+                    <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+                        <!-- Toggle Motion Button -->
+                        <button @click.stop="toggleMotion"
+                            class="bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all"
+                            title="Toggle Animation Preview">
+                            <span :class="[
+                                'w-2 h-2 rounded-full',
+                                isMotionEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+                            ]"></span>
+                            <span>{{ isMotionEnabled ? 'Pause Motion' : 'Play Motion' }}</span>
+                        </button>
+                        
+                        <!-- Fit Map Button -->
+                        <button @click.stop="fitMap"
+                            class="bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all text-foreground"
+                            title="Fit map">
+                            <Maximize class="w-4 h-4" />
+                        </button>
+
+                        <!-- Full Screen Button -->
+                        <button @click.stop="toggleFullScreen"
+                            class="bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all text-foreground"
+                            :title="isFullScreen ? 'Exit full screen' : 'Full screen'">
+                            <Shrink v-if="isFullScreen" class="w-4 h-4" />
+                            <Expand v-else class="w-4 h-4" />
+                        </button>
+                    </div>
 
                     <!-- Active Day Indicator Overlay -->
                     <div

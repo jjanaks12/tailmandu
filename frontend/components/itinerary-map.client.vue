@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { Maximize } from 'lucide-vue-next'
+import { Maximize, Expand, Shrink, Play, Pause } from 'lucide-vue-next'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -10,7 +10,7 @@ interface Place {
     lng: number
     elevation?: number
     offRoad?: boolean
-    routeType?: 'foot' | 'bike' | 'car' | 'offroad'
+    routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
 }
 
 interface Props {
@@ -31,6 +31,30 @@ let markers: any[] = []
 const markersMap = new Map<string, any>()
 let animationFrameId: number | null = null
 let nextLegTimeoutId: any = null
+
+const isFullScreen = ref(false)
+
+const toggleFullScreen = () => {
+    isFullScreen.value = !isFullScreen.value
+    // Need to invalidate map size after a short delay to let CSS transition finish
+    setTimeout(() => {
+        if (map) {
+            map.invalidateSize()
+        }
+    }, 300)
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isFullScreen.value) {
+        toggleFullScreen()
+    }
+}
+
+const isMotionEnabled = ref(true)
+
+const toggleMotion = () => {
+    isMotionEnabled.value = !isMotionEnabled.value
+}
 
 const elevationProfile = ref<{ lat: number, lng: number, elevation: number }[]>([])
 const hoveredPoint = ref<any | null>(null)
@@ -111,6 +135,7 @@ onMounted(() => {
     if (props.activeDayIndex !== null && props.activeDayIndex !== undefined) {
         focusOnDay(props.activeDayIndex)
     }
+    window.addEventListener('keydown', handleKeydown)
 })
 
 onBeforeUnmount(() => {
@@ -122,6 +147,7 @@ onBeforeUnmount(() => {
         hoverMarker.remove()
         hoverMarker = null
     }
+    window.removeEventListener('keydown', handleKeydown)
 })
 
 const initMap = () => {
@@ -150,29 +176,33 @@ const stopAnimation = () => {
     }
 }
 
-const routeBatch = async (batch: Place[], type: 'foot' | 'bike' | 'car'): Promise<L.LatLngTuple[]> => {
-    const fallback = batch.map(p => [p.lat, p.lng] as L.LatLngTuple)
-    if (batch.length < 2) return fallback
-    const osrmProfile = type === 'car' ? 'driving' : (type === 'bike' ? 'bicycle' : 'foot')
-    try {
-        const coordString = batch.map(p => `${p.lng},${p.lat}`).join(';')
-        const res = await fetch(`https://router.project-osrm.org/route/v1/${osrmProfile}/${coordString}?overview=full&geometries=geojson`)
-        const data = await res.json()
-        if (data.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates) {
-            return data.routes[0].geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]] as L.LatLngTuple)
-        }
-    } catch (e) {
-        console.error(`Failed to fetch ${type} route batch, falling back to straight lines`, e)
-    }
-    return fallback
-}
-
 const sampleCoords = (coords: L.LatLngTuple[], maxPoints = 80): L.LatLngTuple[] => {
-    if (coords.length <= maxPoints) return coords
+    if (coords.length === 0) return []
+    if (coords.length === 1) return coords
+    
+    const distances = [0]
+    for (let i = 1; i < coords.length; i++) {
+        distances.push(distances[i-1] + L.latLng(coords[i-1]).distanceTo(L.latLng(coords[i])))
+    }
+    const totalDist = distances[distances.length - 1]
+    
+    if (totalDist === 0) return coords
+    
     const sampled: L.LatLngTuple[] = []
-    const step = (coords.length - 1) / (maxPoints - 1)
+    const step = totalDist / (maxPoints - 1)
+    
     for (let i = 0; i < maxPoints; i++) {
-        sampled.push(coords[Math.round(i * step)])
+        const targetDist = i * step
+        for (let j = 0; j < distances.length - 1; j++) {
+            if (targetDist >= distances[j] && (targetDist <= distances[j+1] || j === distances.length - 2)) {
+                const segmentDist = distances[j+1] - distances[j]
+                const fraction = segmentDist === 0 ? 0 : (targetDist - distances[j]) / segmentDist
+                const lat = coords[j][0] + (coords[j+1][0] - coords[j][0]) * fraction
+                const lng = coords[j][1] + (coords[j+1][1] - coords[j][1]) * fraction
+                sampled.push([lat, lng])
+                break
+            }
+        }
     }
     return sampled
 }
@@ -209,9 +239,9 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
 
     const distances: number[] = [0]
     for (let i = 1; i < sampled.length; i++) {
-        const p1 = L.latLng(sampled[i-1][0], sampled[i-1][1])
+        const p1 = L.latLng(sampled[i - 1][0], sampled[i - 1][1])
         const p2 = L.latLng(sampled[i][0], sampled[i][1])
-        distances.push(distances[i-1] + p1.distanceTo(p2))
+        distances.push(distances[i - 1] + p1.distanceTo(p2))
     }
     const totalDistance = distances[distances.length - 1] || 1
 
@@ -220,7 +250,7 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
         let minDistance = Infinity
         let closestIdx = 0
         const placeLatLng = L.latLng(place.lat, place.lng)
-        
+
         sampled.forEach((coord, idx) => {
             const dist = L.latLng(coord[0], coord[1]).distanceTo(placeLatLng)
             if (dist < minDistance) {
@@ -228,7 +258,7 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
                 closestIdx = idx
             }
         })
-        
+
         placePositions.push({
             distance: distances[closestIdx],
             elevation: place.elevation || 0
@@ -248,11 +278,11 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
         const d = distances[idx]
         let p1 = placePositions[0]
         let p2 = placePositions[placePositions.length - 1]
-        
+
         for (let i = 0; i < placePositions.length - 1; i++) {
-            if (d >= placePositions[i].distance && d <= placePositions[i+1].distance) {
+            if (d >= placePositions[i].distance && d <= placePositions[i + 1].distance) {
                 p1 = placePositions[i]
-                p2 = placePositions[i+1]
+                p2 = placePositions[i + 1]
                 break
             }
         }
@@ -269,8 +299,10 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
     })
 }
 
-const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad') => {
+const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight') => {
     switch (type) {
+        case 'flight':
+            return { color: '#3b82f6', weight: 3, opacity: 0.8, dashArray: '8, 8' }
         case 'bike':
             return { color: '#10b981', weight: 4, opacity: 0.8, dashArray: '5, 8' }
         case 'car':
@@ -279,7 +311,18 @@ const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad') => {
             return { color: '#ef4444', weight: 4, opacity: 0.8, dashArray: '6, 12' }
         case 'foot':
         default:
-            return { color: '#f06723', weight: 4, opacity: 0.8 }
+            return { color: '#f06723', weight: 4, opacity: 0.8, dashArray: '4, 6' }
+    }
+}
+
+const getRouteIcon = (type: string) => {
+    switch (type) {
+        case 'flight': return '✈️'
+        case 'bike': return '🚴'
+        case 'car': return '🚗'
+        case 'offroad': return '🚙'
+        case 'foot':
+        default: return '🚶'
     }
 }
 
@@ -336,64 +379,46 @@ const drawRoute = async () => {
         return
     }
 
-    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' => {
+    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' => {
         if (place.routeType) return place.routeType
         if (place.offRoad) return 'offroad'
         return 'foot'
     }
 
-    // Try to fetch OSRM route along walking paths, respecting routeType settings
-    let routeCoords: L.LatLngTuple[] = []
+    let routeCoords: L.LatLngTuple[] = places.map(p => [p.lat, p.lng] as L.LatLngTuple)
 
-    if (props.routingMode === 'direct') {
-        routeCoords = places.map(p => [p.lat, p.lng] as L.LatLngTuple)
-        const p = L.polyline(routeCoords, getPolylineOptions('foot')).addTo(map)
+    for (let i = 0; i < places.length - 1; i++) {
+        const fromPlace = places[i]
+        const toPlace = places[i + 1]
+        const type = getRouteType(fromPlace)
+
+        const coords: L.LatLngTuple[] = [
+            [fromPlace.lat, fromPlace.lng],
+            [toPlace.lat, toPlace.lng]
+        ]
+
+        const p = L.polyline(coords, getPolylineOptions(type)).addTo(map)
         polylines.push(p)
-    } else {
-        if (places.length > 1) {
-            let currentBatch: Place[] = [places[0]]
-            let currentType = getRouteType(places[0])
 
-            const drawSegment = async (batch: Place[], type: 'foot' | 'bike' | 'car' | 'offroad') => {
-                let coords: L.LatLngTuple[] = []
-                if (type === 'offroad') {
-                    coords = batch.map(p => [p.lat, p.lng] as L.LatLngTuple)
-                } else {
-                    coords = await routeBatch(batch, type)
-                }
-                if (coords.length > 0) {
-                    // Add to overall coordinate tracking for animations and elevations
-                    if (routeCoords.length > 0) {
-                        routeCoords.push(...coords.slice(1))
-                    } else {
-                        routeCoords.push(...coords)
-                    }
-                    // Add as a styled polyline
-                    const p = L.polyline(coords, getPolylineOptions(type)).addTo(map)
-                    polylines.push(p)
-                }
-            }
-
-            for (let i = 0; i < places.length - 1; i++) {
-                const fromPlace = places[i]
-                const toPlace = places[i + 1]
-                const type = getRouteType(fromPlace)
-
-                if (type !== currentType) {
-                    await drawSegment(currentBatch, currentType)
-                    currentBatch = [fromPlace, toPlace]
-                    currentType = type
-                } else {
-                    currentBatch.push(toPlace)
-                }
-            }
-
-            if (currentBatch.length > 1) {
-                await drawSegment(currentBatch, currentType)
-            }
-        } else {
-            routeCoords = [[places[0].lat, places[0].lng]]
-        }
+        // Add midpoint icon
+        const midLat = (fromPlace.lat + toPlace.lat) / 2
+        const midLng = (fromPlace.lng + toPlace.lng) / 2
+        const iconHtml = `
+            <div style="
+                background: white; 
+                border-radius: 50%; 
+                width: 24px; 
+                height: 24px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-size: 14px; 
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3); 
+                border: 1px solid #e2e8f0;
+            ">${getRouteIcon(type)}</div>`
+        const midIcon = L.divIcon({ html: iconHtml, className: '', iconSize: [24, 24], iconAnchor: [12, 12] })
+        const midMarker = L.marker([midLat, midLng], { icon: midIcon, interactive: false }).addTo(map)
+        markers.push(midMarker)
     }
 
     // Fit map boundaries to contain the path
@@ -456,6 +481,12 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
     animatedMarker.setLatLng(startPoint)
 
     const animate = (timestamp: number) => {
+        if (!isMotionEnabled.value) {
+            lastFrameTime = 0
+            animationFrameId = requestAnimationFrame(animate)
+            return
+        }
+
         if (!lastFrameTime) {
             lastFrameTime = timestamp
             animationFrameId = requestAnimationFrame(animate)
@@ -591,8 +622,11 @@ watch(() => props.activeDayIndex, (newVal) => {
 })
 
 const fitMap = () => {
-    if (map && polyline) {
-        map.fitBounds(polyline.getBounds(), { padding: [50, 50] })
+    if (!map) return
+    const places = (props.itinerary || []).flatMap((day: any) => day.places || [])
+    if (places.length > 0) {
+        const bounds = L.latLngBounds(places.map(p => [p.lat, p.lng] as L.LatLngTuple))
+        map.fitBounds(bounds, { padding: [50, 50] })
     }
 }
 
@@ -611,16 +645,34 @@ defineExpose({
 </script>
 
 <template>
-    <div
-        class="relative w-full h-full min-h-[400px] flex flex-col bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] overflow-hidden">
+    <div :class="[
+        'flex flex-col bg-slate-50 dark:bg-slate-900 overflow-hidden transition-all duration-300',
+        isFullScreen
+            ? 'fixed inset-0 z-[100] rounded-none'
+            : 'relative w-full h-full min-h-[400px] rounded-[2.5rem]'
+    ]">
         <!-- Map Container -->
         <div class="flex-1 relative min-h-[300px]">
             <div ref="mapEl" class="w-full h-full absolute inset-0 z-10" />
-            <button @click="fitMap"
-                class="absolute top-4 right-4 z-20 bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                title="Fit map">
-                <Maximize class="w-5 h-5 text-slate-700 dark:text-slate-300" />
-            </button>
+            <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
+                <button @click="fitMap"
+                    class="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    title="Fit map">
+                    <Maximize class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                </button>
+                <button @click="toggleMotion"
+                    class="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    :title="isMotionEnabled ? 'Pause motion' : 'Play motion'">
+                    <Pause v-if="isMotionEnabled" class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                    <Play v-else class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                </button>
+                <button @click="toggleFullScreen"
+                    class="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    :title="isFullScreen ? 'Exit full screen' : 'Full screen'">
+                    <Shrink v-if="isFullScreen" class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                    <Expand v-else class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                </button>
+            </div>
         </div>
 
         <!-- Elevation Profile Chart -->
@@ -643,7 +695,7 @@ defineExpose({
 
             <div class="relative h-[80px] w-full">
                 <svg ref="svgRef" viewBox="0 0 800 130" class="w-full h-full overflow-visible select-none"
-                    @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
+                    preserveAspectRatio="none" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
                     <defs>
                         <linearGradient id="elevation-gradient-client" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stop-color="#f06723" stop-opacity="0.3" />
@@ -653,31 +705,37 @@ defineExpose({
 
                     <!-- Grid lines -->
                     <line x1="0" y1="10" x2="800" y2="10" stroke="currentColor" stroke-dasharray="4 4"
-                        class="text-border/40" />
+                        class="text-border/40" vector-effect="non-scaling-stroke" />
                     <line x1="0" y1="70" x2="800" y2="70" stroke="currentColor" stroke-dasharray="4 4"
-                        class="text-border/40" />
-                    <line x1="0" y1="120" x2="800" y2="120" stroke="currentColor" class="text-border/40" />
+                        class="text-border/40" vector-effect="non-scaling-stroke" />
+                    <line x1="0" y1="120" x2="800" y2="120" stroke="currentColor" class="text-border/40"
+                        vector-effect="non-scaling-stroke" />
 
                     <!-- Shaded Area -->
                     <path :d="areaPath" fill="url(#elevation-gradient-client)" />
 
                     <!-- Line Path -->
-                    <path :d="linePath" stroke="#f06723" stroke-width="3" fill="none" stroke-linecap="round" />
+                    <path :d="linePath" stroke="#f06723" stroke-width="3" fill="none" stroke-linecap="round"
+                        vector-effect="non-scaling-stroke" />
 
                     <!-- Hover Indicator -->
                     <g v-if="hoveredPoint">
                         <line :x1="hoveredPoint.x" y1="10" :x2="hoveredPoint.x" y2="120" stroke="#3b82f6"
-                            stroke-width="1.5" stroke-dasharray="3 3" />
-                        <circle :cx="hoveredPoint.x" :cy="hoveredPoint.y" r="5" fill="#3b82f6" stroke="#ffffff"
-                            stroke-width="2" />
+                            stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" />
                     </g>
                 </svg>
 
-                <!-- Hover Tooltip -->
-                <div v-if="hoveredPoint"
-                    class="absolute top-[-30px] bg-background border border-border/80 rounded-lg px-2 py-1 text-[10px] font-black shadow-md pointer-events-none transform -translate-x-1/2"
-                    :style="{ left: `${(hoveredPoint.x / 800) * 100}%` }">
-                    {{ hoveredPoint.elevation }}m
+                <!-- Hover Tooltip & Circle Overlay -->
+                <div v-if="hoveredPoint" class="absolute inset-0 pointer-events-none">
+                    <!-- The circle overlay -->
+                    <div class="absolute w-2.5 h-2.5 bg-blue-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2"
+                        :style="{ left: `${(hoveredPoint.x / 800) * 100}%`, top: `${(hoveredPoint.y / 130) * 100}%` }">
+                    </div>
+                    <!-- The tooltip -->
+                    <div class="absolute bg-background border border-border/80 rounded-lg px-2 py-1 text-[10px] font-black shadow-md transform -translate-x-1/2"
+                        :style="{ left: `${(hoveredPoint.x / 800) * 100}%`, top: '-30px' }">
+                        {{ hoveredPoint.elevation }}m
+                    </div>
                 </div>
             </div>
         </div>

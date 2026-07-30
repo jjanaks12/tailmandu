@@ -16,7 +16,6 @@ export const verifyAccessToken = (request: Request, response: Response, next: Ne
 
         try {
             if (typeof payload != 'string') {
-                console.log(payload.aud, "aksjbcansjcakn")
                 const user = await prisma.user.findFirstOrThrow({
                     where: { id: payload.aud as string },
                     omit: {
