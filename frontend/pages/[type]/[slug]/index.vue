@@ -197,6 +197,22 @@ const recommendedTreks = computed(() => {
         .slice(0, 3)
 })
 
+const initWeatherWidget = () => {
+    if (!trek.value?.details?.weather?.embedCode?.includes('weatherwidget-io')) return
+    const id = 'weatherwidget-io-js'
+    let script = document.getElementById(id) as HTMLScriptElement
+    if (!script) {
+        script = document.createElement('script')
+        script.id = id
+        script.src = 'https://weatherwidget.io/js/widget.min.js'
+        document.head.appendChild(script)
+    } else {
+        if (typeof (window as any).__weatherwidget_init === 'function') {
+            (window as any).__weatherwidget_init()
+        }
+    }
+}
+
 onMounted(async () => {
     await init()
     try {
@@ -204,6 +220,8 @@ onMounted(async () => {
     } catch (e) {
         console.error('Failed to fetch recommended treks', e)
     }
+    await nextTick()
+    initWeatherWidget()
 })
 </script>
 
