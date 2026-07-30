@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ArrowLeftIcon, Loader2Icon, MessageSquareIcon, StarIcon, UserIcon } from 'lucide-vue-next'
 import { useBlogStore } from '~/store/blog'
-import { showImage } from '~/lib/filters'
+import { showImage, parseContent } from '~/lib/filters'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,6 +31,9 @@ const init = async () => {
     isLoading.value = true
     try {
         const data = await getPost(route.params.id as string)
+        if (data && data.content) {
+            data.content = parseContent(data.content)
+        }
         post.value = data
     } catch (e) {
         console.error(e)

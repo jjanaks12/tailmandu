@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { ref, watch, onBeforeUnmount } from 'vue'
+import { ref, watch, onBeforeUnmount, computed } from 'vue'
+import { icons } from 'lucide'
 import TiptapDocument from '@tiptap/extension-document'
 import TiptapParagraph from '@tiptap/extension-paragraph'
 import TiptapText from '@tiptap/extension-text'
@@ -17,13 +18,14 @@ import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Link from '@tiptap/extension-link'
 import ImageResize from 'tiptap-extension-resize-image'
 import { TiptapLucideIcon } from '~/lib/tiptap/TiptapLucideIcon'
+import { SliderExtension } from '~/lib/tiptap/SliderExtension'
 
 import {
   BoldIcon, Heading1Icon, Heading2Icon, Heading3Icon,
   ItalicIcon, LinkIcon, ListIcon, ListOrderedIcon,
   LoaderCircleIcon, MinusIcon, QuoteIcon, RedoIcon,
   RotateCcwIcon, StrikethroughIcon, UnderlineIcon,
-  UndoIcon, UnlinkIcon, WrapTextIcon, XIcon, ImageIcon, ComponentIcon
+  UndoIcon, UnlinkIcon, WrapTextIcon, XIcon, ImageIcon, ComponentIcon, GalleryHorizontalEndIcon
 } from 'lucide-vue-next'
 
 import { useMediaStore } from '~/store/media'
@@ -82,6 +84,7 @@ const editor = useEditor({
       },
     }),
     TiptapLucideIcon,
+    SliderExtension,
   ],
   onUpdate: ({ editor }) => {
     emit('update:modelValue', editor.getHTML())
@@ -138,11 +141,48 @@ const addImage = () => {
   }
 }
 
-const insertLucideIcon = () => {
-  const iconName = window.prompt('Enter Lucide icon name (e.g. Activity, CheckCircle, MapPin)')
-  if (iconName) {
-    editor.value?.chain().focus().insertContent(`<lucide-icon name="${iconName}"></lucide-icon>&nbsp;`).run()
+const showIconDialog = ref(false)
+const iconNameInput = ref('')
+
+const iconSvg = computed(() => {
+  const iconName = iconNameInput.value
+  if (!iconName) return null
+  
+  let iconData = icons[iconName as keyof typeof icons]
+  if (!iconData) {
+      const pascalCase = iconName.replace(/(^\w|-\w)/g, (text: string) => text.replace(/-/, "").toUpperCase())
+      iconData = icons[pascalCase as keyof typeof icons]
   }
+  if (!iconData && iconName.endsWith('Icon')) {
+      const nameWithoutIcon = iconName.slice(0, -4)
+      const pascalCase = nameWithoutIcon.replace(/(^\w|-\w)/g, (text: string) => text.replace(/-/, "").toUpperCase())
+      iconData = icons[pascalCase as keyof typeof icons]
+  }
+  
+  if (!iconData) return null
+  
+  const children = iconData.map((child: any) => {
+    const attrs = Object.entries(child[1]).map(([k, v]) => `${k}="${v}"`).join(' ')
+    return `<${child[0]} ${attrs}></${child[0]}>`
+  }).join('')
+  
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-primary">${children}</svg>`
+})
+
+const insertLucideIcon = () => {
+  iconNameInput.value = ''
+  showIconDialog.value = true
+}
+
+const confirmIconInsert = () => {
+  if (iconNameInput.value) {
+    editor.value?.chain().focus().insertContent(`<lucide-icon name="${iconNameInput.value}"></lucide-icon>&nbsp;`).run()
+  }
+  showIconDialog.value = false
+}
+
+const insertSlider = () => {
+  editor.value?.chain().focus().insertContent({ type: 'slider', attrs: { images: [] } }).run()
 }
 </script>
 
@@ -240,6 +280,10 @@ const insertLucideIcon = () => {
           @click="insertLucideIcon" title="Insert Lucide Icon">
           <ComponentIcon :size="16" />
         </Button>
+        <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
+          @click="insertSlider" title="Insert Slider Widget">
+          <GalleryHorizontalEndIcon :size="16" />
+        </Button>
       </div>
 
       <!-- History & Clear -->
@@ -264,6 +308,25 @@ const insertLucideIcon = () => {
     </div>
 
     <TiptapEditorContent class="content_editor min-h-[300px]" :editor="editor" />
+
+    <Dialog :open="showIconDialog" @update:open="showIconDialog = $event">
+      <DialogContent class="sm:max-w-md z-[100]">
+        <DialogHeader>
+          <DialogTitle>Insert Icon</DialogTitle>
+          <DialogDescription>Enter a Lucide icon name (e.g., Activity, CheckCircle, MapPin).</DialogDescription>
+        </DialogHeader>
+        <div class="flex flex-col items-center space-y-6 py-4">
+          <div class="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-inner">
+            <div v-if="iconSvg" v-html="iconSvg"></div>
+            <div v-else class="text-slate-400 text-xs text-center px-2">No icon<br>matched</div>
+          </div>
+          <div class="flex items-center space-x-2 w-full">
+            <Input v-model="iconNameInput" placeholder="Icon name" @keyup.enter="confirmIconInsert" autofocus class="flex-1" />
+            <Button type="button" @click="confirmIconInsert" :disabled="!iconSvg">Insert</Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 

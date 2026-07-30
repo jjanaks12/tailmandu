@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CalendarIcon, UserIcon, ArrowRightIcon } from 'lucide-vue-next'
 import type { BlogPost } from '~/lib/types'
-import { showImage } from '~/lib/filters'
+import { showImage, parseContent } from '~/lib/filters'
 
 defineProps<{
     post: BlogPost
@@ -61,7 +61,7 @@ const formatDate = (date: string) => {
             </h3>
 
             <p class="text-slate-500 dark:text-slate-400 mb-8 line-clamp-3 leading-relaxed">
-                {{ post.excerpt || (post.content?.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...') }}
+                {{ post.excerpt || (parseContent(post.content || '')?.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...') }}
             </p>
 
             <div class="mt-auto">

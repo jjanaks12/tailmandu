@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { CalendarIcon, UserIcon, ArrowLeftIcon, ArrowRightIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, TagIcon } from 'lucide-vue-next'
 import { useBlogStore } from '~/store/blog'
-import { showImage } from '~/lib/filters'
+import { showImage, parseContent } from '~/lib/filters'
 import CommentSection from '~/components/pages/blogs/CommentSection.vue'
+import Swiper from 'swiper'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 
 const route = useRoute()
 const { getPublicPostBySlug } = useBlogStore()
@@ -74,11 +76,34 @@ useHead(() => {
     }
 })
 
+const initSwipers = () => {
+    if (typeof window === 'undefined') return
+    setTimeout(() => {
+        const sliders = document.querySelectorAll('.hc-swiper-slider')
+        sliders.forEach((slider: any) => {
+            if (!slider.swiper) {
+                new Swiper(slider, {
+                    modules: [Navigation, Pagination, Autoplay],
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    loop: true,
+                    pagination: { el: '.swiper-pagination', clickable: true },
+                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                    autoplay: { delay: 5000, disableOnInteraction: false },
+                })
+            }
+        })
+    }, 100)
+}
+
 const init = async () => {
     isLoading.value = true
     try {
         const data = await getPublicPostBySlug(route.params.slug as string)
         post.value = data
+        nextTick(() => {
+            initSwipers()
+        })
     } catch (e) {
         console.error(e)
     } finally {
@@ -195,7 +220,7 @@ onMounted(init)
                 <!-- Main Article -->
                 <article class="flex-1 max-w-4xl">
                     <div class="content_editor">
-                        <div v-html="post.content"></div>
+                        <div v-html="parseContent(post.content)"></div>
                     </div>
 
                     <!-- Tags -->

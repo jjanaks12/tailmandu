@@ -3,6 +3,7 @@ export { abbr } from './abbr'
 export { humanize, formatDate, slugify, fixDateTime, distanceToKm } from './humanize'
 export { isObjEq } from './isObjectEqual'
 export { debounce } from './debounce'
+export { parseContent } from './parse_content'
 
 export const pad = (n: string, width: number, z = '0') => {
     n = n + ''

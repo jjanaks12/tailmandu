@@ -250,6 +250,10 @@ form .error__message {
   img {
     @apply max-w-full h-auto rounded-lg my-4 mx-auto block shadow-md border-4 border-white;
   }
+
+  .emoji {
+    @apply size-[14px] m-0 inline-block;
+  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -266,4 +270,8 @@ form .error__message {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-muted-foreground/40;
+}
+
+.swiper-slide {
+  height: auto !important;
 }

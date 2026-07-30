@@ -39,21 +39,31 @@ onMounted(() => fetchPosts(true))
         </div>
     </div>
 
-    <div class="flex gap-4 mb-20">
+    <div class="flex gap-4 mb-20 items-end">
         <div class="flex-grow">
             <div class="flex gap-2 mb-4">
                 <SlidersVerticalIcon />
                 {{ $t('header.filter_title') }}
             </div>
+            <div class="flex gap-4">
+                <Select v-model="params.status" @update:model-value="fetchPosts(true)">
+                    <SelectTrigger class="w-[180px]">
+                        <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="published">Published</SelectItem>
+                        <SelectItem value="draft">Drafts</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
-        <Form class="max-w-[320px] w-full flex items-center gap-2">
-            <Field name="search" v-slot="{ field }">
-                <Input v-bind="field" :placeholder="$t('header.search_placeholder', { name: 'blogs' })" />
-            </Field>
-            <Button variant="secondary" size="lg">
+        <form class="max-w-[320px] w-full flex items-center gap-2" @submit.prevent="fetchPosts(true)">
+            <Input v-model="params.s" :placeholder="$t('header.search_placeholder', { name: 'blogs' })" />
+            <Button type="submit" variant="secondary" size="lg">
                 <SearchIcon />
             </Button>
-        </Form>
+        </form>
     </div>
 
     <Table>
@@ -106,6 +116,24 @@ onMounted(() => fetchPosts(true))
             </TableRow>
         </TableBody>
     </Table>
+    
+    <!-- Pagination -->
+    <div v-if="params.total > params.per_page" class="mt-4 flex justify-end">
+        <Pagination v-slot="{ page }" :items-per-page="params.per_page" :total="params.total"
+            :sibling-count="1" show-edges :default-page="1" :page="params.current"
+            @update:page="p => { params.current = p; fetchPosts(true) }">
+            <PaginationContent v-slot="{ items }">
+                <PaginationPrevious />
+                <template v-for="(item, index) in items" :key="index">
+                    <PaginationItem v-if="item.type === 'page'" :value="item.value"
+                        :class="{ 'bg-primary text-white': item.value === page }">
+                    </PaginationItem>
+                </template>
+                <PaginationEllipsis :index="4" />
+                <PaginationNext />
+            </PaginationContent>
+        </Pagination>
+    </div>
 
     <Dialog :open="showForm" @update:open="showForm = $event">
         <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">

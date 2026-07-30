@@ -33,6 +33,7 @@ export type APIQuery = {
     show_draft?: string
     category?: string
     role?: string
+    status?: string
 }
 
 type TrekStats = {

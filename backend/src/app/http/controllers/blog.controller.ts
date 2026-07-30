@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken'
 export class BlogController {
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
-            const { per_page = 10, current = 1, s = '', sort } = request.query
+            const { per_page = 10, current = 1, s = '', sort, status } = request.query
             const skip = (current - 1) * per_page
 
             const whereQuery: Prisma.BlogPostWhereInput = {
@@ -18,7 +18,13 @@ export class BlogController {
             }
 
             if (s) {
-                whereQuery.title = { contains: s }
+                whereQuery.title = { contains: s as string }
+            }
+
+            if (status === 'published') {
+                whereQuery.published_at = { not: null }
+            } else if (status === 'draft') {
+                whereQuery.published_at = null
             }
 
             if (request.query.category) {

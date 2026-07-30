@@ -6,7 +6,7 @@ import { useBlogStore } from '~/store/blog'
 const { t } = useI18n()
 
 const { fetchPublicPosts, fetchCategories } = useBlogStore()
-const { posts, categories, isLoading } = storeToRefs(useBlogStore())
+const { posts, categories, isLoading, params } = storeToRefs(useBlogStore())
 
 useHead(() => {
     const title = t('public_blogs.seo_title') || 'Trailmandu Blogs & Stories'
@@ -170,6 +170,24 @@ onMounted(async () => {
 
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     <BlogCard v-for="post in (selectedCategory ? posts : remainingPosts)" :key="post.id" :post="post" />
+                </div>
+                
+                <!-- Pagination -->
+                <div v-if="params.total > params.per_page" class="mt-16 flex justify-center">
+                    <Pagination v-slot="{ page }" :items-per-page="params.per_page" :total="params.total"
+                        :sibling-count="1" show-edges :default-page="1" :page="params.current"
+                        @update:page="p => { params.current = p; fetchPublicPosts(selectedCategory || undefined) }">
+                        <PaginationContent v-slot="{ items }">
+                            <PaginationPrevious />
+                            <template v-for="(item, index) in items" :key="index">
+                                <PaginationItem v-if="item.type === 'page'" :value="item.value"
+                                    :class="{ 'bg-primary text-white': item.value === page }">
+                                </PaginationItem>
+                            </template>
+                            <PaginationEllipsis :index="4" />
+                            <PaginationNext />
+                        </PaginationContent>
+                    </Pagination>
                 </div>
             </template>
         </section>
