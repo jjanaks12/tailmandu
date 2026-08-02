@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EllipsisVerticalIcon, SquareCheckBigIcon, SquareIcon, TrashIcon, FolderInputIcon, Loader2Icon } from 'lucide-vue-next'
+import { EllipsisVerticalIcon, SquareCheckBigIcon, SquareIcon, TrashIcon, FolderInputIcon, Loader2Icon, UploadIcon } from 'lucide-vue-next'
 import type { Image } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { useMediaStore } from '~/store/media'
@@ -141,12 +141,12 @@ const handleMove = async () => {
             return
         }
 
-        await axios.post('/medias/move-images', {
+        await axios.post('/medias/link-images', {
             images: selectedIds.value.filter(id => id != null),
             gallery_id: galleryId
         })
 
-        toast.success('Images moved successfully')
+        toast.success('Images added successfully')
         showMoveDialog.value = false
         fetchImages()
         emit('refresh')
@@ -156,9 +156,63 @@ const handleMove = async () => {
         selectedGalleryId.value = ''
     } catch (error) {
         console.error(error)
-        toast.error('Failed to move images')
+        toast.error('Failed to add images')
     } finally {
         isMoving.value = false
+    }
+}
+
+// Drop target for dragged image cards
+const isCardDropOver = ref(false)
+let cardDropCounter = 0
+
+const onCardDragEnter = (e: DragEvent) => {
+    if (!e.dataTransfer?.types.includes('application/x-media-image')) return
+    e.preventDefault()
+    cardDropCounter++
+    isCardDropOver.value = true
+}
+
+const onCardDragOver = (e: DragEvent) => {
+    if (!e.dataTransfer?.types.includes('application/x-media-image')) return
+    e.preventDefault()
+    e.dataTransfer!.dropEffect = 'move'
+}
+
+const onCardDragLeave = (e: DragEvent) => {
+    if (!e.dataTransfer?.types.includes('application/x-media-image')) return
+    e.preventDefault()
+    cardDropCounter--
+    if (cardDropCounter <= 0) {
+        cardDropCounter = 0
+        isCardDropOver.value = false
+    }
+}
+
+const onCardDrop = async (e: DragEvent) => {
+    e.preventDefault()
+    cardDropCounter = 0
+    isCardDropOver.value = false
+
+    const raw = e.dataTransfer?.getData('application/x-media-image')
+    if (!raw) return
+
+    try {
+        const { imageId, sourceGalleryId } = JSON.parse(raw)
+        if (!sourceGalleryId) return // already uncategorized
+
+        // Unlink from source gallery (move to uncategorized)
+        await axios.post('/medias/move-images', {
+            images: [imageId],
+            gallery_id: '', // no target gallery
+            old_gallery_id: sourceGalleryId
+        })
+        toast.success('Image moved to uncategorized')
+        fetchImages()
+        emit('refresh')
+    } catch (error) {
+        console.error(error)
+        toast.error('Failed to move image')
     }
 }
 
@@ -169,10 +223,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <div ref="scrollContainer" class="relative">
+    <div ref="scrollContainer" class="relative" @dragenter="onCardDragEnter" @dragover="onCardDragOver"
+        @dragleave="onCardDragLeave" @drop="onCardDrop"
+        :class="{ 'ring-2 ring-primary/50 ring-offset-2 rounded-lg': isCardDropOver }">
         <div class="flex items-center justify-between py-5 px-1 mb-4 sticky top-[75px] bg-white z-10">
             <div class="grow">
-                <strong class="text-xl">Uncategorised</strong>
+                <strong class="text-xl">Uncategorised
+                    <span v-if="isCardDropOver"
+                        class="ml-2 text-sm font-normal text-primary animate-pulse">Drop here to unlink</span>
+                </strong>
             </div>
             <div class="flex gap-2">
                 <DropdownMenu :open="selectedIds.some(id => id != null)" :modal="false">
@@ -193,7 +252,7 @@ onMounted(() => {
                         <DropdownMenuSeparator v-if="hasSelected" />
                         <DropdownMenuItem @click="showMoveDialog = true" v-if="hasSelected">
                             <FolderInputIcon class="mr-2 size-4" />
-                            Move to gallery
+                            Add to gallery
                         </DropdownMenuItem>
                         <DropdownMenuItem @click="remove" v-if="hasSelected" class="text-destructive">
                             <TrashIcon class="mr-2 size-4" />
@@ -205,7 +264,7 @@ onMounted(() => {
         </div>
         <div class="grid grid-cols-4 gap-2">
             <PagesDashboardMediaCard v-for="(image, index) in uncategories" v-model:selected="selectedIds[index]"
-                :key="`uncategories_${index}`" :image="image" @update="emit('refresh')" />
+                :key="`uncategories_${index}`" :image="image" gallery-id="" @update="emit('refresh')" />
 
             <label
                 class="relative aspect-square border-2 border-dashed rounded-xl overflow-hidden flex flex-col items-center justify-center text-center cursor-pointer hover:bg-muted/50 transition-colors">
@@ -225,9 +284,9 @@ onMounted(() => {
         <Dialog v-model:open="showMoveDialog">
             <DialogContent class="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Move to Gallery</DialogTitle>
+                    <DialogTitle>Add to Gallery</DialogTitle>
                     <DialogDescription>
-                        Move the selected images to an existing gallery or create a new one.
+                        Add the selected images to an existing gallery or create a new one.
                     </DialogDescription>
                 </DialogHeader>
                 <div class="grid gap-4 py-4">

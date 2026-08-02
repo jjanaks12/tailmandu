@@ -1,20 +1,30 @@
 <script lang="ts" setup>
 import { breakpointsTailwind } from '@vueuse/core'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Virtual, Autoplay } from 'swiper/modules'
+import { Autoplay } from 'swiper/modules'
+import { useAxios } from '~/services/axios'
+import { showImage } from '~/lib/filters'
 
 const localePath = useLocalePath()
 const breakpoints = useBreakpoints(breakpointsTailwind)
+const { axios } = useAxios()
 
-const images = ["/images/home-slider15.jpg", "/images/home-slider01.webp", "/images/home-slider02.webp", "/images/home-slider03.jpg", "/images/home-slider04.webp", "/images/home-slider05.jpg", "/images/home-slider06.webp", "/images/home-slider07.webp", "/images/home-slider08.webp", "/images/home-slider09.jpg", "/images/home-slider10.jpg", "/images/home-slider11.jpg", "/images/home-slider12.jpg", "/images/home-slider13.jpg", "/images/home-slider14.jpg"]
+const images = ref<string[]>(["/images/home-slider15.jpg"])
+
+onMounted(async () => {
+    const { data } = await axios.get('/home/hero-slider')
+    if (data?.length) {
+        images.value = data.map((img: { file_name: string }) => showImage(img.file_name))
+    }
+})
 </script>
 
 <template>
     <section class="relative h-screen flex items-center mountain-bg pt-20 z-[1] overflow-hidden">
         <div class="absolute inset-0 z-[-1]">
-            <Swiper class="h-full" :modules="[Autoplay, Virtual]" loop
-                :autoplay="{ delay: 8000, disableOnInteraction: false }" virtual>
-                <SwiperSlide v-for="(image, index) in images" :key="image" :virtualIndex="index">
+            <Swiper class="h-full" :modules="[Autoplay]" loop
+                :autoplay="{ delay: 8000, disableOnInteraction: false }">
+                <SwiperSlide v-for="(image, index) in images" :key="image">
                     <img :src="image" alt="" class="w-full h-full object-cover">
                 </SwiperSlide>
             </Swiper>

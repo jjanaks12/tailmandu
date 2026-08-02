@@ -17,6 +17,7 @@ router.delete('/:id', [verifyAccessToken], MediaController.deleteGallery)
 router.delete('/:id/images', [verifyAccessToken], MediaController.deleteImage)
 router.put('/images/:id', [verifyAccessToken], MediaController.updateImage)
 router.post('/move-images', [verifyAccessToken], MediaController.moveImages)
+router.post('/link-images', [verifyAccessToken], MediaController.linkImages)
 router.get('/get_image/:id', [verifyAccessToken], MediaController.getImageById)
 
 export default router

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { EllipsisVerticalIcon, PencilIcon, SquareCheckBigIcon, TrashIcon, Loader2Icon } from 'lucide-vue-next'
+import { EllipsisVerticalIcon, PencilIcon, SquareCheckBigIcon, TrashIcon, Loader2Icon, FolderInputIcon, UploadIcon } from 'lucide-vue-next'
 import type { Gallery } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 import { toast } from 'vue-sonner'
 import { showImage } from '~/lib/filters'
+import { useMediaStore } from '~/store/media'
 
 interface MediaItemProps {
     gallery: Gallery
@@ -22,6 +23,71 @@ const props = defineProps<MediaItemProps>()
 const images = ref<LocalImage[]>([])
 const selectedImages = ref<string[] | null[]>([])
 const emit = defineEmits(['fetch', 'edit', 'delete'])
+
+const mediaStore = useMediaStore()
+const { galleryList } = storeToRefs(mediaStore)
+
+const showMoveDialog = ref(false)
+const isMoving = ref(false)
+const selectedGalleryId = ref('')
+const isNewGallery = ref(false)
+const newGalleryName = ref('')
+const moveActionType = ref('link')
+
+onMounted(() => {
+    mediaStore.fetchGalleryList()
+})
+
+const handleMove = async () => {
+    isMoving.value = true
+    try {
+        let galleryId = selectedGalleryId.value
+        const imageIds = selectedImages.value.filter(id => id != null)
+
+        if (isNewGallery.value && newGalleryName.value) {
+            const { data } = await axios.post('/medias', {
+                name: newGalleryName.value,
+                images: imageIds,
+                tags: []
+            })
+            galleryId = data.id
+        }
+
+        if (!galleryId) {
+            toast.error('Please select or create a gallery')
+            return
+        }
+
+        if (moveActionType.value === 'move') {
+            await axios.post('/medias/move-images', {
+                images: imageIds,
+                gallery_id: galleryId,
+                old_gallery_id: props.gallery.id
+            })
+            toast.success('Images moved successfully')
+        } else {
+            await axios.post('/medias/link-images', {
+                images: imageIds,
+                gallery_id: galleryId
+            })
+            toast.success('Images linked successfully')
+        }
+
+        showMoveDialog.value = false
+        emit('fetch')
+        init()
+        isNewGallery.value = false
+        newGalleryName.value = ''
+        selectedGalleryId.value = ''
+        moveActionType.value = 'link'
+    } catch (error) {
+        console.error(error)
+        toast.error('Failed to process images')
+    } finally {
+        isMoving.value = false
+    }
+}
+
 
 const editingImage = ref<{
     isLocal: boolean
@@ -145,15 +211,115 @@ watch(() => props.gallery, () => {
     init()
 })
 
+const isDropOver = ref(false)
+let dropCounter = 0
+
+const onUploadDragEnter = (e: DragEvent) => {
+    e.preventDefault()
+    dropCounter++
+    isDropOver.value = true
+}
+
+const onUploadDragOver = (e: DragEvent) => {
+    e.preventDefault()
+}
+
+const onUploadDragLeave = (e: DragEvent) => {
+    e.preventDefault()
+    dropCounter--
+    if (dropCounter <= 0) {
+        dropCounter = 0
+        isDropOver.value = false
+    }
+}
+
+const onUploadDrop = (e: DragEvent) => {
+    e.preventDefault()
+    dropCounter = 0
+    isDropOver.value = false
+
+    const files = e.dataTransfer?.files
+    if (!files || files.length === 0) return
+
+    for (const file of files) {
+        if (!file.type.startsWith('image/')) continue
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            images.value.push({
+                image: e.target?.result as string,
+                description: '',
+                tags: []
+            })
+        }
+        reader.readAsDataURL(file)
+    }
+}
+
+// Gallery-level drop target for dragging cards between galleries
+const isGalleryDropOver = ref(false)
+let galleryDropCounter = 0
+
+const onGalleryDragEnter = (e: DragEvent) => {
+    if (!e.dataTransfer?.types.includes('application/x-media-image')) return
+    e.preventDefault()
+    galleryDropCounter++
+    isGalleryDropOver.value = true
+}
+
+const onGalleryDragOver = (e: DragEvent) => {
+    if (!e.dataTransfer?.types.includes('application/x-media-image')) return
+    e.preventDefault()
+    e.dataTransfer!.dropEffect = 'move'
+}
+
+const onGalleryDragLeave = (e: DragEvent) => {
+    if (!e.dataTransfer?.types.includes('application/x-media-image')) return
+    e.preventDefault()
+    galleryDropCounter--
+    if (galleryDropCounter <= 0) {
+        galleryDropCounter = 0
+        isGalleryDropOver.value = false
+    }
+}
+
+const onGalleryDrop = async (e: DragEvent) => {
+    e.preventDefault()
+    galleryDropCounter = 0
+    isGalleryDropOver.value = false
+
+    const raw = e.dataTransfer?.getData('application/x-media-image')
+    if (!raw) return
+
+    try {
+        const { imageId, sourceGalleryId } = JSON.parse(raw)
+        if (sourceGalleryId === props.gallery.id) return // same gallery, ignore
+
+        await axios.post('/medias/link-images', {
+            images: [imageId],
+            gallery_id: props.gallery.id
+        })
+        toast.success('Image added to gallery')
+        emit('fetch')
+    } catch (error) {
+        console.error(error)
+        toast.error('Failed to add image to gallery')
+    }
+}
+
 onMounted(init)
 </script>
 
 <template>
-    <div class="relative space-y-5">
+    <div class="relative space-y-5" @dragenter="onGalleryDragEnter" @dragover="onGalleryDragOver"
+        @dragleave="onGalleryDragLeave" @drop="onGalleryDrop"
+        :class="{ 'ring-2 ring-primary/50 ring-offset-2 rounded-lg': isGalleryDropOver }">
         <div
             class="flex items-center justify-between sticky top-[75px] py-5 px-1 bg-white z-10 border-b border-dashed border-gray-200">
             <div class="grow">
-                <strong class="text-xl block mb-3">{{ gallery.name }}</strong>
+                <strong class="text-xl block mb-3">{{ gallery.name }}
+                    <span v-if="isGalleryDropOver"
+                        class="ml-2 text-sm font-normal text-primary animate-pulse">Drop here to add</span>
+                </strong>
                 <div class="flex gap-2">
                     <Badge variant="secondary" v-for="(tag, index) in gallery.tags" :key="`tag_${index}`">
                         {{ tag.name }}
@@ -175,6 +341,71 @@ onMounted(init)
                     <Button type="button" variant="destructive" size="icon" @click="emit('delete')">
                         <TrashIcon class="w-4 h-4" />
                     </Button>
+                    <Dialog v-model:open="showMoveDialog">
+                        <DialogContent class="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Move / Link to Gallery</DialogTitle>
+                                <DialogDescription>
+                                    Add the selected images to another gallery.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div class="grid gap-4 py-4">
+                                <div class="flex flex-col gap-2">
+                                    <Label>Action</Label>
+                                    <RadioGroup v-model="moveActionType" class="flex flex-col gap-2 mt-1">
+                                        <div class="flex items-center space-x-2">
+                                            <RadioGroupItem value="link" id="action-link" />
+                                            <Label for="action-link" class="cursor-pointer">Link to Gallery (keep in
+                                                current)</Label>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <RadioGroupItem value="move" id="action-move" />
+                                            <Label for="action-move" class="cursor-pointer">Move to Gallery (remove from
+                                                current)</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                                <div class="flex flex-col gap-2 mt-2">
+                                    <Label>Select Gallery</Label>
+                                    <Select v-model="selectedGalleryId" :disabled="isNewGallery">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Choose a gallery..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem
+                                                v-for="gallery in galleryList.filter(g => g.id !== props.gallery.id)"
+                                                :key="gallery.id" :value="gallery.id">
+                                                {{ gallery.name }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <Checkbox id="new-gallery" v-model="isNewGallery" />
+                                    <Label for="new-gallery" class="text-sm font-medium leading-none cursor-pointer">
+                                        Create new gallery
+                                    </Label>
+                                </div>
+                                <div v-if="isNewGallery"
+                                    class="flex flex-col gap-2 animate-in fade-in slide-in-from-top-2">
+                                    <Label>Gallery Name</Label>
+                                    <Input v-model="newGalleryName" placeholder="Enter new gallery name..." />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button modifier="outline" @click="showMoveDialog = false" :disabled="isMoving">
+                                    Cancel
+                                </Button>
+                                <Button @click="handleMove"
+                                    :disabled="isMoving || (!selectedGalleryId && !isNewGallery) || (isNewGallery && !newGalleryName)">
+                                    <Loader2Icon v-if="isMoving" class="mr-2 h-4 w-4 animate-spin" />
+                                    Apply
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+
                 </template>
                 <DropdownMenu :open="selectedImages.filter(id => id != null).length > 0" :modal="false">
                     <DropdownMenuTrigger as-child>
@@ -187,6 +418,11 @@ onMounted(init)
                             <SquareCheckBigIcon class="mr-2 size-4" />
                             {{ $t('options.select_all') }}
                         </DropdownMenuItem>
+                        <DropdownMenuItem @click="showMoveDialog = true" v-if="selectedImages.some(id => id != null)">
+                            <FolderInputIcon class="mr-2 size-4" />
+                            Move / Link
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem @click="deleteImage" class="text-destructive">
                             <TrashIcon class="mr-2 size-4" />
                             {{ $t('options.delete') }}
@@ -197,7 +433,8 @@ onMounted(init)
         </div>
         <div class="grid grid-cols-4 gap-2">
             <PagesDashboardMediaCard v-for="(image, index) in gallery.images" :key="`gallery_${index}`"
-                v-model:selected="selectedImages[index]" :image="image" @edit-details="openExistingImageEdit" />
+                v-model:selected="selectedImages[index]" :image="image" :gallery-id="gallery.id"
+                @edit-details="openExistingImageEdit" />
             <template v-if="images.length > 0">
                 <div v-for="(image, index) in images" :key="`images_${index}`"
                     class="relative aspect-square border rounded-md overflow-hidden flex items-center justify-center cursor-pointer group"
@@ -212,10 +449,15 @@ onMounted(init)
                 </div>
             </template>
             <label
-                class="relative aspect-square border rounded-md overflow-hidden flex items-center justify-center text-center cursor-pointer hover:bg-gray-50 transition-colors">
+                class="relative aspect-square border-2 border-dashed rounded-md overflow-hidden flex items-center justify-center text-center cursor-pointer transition-colors"
+                :class="isDropOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:bg-gray-50 hover:border-muted-foreground/40'"
+                @dragenter="onUploadDragEnter" @dragover="onUploadDragOver" @dragleave="onUploadDragLeave"
+                @drop="onUploadDrop">
                 <input type="file" multiple @change="handleImageChange" class="invisible absolute" />
-                <div class="">
-                    <span>Click here to upload images</span>
+                <div class="flex flex-col items-center gap-2 p-4 text-muted-foreground">
+                    <UploadIcon class="w-6 h-6" :class="{ 'text-primary animate-bounce': isDropOver }" />
+                    <span class="text-sm font-medium" v-if="isDropOver">Drop images here</span>
+                    <span class="text-sm font-medium" v-else>Click or drop images here</span>
                 </div>
             </label>
         </div>

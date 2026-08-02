@@ -5,11 +5,13 @@ export class HomeController {
     public static async gallery(request: Request, response: Response, next: NextFunction) {
         const data = await prisma.image.findMany({
             where: {
-                gallery: {
-                    tags: {
-                        some: {
-                            name: {
-                                in: request.query.tags as string[]
+                galleries: {
+                    some: {
+                        tags: {
+                            some: {
+                                name: {
+                                    in: request.query.tags as string[]
+                                }
                             }
                         }
                     }
@@ -21,6 +23,34 @@ export class HomeController {
             take: parseInt(request.query.take as string) ?? 10
         })
         response.json(data)
+    }
+
+    public static async heroSlider(request: Request, response: Response, next: NextFunction) {
+        try {
+            const galleryName = (request.query.name as string) || 'Home gallery'
+
+            const gallery = await prisma.gallery.findFirst({
+                where: {
+                    name: galleryName,
+                    deleted_at: null
+                },
+                include: {
+                    images: {
+                        select: {
+                            id: true,
+                            file_name: true
+                        },
+                        orderBy: {
+                            created_at: 'desc'
+                        }
+                    }
+                }
+            })
+
+            response.json(gallery?.images ?? [])
+        } catch (error) {
+            next(error)
+        }
     }
 
     public static async sponsors(request: Request, response: Response, next: NextFunction) {
@@ -44,7 +74,28 @@ export class HomeController {
                     priority: 'asc'
                 }
             })
-            response.json(data)
+
+            console.log(data)
+
+            const sanitizeDates = (obj: any): any => {
+                if (obj === null || obj === undefined) return obj;
+                if (obj instanceof Date) {
+                    return isNaN(obj.getTime()) ? null : obj;
+                }
+                if (Array.isArray(obj)) {
+                    return obj.map(sanitizeDates);
+                }
+                if (typeof obj === 'object') {
+                    const sanitized: any = {};
+                    for (const key in obj) {
+                        sanitized[key] = sanitizeDates(obj[key]);
+                    }
+                    return sanitized;
+                }
+                return obj;
+            }
+
+            response.json(sanitizeDates(data))
         } catch (error) {
             next(error)
         }

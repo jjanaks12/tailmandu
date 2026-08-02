@@ -201,8 +201,7 @@ model Image {
   stage_category_payments StageCategoryPayment[]
   // stage_category_bibs     StageCategory[]        @relation("stage_category_bib")
   tags                    Tag[]
-  gallery                 Gallery?               @relation(fields: [galleryId], references: [id])
-  galleryId               String?
+  galleries               Gallery[]              @relation("GalleryToImage")
   treks                   Trek[]
   product_thumbnails      Product[]              @relation("product_thumbnail")
   blog_posts              BlogPost[]             @relation("blog_featured_image")
@@ -613,7 +612,7 @@ model Gallery {
   deleted_at  DateTime?
   hide_gallery Boolean   @default(true)
 
-  images   Image[]
+  images        Image[] @relation("GalleryToImage")
   tags     Tag[]
   events   TrailRace[]
   treks    Trek[]

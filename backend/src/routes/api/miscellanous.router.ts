@@ -45,6 +45,7 @@ router.put('/payments/:payment_id', [verifyAccessToken], PaymentController.updat
 
 // GALLERY
 router.get('/home/galleries', [], HomeController.gallery)
+router.get('/home/hero-slider', [], HomeController.heroSlider)
 router.get('/home/sponsors', [], HomeController.sponsors)
 
 export default router

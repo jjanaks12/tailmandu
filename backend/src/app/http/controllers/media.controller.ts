@@ -353,26 +353,18 @@ export class MediaController {
             const { per_page = 10, current = 1, s = '', sort } = request.query
             const skip = (current - 1) * per_page
 
-            // Determine the gallery ID query condition:
-            // - If the requested ID is 'uncategorized', look for images with no gallery (galleryId: null).
-            // - If a specific gallery ID is provided, look for that ID.
-            // - If no ID is provided, look for images belonging to any gallery (galleryId: { not: null }).
-            const galleryIdCondition = request.params.id === 'uncategorized' ? null : (request.params.id || { not: null })
+            // Determine the gallery ID query condition for M2M:
+            const whereClause: any = {}
 
-            // Check if the current request is from an authenticated administrator (via optional token middleware)
-            const isAdmin = !!(request.body as any).auth_user
-
-            // Initialize the query filter options
-            const whereClause: any = {
-                galleryId: galleryIdCondition
-            }
-
-            // Exclude images from deleted galleries. For public requests (non-admin),
-            // also exclude images from galleries that are marked as hidden (hide_gallery: true).
-            if (request.params.id !== 'uncategorized') {
-                whereClause.gallery = {
-                    deleted_at: null,
-                    hide_gallery: false
+            if (request.params.id === 'uncategorized') {
+                whereClause.galleries = { none: {} }
+            } else {
+                whereClause.galleries = {
+                    some: {
+                        ...(request.params.id ? { id: request.params.id } : {}),
+                        deleted_at: null,
+                        hide_gallery: false
+                    }
                 }
             }
 
@@ -481,16 +473,50 @@ export class MediaController {
             if (!images || images.length === 0) throw createHttpError.UnprocessableEntity('Images is required')
             if (!gallery_id) throw createHttpError.UnprocessableEntity('Gallery is required')
 
-            await prisma.image.updateMany({
-                where: {
-                    id: { in: images }
-                },
+            // Connect to new gallery
+            await prisma.gallery.update({
+                where: { id: gallery_id },
                 data: {
-                    galleryId: gallery_id
+                    images: {
+                        connect: images.map((id: string) => ({ id }))
+                    }
                 }
             })
 
+            // Disconnect from old gallery if provided
+            if (request.body.old_gallery_id) {
+                await prisma.gallery.update({
+                    where: { id: request.body.old_gallery_id },
+                    data: {
+                        images: {
+                            disconnect: images.map((id: string) => ({ id }))
+                        }
+                    }
+                })
+            }
+
             response.send('Moved successfully')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async linkImages(request: Request, response: Response, next: NextFunction) {
+        try {
+            const { images, gallery_id } = request.body
+            if (!images || images.length === 0) throw createHttpError.UnprocessableEntity('Images is required')
+            if (!gallery_id) throw createHttpError.UnprocessableEntity('Gallery is required')
+
+            await prisma.gallery.update({
+                where: { id: gallery_id },
+                data: {
+                    images: {
+                        connect: images.map((id: string) => ({ id }))
+                    }
+                }
+            })
+
+            response.send('Linked successfully')
         } catch (error) {
             next(error)
         }
