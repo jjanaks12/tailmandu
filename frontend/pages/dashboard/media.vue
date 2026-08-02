@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PlusIcon, RefreshCcwIcon } from 'lucide-vue-next'
+import { PlusIcon, RefreshCcwIcon, SearchIcon } from 'lucide-vue-next'
 import type { Gallery, Image } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
@@ -20,6 +20,13 @@ const showDeleteGalleryDialog = ref(false)
 
 const galleries = ref<Gallery[]>([])
 
+const searchQuery = ref('')
+const filteredGalleries = computed(() => {
+    if (!searchQuery.value) return galleries.value
+    const query = searchQuery.value.toLowerCase()
+    return galleries.value.filter(g => g.name.toLowerCase().includes(query))
+})
+
 const fetch = async () => {
     galleries.value = []
 
@@ -38,12 +45,18 @@ onMounted(fetch)
 </script>
 
 <template>
-    <div class="flex items-center justify-between mb-16">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div class="grow">
             <h1 class="text-2xl font-bold">{{ $t('dashboard.media.title') }}</h1>
             <p class="text-muted-foreground">{{ $t('dashboard.media.description') }}</p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <div class="relative w-full sm:w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SearchIcon class="h-4 w-4 text-muted-foreground" />
+                </div>
+                <Input v-model="searchQuery" type="text" placeholder="Search galleries..." class="pl-9 w-full" />
+            </div>
             <Button @click="showGalleryForm = true" modifier="outline">
                 <PlusIcon class="w-4 h-4 mr-2" />
                 {{ $t('dashboard.media.add_gallery') }}
@@ -53,7 +66,7 @@ onMounted(fetch)
             </Button>
         </div>
     </div>
-    <PagesDashboardMediaList :galleries="galleries"
+    <PagesDashboardMediaList :galleries="filteredGalleries"
         @edit="selectedGallery = $event; showGalleryForm = true"
         @delete="selectedGallery = $event; showDeleteGalleryDialog = true" @fetch="fetch" />
     <Dialog v-model:open="showGalleryForm" @update:open="showGalleryForm = false; selectedGallery = null">

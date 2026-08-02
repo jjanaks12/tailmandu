@@ -476,7 +476,7 @@ definePageMeta({
                                     <TableCell>{{ item.order.user?.personal?.first_name || 'Guest' }} {{
                                         item.order.user?.personal?.last_name }}</TableCell>
                                     <TableCell>{{ item.quantity }}</TableCell>
-                                    <TableCell>${{ item.unit_price }}</TableCell>
+                                    <TableCell>${{ Number(item.unit_price)?.toLocaleString() }}</TableCell>
                                     <TableCell>
                                         <Badge variant="outline">{{ item.order.status }}</Badge>
                                     </TableCell>

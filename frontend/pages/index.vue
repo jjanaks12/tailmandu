@@ -131,7 +131,7 @@ onMounted(fetchSponsors)
                         class="relative overflow-hidden rounded-3xl group p-12 h-96 flex flex-col justify-end text-white">
                         <img alt="Runner profile"
                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4CFZyaizmlgUrzCe-QtRExAoNvZ-2bkDFoLe-zXjoh4CZ7fOJo-YfaiCPd8Q59jx1rMUGi7gyBnwXvQU3_NZcXcV-t71SXF5hsSQXbySZq9OrYaN3u1rOoklkp0Ks4Mph5vk0glUXNsulT9WkJFJkNXTgISLvz8W83ydFGuc_1zd-Y4-9XnN2OvfhYVaHFJCXsPk8PGuVXtQD8xG0jbNm5hYyCFzBv9G-7oFS75ePtpjFaxw6NbWfp87YbsIsYV2f_LtH5qLk-JI" />
+                            src="/images/home-runner.png" />
                         <div class="absolute inset-0 bg-gradient-to-t from-deep-slate via-deep-slate/40 to-transparent">
                         </div>
                         <div class="relative z-10">

@@ -79,8 +79,7 @@ onMounted(() => {
                         <div>
                             <div class="font-bold text-foreground text-sm flex items-center gap-2">
                                 {{ booking.lead_name || 'Anonymous' }}
-                                <Badge v-if="booking.lead_dietary || booking.lead_fitness_level"
-                                    variant="secondary"
+                                <Badge v-if="booking.lead_dietary || booking.lead_fitness_level" variant="secondary"
                                     class="text-[8px] px-1 py-0 h-4 bg-amber-100 text-amber-700 hover:bg-amber-100">
                                     Has Info</Badge>
                             </div>
@@ -111,26 +110,22 @@ onMounted(() => {
                             </select>
                         </div>
                     </div>
-                    <div
-                        class="grid grid-cols-2 gap-3 text-xs text-foreground bg-muted/20 p-3 rounded-md">
+                    <div class="grid grid-cols-2 gap-3 text-xs text-foreground bg-muted/20 p-3 rounded-md">
                         <div>
                             <span
                                 class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Departure</span>
                             {{ new Date(booking.departure_date).toLocaleDateString() }}
                         </div>
                         <div>
-                            <span
-                                class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Group
+                            <span class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Group
                                 Size</span> {{ booking.adults + booking.children }} total
                         </div>
                         <div>
-                            <span
-                                class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Total
-                                Value</span> NPR {{ booking.total_price.toLocaleString() }}
+                            <span class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Total
+                                Value</span> ${{ Number(booking.total_price)?.toLocaleString() }}
                         </div>
                         <div>
-                            <span
-                                class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Gear
+                            <span class="text-muted-foreground font-bold uppercase text-[10px] block mb-0.5">Gear
                                 Add-on</span>
                             <span class="capitalize">{{ booking.gear_option }}</span>
                         </div>
@@ -146,8 +141,8 @@ onMounted(() => {
                             <div v-for="(traveler, idx) in booking.travelers" :key="idx"
                                 class="bg-card border border-border rounded-md p-2 hover:bg-muted/10 transition-colors">
                                 <div class="font-bold flex items-center justify-between">
-                                    <span>{{ traveler.name || 'Unnamed' }} <Badge
-                                            v-if="traveler.is_lead" variant="outline"
+                                    <span>{{ traveler.name || 'Unnamed' }} <Badge v-if="traveler.is_lead"
+                                            variant="outline"
                                             class="ml-1 text-[8px] px-1 py-0 h-4 border-primary text-primary">
                                             Lead</Badge></span>
                                     <span class="text-xs text-muted-foreground font-normal">{{
@@ -157,7 +152,7 @@ onMounted(() => {
                                     class="mt-1 flex flex-wrap gap-2 text-muted-foreground italic text-[10px] bg-muted/20 px-2 py-1 rounded">
                                     <span v-if="traveler.age">Age: {{ traveler.age }}</span>
                                     <span v-if="traveler.nationality">From: {{ traveler.nationality
-                                    }}</span>
+                                        }}</span>
                                     <span v-if="traveler.dietary" class="w-full">Diet: {{
                                         traveler.dietary }}</span>
                                 </div>
