@@ -1,6 +1,6 @@
-<script lang="ts" setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { Maximize, Expand, Shrink, Play, Pause } from 'lucide-vue-next'
+<script setup lang="ts">
+import { ref, computed, onMounted, watch, onBeforeUnmount, nextTick } from 'vue'
+import { Loader2Icon, Expand, Shrink, Maximize } from 'lucide-vue-next'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -13,16 +13,19 @@ interface Place {
     routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
 }
 
-interface Props {
-    itinerary?: any[]
-    elevationProfile?: any[]
-    routingMode?: 'route' | 'direct'
-    activeDayIndex?: number | null
-}
+const props = defineProps<{
+    routingMode: 'route' | 'direct'
+}>()
 
-const props = defineProps<Props>()
+const itinerary = defineModel<{ day: string, title: string, description: string, places?: Place[] }[]>('itinerary', { required: true, default: () => [] })
+const elevationProfile = defineModel<{ lat: number, lng: number, elevation: number }[]>('elevationProfile', { required: true, default: () => [] })
+const activeDayIndex = defineModel<number | null>('activeDayIndex', { required: true, default: null })
 
-const mapEl = ref<HTMLElement | null>(null)
+const emit = defineEmits<{
+    (e: 'focusPlace', lat: number, lng: number): void
+}>()
+
+// Leaflet Map states
 let map: any = null
 let polyline: any = null
 let polylines: any[] = []
@@ -32,16 +35,27 @@ const markersMap = new Map<string, any>()
 let animationFrameId: number | null = null
 let nextLegTimeoutId: any = null
 
+const searchQuery = ref('')
+const isSearchingLocation = ref(false)
+const searchResults = ref<any[]>([])
+const isMotionEnabled = ref(false)
+
 const isFullScreen = ref(false)
 
 const toggleFullScreen = () => {
     isFullScreen.value = !isFullScreen.value
-    // Need to invalidate map size after a short delay to let CSS transition finish
     setTimeout(() => {
-        if (map) {
-            map.invalidateSize()
-        }
+        if (map) map.invalidateSize()
     }, 300)
+}
+
+const fitMap = () => {
+    if (!map) return
+    const places = itinerary.value.flatMap((day: any) => day.places || [])
+    if (places.length > 0) {
+        const bounds = L.latLngBounds(places.map((p: any) => [p.lat, p.lng] as L.LatLngTuple))
+        map.fitBounds(bounds, { padding: [40, 40] })
+    }
 }
 
 const handleKeydown = (e: KeyboardEvent) => {
@@ -50,13 +64,10 @@ const handleKeydown = (e: KeyboardEvent) => {
     }
 }
 
-const isMotionEnabled = ref(true)
+watch(() => props.routingMode, () => {
+    drawRoute()
+})
 
-const toggleMotion = () => {
-    isMotionEnabled.value = !isMotionEnabled.value
-}
-
-const elevationProfile = ref<{ lat: number, lng: number, elevation: number }[]>([])
 const hoveredPoint = ref<any | null>(null)
 let hoverMarker: any = null
 const svgRef = ref<SVGElement | null>(null)
@@ -129,20 +140,34 @@ watch(hoveredPoint, (point) => {
     }
 })
 
-onMounted(() => {
+const toggleMotion = () => {
+    isMotionEnabled.value = !isMotionEnabled.value
+    if (isMotionEnabled.value) {
+        drawRoute()
+    } else {
+        stopAnimation()
+        if (animatedMarker) {
+            animatedMarker.remove()
+            animatedMarker = null
+        }
+    }
+}
+
+onMounted(async () => {
+    await nextTick()
     initMap()
     drawRoute()
-    if (props.activeDayIndex !== null && props.activeDayIndex !== undefined) {
-        focusOnDay(props.activeDayIndex)
-    }
     window.addEventListener('keydown', handleKeydown)
 })
 
 onBeforeUnmount(() => {
     stopAnimation()
-    destroyMap()
     polylines.forEach(p => p.remove())
     polylines = []
+    if (map) {
+        map.remove()
+        map = null
+    }
     if (hoverMarker) {
         hoverMarker.remove()
         hoverMarker = null
@@ -150,22 +175,80 @@ onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleKeydown)
 })
 
-const initMap = () => {
-    if (!L || !mapEl.value) return
-    map = L.map(mapEl.value).setView([27.7172, 85.3240], 8)
+/**
+ * Initializes the Leaflet map and sets the default view.
+ * It also attaches a click listener to the map to allow users to add new waypoints.
+ */
+function initMap() {
+    const el = document.getElementById('itinerary-editor-map')
+    if (!el) return
+
+    if (map) {
+        try {
+            map.remove()
+        } catch (e) {
+            console.error('Error removing map', e)
+        }
+        map = null
+    }
+
+    // Default set view to Nepal region coordinates
+    map = L.map(el).setView([28.3949, 84.1240], 7)
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map)
+
+    // Click to add coordinates to the active day
+    map.on('click', async (e: any) => {
+        if (activeDayIndex.value === null) return
+        const day = itinerary.value[activeDayIndex.value]
+        day.places = day.places || []
+
+        const lat = e.latlng.lat
+        const lng = e.latlng.lng
+        const name = `Waypoint ${day.places.length + 1}`
+
+        const newPlace: Place = { name, lat, lng }
+        day.places.push(newPlace)
+
+        // Fetch elevation and name in background
+        fetchPlaceDetails(newPlace)
+    })
 }
 
-const destroyMap = () => {
-    if (map) {
-        map.remove()
-        map = null
+/**
+ * Fetches additional metadata for a newly added place.
+ * Queries Open-Meteo for the elevation and Nominatim for reverse geocoding (place name).
+ */
+async function fetchPlaceDetails(place: Place) {
+    // Fetch Elevation from Open-Meteo API
+    try {
+        const res = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${place.lat}&longitude=${place.lng}`)
+        const data = await res.json()
+        if (data && data.elevation && data.elevation.length > 0) {
+            place.elevation = Math.round(data.elevation[0])
+        }
+    } catch (err) {
+        console.error('Failed to fetch elevation', err)
+    }
+
+    // Fetch Name from Nominatim Reverse Geocoding API if name starts with 'Waypoint'
+    if (place.name.startsWith('Waypoint')) {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${place.lat}&lon=${place.lng}&format=json&accept-language=en`)
+            const data = await res.json()
+            const fetchedName = data.name || data.display_name?.split(',')[0]
+            if (fetchedName) {
+                place.name = fetchedName
+            }
+        } catch (err) {
+            console.error('Failed to reverse geocode', err)
+        }
     }
 }
 
-const stopAnimation = () => {
+function stopAnimation() {
     if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId)
         animationFrameId = null
@@ -176,29 +259,29 @@ const stopAnimation = () => {
     }
 }
 
-const sampleCoords = (coords: L.LatLngTuple[], maxPoints = 80): L.LatLngTuple[] => {
+function sampleCoords(coords: L.LatLngTuple[], maxPoints = 80): L.LatLngTuple[] {
     if (coords.length === 0) return []
     if (coords.length === 1) return coords
-    
+
     const distances = [0]
     for (let i = 1; i < coords.length; i++) {
-        distances.push(distances[i-1] + L.latLng(coords[i-1]).distanceTo(L.latLng(coords[i])))
+        distances.push(distances[i - 1] + L.latLng(coords[i - 1]).distanceTo(L.latLng(coords[i])))
     }
     const totalDist = distances[distances.length - 1]
-    
+
     if (totalDist === 0) return coords
-    
+
     const sampled: L.LatLngTuple[] = []
     const step = totalDist / (maxPoints - 1)
-    
+
     for (let i = 0; i < maxPoints; i++) {
         const targetDist = i * step
         for (let j = 0; j < distances.length - 1; j++) {
-            if (targetDist >= distances[j] && (targetDist <= distances[j+1] || j === distances.length - 2)) {
-                const segmentDist = distances[j+1] - distances[j]
+            if (targetDist >= distances[j] && (targetDist <= distances[j + 1] || j === distances.length - 2)) {
+                const segmentDist = distances[j + 1] - distances[j]
                 const fraction = segmentDist === 0 ? 0 : (targetDist - distances[j]) / segmentDist
-                const lat = coords[j][0] + (coords[j+1][0] - coords[j][0]) * fraction
-                const lng = coords[j][1] + (coords[j+1][1] - coords[j][1]) * fraction
+                const lat = coords[j][0] + (coords[j + 1][0] - coords[j][0]) * fraction
+                const lng = coords[j][1] + (coords[j + 1][1] - coords[j][1]) * fraction
                 sampled.push([lat, lng])
                 break
             }
@@ -207,7 +290,12 @@ const sampleCoords = (coords: L.LatLngTuple[], maxPoints = 80): L.LatLngTuple[] 
     return sampled
 }
 
-const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
+/**
+ * Fetches or calculates the elevation profile for the entire route.
+ * It first samples coordinates along the route at equal intervals.
+ * It attempts to fetch elevations from Open-Meteo, and falls back to local linear interpolation if the API fails.
+ */
+async function fetchElevationProfile(coords: L.LatLngTuple[]) {
     if (coords.length === 0) return []
     const sampled = sampleCoords(coords, 80)
     try {
@@ -227,7 +315,7 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
     }
 
     // Fallback: Linear interpolation using the places' elevations
-    const places = (props.itinerary || []).flatMap((day: any) => day.places || [])
+    const places = itinerary.value.flatMap((day: any) => day.places || [])
     const validPlaces = places.filter(p => p.elevation !== undefined && p.elevation !== null)
     if (validPlaces.length === 0) {
         return sampled.map(coord => ({ lat: coord[0], lng: coord[1], elevation: 0 }))
@@ -299,7 +387,7 @@ const fetchElevationProfile = async (coords: L.LatLngTuple[]) => {
     })
 }
 
-const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight') => {
+function getPolylineOptions(type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight') {
     switch (type) {
         case 'flight':
             return { color: '#3b82f6', weight: 3, opacity: 0.8, dashArray: '8, 8' }
@@ -315,7 +403,7 @@ const getPolylineOptions = (type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
     }
 }
 
-const getRouteIcon = (type: string) => {
+function getRouteIcon(type: string) {
     switch (type) {
         case 'flight': return '✈️'
         case 'bike': return '🚴'
@@ -326,7 +414,11 @@ const getRouteIcon = (type: string) => {
     }
 }
 
-const fetchRouteGeometry = async (from: Place, to: Place, type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'): Promise<L.LatLngTuple[]> => {
+/**
+ * Fetches the exact route geometry from BRouter (better for hiking/trails).
+ * Falls back to a straight line if it fails or if the route detour is absurdly long.
+ */
+async function fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'): Promise<L.LatLngTuple[]> {
     if (type === 'flight' || type === 'offroad') {
         return [[from.lat, from.lng], [to.lat, to.lng]]
     }
@@ -348,6 +440,7 @@ const fetchRouteGeometry = async (from: Place, to: Place, type: 'foot' | 'bike' 
             const trackLength = parseInt(feature.properties['track-length']) || 0
             const straightLineDist = L.latLng(from.lat, from.lng).distanceTo(L.latLng(to.lat, to.lng))
 
+            // Safeguard against absurd routing (e.g. going out of country due to disconnected graphs)
             if (straightLineDist > 500 && (trackLength > straightLineDist * 5 || trackLength < straightLineDist * 0.2)) {
                 console.warn(`BRouter route rejected (absurd distance: ${trackLength}m vs ${straightLineDist}m). Falling back to straight line.`)
                 return [[from.lat, from.lng], [to.lat, to.lng]]
@@ -362,7 +455,12 @@ const fetchRouteGeometry = async (from: Place, to: Place, type: 'foot' | 'bike' 
     return [[from.lat, from.lng], [to.lat, to.lng]]
 }
 
-const drawRoute = async () => {
+/**
+ * Main rendering function that redraws the entire route on the map.
+ * It clears existing layers, draws markers for each place, and draws polylines
+ * connecting each place. It also orchestrates fetching the elevation profile and starting the animation.
+ */
+async function drawRoute() {
     if (!L || !map) return
 
     // Clear old layers
@@ -375,14 +473,14 @@ const drawRoute = async () => {
     if (animatedMarker) animatedMarker.remove()
     stopAnimation()
 
-    const places = (props.itinerary || []).flatMap((day: any) => day.places || [])
+    const places = itinerary.value.flatMap((day: any) => day.places || [])
     if (places.length === 0) {
         elevationProfile.value = []
         return
     }
 
-    // Draw static markers for all locations using custom divIcon to avoid global image-hiding CSS
-    places.forEach((place: Place, index: number) => {
+    // Draw static markers
+    places.forEach((place: Place) => {
         const customIcon = L.divIcon({
             html: `
                 <div style="
@@ -493,51 +591,53 @@ const drawRoute = async () => {
     // Fit map boundaries to contain the path
     if (routeCoords.length > 0) {
         const bounds = L.latLngBounds(routeCoords)
-        map.fitBounds(bounds, { padding: [50, 50] })
+        map.fitBounds(bounds, { padding: [40, 40] })
     }
 
-    // Fetch elevation profile in background if not already pre-saved in the database
-    if (props.elevationProfile && props.elevationProfile.length > 0) {
-        elevationProfile.value = props.elevationProfile
-    } else {
-        elevationProfile.value = await fetchElevationProfile(routeCoords)
-    }
+    // Fetch elevation profile in background
+    elevationProfile.value = await fetchElevationProfile(routeCoords)
 
-    // Create the animated marker with a custom Lucide navigation icon and pulsing effect
-    const animatedIcon = L.divIcon({
-        html: `
-            <div style="position: relative; width: 24px; height: 24px;">
-                <div class="moving-marker-pulse"></div>
-                <div class="moving-marker-icon" style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #44859d;
-                    color: white;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    border: 2px solid white;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    transition: transform 0.1s linear;
-                ">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                    </svg>
+    // Create the animated marker with a custom Lucide navigation icon and pulsing effect only if motion is enabled
+    if (isMotionEnabled.value) {
+        const animatedIcon = L.divIcon({
+            html: `
+                <div style="position: relative; width: 24px; height: 24px;">
+                    <div class="moving-marker-pulse"></div>
+                    <div class="moving-marker-icon" style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #ef4444;
+                        color: white;
+                        width: 24px;
+                        height: 24px;
+                        border-radius: 50%;
+                        border: 2px solid white;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        transition: transform 0.1s linear;
+                    ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                        </svg>
+                    </div>
                 </div>
-            </div>
-        `,
-        className: 'custom-moving-icon',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-    })
-    animatedMarker = L.marker(routeCoords[0], { icon: animatedIcon }).addTo(map)
+            `,
+            className: 'custom-moving-icon',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        })
+        animatedMarker = L.marker(routeCoords[0], { icon: animatedIcon }).addTo(map)
 
-    // Start animating
-    animateMarker(routeCoords, places)
+        // Start animating
+        animateMarker(routeCoords, places)
+    }
 }
 
-const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
+/**
+ * Animates a marker along the drawn route.
+ * Uses requestAnimationFrame to smoothly interpolate the marker's position between waypoints.
+ */
+function animateMarker(points: L.LatLngTuple[], places: Place[]) {
     if (points.length < 2 || !animatedMarker) return
 
     let currentLeg = 0
@@ -550,12 +650,6 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
     animatedMarker.setLatLng(startPoint)
 
     const animate = (timestamp: number) => {
-        if (!isMotionEnabled.value) {
-            lastFrameTime = 0
-            animationFrameId = requestAnimationFrame(animate)
-            return
-        }
-
         if (!lastFrameTime) {
             lastFrameTime = timestamp
             animationFrameId = requestAnimationFrame(animate)
@@ -564,7 +658,7 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
         const deltaTime = timestamp - lastFrameTime
         lastFrameTime = timestamp
 
-        // If the elapsed time is too long, skip to prevent huge jumps
+        // If elapsed time is too long, skip to prevent huge jumps
         if (deltaTime > 100) {
             animationFrameId = requestAnimationFrame(animate)
             return
@@ -591,7 +685,7 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
         const progressDelta = totalPixelDistance > 0 ? (step / totalPixelDistance) : 1
         progress = Math.min(progress + progressDelta, 1)
 
-        // Interpolate LatLng based on progress to ensure it stays exactly on the path
+        // Interpolate LatLng based on progress
         const currentLat = startLatLng.lat + (endLatLng.lat - startLatLng.lat) * progress
         const currentLng = startLatLng.lng + (endLatLng.lng - startLatLng.lng) * progress
         const currentLatLng = L.latLng(currentLat, currentLng)
@@ -608,7 +702,7 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
             }
         }
 
-        // Keep map centered on the marker only if not all places are currently visible in the viewport
+        // Keep map centered on marker if it goes out of bounds
         if (map) {
             const bounds = map.getBounds()
             const allVisible = places.every((p: Place) => bounds.contains(L.latLng(p.lat, p.lng)))
@@ -623,7 +717,6 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
             // Check if the node we just reached is one of the user's stopovers (within 25m)
             const reachedUserWaypoint = places.some((p: Place) => endLatLng.distanceTo(L.latLng(p.lat, p.lng)) < 25)
 
-            // Leg completed! Reset progress
             progress = 0
 
             // Advance or reverse to the next leg
@@ -643,7 +736,7 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
 
             if (reachedUserWaypoint) {
                 // Pause slightly at stopover before starting next leg
-                lastFrameTime = 0 // Reset frame time so we don't have a jump
+                lastFrameTime = 0
                 nextLegTimeoutId = setTimeout(() => {
                     animationFrameId = requestAnimationFrame(animate)
                 }, 500)
@@ -657,95 +750,140 @@ const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
     animationFrameId = requestAnimationFrame(animate)
 }
 
-watch(() => [props.itinerary, props.routingMode], () => {
+// Watch places changes to redraw route & animation
+watch(() => itinerary.value.map(day => (day.places || []).map(p => `${p.lat},${p.lng},${p.name},${p.offRoad},${p.routeType}`)), () => {
     drawRoute()
 }, { deep: true })
 
-const focusOnDay = (dayIndex: number) => {
-    if (!map || !props.itinerary) return
-    const day = props.itinerary[dayIndex]
-
-    if (day && day.places && day.places.length > 0) {
-        if (day.places.length > 1) {
-            const bounds = L.latLngBounds(day.places.map((p: Place) => [p.lat, p.lng] as L.LatLngTuple))
-            map.fitBounds(bounds, { padding: [100, 100], maxZoom: 12 })
-        } else {
-            const firstPlace = day.places[0]
-            map.setView([firstPlace.lat, firstPlace.lng], 12)
-        }
-
-        // Open popup of the first place of this day
-        const firstPlace = day.places[0]
-        const marker = markersMap.get(`${firstPlace.lat}-${firstPlace.lng}`)
-        if (marker) {
-            setTimeout(() => {
-                if (marker) marker.openPopup()
-            }, 200)
-        }
+const searchLocation = async () => {
+    if (!searchQuery.value.trim()) return
+    isSearchingLocation.value = true
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery.value)}&format=json&limit=5`)
+        searchResults.value = await response.json()
+    } catch (e) {
+        console.error('Failed to search location', e)
+    } finally {
+        isSearchingLocation.value = false
     }
 }
 
-watch(() => props.activeDayIndex, (newVal) => {
-    if (newVal === null || newVal === undefined) return
-    focusOnDay(newVal)
-})
+const selectSearchResult = (res: any) => {
+    const lat = Number(res.lat)
+    const lng = Number(res.lon)
+    const name = res.name || res.display_name.split(',')[0]
 
-const fitMap = () => {
-    if (!map) return
-    const places = (props.itinerary || []).flatMap((day: any) => day.places || [])
-    if (places.length > 0) {
-        const bounds = L.latLngBounds(places.map(p => [p.lat, p.lng] as L.LatLngTuple))
-        map.fitBounds(bounds, { padding: [50, 50] })
+    if (activeDayIndex.value !== null && map) {
+        const day = itinerary.value[activeDayIndex.value]
+        day.places = day.places || []
+        const newPlace: Place = { name, lat, lng }
+        day.places.push(newPlace)
+
+        map.setView([lat, lng], 13)
+        searchResults.value = []
+        searchQuery.value = ''
+
+        // Fetch elevation in background
+        fetchPlaceDetails(newPlace)
     }
 }
 
-const focusOnPlace = (place: Place) => {
+const focusOnPlace = (lat: number, lng: number) => {
     if (!map) return
-    map.setView([place.lat, place.lng], 14)
-    const marker = markersMap.get(`${place.lat}-${place.lng}`)
+    map.setView([lat, lng], 14)
+    const marker = markersMap.get(`${lat}-${lng}`)
     if (marker) {
         marker.openPopup()
     }
 }
 
-defineExpose({
-    focusOnPlace
-})
+defineExpose({ focusOnPlace })
 </script>
 
 <template>
-    <div :class="[
-        'flex flex-col bg-slate-50 dark:bg-slate-900 overflow-hidden transition-all duration-300',
-        isFullScreen
-            ? 'fixed inset-0 z-[100] rounded-none'
-            : 'relative w-full h-full min-h-[400px] rounded-[2.5rem]'
-    ]">
-        <!-- Map Container -->
-        <div class="flex-1 relative min-h-[300px]">
-            <div ref="mapEl" class="w-full h-full absolute inset-0 z-10" />
-            <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
-                <button @click="fitMap"
-                    class="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                    title="Fit map">
-                    <Maximize class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+    <div class="bg-card p-5 rounded-2xl border border-border/50 shadow-sm space-y-4 relative">
+        <div class="flex items-center justify-between">
+            <h4 class="text-sm font-black text-foreground uppercase tracking-wider">Route Map Preview</h4>
+            <div class="flex items-center gap-2">
+                <span
+                    class="text-[10px] bg-primary/10 text-primary px-2.5 py-1 rounded-full font-black uppercase tracking-wider">Interactive</span>
+            </div>
+        </div>
+
+        <!-- Location Search -->
+        <div class="space-y-2 relative">
+            <div class="flex gap-2">
+                <input v-model="searchQuery" placeholder="Search for a location (e.g. Namche Bazaar)"
+                    @keyup.enter="searchLocation"
+                    class="flex-1 bg-muted/10 border border-border/50 text-xs px-3 h-9 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary" />
+                <button @click="searchLocation" :disabled="isSearchingLocation"
+                    class="bg-primary text-primary-foreground font-bold px-4 h-9 rounded-xl flex items-center justify-center disabled:opacity-50 text-xs hover:bg-primary/90 transition-colors">
+                    <Loader2Icon v-if="isSearchingLocation" class="w-3.5 h-3.5 animate-spin mr-1" />
+                    Search
                 </button>
-                <button @click="toggleMotion"
-                    class="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                    :title="isMotionEnabled ? 'Pause motion' : 'Play motion'">
-                    <Pause v-if="isMotionEnabled" class="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                    <Play v-else class="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                </button>
-                <button @click="toggleFullScreen"
-                    class="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                    :title="isFullScreen ? 'Exit full screen' : 'Full screen'">
-                    <Shrink v-if="isFullScreen" class="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                    <Expand v-else class="w-5 h-5 text-slate-700 dark:text-slate-300" />
+            </div>
+            <div v-if="searchResults.length > 0"
+                class="absolute z-30 max-h-36 w-full overflow-y-auto border border-border rounded-xl bg-card shadow-lg divide-y divide-border text-xs mt-1">
+                <button v-for="(res, idx) in searchResults" :key="idx" @click="selectSearchResult(res)"
+                    class="w-full text-left p-2.5 hover:bg-muted font-medium text-foreground block">
+                    {{ res.display_name }}
                 </button>
             </div>
         </div>
 
+        <!-- Map Container -->
+        <div :class="[
+            isFullScreen ? 'fixed inset-0 z-[100] h-screen w-screen rounded-none' : 'h-[480px] rounded-2xl relative',
+            'overflow-hidden border border-border shadow-inner z-10 bg-slate-50 dark:bg-slate-900 transition-all duration-300'
+        ]">
+            <div id="itinerary-editor-map" class="w-full h-full absolute inset-0" />
+
+            <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+                <!-- Toggle Motion Button -->
+                <button @click.stop="toggleMotion"
+                    class="bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all text-foreground"
+                    title="Toggle Animation Preview">
+                    <span :class="[
+                        'w-2 h-2 rounded-full',
+                        isMotionEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+                    ]"></span>
+                    <span>{{ isMotionEnabled ? 'Pause Motion' : 'Play Motion' }}</span>
+                </button>
+
+                <!-- Fit Map Button -->
+                <button @click.stop="fitMap"
+                    class="bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all text-foreground"
+                    title="Fit map">
+                    <Maximize class="w-4 h-4" />
+                </button>
+
+                <!-- Full Screen Button -->
+                <button @click.stop="toggleFullScreen"
+                    class="bg-background/95 backdrop-blur border border-border p-2 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 hover:bg-muted transition-all text-foreground"
+                    :title="isFullScreen ? 'Exit full screen' : 'Full screen'">
+                    <Shrink v-if="isFullScreen" class="w-4 h-4" />
+                    <Expand v-else class="w-4 h-4" />
+                </button>
+            </div>
+
+            <!-- Active Day Indicator Overlay -->
+            <div
+                class="absolute bottom-4 left-4 z-20 bg-background/95 backdrop-blur border border-border px-3 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-foreground">
+                    Targeting: <span class="text-primary font-black">Day {{ activeDayIndex !== null ?
+                        itinerary[activeDayIndex]?.day : 'None' }}</span>
+                </span>
+            </div>
+        </div>
+
         <!-- Elevation Profile Chart -->
-        <div v-if="elevationProfile.length > 0" class="p-4 bg-muted/20 border-t border-border/40 relative">
+        <div v-if="elevationProfile.length > 0"
+            class="mt-4 p-4 bg-muted/20 border border-border/60 rounded-2xl relative">
             <div class="flex justify-between items-center mb-2">
                 <h4
                     class="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
@@ -762,82 +900,35 @@ defineExpose({
                 </div>
             </div>
 
-            <div class="relative h-[80px] w-full">
-                <svg ref="svgRef" viewBox="0 0 800 130" class="w-full h-full overflow-visible select-none"
-                    preserveAspectRatio="none" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
+            <div class="h-32 w-full relative">
+                <!-- SVG Chart -->
+                <svg ref="svgRef" viewBox="0 0 800 130" preserveAspectRatio="none"
+                    class="w-full h-full cursor-crosshair overflow-visible" @mousemove="handleMouseMove"
+                    @mouseleave="handleMouseLeave">
                     <defs>
-                        <linearGradient id="elevation-gradient-client" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#f06723" stop-opacity="0.3" />
-                            <stop offset="100%" stop-color="#f06723" stop-opacity="0" />
+                        <linearGradient id="elevGradientEditor" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3" />
+                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0" />
                         </linearGradient>
                     </defs>
+                    <path :d="areaPath" fill="url(#elevGradientEditor)" />
+                    <path :d="linePath" fill="none" stroke="#3b82f6" stroke-width="2" />
 
-                    <!-- Grid lines -->
-                    <line x1="0" y1="10" x2="800" y2="10" stroke="currentColor" stroke-dasharray="4 4"
-                        class="text-border/40" vector-effect="non-scaling-stroke" />
-                    <line x1="0" y1="70" x2="800" y2="70" stroke="currentColor" stroke-dasharray="4 4"
-                        class="text-border/40" vector-effect="non-scaling-stroke" />
-                    <line x1="0" y1="120" x2="800" y2="120" stroke="currentColor" class="text-border/40"
-                        vector-effect="non-scaling-stroke" />
-
-                    <!-- Shaded Area -->
-                    <path :d="areaPath" fill="url(#elevation-gradient-client)" />
-
-                    <!-- Line Path -->
-                    <path :d="linePath" stroke="#f06723" stroke-width="3" fill="none" stroke-linecap="round"
-                        vector-effect="non-scaling-stroke" />
-
-                    <!-- Hover Indicator -->
+                    <!-- Hover indicator -->
                     <g v-if="hoveredPoint">
-                        <line :x1="hoveredPoint.x" y1="10" :x2="hoveredPoint.x" y2="120" stroke="#3b82f6"
-                            stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" />
+                        <line :x1="hoveredPoint.x" y1="0" :x2="hoveredPoint.x" y2="130" stroke="#94a3b8"
+                            stroke-width="1" stroke-dasharray="4" />
+                        <circle :cx="hoveredPoint.x" :cy="hoveredPoint.y" r="4" fill="#3b82f6" stroke="white"
+                            stroke-width="2" />
                     </g>
                 </svg>
+            </div>
 
-                <!-- Hover Tooltip & Circle Overlay -->
-                <div v-if="hoveredPoint" class="absolute inset-0 pointer-events-none">
-                    <!-- The circle overlay -->
-                    <div class="absolute w-2.5 h-2.5 bg-blue-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2"
-                        :style="{ left: `${(hoveredPoint.x / 800) * 100}%`, top: `${(hoveredPoint.y / 130) * 100}%` }">
-                    </div>
-                    <!-- The tooltip -->
-                    <div class="absolute bg-background border border-border/80 rounded-lg px-2 py-1 text-[10px] font-black shadow-md transform -translate-x-1/2"
-                        :style="{ left: `${(hoveredPoint.x / 800) * 100}%`, top: '-30px' }">
-                        {{ hoveredPoint.elevation }}m
-                    </div>
-                </div>
+            <!-- Hover details -->
+            <div v-if="hoveredPoint"
+                class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-[10px] px-2 py-1 rounded shadow-lg border border-border pointer-events-none font-bold whitespace-nowrap">
+                Elevation: {{ hoveredPoint.elevation }}m
             </div>
         </div>
     </div>
 </template>
-
-<style>
-.leaflet-container {
-    z-index: 10 !important;
-}
-
-@keyframes marker-pulse {
-    0% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: scale(2.2);
-        opacity: 0;
-    }
-}
-
-.moving-marker-pulse {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 24px;
-    height: 24px;
-    background-color: #ef4444;
-    border-radius: 50%;
-    animation: marker-pulse 1.8s infinite ease-out;
-    pointer-events: none;
-    z-index: -1;
-}
-</style>
