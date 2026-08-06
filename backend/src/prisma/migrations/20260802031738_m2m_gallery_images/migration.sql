@@ -17,11 +17,11 @@ ALTER TABLE `_GalleryToImage` ADD CONSTRAINT `_GalleryToImage_B_fkey` FOREIGN KE
 INSERT IGNORE INTO `_GalleryToImage` (`A`, `B`)
 SELECT `galleryId`, `id` FROM `images` WHERE `galleryId` IS NOT NULL;
 
--- DropForeignKey (if exists)
-ALTER TABLE `images` DROP FOREIGN KEY IF EXISTS `images_galleryId_fkey`;
+-- DropForeignKey
+ALTER TABLE `images` DROP FOREIGN KEY `images_galleryId_fkey`;
 
--- DropIndex (if exists)  
-DROP INDEX IF EXISTS `images_galleryId_fkey` ON `images`;
+-- DropIndex  
+DROP INDEX `images_galleryId_fkey` ON `images`;
 
 -- AlterTable: Remove the legacy galleryId column
-ALTER TABLE `images` DROP COLUMN IF EXISTS `galleryId`;
+ALTER TABLE `images` DROP COLUMN `galleryId`;

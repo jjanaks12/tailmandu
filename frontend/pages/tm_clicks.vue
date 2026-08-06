@@ -3,6 +3,10 @@ import { SearchIcon } from 'lucide-vue-next'
 import type { Gallery, WithCount } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
+const { axios } = useAxios()
+const galleries = ref<WithCount<Gallery>[]>([])
+const params = useUrlSearchParams('history')
+
 useHead(() => {
     const title = 'TM Clicks Gallery | Trailmandu'
     const description = 'Browse the official photo gallery of Trailmandu events, capturing stunning trail running, skyrunning, and adventure moments in Nepal.'
@@ -57,10 +61,6 @@ useHead(() => {
 definePageMeta({
     layout: 'default'
 })
-
-const { axios } = useAxios()
-const galleries = ref<WithCount<Gallery>[]>([])
-const params = useUrlSearchParams('history')
 
 const totalImages = computed(() => galleries.value.reduce((acc, curr) => acc + (curr._count?.images ?? 0), 0))
 const filteredCategories = computed(() => galleries.value.filter((gallery) => gallery.name.toLowerCase().includes(((params.s as string ?? '')).toLowerCase() || '')))
