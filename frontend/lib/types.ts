@@ -348,6 +348,7 @@ export type StageCategory = {
     excerpt: string
     description: string
     distance: string
+    elevation?: string
     difficulty: string
     location: string
     start: string

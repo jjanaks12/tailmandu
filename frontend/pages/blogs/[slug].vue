@@ -8,73 +8,8 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 
 const route = useRoute()
 const { getPublicPostBySlug } = useBlogStore()
-const post = ref<any>(null)
-const isLoading = ref(true)
-
-useHead(() => {
-    if (!post.value) return {}
-
-    const title = post.value.seo?.meta_title || post.value.title
-    const description = post.value.seo?.meta_description || post.value.excerpt
-    const canonical = post.value.seo?.canonical_url || `https://trailmandu.com/blogs/${post.value.slug}`
-    const image = post.value.seo?.og_image
-        ? showImage(post.value.seo.og_image.file_name)
-        : (post.value.featured_image ? showImage(post.value.featured_image.file_name) : 'https://trailmandu.com/logo.png')
-
-    return {
-        title,
-        link: [
-            { rel: 'canonical', href: canonical }
-        ],
-        meta: [
-            { name: 'description', content: description },
-            { name: 'keywords', content: post.value.seo?.meta_keywords || '' },
-            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
-            // Open Graph
-            { property: 'og:title', content: post.value.seo?.og_title || title },
-            { property: 'og:description', content: post.value.seo?.og_description || description },
-            { property: 'og:image', content: image },
-            { property: 'og:url', content: canonical },
-            { property: 'og:type', content: 'article' },
-            // Twitter
-            { name: 'twitter:card', content: 'summary_large_image' },
-            { name: 'twitter:title', content: post.value.seo?.og_title || title },
-            { name: 'twitter:description', content: post.value.seo?.og_description || description },
-            { name: 'twitter:image', content: image }
-        ],
-        script: [
-            {
-                type: 'application/ld+json',
-                innerHTML: JSON.stringify({
-                    '@context': 'https://schema.org',
-                    '@type': 'BlogPosting',
-                    '@id': `${canonical}#blogposting`,
-                    'mainEntityOfPage': canonical,
-                    'headline': post.value.title,
-                    'description': description,
-                    'image': image,
-                    'datePublished': post.value.published_at || post.value.created_at,
-                    'dateModified': post.value.updated_at || post.value.published_at || post.value.created_at,
-                    'author': {
-                        '@type': 'Person',
-                        'name': post.value.author?.personal?.first_name 
-                            ? `${post.value.author.personal.first_name} ${post.value.author.personal.last_name || ''}`.trim()
-                            : 'Trailmandu Team'
-                    },
-                    'publisher': {
-                        '@type': 'SportsOrganization',
-                        '@id': 'https://trailmandu.com/#organization',
-                        'name': 'Trailmandu',
-                        'logo': {
-                            '@type': 'ImageObject',
-                            'url': 'https://trailmandu.com/logo.png'
-                        }
-                    }
-                })
-            } as any
-        ]
-    }
-})
+const { data: post, pending: isLoading } = await useAsyncData(`post-${route.params.slug}`, () => getPublicPostBySlug(route.params.slug as string))
+const { public: { serverUrl } } = useRuntimeConfig()
 
 const initSwipers = () => {
     if (typeof window === 'undefined') return
@@ -94,21 +29,6 @@ const initSwipers = () => {
             }
         })
     }, 100)
-}
-
-const init = async () => {
-    isLoading.value = true
-    try {
-        const data = await getPublicPostBySlug(route.params.slug as string)
-        post.value = data
-        nextTick(() => {
-            initSwipers()
-        })
-    } catch (e) {
-        console.error(e)
-    } finally {
-        isLoading.value = false
-    }
 }
 
 const formatDate = (date: string) => {
@@ -144,7 +64,75 @@ const shareOnSocial = (link: typeof socialLinks[0]) => {
     }
 }
 
-onMounted(init)
+useHead(() => {
+    if (!post.value) return {}
+    const logoUrl = '/images/logo.png'
+
+    const title = post.value.seo?.meta_title || post.value.title
+    const description = post.value.seo?.meta_description || post.value.excerpt
+    const canonical = post.value.seo?.canonical_url || `https://trailmandu.com/blogs/${post.value.slug}`
+    const image = post.value.seo?.og_image
+        ? `${serverUrl}resources/images/${post.value.seo.og_image.file_name}`
+        : post.value.featured_image
+            ? `${serverUrl}resources/images/${post.value.featured_image.file_name}`
+            : logoUrl
+
+    return {
+        title,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: description },
+            { name: 'keywords', content: post.value.seo?.meta_keywords || '' },
+            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+            // Open Graph
+            { property: 'og:title', content: post.value.seo?.og_title || title },
+            { property: 'og:description', content: post.value.seo?.og_description || description },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'article' },
+            // Twitter
+            { name: 'twitter:card', content: image },
+            { name: 'twitter:title', content: post.value.seo?.og_title || title },
+            { name: 'twitter:description', content: post.value.seo?.og_description || description },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BlogPosting',
+                    '@id': `${canonical}#blogposting`,
+                    'mainEntityOfPage': canonical,
+                    'headline': post.value.title,
+                    'description': description,
+                    'image': image,
+                    'datePublished': post.value.published_at || post.value.created_at,
+                    'dateModified': post.value.updated_at || post.value.published_at || post.value.created_at,
+                    'author': {
+                        '@type': 'Person',
+                        'name': post.value.author?.personal?.first_name
+                            ? `${post.value.author.personal.first_name} ${post.value.author.personal.last_name || ''}`.trim()
+                            : 'Trailmandu Team'
+                    },
+                    'publisher': {
+                        '@type': 'SportsOrganization',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': logoUrl
+                        }
+                    }
+                })
+            } as any
+        ]
+    }
+})
+
+onMounted(initSwipers)
 </script>
 
 <template>
@@ -208,7 +196,8 @@ onMounted(init)
                 <!-- Sidebar Left: Social Share -->
                 <div class="hidden lg:block w-20 sticky top-32 h-fit">
                     <div class="flex flex-col gap-4 items-center">
-                        <span class="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-2">{{ $t('public_blogs.share') }}</span>
+                        <span class="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-2">{{
+                            $t('public_blogs.share') }}</span>
                         <Button v-for="link in socialLinks" :key="link.platform" size="icon" modifier="outline"
                             @click="shareOnSocial(link)"
                             :class="['rounded-full border-slate-200 dark:border-slate-800 transition-colors', link.hoverClass]">
@@ -236,37 +225,53 @@ onMounted(init)
                     </div>
 
                     <!-- Prev / Next Navigation -->
-                    <div v-if="post.prev || post.next" class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center gap-4">
-                        <NuxtLink v-if="post.prev" :to="`/blogs/${post.prev.slug}`" class="group flex flex-col items-start text-left flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                    <div v-if="post.prev || post.next"
+                        class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center gap-4">
+                        <NuxtLink v-if="post.prev" :to="`/blogs/${post.prev.slug}`"
+                            class="group flex flex-col items-start text-left flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
+                            <span
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
                                 <ArrowLeftIcon class="w-3 h-3 transition-transform group-hover:-translate-x-1" />
                                 {{ $t('public_blogs.previous_post') }}
                             </span>
-                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{ post.prev.title }}</span>
+                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{
+                                post.prev.title }}</span>
                         </NuxtLink>
                         <div v-else class="flex-1"></div>
 
-                        <NuxtLink v-if="post.next" :to="`/blogs/${post.next.slug}`" class="group flex flex-col items-end text-right flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                        <NuxtLink v-if="post.next" :to="`/blogs/${post.next.slug}`"
+                            class="group flex flex-col items-end text-right flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
+                            <span
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
                                 {{ $t('public_blogs.next_post') }}
                                 <ArrowRightIcon class="w-3 h-3 transition-transform group-hover:translate-x-1" />
                             </span>
-                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{ post.next.title }}</span>
+                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{
+                                post.next.title }}</span>
                         </NuxtLink>
                         <div v-else class="flex-1"></div>
                     </div>
 
                     <!-- Recommended Blogs -->
-                    <div v-if="post.recommended && post.recommended.length > 0" class="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
-                        <h3 class="font-display font-bold text-2xl mb-8">{{ $t('public_blogs.recommended_reading') }}</h3>
+                    <div v-if="post.recommended && post.recommended.length > 0"
+                        class="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <h3 class="font-display font-bold text-2xl mb-8">{{ $t('public_blogs.recommended_reading') }}
+                        </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <NuxtLink v-for="rec in post.recommended" :key="rec.id" :to="`/blogs/${rec.slug}`" class="group block">
-                                <div class="aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-800 relative">
-                                    <img v-if="rec.featured_image" :src="showImage(rec.featured_image.file_name)" :alt="rec.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            <NuxtLink v-for="rec in post.recommended" :key="rec.id" :to="`/blogs/${rec.slug}`"
+                                class="group block">
+                                <div
+                                    class="aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-800 relative">
+                                    <img v-if="rec.featured_image" :src="showImage(rec.featured_image.file_name)"
+                                        :alt="rec.title"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                     <div class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl"></div>
                                 </div>
-                                <h4 class="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2 mb-2">{{ rec.title }}</h4>
-                                <p v-if="rec.excerpt" class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{{ rec.excerpt }}</p>
+                                <h4
+                                    class="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                                    {{ rec.title }}</h4>
+                                <p v-if="rec.excerpt" class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{{
+                                    rec.excerpt }}</p>
                             </NuxtLink>
                         </div>
                     </div>
@@ -296,14 +301,22 @@ onMounted(init)
                     <!-- Recent Posts Sidebar -->
                     <div v-if="post.recent && post.recent.length > 0" class="space-y-6">
                         <h4 class="font-display font-bold text-xl px-2">{{ $t('public_blogs.recent_posts') }}</h4>
-                        <div class="flex flex-col gap-6 p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
-                            <NuxtLink v-for="recent in post.recent" :key="recent.id" :to="`/blogs/${recent.slug}`" class="group flex gap-4 items-start">
-                                <div class="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                    <img v-if="recent.featured_image" :src="showImage(recent.featured_image.file_name)" :alt="recent.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <div
+                            class="flex flex-col gap-6 p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <NuxtLink v-for="recent in post.recent" :key="recent.id" :to="`/blogs/${recent.slug}`"
+                                class="group flex gap-4 items-start">
+                                <div
+                                    class="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                    <img v-if="recent.featured_image" :src="showImage(recent.featured_image.file_name)"
+                                        :alt="recent.title"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                 </div>
                                 <div>
-                                    <h5 class="font-bold text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-2">{{ recent.title }}</h5>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ formatDate(recent.published_at || recent.created_at) }}</p>
+                                    <h5
+                                        class="font-bold text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                                        {{ recent.title }}</h5>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{
+                                        formatDate(recent.published_at || recent.created_at) }}</p>
                                 </div>
                             </NuxtLink>
                         </div>

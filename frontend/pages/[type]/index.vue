@@ -2,6 +2,7 @@
 import { showImage } from '~/lib/filters'
 import { useTrekStore } from '~/store/trek'
 import { storeToRefs } from 'pinia'
+import type { Trek } from '~/lib/types'
 
 definePageMeta({
     validate: async (route) => {
@@ -10,6 +11,7 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { public: { serverUrl } } = useRuntimeConfig()
 const type = computed(() => route.params.type as string)
 
 const category = computed(() => {
@@ -21,19 +23,23 @@ const title = computed(() => {
 })
 
 const description = computed(() => {
-    return category.value === 'Treks' 
+    return category.value === 'Treks'
         ? 'Journey through legendary trails, ancient cultures, and breathtaking vistas. Our curated treks offer the perfect balance of challenge and serenity.'
         : 'Move fast, travel light. Experience the raw intensity of the mountains with our performance-oriented fastpacking adventures.'
 })
 
-const trekStore = useTrekStore()
-const { treks } = storeToRefs(trekStore)
+const { fetchTreks } = useTrekStore()
+const { data: treks } = await useAsyncData<Trek[]>(async () => {
+    await fetchTreks()
+    const { treks } = storeToRefs(useTrekStore())
+    return treks.value
+})
 
 useHead(() => {
     const currentTitle = title.value
     const currentDescription = description.value
     const canonical = `https://trailmandu.com/${type.value}`
-    const logoUrl = 'https://trailmandu.com/logo.png'
+    const logoUrl = '/images/logo.png'
 
     return {
         title: currentTitle,
@@ -65,8 +71,8 @@ useHead(() => {
                     'name': currentTitle,
                     'description': currentDescription,
                     'url': canonical,
-                    'numberOfItems': treks.value.length,
-                    'itemListElement': treks.value.map((item, index) => ({
+                    'numberOfItems': treks.value?.length,
+                    'itemListElement': treks.value?.map((item, index) => ({
                         '@type': 'ListItem',
                         'position': index + 1,
                         'item': {
@@ -75,7 +81,7 @@ useHead(() => {
                             'name': item.name,
                             'description': item.excerpt || item.description || '',
                             'url': `https://trailmandu.com/${type.value}/${item.slug}`,
-                            'image': item.thumbnail ? showImage(item.thumbnail.file_name) : logoUrl
+                            'image': item.thumbnail ? `${serverUrl}resources/images/${item.thumbnail.file_name}` : logoUrl
                         }
                     }))
                 })
@@ -86,9 +92,5 @@ useHead(() => {
 </script>
 
 <template>
-    <PagesDefaultFastpackingTrekListing 
-        :category="category"
-        :title="title"
-        :description="description"
-    />
+    <PagesDefaultFastpackingTrekListing :category="category" :title="title" :description="description" />
 </template>

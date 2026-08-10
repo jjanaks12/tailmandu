@@ -37,7 +37,7 @@ const securityProtocolIconMapping: Record<string, any> = {
     'Emergency Evacuation': CrossIcon
 }
 
-const trek = ref<Trek | null>(null)
+const { data: trek, pending, error, refresh, clear } = await useAsyncData<Trek>(`trek-${route.params.slug}`, async () => await getTrekBySlug(route.params.slug as string), { lazy: true })
 const loading = ref(true)
 
 const activeDayKey = ref('item-0')
@@ -55,98 +55,6 @@ const itineraryMapRef = ref<any>(null)
 const focusOnPlace = (place: any) => {
     if (itineraryMapRef.value) {
         itineraryMapRef.value.focusOnPlace(place)
-    }
-}
-
-useHead(() => {
-    if (!trek.value) return { title: 'Loading Adventure...' }
-
-    const currentTitle = `${trek.value.name} | Trailmandu`
-    const currentDescription = trek.value.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.'
-    const canonical = `https://trailmandu.com/${type.value}/${trek.value.slug}`
-    const image = trek.value.thumbnail?.file_name
-        ? showImage(trek.value.thumbnail.file_name)
-        : 'https://trailmandu.com/logo.png'
-
-    return {
-        title: currentTitle,
-        link: [
-            { rel: 'canonical', href: canonical }
-        ],
-        meta: [
-            { name: 'description', content: currentDescription },
-            { name: 'keywords', content: `${trek.value.name}, ${type.value} nepal, trekking in nepal, fastpacking route, hike, himalayas` },
-            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
-            // Open Graph
-            { property: 'og:title', content: currentTitle },
-            { property: 'og:description', content: currentDescription },
-            { property: 'og:image', content: image },
-            { property: 'og:url', content: canonical },
-            { property: 'og:type', content: 'website' },
-            // Twitter
-            { name: 'twitter:card', content: 'summary_large_image' },
-            { name: 'twitter:title', content: currentTitle },
-            { name: 'twitter:description', content: currentDescription },
-            { name: 'twitter:image', content: image }
-        ],
-        script: [
-            {
-                type: 'application/ld+json',
-                innerHTML: JSON.stringify({
-                    '@context': 'https://schema.org',
-                    '@type': 'TouristTrip',
-                    '@id': `${canonical}#trip`,
-                    'name': trek.value.name,
-                    'description': currentDescription,
-                    'image': image,
-                    'touristType': type.value === 'treks' ? 'Trekker' : 'Fastpacker',
-                    'provider': {
-                        '@type': 'SportsOrganization',
-                        '@id': 'https://trailmandu.com/#organization',
-                        'name': 'Trailmandu',
-                        'logo': {
-                            '@type': 'ImageObject',
-                            'url': 'https://trailmandu.com/logo.png'
-                        }
-                    },
-                    'offers': {
-                        '@type': 'Offer',
-                        'price': startingPrice.value,
-                        'priceCurrency': 'USD',
-                        'url': `${canonical}/booking`,
-                        'availability': 'https://schema.org/InStock',
-                        'validFrom': new Date().toISOString().split('T')[0]
-                    },
-                    'itinerary': trek.value.details?.itinerary?.map((day: any, idx: number) => ({
-                        '@type': 'ListItem',
-                        'position': idx + 1,
-                        'name': day.title || `Day ${idx + 1}`,
-                        'description': day.description || ''
-                    }))
-                })
-            } as any
-        ]
-    }
-})
-
-const init = async () => {
-    loading.value = true
-    try {
-        trek.value = await getTrekBySlug(route.params.slug as string)
-        if (!trek.value) {
-            throw createError({ statusCode: 404, statusMessage: 'Trek not found', fatal: true })
-        }
-        if (!trek.value.published_at && !isLoggedin.value) {
-            trek.value = null
-            throw createError({ statusCode: 404, statusMessage: 'Trek not found', fatal: true })
-        }
-    } catch (err: any) {
-        if (err.statusCode) {
-            throw err
-        }
-        throw createError({ statusCode: 404, statusMessage: 'Trek not found', fatal: true })
-    } finally {
-        loading.value = false
     }
 }
 
@@ -213,8 +121,78 @@ const initWeatherWidget = () => {
     }
 }
 
+useHead(() => {
+    if (!trek.value) return { title: 'Loading Adventure...' }
+
+    const currentTitle = `${trek.value.name} | Trailmandu`
+    const currentDescription = trek.value.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.'
+    const canonical = `https://trailmandu.com/${type.value}/${trek.value.slug}`
+    const image = trek.value.thumbnail?.file_name
+        ? showImage(trek.value.thumbnail.file_name)
+        : '/images/logo.png'
+
+    return {
+        title: currentTitle,
+        link: [
+            { rel: 'canonical', href: canonical }
+        ],
+        meta: [
+            { name: 'description', content: currentDescription },
+            { name: 'keywords', content: `${trek.value.name}, ${type.value} nepal, trekking in nepal, fastpacking route, hike, himalayas` },
+            { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+            // Open Graph
+            { property: 'og:title', content: currentTitle },
+            { property: 'og:description', content: currentDescription },
+            { property: 'og:image', content: image },
+            { property: 'og:url', content: canonical },
+            { property: 'og:type', content: 'website' },
+            // Twitter
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: currentTitle },
+            { name: 'twitter:description', content: currentDescription },
+            { name: 'twitter:image', content: image }
+        ],
+        script: [
+            {
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'TouristTrip',
+                    '@id': `${canonical}#trip`,
+                    'name': trek.value.name,
+                    'description': currentDescription,
+                    'image': image,
+                    'touristType': type.value === 'treks' ? 'Trekker' : 'Fastpacker',
+                    'provider': {
+                        '@type': 'SportsOrganization',
+                        '@id': 'https://trailmandu.com/#organization',
+                        'name': 'Trailmandu',
+                        'logo': {
+                            '@type': 'ImageObject',
+                            'url': 'https://trailmandu.com/logo.png'
+                        }
+                    },
+                    'offers': {
+                        '@type': 'Offer',
+                        'price': startingPrice.value,
+                        'priceCurrency': 'USD',
+                        'url': `${canonical}/booking`,
+                        'availability': 'https://schema.org/InStock',
+                        'validFrom': new Date().toISOString().split('T')[0]
+                    },
+                    'itinerary': trek.value.details?.itinerary?.map((day: any, idx: number) => ({
+                        '@type': 'ListItem',
+                        'position': idx + 1,
+                        'name': day.title || `Day ${idx + 1}`,
+                        'description': day.description || ''
+                    }))
+                })
+            } as any
+        ]
+    }
+})
+
 onMounted(async () => {
-    await init()
     try {
         await trekStore.fetchTreks(false, categoryName.value)
     } catch (e) {
@@ -226,22 +204,47 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div v-if="loading"
+    <div v-if="pending"
         class="flex justify-center items-center min-h-[500px] text-xl font-bold uppercase tracking-widest text-[#1A1A1A]">
         <Loader2Icon class="w-8 h-8 animate-spin mr-3 text-primary" />
         Loading Trek...
     </div>
-    <template v-else-if="trek">
+    <div v-else-if="error">
+        <div class="flex items-center justify-center h-screen">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold">Error loading trek</h2>
+                <p class="text-muted-foreground">{{ error.message }}</p>
+                <Button @click="refresh" class="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded">
+                    Refresh
+                </Button>
+            </div>
+        </div>
+    </div>
+    <div v-else-if="!trek">
+        <div class="flex items-center justify-center h-screen">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold">Trek not found</h2>
+                <p class="text-muted-foreground">The trek you are looking for does not exist.</p>
+            </div>
+        </div>
+    </div>
+    <template v-else>
         <section class="relative w-full overflow-hidden">
             <Swiper :modules="[Autoplay]" class="h-screen" :autoplay="{
                 delay: 2500,
                 disableOnInteraction: false,
-            }">
-                <SwiperSlide v-for="image in trek.gallery?.images">
+            }" v-if="trek.gallery && trek.gallery.images.length > 0">
+                <SwiperSlide v-for="image in trek.gallery.images">
                     <img alt="Forest trail" class="w-full h-full rounded-sm object-cover border border-black/5"
                         :src="showImage(image.file_name)" />
                 </SwiperSlide>
             </Swiper>
+            <div v-else-if="trek.thumbnail">
+                <img :src="showImage(trek.thumbnail.file_name)" alt="" class="w-full h-screen object-cover">
+            </div>
+            <div v-else class="flex items-center justify-center h-screen">
+                <img alt="Forest trail" class="size-full object-cover" src="/images/home-runner.png" />
+            </div>
             <div class="pb-[200px] absolute bottom-0 left-0 right-0 text-white z-20 max-w-4xl px-4">
                 <span v-for="tag in trek.tags" :key="tag.id"
                     class="inline-block px-2 py-1 border border-primary text-sm font-black uppercase tracking-[0.2em] mb-4 mr-2">
@@ -255,7 +258,7 @@ onMounted(async () => {
                 </p>
             </div>
         </section>
-        <main class="max-w-7xl mx-auto px-6 md:px-10">
+        <div class="max-w-7xl mx-auto px-6 md:px-10">
             <!-- Hero Section -->
             <!-- Quick Facts Bar -->
             <section class="relative z-30 mb-16">
@@ -280,7 +283,7 @@ onMounted(async () => {
                                 <div>
                                     <p class="text-sm uppercase text-text-muted font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                    }}</p>
+                                        }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm uppercase text-text-muted font-bold mb-1">Distance</p>
@@ -665,7 +668,7 @@ onMounted(async () => {
                     </div>
                 </div>
             </section>
-        </main>
+        </div>
         <div :class="[
             'fixed bottom-0 left-0 w-full bg-white border-t border-black/10 z-[50] transform transition-all duration-500',
             (!isBookingBarVisible && scrollY > 300) ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'

@@ -99,7 +99,7 @@ useHead(() => {
     const canonical = `https://trailmandu.com/store/${prod.id}`
     const image = prod.thumbnail?.file_name
         ? showImage(prod.thumbnail.file_name)
-        : 'https://trailmandu.com/logo.png'
+        : '/images/logo.png'
 
     // Formulate offers
     const offerDetails = prod.variants && prod.variants.length > 0
@@ -334,7 +334,7 @@ useHead(() => {
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm">{{ review.user?.name || review.author_name || 'Anonymous'
-                                }}
+                                    }}
                                 </h4>
                                 <p class="text-xs text-on-surface-variant">{{ formatDate(review.created_at) }}</p>
                             </div>

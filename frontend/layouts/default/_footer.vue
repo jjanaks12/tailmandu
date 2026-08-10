@@ -6,7 +6,6 @@ import * as Icons from 'lucide-vue-next'
 import Icon from '~/components/icon.vue'
 
 const { company } = storeToRefs(useAppStore())
-const { pages } = storeToRefs(usePageStore())
 const { fetchPublicPages } = usePageStore()
 const localePath = useLocalePath()
 
@@ -18,7 +17,11 @@ const SocialLinkMapper: Record<string, keyof typeof Icons> = {
     youtube: 'YoutubeIcon',
 }
 
-onMounted(fetchPublicPages)
+const { data: pages } = useAsyncData('footer', async () => {
+    const { pages } = storeToRefs(usePageStore())
+    await fetchPublicPages()
+    return pages.value
+})
 </script>
 
 <template>

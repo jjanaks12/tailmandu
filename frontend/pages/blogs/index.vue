@@ -5,14 +5,22 @@ import { useBlogStore } from '~/store/blog'
 
 const { t } = useI18n()
 
-const { fetchPublicPosts, fetchCategories } = useBlogStore()
-const { posts, categories, isLoading, params } = storeToRefs(useBlogStore())
+const blogStore = useBlogStore()
+const { fetchPublicPosts, fetchCategories } = blogStore
+const { posts, categories, params } = storeToRefs(blogStore)
+const { public: { serverUrl } } = useRuntimeConfig()
+
+const { pending: isLoading } = await useAsyncData('blogs', async () => {
+    await fetchCategories()
+    await fetchPublicPosts()
+    return true
+})
 
 useHead(() => {
     const title = t('public_blogs.seo_title') || 'Trailmandu Blogs & Stories'
     const description = t('public_blogs.seo_description') || 'Read the latest updates, guides, and stories about trail running, skyrunning, and fastpacking in Nepal.'
     const canonical = 'https://trailmandu.com/blogs'
-    const logoUrl = 'https://trailmandu.com/logo.png'
+    const logoUrl = '/images/logo.png'
 
     return {
         title,
@@ -54,13 +62,13 @@ useHead(() => {
                             'url': logoUrl
                         }
                     },
-                    'blogPost': posts.value.map(post => ({
+                    'blogPost': posts.value.filter(post => post.featured_image != null).map(post => ({
                         '@type': 'BlogPosting',
                         '@id': `https://trailmandu.com/blogs/${post.slug}#blogposting`,
                         'headline': post.title,
                         'description': post.excerpt || '',
                         'url': `https://trailmandu.com/blogs/${post.slug}`,
-                        'image': post.featured_image ? showImage(post.featured_image.file_name) : logoUrl,
+                        'image': post.featured_image ? `${serverUrl}resources/images/${post.featured_image.file_name}` : logoUrl,
                         'datePublished': post.published_at || post.created_at
                     }))
                 })
@@ -78,13 +86,6 @@ const filterByCategory = (slug: string | null) => {
 
 const featuredPost = computed(() => posts.value.find(p => p.is_featured) || posts.value[0])
 const remainingPosts = computed(() => posts.value.filter(p => p.id !== featuredPost.value?.id))
-
-onMounted(async () => {
-    await Promise.all([
-        fetchPublicPosts(),
-        fetchCategories()
-    ])
-})
 </script>
 
 <template>
@@ -101,7 +102,8 @@ onMounted(async () => {
                     {{ $t('public_blogs.badge_stories') }}
                 </Badge>
                 <h1 class="text-5xl md:text-7xl font-display font-black tracking-tight mb-6">
-                    {{ $t('public_blogs.hero_title') }} <span class="text-primary">{{ $t('public_blogs.hero_highlight') }}</span>
+                    {{ $t('public_blogs.hero_title') }} <span class="text-primary">{{ $t('public_blogs.hero_highlight')
+                        }}</span>
                 </h1>
                 <p class="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
                     {{ $t('public_blogs.hero_desc') }}
@@ -171,7 +173,7 @@ onMounted(async () => {
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     <BlogCard v-for="post in (selectedCategory ? posts : remainingPosts)" :key="post.id" :post="post" />
                 </div>
-                
+
                 <!-- Pagination -->
                 <div v-if="params.total > params.per_page" class="mt-16 flex justify-center">
                     <Pagination v-slot="{ page }" :items-per-page="params.per_page" :total="params.total"

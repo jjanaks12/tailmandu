@@ -6,13 +6,18 @@ import { useEventStore } from '~/store/event'
 import moment from 'moment'
 import { Autoplay, Virtual } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { useAppStore } from '~/store/app'
 
 const route = useRoute()
-const trailRace = ref<TrailRace | null>(null)
+const { getBySlug } = useEventStore()
+const { public: { serverUrl } } = useRuntimeConfig()
+
 const selectedStage = ref<Stage | null>(null)
 const selectedStageCategory = ref<StageCategory | null>(null)
-const { getBySlug } = useEventStore()
 
+const { data: trailRace } = await useAsyncData<TrailRace | null>(`trail-race-${route.params.slug}`, async () => {
+    return await getBySlug(route.params.slug as string)
+})
 const isFinished = computed(() => moment().isAfter(moment(trailRace.value?.end as string)))
 const isUpcoming = computed(() => moment().isBefore(moment(trailRace.value?.start as string)))
 
@@ -36,22 +41,53 @@ const parsedDetails = computed(() => {
 })
 
 const totalElevationGain = computed(() => {
-    if (!trailRace.value?.stages) return 0
-    // Assuming we might have elevation data in stage_categories or similar, 
-    // but for now let's just use a placeholder or sum from categories if available
-    return "8,450" // Placeholder as per design, we can refine this if data is available
+    if (!trailRace.value?.stages) return "0"
+    const sum = trailRace.value.stages.reduce((acc, stage) => {
+        return acc + stage.stage_categories.reduce((t, st) => {
+            const elev = (st as any).elevation || 0
+            return t + (parseFloat(elev) || 0)
+        }, 0)
+    }, 0)
+    return sum.toLocaleString('en-US')
+})
+
+if (trailRace.value && trailRace.value.stages.length > 0) {
+    let initialStage = trailRace.value.stages[0]
+    if (route.query.stage_id) {
+        const foundStage = trailRace.value.stages.find(s => s.id === route.query.stage_id)
+        if (foundStage) initialStage = foundStage
+    }
+    selectedStage.value = initialStage ?? null
+    selectedStageCategory.value = selectedStage.value?.stage_categories[0] ?? null
+}
+
+onMounted(() => {
+    if (route.query.stage_id && trailRace.value?.stages?.length) {
+        nextTick(() => {
+            // Wait for Vue to render the selectedStage section
+            setTimeout(() => {
+                const el = document.getElementById('stage-details')
+                if (el) {
+                    const yOffset = -120 // Adjust for sticky header
+                    const y = el.getBoundingClientRect().top + window.scrollY + yOffset
+                    window.scrollTo({ top: y, behavior: 'smooth' })
+                }
+            }, 100)
+        })
+    }
 })
 
 useHead(() => {
     const race = trailRace.value
     if (!race) return { title: 'Loading Race...' }
 
+    const logoUrl = '/images/logo.png'
     const currentTitle = `${race.name} | Trailmandu`
     const currentDescription = race.excerpt || 'Participate in premier skyrunning events, trail running marathons, and adventure runs organized by Trailmandu.'
     const canonical = `https://trailmandu.com/races/${race.slug}`
     const image = race.thumbnail?.file_name
-        ? showImage(race.thumbnail.file_name)
-        : 'https://trailmandu.com/logo.png'
+        ? `${serverUrl}resources/images/${race.thumbnail.file_name}`
+        : logoUrl
 
     return {
         title: currentTitle,
@@ -100,7 +136,7 @@ useHead(() => {
                         'name': 'Trailmandu',
                         'logo': {
                             '@type': 'ImageObject',
-                            'url': 'https://trailmandu.com/logo.png'
+                            'url': logoUrl
                         }
                     },
                     'subEvent': race.stages?.map(stage => ({
@@ -145,33 +181,6 @@ useHead(() => {
                 })
             } as any
         ]
-    }
-})
-
-onBeforeMount(async () => {
-    trailRace.value = await getBySlug(route.params.slug as string)
-    if (trailRace.value && trailRace.value.stages.length > 0) {
-        let initialStage = trailRace.value.stages[0]
-        if (route.query.stage_id) {
-            const foundStage = trailRace.value.stages.find(s => s.id === route.query.stage_id)
-            if (foundStage) initialStage = foundStage
-        }
-        selectedStage.value = initialStage ?? null
-        selectedStageCategory.value = selectedStage.value?.stage_categories[0] ?? null
-
-        if (route.query.stage_id) {
-            nextTick(() => {
-                // Wait for Vue to render the selectedStage section
-                setTimeout(() => {
-                    const el = document.getElementById('stage-details')
-                    if (el) {
-                        const yOffset = -120 // Adjust for sticky header
-                        const y = el.getBoundingClientRect().top + window.scrollY + yOffset
-                        window.scrollTo({ top: y, behavior: 'smooth' })
-                    }
-                }, 100)
-            })
-        }
     }
 })
 

@@ -25,7 +25,7 @@ useHead(() => {
     const title = t('store.catalog.title') || 'Expedition Gear Shop | Trailmandu'
     const description = t('store.catalog.description') || 'Curated technical equipment for high-altitude trekking and alpine climbing in Nepal.'
     const canonical = 'https://trailmandu.com/store'
-    const image = 'https://trailmandu.com/logo.png'
+    const image = '/images/logo.png'
 
     return {
         title,
@@ -64,7 +64,7 @@ useHead(() => {
                         'name': 'Trailmandu',
                         'logo': {
                             '@type': 'ImageObject',
-                            'url': 'https://trailmandu.com/logo.png'
+                            'url': image
                         }
                     }
                 })

@@ -1,14 +1,36 @@
 <script setup lang="ts">
-import { MountainIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon, SlidersHorizontalIcon } from 'lucide-vue-next'
-import { useEventStore } from '~/store/event'
+import { MountainIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from 'lucide-vue-next'
+import type { TrailRace } from '~/lib/types';
+import { useAppStore } from '~/store/app';
+import { useEventStore } from '~/store/event';
 
-import { showImage } from '~/lib/filters'
+const { fetchPublic } = useEventStore()
+const { params } = storeToRefs(useEventStore())
+const { public: { serverUrl } } = useRuntimeConfig()
+
+const searchQuery = ref('')
+const { data: events, pending: isLoading, refresh } = await useAsyncData<TrailRace[]>('race', async () => {
+    await fetchPublic()
+    const { events } = storeToRefs(useEventStore())
+    return events.value
+})
+
+const handleSearch = () => {
+    params.value.s = searchQuery.value
+    params.value.current = 1
+    refresh()
+}
+
+const goToPage = (page: number) => {
+    params.value.current = page
+    refresh()
+}
 
 useHead(() => {
     const title = 'Trail Races in Nepal - Trailmandu'
     const description = 'Join the most challenging and scenic trail races in Nepal. From short trail runs to multi-stage ultras.'
     const canonical = 'https://trailmandu.com/races'
-    const logoUrl = 'https://trailmandu.com/logo.png'
+    const logoUrl = '/images/logo.png'
 
     return {
         title,
@@ -40,8 +62,8 @@ useHead(() => {
                     'name': 'Upcoming Trail Races in Nepal',
                     'description': description,
                     'url': canonical,
-                    'numberOfItems': events.value.length,
-                    'itemListElement': events.value.map((race, index) => ({
+                    'numberOfItems': events.value?.length,
+                    'itemListElement': events.value?.map((race, index) => ({
                         '@type': 'ListItem',
                         'position': index + 1,
                         'item': {
@@ -52,7 +74,7 @@ useHead(() => {
                             'url': `https://trailmandu.com/races/${race.slug}`,
                             'startDate': race.start || undefined,
                             'endDate': race.end || undefined,
-                            'image': race.thumbnail?.file_name ? showImage(race.thumbnail.file_name) : logoUrl,
+                            'image': race.thumbnail?.file_name ? `${serverUrl}resources/images/${race.thumbnail.file_name}` : logoUrl,
                             'organizer': {
                                 '@type': 'SportsOrganization',
                                 '@id': 'https://trailmandu.com/#organization',
@@ -67,25 +89,9 @@ useHead(() => {
     }
 })
 
-const { fetchPublic } = useEventStore()
-const { events, params, isLoading } = storeToRefs(useEventStore())
-
-const searchQuery = ref('')
-
-const handleSearch = () => {
-    params.value.s = searchQuery.value
-    params.value.current = 1
-    fetchPublic()
-}
-
-const goToPage = (page: number) => {
-    params.value.current = page
-    fetchPublic()
-}
-
 onMounted(() => {
     params.value.current = 1
-    fetchPublic()
+    refresh()
 })
 </script>
 
@@ -111,7 +117,7 @@ onMounted(() => {
                     </p>
 
                     <!-- Search Bar -->
-                    <!-- <div class="relative max-w-xl group">
+                    <div class="relative max-w-xl group">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <SearchIcon
                                 class="h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
@@ -124,7 +130,7 @@ onMounted(() => {
                                 Search
                             </Button>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -137,7 +143,7 @@ onMounted(() => {
             </div>
 
             <template v-else>
-                <div v-if="events.length === 0" class="text-center py-24">
+                <div v-if="events && events.length === 0" class="text-center py-24">
                     <div class="mb-6 opacity-20 text-slate-400">
                         <MountainIcon class="w-24 h-24 mx-auto" />
                     </div>
