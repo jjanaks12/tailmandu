@@ -32,6 +32,7 @@ import { useMediaStore } from '~/store/media'
 import { storeToRefs } from 'pinia'
 import { showImage } from '~/lib/filters'
 import { useDebounceFn } from '@vueuse/core'
+import { useAxios } from '~/services/axios'
 
 interface TiptapEditorProps {
   modelValue: string
@@ -111,18 +112,94 @@ onBeforeUnmount(() => {
   }
 })
 
-const setLink = () => {
-  const previousUrl = editor.value?.getAttributes('link').href
-  const url = window.prompt('URL', previousUrl || '')
+const { axios } = useAxios()
+const showLinkDialog = ref(false)
+const linkUrlInput = ref('')
+const linkType = ref('external')
+const internalCategory = ref('blogs')
+const internalSearchQuery = ref('')
+const internalItems = ref<any[]>([])
+const internalLoading = ref(false)
 
-  if (url === null) return
+const searchInternalLinks = async () => {
+  internalLoading.value = true
+  try {
+    let endpoint = ''
+    if (internalCategory.value === 'blogs') endpoint = '/blogs/public'
+    else if (internalCategory.value === 'treks') endpoint = '/treks'
+    else if (internalCategory.value === 'products') endpoint = '/products'
+    else if (internalCategory.value === 'races') endpoint = '/events/public'
 
-  if (url === '') {
-    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
-    return
+    const { data } = await axios.get(endpoint, {
+      params: { s: internalSearchQuery.value, per_page: 20 }
+    })
+    
+    internalItems.value = data?.data?.data || data?.data || []
+  } catch (e) {
+    internalItems.value = []
+  } finally {
+    internalLoading.value = false
   }
+}
 
-  editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+watch([internalCategory, internalSearchQuery], useDebounceFn(() => {
+  if (linkType.value === 'internal') {
+    searchInternalLinks()
+  }
+}, 300))
+
+watch(linkType, (newType) => {
+  if (newType === 'internal' && internalItems.value.length === 0) {
+    searchInternalLinks()
+  }
+})
+
+const getSiteOrigin = () => typeof window !== 'undefined' ? window.location.origin : 'https://trailmandu.com'
+
+const getInternalUrl = (item: any) => {
+  if (internalCategory.value === 'blogs') return `/blogs/${item.slug}`
+  if (internalCategory.value === 'treks') return `/treks/${item.slug}`
+  if (internalCategory.value === 'products') return `/store/${item.slug || item.id}`
+  if (internalCategory.value === 'races') return `/races/${item.slug}`
+  return ''
+}
+
+const confirmLinkInsert = () => {
+  if (linkUrlInput.value === '') {
+    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+  } else {
+    editor.value?.chain().focus().extendMarkRange('link').setLink({ href: linkUrlInput.value }).run()
+  }
+  showLinkDialog.value = false
+}
+
+const selectInternalItem = (item: any) => {
+  linkUrlInput.value = getInternalUrl(item)
+  confirmLinkInsert()
+}
+
+const openLinkDialog = () => {
+  linkUrlInput.value = editor.value?.getAttributes('link').href || ''
+  
+  let isInternal = false
+  if (linkUrlInput.value) {
+    if (linkUrlInput.value.startsWith('/')) {
+      isInternal = true
+    } else {
+      try {
+        const urlObj = new URL(linkUrlInput.value)
+        isInternal = urlObj.hostname === window.location.hostname || urlObj.hostname.endsWith('trailmandu.com')
+      } catch {
+        isInternal = false
+      }
+    }
+  }
+  
+  linkType.value = isInternal ? 'internal' : 'external'
+  showLinkDialog.value = true
+  if (linkType.value === 'internal' && internalItems.value.length === 0) {
+    searchInternalLinks()
+  }
 }
 
 const addImage = () => {
@@ -265,7 +342,7 @@ const insertSlider = () => {
       <!-- Links & Images -->
       <div class="flex items-center bg-background rounded-sm border border-border overflow-hidden">
         <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
-          @click="setLink" :class="{ 'bg-muted text-primary': editor.isActive('link') }">
+          @click="openLinkDialog" :class="{ 'bg-muted text-primary': editor.isActive('link') }">
           <LinkIcon :size="16" />
         </Button>
         <Button tabindex="-1" type="button" size="sm" variant="ghost" class="rounded-none px-2 py-1 h-8"
@@ -308,6 +385,66 @@ const insertSlider = () => {
     </div>
 
     <TiptapEditorContent class="content_editor min-h-[300px]" :editor="editor" />
+
+    <Dialog :open="showLinkDialog" @update:open="showLinkDialog = $event">
+      <DialogContent class="sm:max-w-md z-[100]">
+        <DialogHeader>
+          <DialogTitle>Insert Link</DialogTitle>
+          <DialogDescription>Choose the type of link and configure its destination.</DialogDescription>
+        </DialogHeader>
+        
+        <Tabs v-model="linkType" class="w-full mt-4 min-w-0">
+          <TabsList class="grid w-full grid-cols-2 mb-4 min-w-0">
+            <TabsTrigger value="external" class="truncate min-w-0">External</TabsTrigger>
+            <TabsTrigger value="internal" class="truncate min-w-0">Internal</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="external" class="space-y-4 min-w-0">
+            <div class="flex items-center space-x-2 w-full py-2 min-w-0">
+              <Input v-model="linkUrlInput" placeholder="https://example.com" @keyup.enter="confirmLinkInsert" autofocus class="flex-1 min-w-0" />
+              <Button type="button" @click="confirmLinkInsert" class="shrink-0">Save</Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="internal" class="space-y-4 overflow-hidden min-w-0">
+            <div class="flex space-x-2 w-full min-w-0">
+              <Select v-model="internalCategory">
+                <SelectTrigger class="w-[100px] sm:w-[120px] shrink-0 min-w-0">
+                  <SelectValue placeholder="Category" class="truncate" />
+                </SelectTrigger>
+                <SelectContent class="z-[110]">
+                  <SelectItem value="blogs">Blogs</SelectItem>
+                  <SelectItem value="treks">Treks</SelectItem>
+                  <SelectItem value="races">Races</SelectItem>
+                  <SelectItem value="products">Store</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input v-model="internalSearchQuery" placeholder="Search..." class="flex-1 min-w-0" />
+            </div>
+            
+            <div class="h-56 overflow-y-auto overflow-x-hidden border rounded-md p-1 space-y-1 bg-muted/20 w-full min-w-0">
+              <div v-if="internalLoading" class="flex justify-center p-4">
+                <LoaderCircleIcon class="w-5 h-5 animate-spin text-primary" />
+              </div>
+              <div v-else-if="internalItems.length === 0" class="text-center text-sm text-muted-foreground p-4">
+                No items found.
+              </div>
+              <button 
+                v-else
+                v-for="item in internalItems" 
+                :key="item.id"
+                type="button"
+                @click="selectInternalItem(item)"
+                class="block w-full max-w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-muted focus:bg-muted focus:outline-none transition-colors overflow-hidden"
+              >
+                <div class="font-medium truncate block w-full max-w-full">{{ item.title || item.name }}</div>
+                <div class="text-xs text-muted-foreground truncate block w-full max-w-full">{{ getInternalUrl(item) }}</div>
+              </button>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
 
     <Dialog :open="showIconDialog" @update:open="showIconDialog = $event">
       <DialogContent class="sm:max-w-md z-[100]">

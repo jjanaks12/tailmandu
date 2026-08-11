@@ -17,31 +17,25 @@ const { axios } = useAxios()
 const selectedGallery = ref<Gallery | null>(null)
 const showGalleryForm = ref(false)
 const showDeleteGalleryDialog = ref(false)
+const { data: galleries, refresh } = await useAsyncData<Gallery[]>('gallery', async () => {
+    const { data } = await axios.get('/medias')
+    return data.galleries
+})
 
-const galleries = ref<Gallery[]>([])
 
 const searchQuery = ref('')
 const filteredGalleries = computed(() => {
-    if (!searchQuery.value) return galleries.value
+    if (!searchQuery.value) return galleries.value ?? []
     const query = searchQuery.value.toLowerCase()
-    return galleries.value.filter(g => g.name.toLowerCase().includes(query))
+    return (galleries.value ?? []).filter(g => g.name.toLowerCase().includes(query))
 })
-
-const fetch = async () => {
-    galleries.value = []
-
-    const { data } = await axios.get('/medias')
-    galleries.value = data.galleries
-}
-
 const removeGallery = async () => {
     await axios.delete(`/medias/${selectedGallery.value?.id}`)
-    fetch()
+    refresh()
     showDeleteGalleryDialog.value = false
     selectedGallery.value = null
 }
 
-onMounted(fetch)
 </script>
 
 <template>
@@ -61,14 +55,13 @@ onMounted(fetch)
                 <PlusIcon class="w-4 h-4 mr-2" />
                 {{ $t('dashboard.media.add_gallery') }}
             </Button>
-            <Button @click="fetch" modifier="outline" size="icon">
+            <Button @click="refresh()" modifier="outline" size="icon">
                 <RefreshCcwIcon class="w-4 h-4" />
             </Button>
         </div>
     </div>
-    <PagesDashboardMediaList :galleries="filteredGalleries"
-        @edit="selectedGallery = $event; showGalleryForm = true"
-        @delete="selectedGallery = $event; showDeleteGalleryDialog = true" @fetch="fetch" />
+    <PagesDashboardMediaList :galleries="filteredGalleries" @edit="selectedGallery = $event; showGalleryForm = true"
+        @delete="selectedGallery = $event; showDeleteGalleryDialog = true" @fetch="refresh" />
     <Dialog v-model:open="showGalleryForm" @update:open="showGalleryForm = false; selectedGallery = null">
         <DialogContent>
             <DialogHeader>
@@ -84,7 +77,7 @@ onMounted(fetch)
                 </DialogDescription>
             </DialogHeader>
             <PagesDashboardMediaForm @close="showGalleryForm = false" :gallery="selectedGallery"
-                @fetch="fetch(); selectedGallery = null; showGalleryForm = false" />
+                @fetch="refresh(); selectedGallery = null; showGalleryForm = false" />
         </DialogContent>
     </Dialog>
     <Dialog v-model:open="showDeleteGalleryDialog">

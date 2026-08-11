@@ -9,7 +9,7 @@ const localePath = useLocalePath()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const { axios } = useAxios()
 
-const images = ref<string[]>(["/images/home-slider15.jpg"])
+const images = ref<string[]>(["/images/home-slider01.webp"])
 
 onMounted(async () => {
     const { data } = await axios.get('/home/hero-slider')
@@ -22,8 +22,7 @@ onMounted(async () => {
 <template>
     <section class="relative h-screen flex items-center mountain-bg pt-20 z-[1] overflow-hidden">
         <div class="absolute inset-0 z-[-1]">
-            <Swiper class="h-full" :modules="[Autoplay]" loop
-                :autoplay="{ delay: 8000, disableOnInteraction: false }">
+            <Swiper class="h-full" :modules="[Autoplay]" loop :autoplay="{ delay: 8000, disableOnInteraction: false }">
                 <SwiperSlide v-for="(image, index) in images" :key="image">
                     <img :src="image" alt="" class="w-full h-full object-cover">
                 </SwiperSlide>

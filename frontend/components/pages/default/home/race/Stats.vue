@@ -13,14 +13,20 @@ const props = defineProps<StatsProps>()
 const currentStageCategory = computed(() => props.stage?.stage_categories
     .sort((a, b) => moment.utc(a.start).diff(moment.utc(b.start)))[0])
 
-const totalDistance = computed(() => props.stage?.stage_categories.reduce((total, category) => total + parseInt(category.distance ?? ''), 0))
+const totalDistance = computed(() => props.stage?.stage_categories.reduce((total, category) => total + parseInt(category.distance ?? '0'), 0))
+const totalElevation = computed(() => props.stage?.stage_categories.reduce((total, category) => total + parseInt(category.elevation || '0'), 0))
+
+const difficulty = computed(() => {
+    if (!props.stage?.difficulty) return '-'
+    return props.stage.difficulty.charAt(0).toUpperCase() + props.stage.difficulty.slice(1)
+})
 </script>
 
 <template>
     <div
         class="dark:bg-black/60 bg-white/60 backdrop-blur-[10px] -mx-4 md:mx-0 p-4 md:p-8 rounded-2xl shadow-2xl border border-white/20">
         <div class="flex flex-col md:flex-row justify-between md:items-start mb-6">
-            <div>
+            <div class="pr-2">
                 <span class="bg-primary/20 text-primary px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
                     {{ $t('home.banner.upcoming_race') }}
                 </span>
@@ -38,11 +44,11 @@ const totalDistance = computed(() => props.stage?.stage_categories.reduce((total
                 <div class="text-xs uppercase opacity-60">{{ $t('home.banner.distance') }}</div>
             </div>
             <div class="text-center p-4 bg-slate-100 dark:bg-slate-700/50 text-gray-600 dark:text-white rounded-xl">
-                <div class="text-xl font-bold">4,380m</div>
+                <div class="text-xl font-bold">{{ totalElevation ? totalElevation.toLocaleString() + 'm' : '-' }}</div>
                 <div class="text-xs uppercase opacity-60">{{ $t('home.banner.elevation') }}</div>
             </div>
             <div class="text-center p-4 bg-slate-100 dark:bg-slate-700/50 text-gray-600 dark:text-white rounded-xl">
-                <div class="text-xl font-bold">Hard</div>
+                <div class="text-xl font-bold">{{ difficulty }}</div>
                 <div class="text-xs uppercase opacity-60">{{ $t('home.banner.difficulty') }}</div>
             </div>
         </div>

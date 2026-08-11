@@ -13,14 +13,15 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { useAppStore } from '~/store/app'
 import { Autoplay, Navigation } from 'swiper/modules'
 import { storeToRefs } from 'pinia'
-import { useAuthStore } from '~/store/auth'
 
 const trekStore = useTrekStore()
 const { getTrekBySlug } = trekStore
 const { treks } = storeToRefs(trekStore)
 const route = useRoute()
 const { setImageForPreview } = useAppStore()
-const { isLoggedin } = storeToRefs(useAuthStore())
+const { public: { serverUrl } } = useRuntimeConfig()
+
+const getImageUrl = (fileName: string | undefined) => fileName ? `${serverUrl}resources/images/${fileName}` : '/images/not-found.png'
 
 definePageMeta({
     validate: async (route) => {
@@ -37,8 +38,7 @@ const securityProtocolIconMapping: Record<string, any> = {
     'Emergency Evacuation': CrossIcon
 }
 
-const { data: trek, pending, error, refresh, clear } = await useAsyncData<Trek>(`trek-${route.params.slug}`, async () => await getTrekBySlug(route.params.slug as string), { lazy: true })
-const loading = ref(true)
+const { data: trek, pending, error, refresh } = await useAsyncData<Trek>(`trek-${route.params.slug}`, async () => await getTrekBySlug(route.params.slug as string), { lazy: true })
 
 const activeDayKey = ref('item-0')
 const activeDayIndex = computed(() => {
@@ -87,9 +87,6 @@ const startingPrice = computed(() => {
     }
     return Number(trek.value?.price) || 0
 })
-const hasItineraryMap = computed(() => {
-    return trek.value?.details?.itinerary?.some((day: any) => day.places && day.places.length > 0) || false
-})
 const isScrolled = computed(() => scrollY.value > 20)
 
 const { formatCurrency } = useCurrency()
@@ -128,7 +125,7 @@ useHead(() => {
     const currentDescription = trek.value.excerpt || 'Embark on premium Himalayan treks and fastpacking expeditions with Trailmandu.'
     const canonical = `https://trailmandu.com/${type.value}/${trek.value.slug}`
     const image = trek.value.thumbnail?.file_name
-        ? showImage(trek.value.thumbnail.file_name)
+        ? `${serverUrl}/resources/images/${trek.value.thumbnail.file_name}`
         : '/images/logo.png'
 
     return {
@@ -159,7 +156,7 @@ useHead(() => {
                     '@context': 'https://schema.org',
                     '@type': 'TouristTrip',
                     '@id': `${canonical}#trip`,
-                    'name': trek.value.name,
+                    'name': trek.value?.name,
                     'description': currentDescription,
                     'image': image,
                     'touristType': type.value === 'treks' ? 'Trekker' : 'Fastpacker',
@@ -180,7 +177,7 @@ useHead(() => {
                         'availability': 'https://schema.org/InStock',
                         'validFrom': new Date().toISOString().split('T')[0]
                     },
-                    'itinerary': trek.value.details?.itinerary?.map((day: any, idx: number) => ({
+                    'itinerary': trek.value?.details?.itinerary?.map((day: any, idx: number) => ({
                         '@type': 'ListItem',
                         'position': idx + 1,
                         'name': day.title || `Day ${idx + 1}`,
@@ -236,11 +233,11 @@ onMounted(async () => {
             }" v-if="trek.gallery && trek.gallery.images.length > 0">
                 <SwiperSlide v-for="image in trek.gallery.images">
                     <img alt="Forest trail" class="w-full h-full rounded-sm object-cover border border-black/5"
-                        :src="showImage(image.file_name)" />
+                        :src="getImageUrl(image.file_name)" />
                 </SwiperSlide>
             </Swiper>
             <div v-else-if="trek.thumbnail">
-                <img :src="showImage(trek.thumbnail.file_name)" alt="" class="w-full h-screen object-cover">
+                <img :src="getImageUrl(trek.thumbnail.file_name)" alt="" class="w-full h-screen object-cover">
             </div>
             <div v-else class="flex items-center justify-center h-screen">
                 <img alt="Forest trail" class="size-full object-cover" src="/images/home-runner.png" />

@@ -120,5 +120,36 @@ export default defineNuxtConfig({
         }
       ]
     }
+  },
+
+  hooks: {
+    'components:extend'(components: any[]) {
+      // Group all components by name
+      const componentGroups: Record<string, any[]> = {}
+      for (const c of components) {
+        if (!componentGroups[c.pascalName || c.name]) {
+          componentGroups[c.pascalName || c.name] = []
+        }
+        componentGroups[c.pascalName || c.name].push(c)
+      }
+      
+      // Deduplicate any component that has been registered multiple times
+      for (const [name, duplicates] of Object.entries(componentGroups)) {
+        if (duplicates.length > 1) {
+          // Prefer keeping the local component from components/ui/
+          const toKeep = duplicates.find(c => c.filePath.includes('components/ui')) || duplicates[0]
+          
+          // Remove all duplicate instances
+          for (let i = components.length - 1; i >= 0; i--) {
+            if ((components[i].pascalName || components[i].name) === name) {
+              components.splice(i, 1)
+            }
+          }
+          
+          // Re-add the chosen one to suppress the overriding warning
+          components.push(toKeep)
+        }
+      }
+    }
   }
 })

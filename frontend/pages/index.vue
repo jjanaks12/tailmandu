@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import img01 from '@/assets/images/review-img01.jpg'
 import { GlobeIcon, MoonIcon, SunIcon } from 'lucide-vue-next'
 import type { SponsorType } from '~/lib/types'
 import { useAxios } from '~/services/axios'
@@ -81,13 +80,13 @@ useSeoMeta({
     description: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
     ogTitle: 'Trailmandu - From The City To The Mountains',
     ogDescription: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
-    ogImage: img01,
+    ogImage: '/images/home-slider01.webp',
     ogUrl: 'https://trailmandu.com',
     ogType: 'website',
     twitterCard: 'summary_large_image',
     twitterTitle: 'Trailmandu - From The City To The Mountains',
     twitterDescription: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
-    twitterImage: img01
+    twitterImage: '/images/home-slider01.webp'
 })
 
 onMounted(() => {
