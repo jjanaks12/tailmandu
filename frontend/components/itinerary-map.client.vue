@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { Maximize, Expand, Shrink, Play, Pause } from 'lucide-vue-next'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -61,6 +61,8 @@ const elevationProfile = ref<{ lat: number, lng: number, elevation: number }[]>(
 const hoveredPoint = ref<any | null>(null)
 let hoverMarker: any = null
 const svgRef = ref<SVGElement | null>(null)
+
+const debugError = ref<string | null>(null)
 
 const minElev = computed(() => elevationProfile.value.length ? Math.min(...elevationProfile.value.map(p => p.elevation)) : 0)
 const maxElev = computed(() => elevationProfile.value.length ? Math.max(...elevationProfile.value.map(p => p.elevation)) : 100)
@@ -130,7 +132,8 @@ watch(hoveredPoint, (point) => {
     }
 })
 
-onMounted(() => {
+onMounted(async () => {
+    await nextTick()
     initMap()
     drawRoute()
     if (props.activeDayIndex !== null && props.activeDayIndex !== undefined) {
@@ -152,11 +155,15 @@ onBeforeUnmount(() => {
 })
 
 const initMap = () => {
+    // debugError.value = (debugError.value || '') + '\ninitMap called. L=' + !!L + ', mapEl=' + !!mapEl.value
+
     if (!L || !mapEl.value) return
     map = L.map(mapEl.value).setView([27.7172, 85.3240], 8)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map)
+
+    // debugError.value += '\nMap initialized.'
 }
 
 const destroyMap = () => {
@@ -180,26 +187,26 @@ const stopAnimation = () => {
 const sampleCoords = (coords: L.LatLngTuple[], maxPoints = 80): L.LatLngTuple[] => {
     if (coords.length === 0) return []
     if (coords.length === 1) return coords
-    
+
     const distances = [0]
     for (let i = 1; i < coords.length; i++) {
-        distances.push(distances[i-1] + L.latLng(coords[i-1]).distanceTo(L.latLng(coords[i])))
+        distances.push(distances[i - 1] + L.latLng(coords[i - 1]).distanceTo(L.latLng(coords[i])))
     }
     const totalDist = distances[distances.length - 1]
-    
+
     if (totalDist === 0) return coords
-    
+
     const sampled: L.LatLngTuple[] = []
     const step = totalDist / (maxPoints - 1)
-    
+
     for (let i = 0; i < maxPoints; i++) {
         const targetDist = i * step
         for (let j = 0; j < distances.length - 1; j++) {
-            if (targetDist >= distances[j] && (targetDist <= distances[j+1] || j === distances.length - 2)) {
-                const segmentDist = distances[j+1] - distances[j]
+            if (targetDist >= distances[j] && (targetDist <= distances[j + 1] || j === distances.length - 2)) {
+                const segmentDist = distances[j + 1] - distances[j]
                 const fraction = segmentDist === 0 ? 0 : (targetDist - distances[j]) / segmentDist
-                const lat = coords[j][0] + (coords[j+1][0] - coords[j][0]) * fraction
-                const lng = coords[j][1] + (coords[j+1][1] - coords[j][1]) * fraction
+                const lat = coords[j][0] + (coords[j + 1][0] - coords[j][0]) * fraction
+                const lng = coords[j][1] + (coords[j + 1][1] - coords[j][1]) * fraction
                 sampled.push([lat, lng])
                 break
             }
@@ -364,28 +371,33 @@ const fetchRouteGeometry = async (from: Place, to: Place, type: 'foot' | 'bike' 
 }
 
 const drawRoute = async () => {
-    if (!L || !map) return
+    // debugError.value = (debugError.value || '') + '\ndrawRoute called.'
+    try {
+        if (!L || !map) {
+            debugError.value = 'Aborting drawRoute: L or map is null.'
+            return
+        }
 
-    // Clear old layers
-    markers.forEach(m => m.remove())
-    markers = []
-    markersMap.clear()
-    if (polyline) polyline.remove()
-    polylines.forEach(p => p.remove())
-    polylines = []
-    if (animatedMarker) animatedMarker.remove()
-    stopAnimation()
+        // Clear old layers
+        markers.forEach(m => m.remove())
+        markers = []
+        markersMap.clear()
+        if (polyline) polyline.remove()
+        polylines.forEach(p => p.remove())
+        polylines = []
+        if (animatedMarker) animatedMarker.remove()
+        stopAnimation()
 
-    const places = (props.itinerary || []).flatMap((day: any) => day.places || [])
-    if (places.length === 0) {
-        elevationProfile.value = []
-        return
-    }
+        const places = (props.itinerary || []).flatMap((day: any) => day.places || [])
+        if (places.length === 0) {
+            elevationProfile.value = []
+            return
+        }
 
-    // Draw static markers for all locations using custom divIcon to avoid global image-hiding CSS
-    places.forEach((place: Place, index: number) => {
-        const customIcon = L.divIcon({
-            html: `
+        // Draw static markers for all locations using custom divIcon to avoid global image-hiding CSS
+        places.forEach((place: Place, index: number) => {
+            const customIcon = L.divIcon({
+                html: `
                 <div style="
                     background-color: #f06723;
                     width: 14px;
@@ -399,74 +411,74 @@ const drawRoute = async () => {
                     transform: translate(-7px, -7px);
                 "></div>
             `,
-            className: 'custom-static-icon',
-            iconSize: [14, 14],
-            iconAnchor: [7, 7]
+                className: 'custom-static-icon',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            })
+            const marker = L.marker([place.lat, place.lng], { icon: customIcon })
+                .bindPopup(`<b>📍 ${place.name}</b>`)
+                .addTo(map)
+            markers.push(marker)
+            markersMap.set(`${place.lat}-${place.lng}`, marker)
         })
-        const marker = L.marker([place.lat, place.lng], { icon: customIcon })
-            .bindPopup(`<b>📍 ${place.name}</b>`)
-            .addTo(map)
-        markers.push(marker)
-        markersMap.set(`${place.lat}-${place.lng}`, marker)
-    })
 
-    if (places.length === 1) {
-        map.setView([places[0].lat, places[0].lng], 12)
-        elevationProfile.value = [{ lat: places[0].lat, lng: places[0].lng, elevation: places[0].elevation || 0 }]
-        return
-    }
+        if (places.length === 1) {
+            map.setView([places[0].lat, places[0].lng], 12)
+            elevationProfile.value = [{ lat: places[0].lat, lng: places[0].lng, elevation: places[0].elevation || 0 }]
+            return
+        }
 
-    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' => {
-        if (place.routeType) return place.routeType
-        if (place.offRoad) return 'offroad'
-        return 'foot'
-    }
+        const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' => {
+            if (place.routeType) return place.routeType
+            if (place.offRoad) return 'offroad'
+            return 'foot'
+        }
 
-    let routeCoords: L.LatLngTuple[] = []
+        let routeCoords: L.LatLngTuple[] = []
 
-    for (let i = 0; i < places.length - 1; i++) {
-        const fromPlace = places[i]
-        const toPlace = places[i + 1]
-        const type = getRouteType(fromPlace)
+        for (let i = 0; i < places.length - 1; i++) {
+            const fromPlace = places[i]
+            const toPlace = places[i + 1]
+            const type = getRouteType(fromPlace)
 
-        let coords: L.LatLngTuple[] = [
-            [fromPlace.lat, fromPlace.lng],
-            [toPlace.lat, toPlace.lng]
-        ]
+            let coords: L.LatLngTuple[] = [
+                [fromPlace.lat, fromPlace.lng],
+                [toPlace.lat, toPlace.lng]
+            ]
 
-        if (props.routingMode === 'route') {
-            if (fromPlace.routeToNext) {
-                coords = fromPlace.routeToNext
-            } else {
-                coords = await fetchRouteGeometry(fromPlace, toPlace, type)
+            if (props.routingMode === 'route') {
+                if (fromPlace.routeToNext) {
+                    coords = fromPlace.routeToNext
+                } else {
+                    coords = await fetchRouteGeometry(fromPlace, toPlace, type)
+                }
             }
-        }
 
-        if (i === 0) {
-            routeCoords.push(...coords)
-        } else {
-            routeCoords.push(...coords.slice(1))
-        }
+            if (i === 0) {
+                routeCoords.push(...coords)
+            } else {
+                routeCoords.push(...coords.slice(1))
+            }
 
-        const p = L.polyline(coords, getPolylineOptions(type as any)).addTo(map)
-        polylines.push(p)
+            const p = L.polyline(coords, getPolylineOptions(type as any)).addTo(map)
+            polylines.push(p)
 
-        // Add midpoint icon (approximate middle of the segment)
-        const midIdx = Math.floor(coords.length / 2)
-        const midLat = coords[midIdx][0]
-        const midLng = coords[midIdx][1]
-        
-        // Calculate angle for the arrow
-        const lookAhead = Math.min(5, Math.floor(coords.length / 4) || 1)
-        const p1 = coords[Math.max(0, midIdx - lookAhead)]
-        const p2 = coords[Math.min(coords.length - 1, midIdx + lookAhead)]
-        const screenDy = p1[0] - p2[0]
-        const screenDx = p2[1] - p1[1]
-        const angle = Math.atan2(screenDy, screenDx) * (180 / Math.PI)
-        
-        const color = getPolylineOptions(type as any).color
+            // Add midpoint icon (approximate middle of the segment)
+            const midIdx = Math.floor(coords.length / 2)
+            const midLat = coords[midIdx][0]
+            const midLng = coords[midIdx][1]
 
-        const iconHtml = `
+            // Calculate angle for the arrow
+            const lookAhead = Math.min(5, Math.floor(coords.length / 4) || 1)
+            const p1 = coords[Math.max(0, midIdx - lookAhead)]
+            const p2 = coords[Math.min(coords.length - 1, midIdx + lookAhead)]
+            const screenDy = p1[0] - p2[0]
+            const screenDx = p2[1] - p1[1]
+            const angle = Math.atan2(screenDy, screenDx) * (180 / Math.PI)
+
+            const color = getPolylineOptions(type as any).color
+
+            const iconHtml = `
             <div style="
                 background: white; 
                 border-radius: 12px; 
@@ -485,61 +497,73 @@ const drawRoute = async () => {
                 </svg>
             </div>`
 
-        const midIcon = L.divIcon({
-            html: iconHtml,
+            const midIcon = L.divIcon({
+                html: iconHtml,
+                className: '',
+                iconSize: [40, 24],
+                iconAnchor: [20, 12]
+            })
+            const midMarker = L.marker([midLat, midLng], { icon: midIcon, interactive: false }).addTo(map)
+            markers.push(midMarker)
+        }
+
+        // Fit map boundaries to contain the path
+        if (routeCoords.length > 0) {
+            const bounds = L.latLngBounds(routeCoords)
+            map.fitBounds(bounds, { padding: [50, 50] })
+        }
+
+        // Fetch elevation profile in background if not already pre-saved in the database
+        if (props.elevationProfile && props.elevationProfile.length > 0) {
+            elevationProfile.value = props.elevationProfile
+        } else {
+            elevationProfile.value = await fetchElevationProfile(routeCoords)
+        }
+
+        // Create the animated marker with a custom Lucide navigation icon and pulsing effect
+        const markerIconHtml = `
+        <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+            <div style="
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                background-color: rgba(59, 130, 246, 0.4);
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+            "></div>
+            <div style="
+                background-color: #3b82f6; 
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+                z-index: 2;
+            "></div>
+        </div>
+        <style>
+            @keyframes pulse {
+                0% { transform: scale(1); opacity: 0.8; }
+                100% { transform: scale(1.5); opacity: 0; }
+            }
+        </style>
+    `
+
+        const motionIcon = L.divIcon({
+            html: markerIconHtml,
             className: '',
-            iconSize: [40, 24],
-            iconAnchor: [20, 12]
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
         })
-        const midMarker = L.marker([midLat, midLng], { icon: midIcon, interactive: false }).addTo(map)
-        markers.push(midMarker)
+
+        if (animatedMarker) animatedMarker.remove()
+        animatedMarker = L.marker(routeCoords[0], { icon: motionIcon, interactive: false }).addTo(map)
+
+        animateMarker(routeCoords, places)
+    } catch (err: any) {
+        console.error("drawRoute Error:", err)
+        debugError.value = err.message + "\n" + err.stack
     }
-
-    // Fit map boundaries to contain the path
-    if (routeCoords.length > 0) {
-        const bounds = L.latLngBounds(routeCoords)
-        map.fitBounds(bounds, { padding: [50, 50] })
-    }
-
-    // Fetch elevation profile in background if not already pre-saved in the database
-    if (props.elevationProfile && props.elevationProfile.length > 0) {
-        elevationProfile.value = props.elevationProfile
-    } else {
-        elevationProfile.value = await fetchElevationProfile(routeCoords)
-    }
-
-    // Create the animated marker with a custom Lucide navigation icon and pulsing effect
-    const animatedIcon = L.divIcon({
-        html: `
-            <div style="position: relative; width: 24px; height: 24px;">
-                <div class="moving-marker-pulse"></div>
-                <div class="moving-marker-icon" style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #44859d;
-                    color: white;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    border: 2px solid white;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    transition: transform 0.1s linear;
-                ">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                    </svg>
-                </div>
-            </div>
-        `,
-        className: 'custom-moving-icon',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-    })
-    animatedMarker = L.marker(routeCoords[0], { icon: animatedIcon }).addTo(map)
-
-    // Start animating
-    animateMarker(routeCoords, places)
 }
 
 const animateMarker = (points: L.LatLngTuple[], places: Place[]) => {
@@ -726,7 +750,14 @@ defineExpose({
             : 'relative w-full h-full min-h-[400px] rounded-[2.5rem]'
     ]">
         <!-- Map Container -->
-        <div class="flex-1 relative min-h-[300px]">
+        <div class="relative w-full h-full rounded-2xl overflow-hidden shadow-sm bg-muted/20 border"
+            :class="{ 'fixed inset-4 z-50 shadow-2xl': isFullScreen }">
+
+            <div v-if="debugError"
+                class="absolute z-50 inset-4 bg-red-100 text-red-900 p-4 overflow-auto rounded font-mono text-xs whitespace-pre">
+                {{ debugError }}
+            </div>
+
             <div ref="mapEl" class="w-full h-full absolute inset-0 z-10" />
             <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
                 <button @click="fitMap"

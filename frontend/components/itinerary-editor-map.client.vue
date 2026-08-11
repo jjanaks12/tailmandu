@@ -11,6 +11,7 @@ interface Place {
     elevation?: number
     offRoad?: boolean
     routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
+    routeToNext?: L.LatLngTuple[]
 }
 
 const props = defineProps<{
@@ -65,7 +66,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 }
 
 watch(() => props.routingMode, () => {
-    drawRoute()
+    drawRoute(false)
 })
 
 const hoveredPoint = ref<any | null>(null)
@@ -143,7 +144,7 @@ watch(hoveredPoint, (point) => {
 const toggleMotion = () => {
     isMotionEnabled.value = !isMotionEnabled.value
     if (isMotionEnabled.value) {
-        drawRoute()
+        drawRoute(false)
     } else {
         stopAnimation()
         if (animatedMarker) {
@@ -153,10 +154,18 @@ const toggleMotion = () => {
     }
 }
 
+let hasLoadedInitialData = false
+
 onMounted(async () => {
     await nextTick()
     initMap()
-    drawRoute()
+    
+    const places = itinerary.value.flatMap((day: any) => day.places || [])
+    if (places.length > 0) {
+        hasLoadedInitialData = true
+    }
+    
+    drawRoute(true)
     window.addEventListener('keydown', handleKeydown)
 })
 
@@ -460,7 +469,7 @@ async function fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' 
  * It clears existing layers, draws markers for each place, and draws polylines
  * connecting each place. It also orchestrates fetching the elevation profile and starting the animation.
  */
-async function drawRoute() {
+async function drawRoute(isInitialLoad = false) {
     if (!L || !map) return
 
     // Clear old layers
@@ -532,7 +541,12 @@ async function drawRoute() {
         ]
 
         if (props.routingMode === 'route') {
-            coords = await fetchRouteGeometry(fromPlace, toPlace, type)
+            if (isInitialLoad && fromPlace.routeToNext) {
+                coords = fromPlace.routeToNext
+            } else {
+                coords = await fetchRouteGeometry(fromPlace, toPlace, type)
+                fromPlace.routeToNext = coords // Cache locally for future redraws
+            }
         }
 
         if (i === 0) {
@@ -595,7 +609,9 @@ async function drawRoute() {
     }
 
     // Fetch elevation profile in background
-    elevationProfile.value = await fetchElevationProfile(routeCoords)
+    if (!isInitialLoad || elevationProfile.value.length === 0) {
+        elevationProfile.value = await fetchElevationProfile(routeCoords)
+    }
 
     // Create the animated marker with a custom Lucide navigation icon and pulsing effect only if motion is enabled
     if (isMotionEnabled.value) {
@@ -751,8 +767,14 @@ function animateMarker(points: L.LatLngTuple[], places: Place[]) {
 }
 
 // Watch places changes to redraw route & animation
-watch(() => itinerary.value.map(day => (day.places || []).map(p => `${p.lat},${p.lng},${p.name},${p.offRoad},${p.routeType}`)), () => {
-    drawRoute()
+watch(() => itinerary.value.map(day => (day.places || []).map(p => `${p.lat},${p.lng},${p.name},${p.offRoad},${p.routeType}`)), (newVal) => {
+    const isActuallyPopulated = newVal.flat().length > 0
+    if (!hasLoadedInitialData && isActuallyPopulated) {
+        hasLoadedInitialData = true
+        drawRoute(true)
+    } else {
+        drawRoute(false)
+    }
 }, { deep: true })
 
 const searchLocation = async () => {
