@@ -4,8 +4,8 @@ import type { Trek } from '~/lib/types'
 import {
     ActivityIcon, BanIcon, BriefcaseMedicalIcon, ChartNoAxesCombinedIcon, CircleCheckIcon, ClockIcon, DumbbellIcon, StarIcon, Loader2Icon,
     CrossIcon,
-    ArrowLeftIcon,
-    ArrowRightIcon
+    ArrowRightIcon,
+    Heart
 } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import { useTrekStore } from '~/store/trek'
@@ -13,6 +13,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { useAppStore } from '~/store/app'
 import { Autoplay, Navigation } from 'swiper/modules'
 import { storeToRefs } from 'pinia'
+import { ArrowLeftIcon } from '@lucide/vue'
 
 const trekStore = useTrekStore()
 const { getTrekBySlug } = trekStore
@@ -267,23 +268,23 @@ onMounted(async () => {
                                 <ChartNoAxesCombinedIcon />
                                 Vital Stats
                             </h3>
-                            <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-2 gap-6 text-black">
                                 <div>
-                                    <p class="text-sm uppercase text-text-muted font-bold mb-1">Duration</p>
+                                    <p class="text-sm uppercase font-bold mb-1">Duration</p>
                                     <p class="text-xl font-black">{{ duration }} {{ duration === 1 ? 'Day' : 'Days' }}
                                     </p>
                                 </div>
                                 <div>
-                                    <p class="text-sm uppercase text-text-muted font-bold mb-1">Max Altitude</p>
+                                    <p class="text-sm uppercase font-bold mb-1">Max Altitude</p>
                                     <p class="text-xl font-black">{{ trek.details?.stats?.maxElevation || '---' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm uppercase text-text-muted font-bold mb-1">Difficulty</p>
+                                    <p class="text-sm uppercase font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                        }}</p>
+                                    }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm uppercase text-text-muted font-bold mb-1">Distance</p>
+                                    <p class="text-sm uppercase font-bold mb-1">Distance</p>
                                     <p class="text-xl font-black lowercase">{{ trek.details?.stats?.distance || '---' }}
                                     </p>
                                 </div>
@@ -308,6 +309,28 @@ onMounted(async () => {
             </section>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
                 <div class="lg:col-span-7 space-y-16">
+                    <!-- Reviews & Recommendations Bar -->
+                    <div class="flex flex-wrap items-center gap-4 sm:gap-6 py-4 mb-2 border-y border-black/10">
+                        <div class="flex items-center gap-3">
+                            <div class="flex gap-1">
+                                <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
+                                <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
+                                <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
+                                <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
+                                <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
+                            </div>
+                            <a href="#"
+                                class="text-[#00aa6c] font-bold text-sm underline underline-offset-4 decoration-2 hover:text-[#00aa6c]/80">
+                                100+ Reviews in TripAdvisor
+                            </a>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-[#1A1A1A]">
+                            <Heart class="w-4 h-4 text-[#ff385c]" fill="currentColor" stroke="none" />
+                            <span class="font-bold text-sm">Recommended by 99% of travellers</span>
+                        </div>
+                    </div>
+
                     <!-- Trek Overview -->
                     <section id="overview">
                         <h2

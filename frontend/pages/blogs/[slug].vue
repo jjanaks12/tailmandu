@@ -164,7 +164,8 @@ onMounted(initSwipers)
                         </Badge>
                     </div>
 
-                    <h1 class="text-4xl md:text-6xl font-display font-black tracking-tight mb-8 leading-tight">
+                    <h1
+                        class="text-4xl md:text-6xl text-black font-display font-black tracking-tight mb-8 leading-tight">
                         {{ post.title }}
                     </h1>
 
