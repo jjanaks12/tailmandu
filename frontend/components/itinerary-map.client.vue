@@ -11,6 +11,7 @@ interface Place {
     elevation?: number
     offRoad?: boolean
     routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
+    routeToNext?: L.LatLngTuple[]
 }
 
 interface Props {
@@ -434,7 +435,11 @@ const drawRoute = async () => {
         ]
 
         if (props.routingMode === 'route') {
-            coords = await fetchRouteGeometry(fromPlace, toPlace, type)
+            if (fromPlace.routeToNext) {
+                coords = fromPlace.routeToNext
+            } else {
+                coords = await fetchRouteGeometry(fromPlace, toPlace, type)
+            }
         }
 
         if (i === 0) {

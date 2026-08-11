@@ -1,6 +1,7 @@
 import { trekSchema } from "@/app/lib/schema/treks.schema"
 import { APIQuery } from "@/app/lib/types"
 import { prisma } from "@/app/lib/services/prisma.service"
+import { MapService } from "@/app/lib/services/map.service"
 import { FileHandler } from "@/app/lib/services/file.service"
 import { Prisma } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
@@ -92,6 +93,11 @@ export class TrekController {
 
             const slug = validationData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
+            let enrichedDetails = validationData.details
+            if (enrichedDetails) {
+                enrichedDetails = await MapService.enrichTrekDetails(enrichedDetails)
+            }
+
             response.send(await prisma.trek.create({
                 data: {
                     name: validationData.name,
@@ -100,7 +106,7 @@ export class TrekController {
                     price: validationData.price ?? '',
                     description: validationData.description,
                     image_id: validationData.image,
-                    details: validationData.details,
+                    details: enrichedDetails,
                     gallery_id: validationData.gallery_id,
                     category_id: (validationData as any).category_id,
                     tags: {
@@ -153,6 +159,11 @@ export class TrekController {
                 }
             }
 
+            let enrichedDetails = request.body.details
+            if (enrichedDetails) {
+                enrichedDetails = await MapService.enrichTrekDetails(enrichedDetails)
+            }
+
             response.send(await prisma.trek.update({
                 where: {
                     id: request.params.id as string
@@ -163,7 +174,7 @@ export class TrekController {
                     excerpt: request.body.excerpt ?? existingTrek.excerpt,
                     description: request.body.description ?? existingTrek.description,
                     image_id: request.body.image_id ?? existingTrek.image_id,
-                    details: request.body.details ?? existingTrek.details,
+                    details: enrichedDetails ?? existingTrek.details,
                     gallery_id: request.body.gallery_id ?? existingTrek.gallery_id,
                     category_id: request.body.category_id ?? (existingTrek as any).category_id,
                     price: request.body.price ?? existingTrek.price,
