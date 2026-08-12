@@ -35,12 +35,14 @@ const isScrolled = computed(() => scrollY.value > 20)
                             <template v-for="menu of menus">
                                 <NavigationMenuItem v-if="menu.subMenu && menu.subMenu.length > 0">
                                     <NavigationMenuTrigger
-                                        class="bg-transparent uppercase data-[state=open]:hover:bg-transparent">
-                                        <Icon :name="(menu.icon as keyof typeof Icons)" v-if="menu.showIcon" />
+                                        class="bg-transparent uppercase data-[state=open]:hover:bg-transparent transition-colors duration-300 data-[active=true]:!drop-shadow-none data-[state=open]:!drop-shadow-none"
+                                        :class="!isScrolled ? 'text-white drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]' : ''">
+                                        <Icon :name="(menu.icon as keyof typeof Icons)" v-if="menu.showIcon"
+                                            class="text-inherit" />
                                         {{ menu.title }}
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
-                                        <ul class="grid w-[200px] gap-4 uppercase">
+                                        <ul class="grid w-[200px] gap-4 uppercase text-slate-800 dark:text-slate-200">
                                             <li v-for="subMenu of menu.subMenu">
                                                 <NavigationMenuLink as-child>
                                                     <a :href="localePath(subMenu.path)">{{ subMenu.title }}</a>
@@ -51,8 +53,11 @@ const isScrolled = computed(() => scrollY.value > 20)
                                 </NavigationMenuItem>
                                 <template v-else>
                                     <NavigationMenuLink as-child>
-                                        <NuxtLink :to="localePath(menu.path)" class="flex-row items-center gap-2">
-                                            <Icon :name="(menu.icon as keyof typeof Icons)" v-if="menu.showIcon" />
+                                        <NuxtLink :to="localePath(menu.path)"
+                                            class="flex items-center gap-2 transition-colors duration-300 [&.router-link-active]:!drop-shadow-none [&.router-link-exact-active]:!drop-shadow-none data-[active=true]:!drop-shadow-none"
+                                            :class="!isScrolled ? 'text-white drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]' : ''">
+                                            <Icon :name="(menu.icon as keyof typeof Icons)" v-if="menu.showIcon"
+                                                class="text-inherit" />
                                             {{ menu.title }}
                                         </NuxtLink>
                                     </NavigationMenuLink>

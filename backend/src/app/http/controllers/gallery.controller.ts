@@ -45,6 +45,7 @@ export class GalleryController {
                 data: {
                     name: validationData.name,
                     description: validationData.description,
+                    image_order: validationData.image_order,
                     tags: {
                         connect: tags
                     },
@@ -92,6 +93,7 @@ export class GalleryController {
                 data: {
                     name: validationData.name,
                     description: validationData.description,
+                    image_order: validationData.image_order,
                     tags: {
                         connect: tags
                     },

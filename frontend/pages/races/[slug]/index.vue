@@ -40,7 +40,7 @@ const parsedDetails = computed(() => {
     }
 })
 
-const totalElevationGain = computed(() => {
+/* const totalElevationGain = computed(() => {
     if (!trailRace.value?.stages) return "0"
     const sum = trailRace.value.stages.reduce((acc, stage) => {
         return acc + stage.stage_categories.reduce((t, st) => {
@@ -49,7 +49,7 @@ const totalElevationGain = computed(() => {
         }, 0)
     }, 0)
     return sum.toLocaleString('en-US')
-})
+}) */
 
 if (trailRace.value && trailRace.value.stages.length > 0) {
     let initialStage = trailRace.value.stages[0]
@@ -233,7 +233,8 @@ const isSticky = computed(() => y.value > 450)
                         class="hidden md:flex items-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                         <div class="flex items-center gap-1.5" v-if="!isFinished">
                             <CalendarIcon class="w-4 h-4 text-primary" />
-                            <span>{{ formatDate(trailRace.start) }} — {{ formatDate(trailRace.end) }}</span>
+                            <span>{{ formatDate(selectedStageCategory?.start ?? trailRace.start) }} — {{
+                                formatDate(selectedStageCategory?.end ?? trailRace.end) }}</span>
                         </div>
                         <div class="flex items-center gap-1.5" v-if="selectedStage">
                             <MapPinIcon class="w-4 h-4 text-primary" />
@@ -293,7 +294,8 @@ const isSticky = computed(() => y.value > 450)
                         class="flex flex-wrap items-center gap-8 text-slate-300 font-bold uppercase tracking-widest text-sm">
                         <div class="flex items-center gap-2.5" v-if="!isFinished">
                             <CalendarIcon class="w-5 h-5 text-primary" />
-                            <span>{{ formatDate(trailRace.start) }} — {{ formatDate(trailRace.end) }}</span>
+                            <span>{{ formatDate(selectedStageCategory?.start ?? trailRace.start) }} — {{
+                                formatDate(selectedStageCategory?.end ?? trailRace.end) }}</span>
                         </div>
                         <div class="flex items-center gap-2.5" v-if="selectedStage">
                             <MapPinIcon class="w-5 h-5 text-primary" />
@@ -323,22 +325,25 @@ const isSticky = computed(() => y.value > 450)
                                 Distance</span>
                             <div class="flex items-baseline gap-1">
                                 <span
-                                    class="text-4xl font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">{{
-                                        totalDistance }}</span>
+                                    class="text-4xl font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+                                    {{ totalDistance }}
+                                </span>
                                 <span class="text-sm font-bold text-slate-400 uppercase">KM</span>
                             </div>
                         </div>
-                        <div
+                        <!-- <div
                             class="bg-white dark:bg-deep-slate p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col gap-3 group hover:border-primary/50 transition-colors">
-                            <span class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Vert
-                                Gain</span>
+                            <span class="text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                                Vert Gain
+                            </span>
                             <div class="flex items-baseline gap-1">
                                 <span
-                                    class="text-4xl font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">{{
-                                        totalElevationGain }}</span>
+                                    class="text-4xl font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+                                    {{ totalElevationGain }}
+                                </span>
                                 <span class="text-sm font-bold text-slate-400 uppercase">M</span>
                             </div>
-                        </div>
+                        </div> -->
                         <div
                             class="bg-white dark:bg-deep-slate p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col gap-3">
                             <span

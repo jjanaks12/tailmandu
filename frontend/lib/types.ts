@@ -451,6 +451,7 @@ export type Gallery = {
     updated_at: string
     deleted_at: string
     hide_gallery: boolean
+    image_order: string[] | null
     images: Image[]
     tags: Tag[]
     _count: Record<string, number>

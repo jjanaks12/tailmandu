@@ -607,6 +607,7 @@ model Gallery {
   id          String    @id @default(cuid())
   name        String
   description String?   @db.Text
+  image_order Json?
   created_at  DateTime  @default(now())
   updated_at  DateTime?
   deleted_at  DateTime?

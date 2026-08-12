@@ -85,6 +85,7 @@ export class MediaController {
                     name: validationData.name,
                     description: validationData.description,
                     hide_gallery: validationData.hide_gallery,
+                    image_order: validationData.image_order,
                     tags: {
                         connect: tags
                     }
@@ -143,6 +144,7 @@ export class MediaController {
                     name: validationData.name,
                     description: validationData.description,
                     hide_gallery: validationData.hide_gallery,
+                    image_order: validationData.image_order,
                     tags: {
                         connect: tags,
                         disconnect: deletedTags

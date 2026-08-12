@@ -5,6 +5,8 @@ import { useAxios } from '~/services/axios'
 import { toast } from 'vue-sonner'
 import { showImage } from '~/lib/filters'
 import { useMediaStore } from '~/store/media'
+import draggable from 'vuedraggable'
+import type { Image } from '~/lib/types'
 
 interface MediaItemProps {
     gallery: Gallery
@@ -22,6 +24,7 @@ const props = defineProps<MediaItemProps>()
 
 const images = ref<LocalImage[]>([])
 const selectedImages = ref<string[] | null[]>([])
+const galleryImages = ref<Image[]>([])
 const emit = defineEmits(['fetch', 'edit', 'delete'])
 
 const mediaStore = useMediaStore()
@@ -198,18 +201,50 @@ const deleteImage = async () => {
 }
 
 const init = () => {
-    if (props.gallery.images.length > 0)
+    if (props.gallery.images.length > 0) {
         selectedImages.value = props.gallery.images.map(_ => null)
+        
+        let sortedImages = [...props.gallery.images]
+        if (props.gallery.image_order && props.gallery.image_order.length > 0) {
+            sortedImages.sort((a, b) => {
+                const indexA = props.gallery.image_order!.indexOf(a.id)
+                const indexB = props.gallery.image_order!.indexOf(b.id)
+                if (indexA === -1 && indexB === -1) return 0
+                if (indexA === -1) return 1
+                if (indexB === -1) return -1
+                return indexA - indexB
+            })
+        }
+        galleryImages.value = sortedImages
+    } else {
+        galleryImages.value = []
+    }
+}
+
+const saveImageOrder = async () => {
+    try {
+        await axios.put(`/medias/${props.gallery.id}`, {
+            name: props.gallery.name,
+            description: props.gallery.description,
+            hide_gallery: props.gallery.hide_gallery,
+            tags: props.gallery.tags.map((t: any) => t.name),
+            image_order: galleryImages.value.map(img => img.id)
+        })
+        toast.success('Image order saved')
+        // No emit fetch here, otherwise it triggers a refresh immediately
+    } catch (error) {
+        toast.error('Failed to save order')
+    }
 }
 
 const selectAllImages = () => {
-    selectedImages.value = props.gallery.images.map(image => image.id)
+    selectedImages.value = galleryImages.value.map(image => image.id)
 }
 
 watch(() => props.gallery, () => {
     images.value = []
     init()
-})
+}, { deep: true })
 
 const isDropOver = ref(false)
 let dropCounter = 0
@@ -317,8 +352,8 @@ onMounted(init)
             class="flex items-center justify-between sticky top-[75px] py-5 px-1 bg-white z-10 border-b border-dashed border-gray-200">
             <div class="grow">
                 <strong class="text-xl block mb-3">{{ gallery.name }}
-                    <span v-if="isGalleryDropOver"
-                        class="ml-2 text-sm font-normal text-primary animate-pulse">Drop here to add</span>
+                    <span v-if="isGalleryDropOver" class="ml-2 text-sm font-normal text-primary animate-pulse">Drop here
+                        to add</span>
                 </strong>
                 <div class="flex gap-2">
                     <Badge variant="secondary" v-for="(tag, index) in gallery.tags" :key="`tag_${index}`">
@@ -432,9 +467,16 @@ onMounted(init)
             </div>
         </div>
         <div class="grid grid-cols-4 gap-2">
-            <PagesDashboardMediaCard v-for="(image, index) in gallery.images" :key="`gallery_${index}`"
-                v-model:selected="selectedImages[index]" :image="image" :gallery-id="gallery.id"
-                @edit-details="openExistingImageEdit" />
+            <draggable v-model="galleryImages" item-key="id" class="contents" @end="saveImageOrder">
+                <template #item="{ element: image, index }">
+                    <PagesDashboardMediaCard 
+                        v-model:selected="selectedImages[index]" 
+                        :image="image" 
+                        :gallery-id="gallery.id"
+                        @edit-details="openExistingImageEdit" 
+                    />
+                </template>
+            </draggable>
             <template v-if="images.length > 0">
                 <div v-for="(image, index) in images" :key="`images_${index}`"
                     class="relative aspect-square border rounded-md overflow-hidden flex items-center justify-center cursor-pointer group"
@@ -464,7 +506,7 @@ onMounted(init)
     </div>
 
     <Dialog :open="!!editingImage" @update:open="editingImage = null">
-        <DialogContent class="sm:max-w-[700px] w-[100%]">
+        <DialogContent class="sm:max-w-[700px] w-[100%] max-h-screen overflow-y-auto">
             <DialogHeader>
                 <DialogTitle>Edit Image Details</DialogTitle>
                 <DialogDescription>

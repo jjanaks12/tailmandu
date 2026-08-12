@@ -63,7 +63,7 @@ const removeGallery = async () => {
     <PagesDashboardMediaList :galleries="filteredGalleries" @edit="selectedGallery = $event; showGalleryForm = true"
         @delete="selectedGallery = $event; showDeleteGalleryDialog = true" @fetch="refresh" />
     <Dialog v-model:open="showGalleryForm" @update:open="showGalleryForm = false; selectedGallery = null">
-        <DialogContent>
+        <DialogContent class="max-h-screen overflow-y-auto">
             <DialogHeader>
                 <DialogTitle>
                     {{ selectedGallery
