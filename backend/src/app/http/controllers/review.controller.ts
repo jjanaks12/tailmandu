@@ -32,10 +32,16 @@ export const getGoogleReviews = async (req: Request, res: Response): Promise<voi
             }
         );
 
+        const reviews = (data.reviews || []).map((r: any) => ({
+            ...r,
+            platform: 'google'
+        }));
+
         const payload = {
+            platform: 'google',
             rating: data.rating || null,
             userRatingCount: data.userRatingCount || 0,
-            reviews: data.reviews || []
+            reviews
         };
 
         // 3. Cache in Redis for 30 days (30 * 24 * 60 * 60 = 2592000 seconds)
