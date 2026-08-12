@@ -35,28 +35,35 @@ const fetchReviews = async () => {
 
         let allReviews = [...localReviews]
 
-        // 3. Fetch Google Reviews
+        // 3. Fetch Third-party Reviews
         try {
             const { data: gData } = await axios.get('/reviews')
             if (gData) {
-                thirdpartyReview.value = { rating: gData.rating, userRatingCount: gData.userRatingCount, reviews: gData.reviews, platform: gData.platform }
+                thirdpartyReview.value = gData
 
-                // Map Google reviews (if any exist with text) to match local shape
-                if (gData.reviews && gData.reviews.length > 0) {
-                    const mappedGoogleReviews = gData.reviews
-                        .filter((r: any) => r.text && r.text.text)
-                        .map((r: any) => ({
-                            id: Math.random().toString(),
-                            rating: r.rating,
-                            message: r.text.text,
-                            name: r.authorAttribution?.displayName || 'Google User',
-                            subject: 'Google Review'
-                        }))
-                    allReviews = [...allReviews, ...mappedGoogleReviews]
-                }
+                // Map third-party reviews (if any exist with text) to match local shape
+                Object.values(gData).forEach((platformData: any) => {
+                    if (platformData.reviews && platformData.reviews.length > 0) {
+                        const mappedReviews = platformData.reviews
+                            .filter((r: any) => r.text && r.text.text)
+                            .map((r: any) => {
+                                const platformName = platformData.platform
+                                    ? platformData.platform.charAt(0).toUpperCase() + platformData.platform.slice(1)
+                                    : 'Guest'
+                                return {
+                                    id: Math.random().toString(),
+                                    rating: r.rating,
+                                    message: r.text.text,
+                                    name: r.authorAttribution?.displayName || `${platformName} User`,
+                                    subject: `${platformName} Review`
+                                }
+                            })
+                        allReviews = [...allReviews, ...mappedReviews]
+                    }
+                })
             }
         } catch (e) {
-            console.error('Failed to fetch google reviews', e)
+            console.error('Failed to fetch third-party reviews', e)
         }
 
         reviews.value = allReviews
@@ -91,7 +98,7 @@ onMounted(fetchReviews)
             <!-- Google Rating Badge -->
         </div>
         <div v-if="thirdpartyReview"
-            class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-full shadow-sm w-fit"
+            class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-full shadow-sm w-fit mb-4"
             v-for="(review, platform) in thirdpartyReview">
             <img :src="imageMapper[platform]" :alt="platform" class="h-5 object-contain mr-1" />
             <span class="font-bold text-lg leading-none">{{ review.rating }}</span>
