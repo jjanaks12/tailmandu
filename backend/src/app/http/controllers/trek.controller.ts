@@ -29,7 +29,9 @@ export class TrekController {
                 }
             }
 
-            const treks = await prisma.trek.findMany({
+            // Fetch only IDs first (Deferred Join pattern) to avoid MySQL sort buffer exhaustion 
+            // from large JSON/TEXT columns during ORDER BY
+            const ids = await prisma.trek.findMany({
                 skip,
                 take: parseInt(per_page.toString()),
                 orderBy: sort ? {
@@ -38,8 +40,14 @@ export class TrekController {
                     created_at: 'desc'
                 },
                 where: whereQuery,
+                select: { id: true }
+            })
+
+            const treksUnsorted = await prisma.trek.findMany({
+                where: {
+                    id: { in: ids.map(i => i.id) }
+                },
                 omit: {
-                    details: true,
                     description: true
                 },
                 include: {
@@ -56,6 +64,9 @@ export class TrekController {
                     category: true
                 }
             })
+
+            // Re-sort the fetched treks to match the ordered IDs
+            const treks = ids.map(i => treksUnsorted.find(t => t.id === i.id)).filter(Boolean)
 
             const total = await prisma.trek.count()
             response.send({

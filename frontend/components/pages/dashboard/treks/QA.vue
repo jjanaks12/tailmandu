@@ -21,12 +21,16 @@ const isQADirty = computed(() => {
 onMounted(() => {
     if (props.trek.details?.qa) {
         qa.value = JSON.parse(JSON.stringify(props.trek.details.qa))
+    } else {
+        qa.value = []
     }
 })
 
 watch(() => props.trek, (newTrek) => {
     if (newTrek?.details?.qa) {
         qa.value = JSON.parse(JSON.stringify(newTrek.details.qa))
+    } else {
+        qa.value = []
     }
 }, { deep: true })
 

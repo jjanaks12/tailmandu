@@ -45,6 +45,7 @@ onMounted(async () => {
             <div v-else class="space-y-8">
                 <div class="group bg-white dark:bg-deep-slate rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-xl hover:shadow-2xl transition-all border border-slate-100 dark:border-slate-800"
                     v-for="adventure in adventureList" :key="adventure.id">
+                    <pre>{{ adventure }}</pre>
                     <div class="md:w-2/5 relative overflow-hidden">
                         <img :alt="adventure.name"
                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

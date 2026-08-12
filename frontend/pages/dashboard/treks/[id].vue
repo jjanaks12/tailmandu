@@ -154,7 +154,16 @@ const init = async () => {
     if (savedState) {
         try {
             const savedStateData = JSON.parse(savedState)
-            trek.value = savedStateData.trek
+            
+            // Only restore inline-editable fields to prevent overwriting sub-components (like QA, Pricing, etc) that save independently
+            if (trek.value && savedStateData.trek?.details) {
+                trek.value.details.included = savedStateData.trek.details.included || []
+                trek.value.details.excluded = savedStateData.trek.details.excluded || []
+                trek.value.details.itemisedInclusions = savedStateData.trek.details.itemisedInclusions || []
+                trek.value.details.mandatoryGear = savedStateData.trek.details.mandatoryGear || []
+                trek.value.details.optionalGear = savedStateData.trek.details.optionalGear || []
+            }
+            
             excerpt.value = savedStateData.excerpt
             slug.value = savedStateData.slug || ''
             hasUnsavedChanges.value = true
