@@ -305,9 +305,6 @@ export class EventController {
                         include: {
                             thumbnail: true,
                             stage_categories: {
-                                where: {
-                                    deleted_at: null
-                                },
                                 include: {
                                     map_file: true,
                                     checkpoints: {
