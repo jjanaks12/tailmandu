@@ -38,6 +38,10 @@ export class TrekController {
                     created_at: 'desc'
                 },
                 where: whereQuery,
+                omit: {
+                    details: true,
+                    description: true
+                },
                 include: {
                     tags: true,
                     gallery: {
