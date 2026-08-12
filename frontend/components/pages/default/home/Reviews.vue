@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from 'lucide-vue-next'
+import type { Review } from '~/lib/types'
 import { useAxios } from '~/services/axios'
-import type { Enquiry } from '~/store/enquiry'
 
 const REVIEW_CATEGORY_NAME = 'Give review'
 
 const { axios } = useAxios()
 
 const reviews = ref<any[]>([])
-const googleStats = ref({ rating: null, count: 0 })
+const thirdpartyReview = ref<Review | null>(null)
 const current = ref(0)
 const isLoading = ref(true)
 
@@ -32,15 +32,15 @@ const fetchReviews = async () => {
         const { data: localReviews } = await axios.get('/enquiries', {
             params: { category_id: reviewCategory.id, status: 'RESOLVED' }
         })
-        
+
         let allReviews = [...localReviews]
 
         // 3. Fetch Google Reviews
         try {
             const { data: gData } = await axios.get('/reviews')
             if (gData) {
-                googleStats.value = { rating: gData.rating, count: gData.userRatingCount }
-                
+                thirdpartyReview.value = { rating: gData.rating, userRatingCount: gData.userRatingCount, reviews: gData.reviews, platform: gData.platform }
+
                 // Map Google reviews (if any exist with text) to match local shape
                 if (gData.reviews && gData.reviews.length > 0) {
                     const mappedGoogleReviews = gData.reviews
@@ -76,21 +76,29 @@ const initials = (name: string) => name
 
 const stars = (rating?: number) => Math.round(rating ?? 5)
 
+const imageMapper: Record<string, string> = {
+    google: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png'
+}
+
 onMounted(fetchReviews)
 </script>
 
 <template>
     <div>
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-            <h2 class="font-display text-4xl font-bold m-0">Voices from the Trail</h2>
-            
+            <h2 class="font-display text-4xl font-bold m-0">Tales of Trail</h2>
+
             <!-- Google Rating Badge -->
-            <div v-if="googleStats.rating" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-full shadow-sm w-fit">
-                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" class="h-4 object-contain mr-1" />
-                <span class="font-bold text-lg leading-none">{{ googleStats.rating }}</span>
-                <StarIcon class="size-4 text-[#FBBC05] fill-[#FBBC05] -mt-0.5" />
-                <span class="text-sm text-slate-500 font-medium ml-1">({{ googleStats.count }} Reviews)</span>
-            </div>
+        </div>
+        <div v-if="thirdpartyReview"
+            class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-full shadow-sm w-fit"
+            v-for="(review, platform) in thirdpartyReview">
+            <img :src="imageMapper[platform]" :alt="platform" class="h-5 object-contain mr-1" />
+            <span class="font-bold text-lg leading-none">{{ review.rating }}</span>
+            <StarIcon class="size-4 text-[#FBBC05] fill-[#FBBC05] -mt-0.5" />
+            <span class="text-sm text-slate-500 font-medium ml-1 whitespace-nowrap">
+                ({{ review.userRatingCount }} Reviews)
+            </span>
         </div>
 
         <!-- Loading skeleton -->

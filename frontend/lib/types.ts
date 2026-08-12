@@ -713,3 +713,10 @@ export type TeamMember = {
     updated_at: string | null
     deleted_at: string | null
 }
+
+export type Review = Record<string, {
+    rating: number,
+    platform: string,
+    userRatingCount: number,
+    reviews: any[]
+}>

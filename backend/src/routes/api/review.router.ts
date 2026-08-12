@@ -1,8 +1,8 @@
+import { ReviewController } from '@/app/http/controllers/review.controller';
 import { Router } from 'express';
-import { getGoogleReviews } from '@/app/http/controllers/review.controller';
 
 const router = Router();
 
-router.get('/', getGoogleReviews);
+router.get('/', ReviewController.index);
 
 export default router;
