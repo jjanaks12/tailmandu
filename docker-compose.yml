@@ -28,6 +28,17 @@ services:
       # Exposed on 6380 on the host to avoid conflicting with any local Redis running on 6379
       - "6380:6379"
 
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: trailmandu-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+
   backend:
     build:
       context: ./backend

@@ -7,7 +7,8 @@ const REVIEW_CATEGORY_NAME = 'Give review'
 
 const { axios } = useAxios()
 
-const reviews = ref<Enquiry[]>([])
+const reviews = ref<any[]>([])
+const googleStats = ref({ rating: null, count: 0 })
 const current = ref(0)
 const isLoading = ref(true)
 
@@ -28,10 +29,37 @@ const fetchReviews = async () => {
         if (!reviewCategory) return
 
         // 2. Fetch enquiries for that category (published ones from the list)
-        const { data } = await axios.get('/enquiries', {
+        const { data: localReviews } = await axios.get('/enquiries', {
             params: { category_id: reviewCategory.id, status: 'RESOLVED' }
         })
-        reviews.value = data
+        
+        let allReviews = [...localReviews]
+
+        // 3. Fetch Google Reviews
+        try {
+            const { data: gData } = await axios.get('/reviews')
+            if (gData) {
+                googleStats.value = { rating: gData.rating, count: gData.userRatingCount }
+                
+                // Map Google reviews (if any exist with text) to match local shape
+                if (gData.reviews && gData.reviews.length > 0) {
+                    const mappedGoogleReviews = gData.reviews
+                        .filter((r: any) => r.text && r.text.text)
+                        .map((r: any) => ({
+                            id: Math.random().toString(),
+                            rating: r.rating,
+                            message: r.text.text,
+                            name: r.authorAttribution?.displayName || 'Google User',
+                            subject: 'Google Review'
+                        }))
+                    allReviews = [...allReviews, ...mappedGoogleReviews]
+                }
+            }
+        } catch (e) {
+            console.error('Failed to fetch google reviews', e)
+        }
+
+        reviews.value = allReviews
     } catch {
         // silently fail on public page
     } finally {
@@ -53,7 +81,17 @@ onMounted(fetchReviews)
 
 <template>
     <div>
-        <h2 class="font-display text-4xl font-bold mb-8">Voices from the Trail</h2>
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <h2 class="font-display text-4xl font-bold m-0">Voices from the Trail</h2>
+            
+            <!-- Google Rating Badge -->
+            <div v-if="googleStats.rating" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-full shadow-sm w-fit">
+                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" class="h-4 object-contain mr-1" />
+                <span class="font-bold text-lg leading-none">{{ googleStats.rating }}</span>
+                <StarIcon class="size-4 text-[#FBBC05] fill-[#FBBC05] -mt-0.5" />
+                <span class="text-sm text-slate-500 font-medium ml-1">({{ googleStats.count }} Reviews)</span>
+            </div>
+        </div>
 
         <!-- Loading skeleton -->
         <div v-if="isLoading"
