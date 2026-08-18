@@ -56,7 +56,8 @@ const socialLinks = [
 
 const shareOnSocial = (link: typeof socialLinks[0]) => {
     if (typeof window === 'undefined') return
-    const url = encodeURIComponent(window.location.href)
+    const currentUrl = post.value?.seo?.canonical_url || `https://trailmandu.com/blogs/${post.value?.slug}`
+    const url = encodeURIComponent(currentUrl)
     const shareUrl = link.getShareUrl(url)
 
     if (shareUrl) {
@@ -170,7 +171,7 @@ onMounted(initSwipers)
                     </h1>
 
                     <div
-                        class="flex items-center justify-center gap-8 text-sm font-bold uppercase tracking-widest text-slate-400">
+                        class="flex items-center justify-center gap-8 text-sm font-bold uppercase tracking-widest text-black">
                         <div class="flex items-center gap-2">
                             <CalendarIcon class="w-4 h-4" />
                             {{ formatDate(post.published_at || post.created_at) }}
@@ -197,7 +198,7 @@ onMounted(initSwipers)
                 <!-- Sidebar Left: Social Share -->
                 <div class="hidden lg:block w-20 sticky top-32 h-fit">
                     <div class="flex flex-col gap-4 items-center">
-                        <span class="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-2">{{
+                        <span class="text-[10px] font-black uppercase tracking-tighter text-black mb-2">{{
                             $t('public_blogs.share') }}</span>
                         <Button v-for="link in socialLinks" :key="link.platform" size="icon" modifier="outline"
                             @click="shareOnSocial(link)"
@@ -231,24 +232,26 @@ onMounted(initSwipers)
                         <NuxtLink v-if="post.prev" :to="`/blogs/${post.prev.slug}`"
                             class="group flex flex-col items-start text-left flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
                             <span
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                                class="text-[10px] font-black text-black uppercase tracking-widest mb-2 flex items-center gap-1">
                                 <ArrowLeftIcon class="w-3 h-3 transition-transform group-hover:-translate-x-1" />
                                 {{ $t('public_blogs.previous_post') }}
                             </span>
-                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{
-                                post.prev.title }}</span>
+                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">
+                                {{ post.prev.title }}
+                            </span>
                         </NuxtLink>
                         <div v-else class="flex-1"></div>
 
                         <NuxtLink v-if="post.next" :to="`/blogs/${post.next.slug}`"
                             class="group flex flex-col items-end text-right flex-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 rounded-2xl transition-colors">
                             <span
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                                class="text-[10px] font-black text-black uppercase tracking-widest mb-2 flex items-center gap-1">
                                 {{ $t('public_blogs.next_post') }}
                                 <ArrowRightIcon class="w-3 h-3 transition-transform group-hover:translate-x-1" />
                             </span>
-                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">{{
-                                post.next.title }}</span>
+                            <span class="font-display font-bold text-lg leading-tight line-clamp-2 text-primary">
+                                {{ post.next.title }}
+                            </span>
                         </NuxtLink>
                         <div v-else class="flex-1"></div>
                     </div>

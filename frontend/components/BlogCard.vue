@@ -45,7 +45,7 @@ const formatDate = (date: string) => {
 
         <!-- Content -->
         <div class="p-8 flex flex-col flex-1">
-            <div class="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+            <div class="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-700 mb-4">
                 <div class="flex items-center gap-1.5">
                     <CalendarIcon class="w-3.5 h-3.5" />
                     {{ formatDate(post.published_at || post.created_at) }}
@@ -56,12 +56,14 @@ const formatDate = (date: string) => {
                 </div>
             </div>
 
-            <h3 class="text-2xl font-display font-bold mb-4 group-hover:text-primary transition-colors line-clamp-2">
+            <h3
+                class="text-2xl font-display font-bold mb-4 text-black group-hover:text-primary transition-colors line-clamp-2">
                 <NuxtLink :to="`/blogs/${post.slug}`">{{ post.title }}</NuxtLink>
             </h3>
 
             <p class="text-slate-500 dark:text-slate-400 mb-8 line-clamp-3 leading-relaxed">
-                {{ post.excerpt || (parseContent(post.content || '')?.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...') }}
+                {{ post.excerpt || (parseContent(post.content || '')?.replace(/<[^>]*>?/gm, '').substring(0, 150) +
+                    '...') }}
             </p>
 
             <div class="mt-auto">

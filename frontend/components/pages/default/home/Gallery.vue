@@ -13,7 +13,7 @@ const localePath = useLocalePath()
 const fetch = async () => {
     const { data } = await axios.get('/home/galleries', {
         params: {
-            take: 7,
+            take: 9,
             tags: ['treks', 'trail race']
         }
     })
@@ -22,10 +22,10 @@ const fetch = async () => {
 
 // const sizeMap = ['col-span-2 row-span-2', 'row-span-1', 'row-span-2', 'row-span-1', 'col-span-1 row-span-1', 'col-span-1 row-span-1', 'col-span-1 row-span-1', 'col-span-1 row-span-1']
 // const sizeMap = ['col-span-2 row-span-2', 'row-span-1', 'row-span-2', 'row-span-1']
-const sizeMap = [
+/* const sizeMap = [
     'col-span-2 row-span-2', 'row-span-1', 'row-span-2', 'row-span-1',
     'row-span-1', 'col-span-2 row-span-2', 'row-span-2', 'col-span-1 row-span-1'
-]
+] */
 
 onMounted(fetch)
 </script>
@@ -37,9 +37,9 @@ onMounted(fetch)
                 <h2 class="font-display text-4xl font-bold mb-4">{{ $t('home.gallery.title') }}</h2>
                 <p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">{{ $t('home.gallery.description') }}</p>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[200px]">
                 <div v-for="(image, index) in images" :key="image.id" class="relative group overflow-hidden rounded-2xl"
-                    @click="setImageForPreview(showImage(image.file_name))" :class="sizeMap[index % sizeMap.length]">
+                    @click="setImageForPreview(showImage(image.file_name))">
                     <img alt="Runner on ridge"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         :src="showImage(image.file_name)" />

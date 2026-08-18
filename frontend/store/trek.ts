@@ -17,6 +17,11 @@ export const useTrekStore = defineStore('trek', () => {
         isLoading.value = false
     }
 
+    const fetchTreksByCategory = async (category?: string, per_page = 2): Promise<Trek[]> => {
+        const { data: { data } } = await axios.get('/treks', { params: { show_draft: false, per_page, category } })
+        return data
+    }
+
     const getTrek = async (id: string) => {
         const { data } = await axios.get(`/treks/${id}`)
         return data as Trek
@@ -49,6 +54,6 @@ export const useTrekStore = defineStore('trek', () => {
     return {
         treks,
         isLoading, params,
-        fetchTreks, publish, deleteTrek, getTrek, saveDescription, getTrekBySlug, unpublish
+        fetchTreks, fetchTreksByCategory, publish, deleteTrek, getTrek, saveDescription, getTrekBySlug, unpublish
     }
 })

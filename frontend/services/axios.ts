@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { toast } from 'vue-sonner'
 import { useAuthStore } from '~/store/auth'
 
 export const useAxios = () => {
@@ -44,10 +43,6 @@ export const useAxios = () => {
         if (error.response.data.error.message == 'Unauthorized') {
             token.value = null
         }
-
-        console.log(error.response?.data?.error?.message);
-
-        toast.error(error.response?.data?.error?.message)
         return error
     })
 

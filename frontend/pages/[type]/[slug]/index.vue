@@ -281,7 +281,7 @@ onMounted(async () => {
                                 <div>
                                     <p class="text-sm uppercase font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                    }}</p>
+                                        }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm uppercase font-bold mb-1">Distance</p>
@@ -310,7 +310,7 @@ onMounted(async () => {
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
                 <div class="lg:col-span-7 space-y-16">
                     <!-- Reviews & Recommendations Bar -->
-                    <div class="flex flex-wrap items-center gap-4 sm:gap-6 py-4 mb-2 border-y border-black/10">
+                    <div class="flex flex-wrap items-center gap-4 sm:gap-6 py-4 mb-10 border-y border-black/10">
                         <div class="flex items-center gap-3">
                             <div class="flex gap-1">
                                 <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>

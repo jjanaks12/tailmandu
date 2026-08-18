@@ -30,17 +30,18 @@ const isUpcoming = computed(() => {
 </script>
 
 <template>
-    <div class="group bg-white dark:bg-deep-slate rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-slate-800 flex flex-col h-full">
+    <div
+        class="group bg-white dark:bg-deep-slate rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-slate-800 flex flex-col h-full">
         <!-- Image Container -->
         <figure class="relative aspect-[16/9] overflow-hidden">
-            <img v-if="race.thumbnail" :src="showImage(race.thumbnail.file_name)" :alt="race.name"
-                loading="lazy"
+            <img v-if="race.thumbnail" :src="showImage(race.thumbnail.file_name)" :alt="race.name" loading="lazy"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div v-else class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                 <MountainIcon class="w-12 h-12 text-slate-300 dark:text-slate-700" />
             </div>
-            
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+
+            <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             </div>
 
             <!-- Status Badge -->
@@ -59,7 +60,7 @@ const isUpcoming = computed(() => {
 
         <!-- Content -->
         <div class="p-8 flex flex-col flex-1">
-            <div class="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+            <div class="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-700 mb-4">
                 <div class="flex items-center gap-1.5">
                     <CalendarIcon class="w-3.5 h-3.5 text-primary" />
                     {{ formatDate(race.start) }}
@@ -70,7 +71,8 @@ const isUpcoming = computed(() => {
                 </div>
             </div>
 
-            <h3 class="text-2xl font-display font-bold mb-4 group-hover:text-primary transition-colors line-clamp-2">
+            <h3
+                class="text-2xl font-display font-bold mb-4 text-black group-hover:text-primary transition-colors line-clamp-2">
                 <NuxtLink :to="`/races/${race.slug}`">{{ race.name }}</NuxtLink>
             </h3>
 
@@ -84,8 +86,9 @@ const isUpcoming = computed(() => {
                     Explore Details
                     <ArrowRightIcon class="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
                 </NuxtLink>
-                
-                <div v-if="race._count?.stages" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase tracking-tighter text-slate-500">
+
+                <div v-if="race._count?.stages"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase tracking-tighter text-slate-500">
                     {{ race._count.stages }} Stages
                 </div>
             </div>

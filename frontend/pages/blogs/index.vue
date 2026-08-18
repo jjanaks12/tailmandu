@@ -101,9 +101,9 @@ const remainingPosts = computed(() => posts.value.filter(p => p.id !== featuredP
                     class="mb-6 border-primary/20 text-primary font-bold uppercase tracking-widest px-4 py-1">
                     {{ $t('public_blogs.badge_stories') }}
                 </Badge>
-                <h1 class="text-5xl md:text-7xl font-display font-black tracking-tight mb-6">
-                    {{ $t('public_blogs.hero_title') }} <span class="text-primary">{{ $t('public_blogs.hero_highlight')
-                        }}</span>
+                <h1 class="text-5xl md:text-7xl font-display text-black font-black tracking-tight mb-6">
+                    {{ $t('public_blogs.hero_title') }}
+                    <span class="text-primary">{{ $t('public_blogs.hero_highlight') }}</span>
                 </h1>
                 <p class="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
                     {{ $t('public_blogs.hero_desc') }}
@@ -139,7 +139,7 @@ const remainingPosts = computed(() => posts.value.filter(p => p.id !== featuredP
                         {{ $t('public_blogs.must_read') }}
                     </Badge>
                     <h2
-                        class="text-4xl md:text-5xl font-display font-black mb-6 leading-tight group-hover:text-primary transition-colors">
+                        class="text-4xl md:text-5xl font-display text-black font-black mb-6 leading-tight group-hover:text-primary transition-colors">
                         {{ featuredPost.title }}
                     </h2>
                     <p class="text-lg text-slate-500 dark:text-slate-400 mb-10 line-clamp-4 leading-relaxed">

@@ -228,7 +228,8 @@ const saveImageOrder = async () => {
             description: props.gallery.description,
             hide_gallery: props.gallery.hide_gallery,
             tags: props.gallery.tags.map((t: any) => t.name),
-            image_order: galleryImages.value.map(img => img.id)
+            image_order: galleryImages.value.map(img => img.id),
+            images: galleryImages.value.map(img => img.id)
         })
         toast.success('Image order saved')
         // No emit fetch here, otherwise it triggers a refresh immediately

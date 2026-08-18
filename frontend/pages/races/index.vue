@@ -108,7 +108,7 @@ onMounted(() => {
                     <Badge class="mb-6">
                         Epic Trail Adventures
                     </Badge>
-                    <h1 class="text-5xl md:text-7xl font-display font-black tracking-tight mb-6">
+                    <h1 class="text-5xl md:text-7xl font-display text-black font-black tracking-tight mb-6">
                         Find Your <span class="text-primary">Race</span>
                     </h1>
                     <p class="text-xl text-slate-500 dark:text-slate-400 leading-relaxed mb-10">

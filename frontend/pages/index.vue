@@ -130,7 +130,7 @@ onMounted(fetchSponsors)
                         class="relative overflow-hidden rounded-3xl group p-12 h-96 flex flex-col justify-end text-white">
                         <img alt="Runner profile"
                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            src="/images/home-runner.png" />
+                            src="/images/home-runner.jpeg" />
                         <div class="absolute inset-0 bg-gradient-to-t from-deep-slate via-deep-slate/40 to-transparent">
                         </div>
                         <div class="relative z-10">
@@ -149,7 +149,7 @@ onMounted(fetchSponsors)
                         class="relative overflow-hidden rounded-3xl group p-12 h-96 flex flex-col justify-end text-white">
                         <img alt="Volunteers at race"
                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            src="/images/home-volunteer.png" />
+                            src="/images/home-volunteer.JPG" />
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-earth-brown via-earth-brown/40 to-transparent">
                         </div>
