@@ -10,7 +10,7 @@ interface Place {
     lng: number
     elevation?: number
     offRoad?: boolean
-    routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'
+    routeType?: 'foot' | 'bike' | 'car' | 'offroad' | 'flight' | 'none'
     routeToNext?: L.LatLngTuple[]
 }
 
@@ -35,6 +35,8 @@ let markers: any[] = []
 const markersMap = new Map<string, any>()
 let animationFrameId: number | null = null
 let nextLegTimeoutId: any = null
+
+const routeCache = new Map<string, L.LatLngTuple[]>()
 
 const searchQuery = ref('')
 const isSearchingLocation = ref(false)
@@ -167,7 +169,61 @@ onMounted(async () => {
     
     drawRoute(true)
     window.addEventListener('keydown', handleKeydown)
+    window.addEventListener('delete-waypoint', handleDeleteWaypoint as EventListener)
+    window.addEventListener('remove-path', handleRemovePath as EventListener)
+    window.addEventListener('regenerate-path', handleRegeneratePath as EventListener)
 })
+
+const handleDeleteWaypoint = (e: CustomEvent) => {
+    const { lat, lng } = e.detail
+    for (let i = 0; i < itinerary.value.length; i++) {
+        const day = itinerary.value[i]
+        if (day.places) {
+            const idx = day.places.findIndex(p => p.lat === lat && p.lng === lng)
+            if (idx !== -1) {
+                day.places.splice(idx, 1)
+                break
+            }
+        }
+    }
+}
+
+const handleRemovePath = (e: CustomEvent) => {
+    const { lat, lng } = e.detail
+    for (let i = 0; i < itinerary.value.length; i++) {
+        const day = itinerary.value[i]
+        if (day.places) {
+            const place = day.places.find(p => p.lat === lat && p.lng === lng)
+            if (place) {
+                place.routeType = 'none'
+                break
+            }
+        }
+    }
+}
+
+const handleRegeneratePath = (e: CustomEvent) => {
+    const { lat, lng } = e.detail
+    
+    // Find fromPlace and toPlace
+    const allPlaces = itinerary.value.flatMap(d => d.places || [])
+    const idx = allPlaces.findIndex(p => p.lat === lat && p.lng === lng)
+    
+    if (idx !== -1 && idx < allPlaces.length - 1) {
+        const fromPlace = allPlaces[idx]
+        const toPlace = allPlaces[idx + 1]
+        
+        // Clear all possible cache types for this segment
+        const types = ['foot', 'bike', 'car', 'offroad', 'flight', 'none']
+        types.forEach(t => {
+            const cacheKey = `${t}-${fromPlace.lat.toFixed(5)},${fromPlace.lng.toFixed(5)}-${toPlace.lat.toFixed(5)},${toPlace.lng.toFixed(5)}`
+            routeCache.delete(cacheKey)
+        })
+        
+        // Re-draw route
+        drawRoute(false)
+    }
+}
 
 onBeforeUnmount(() => {
     stopAnimation()
@@ -182,6 +238,9 @@ onBeforeUnmount(() => {
         hoverMarker = null
     }
     window.removeEventListener('keydown', handleKeydown)
+    window.removeEventListener('delete-waypoint', handleDeleteWaypoint as EventListener)
+    window.removeEventListener('remove-path', handleRemovePath as EventListener)
+    window.removeEventListener('regenerate-path', handleRegeneratePath as EventListener)
 })
 
 /**
@@ -427,9 +486,14 @@ function getRouteIcon(type: string) {
  * Fetches the exact route geometry from BRouter (better for hiking/trails).
  * Falls back to a straight line if it fails or if the route detour is absurdly long.
  */
-async function fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'): Promise<L.LatLngTuple[]> {
-    if (type === 'flight' || type === 'offroad') {
+async function fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight' | 'none'): Promise<L.LatLngTuple[]> {
+    if (type === 'flight' || type === 'offroad' || type === 'none') {
         return [[from.lat, from.lng], [to.lat, to.lng]]
+    }
+
+    const cacheKey = `${type}-${from.lat.toFixed(5)},${from.lng.toFixed(5)}-${to.lat.toFixed(5)},${to.lng.toFixed(5)}`
+    if (routeCache.has(cacheKey)) {
+        return routeCache.get(cacheKey)!
     }
 
     const profileMap: Record<string, string> = {
@@ -438,6 +502,22 @@ async function fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' 
         'car': 'car-fast'
     }
     const profile = profileMap[type] || 'trekking'
+
+    // For long car routes, use OSRM as it's faster and has higher limits than BRouter
+    if (type === 'car') {
+        try {
+            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`
+            const osrmRes = await fetch(osrmUrl)
+            const osrmData = await osrmRes.json()
+            if (osrmData.code === 'Ok' && osrmData.routes.length > 0) {
+                const result = osrmData.routes[0].geometry.coordinates.map((c: number[]) => [c[1], c[0]] as L.LatLngTuple)
+                routeCache.set(cacheKey, result)
+                return result
+            }
+        } catch (e) {
+            console.error('OSRM failed, falling back to BRouter', e)
+        }
+    }
 
     try {
         const url = `https://brouter.de/brouter?lonlats=${from.lng},${from.lat}|${to.lng},${to.lat}&profile=${profile}&alternativeidx=0&format=geojson`
@@ -450,18 +530,25 @@ async function fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' 
             const straightLineDist = L.latLng(from.lat, from.lng).distanceTo(L.latLng(to.lat, to.lng))
 
             // Safeguard against absurd routing (e.g. going out of country due to disconnected graphs)
-            if (straightLineDist > 500 && (trackLength > straightLineDist * 5 || trackLength < straightLineDist * 0.2)) {
+            // Relaxed for mountain routes which can zigzag heavily
+            if (straightLineDist > 2000 && (trackLength > straightLineDist * 15 || trackLength < straightLineDist * 0.2)) {
                 console.warn(`BRouter route rejected (absurd distance: ${trackLength}m vs ${straightLineDist}m). Falling back to straight line.`)
-                return [[from.lat, from.lng], [to.lat, to.lng]]
+                const fallback: L.LatLngTuple[] = [[from.lat, from.lng], [to.lat, to.lng]]
+                routeCache.set(cacheKey, fallback)
+                return fallback
             }
 
-            return feature.geometry.coordinates.map((c: number[]) => [c[1], c[0]] as L.LatLngTuple)
+            const result = feature.geometry.coordinates.map((c: number[]) => [c[1], c[0]] as L.LatLngTuple)
+            routeCache.set(cacheKey, result)
+            return result
         }
     } catch (e) {
         console.error('Failed to fetch route from BRouter', e)
     }
 
-    return [[from.lat, from.lng], [to.lat, to.lng]]
+    const fallback: L.LatLngTuple[] = [[from.lat, from.lng], [to.lat, to.lng]]
+    routeCache.set(cacheKey, fallback)
+    return fallback
 }
 
 /**
@@ -483,6 +570,13 @@ async function drawRoute(isInitialLoad = false) {
     stopAnimation()
 
     const places = itinerary.value.flatMap((day: any) => day.places || [])
+    const dayIndices: number[] = []
+    itinerary.value.forEach((day: any, dIdx: number) => {
+        (day.places || []).forEach(() => {
+            dayIndices.push(dIdx)
+        })
+    })
+
     if (places.length === 0) {
         elevationProfile.value = []
         return
@@ -503,6 +597,7 @@ async function drawRoute(isInitialLoad = false) {
                     top: 50%;
                     left: 50%;
                     transform: translate(-7px, -7px);
+                    transition: all 0.3s ease;
                 "></div>
             `,
             className: 'custom-static-icon',
@@ -510,7 +605,14 @@ async function drawRoute(isInitialLoad = false) {
             iconAnchor: [7, 7]
         })
         const marker = L.marker([place.lat, place.lng], { icon: customIcon })
-            .bindPopup(`<b>📍 ${place.name}</b>`)
+            .bindPopup(`
+                <div class="flex flex-col gap-1 p-1">
+                    <b class="text-sm">📍 ${place.name}</b>
+                    <button class="text-xs text-red-500 font-bold hover:underline text-left mt-2" onclick="window.dispatchEvent(new CustomEvent('delete-waypoint', { detail: { lat: ${place.lat}, lng: ${place.lng} } }))">
+                        Remove Waypoint
+                    </button>
+                </div>
+            `)
             .addTo(map)
         markers.push(marker)
         markersMap.set(`${place.lat}-${place.lng}`, marker)
@@ -522,7 +624,7 @@ async function drawRoute(isInitialLoad = false) {
         return
     }
 
-    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' => {
+    const getRouteType = (place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' | 'none' => {
         if (place.routeType) return place.routeType
         if (place.offRoad) return 'offroad'
         return 'foot'
@@ -555,7 +657,41 @@ async function drawRoute(isInitialLoad = false) {
             routeCoords.push(...coords.slice(1))
         }
 
-        const p = L.polyline(coords, getPolylineOptions(type as any)).addTo(map)
+        if (type === 'none') {
+            continue
+        }
+
+        const originalOptions = getPolylineOptions(type as any)
+        const p = L.polyline(coords, originalOptions)
+            .bindPopup(`
+                <div class="flex flex-col gap-2 p-2 items-center min-w-[100px]">
+                    <button class="text-xs text-primary font-bold hover:underline" onclick="window.dispatchEvent(new CustomEvent('regenerate-path', { detail: { lat: ${fromPlace.lat}, lng: ${fromPlace.lng} } }))">
+                        🔄 Regenerate
+                    </button>
+                    <div class="h-px w-full bg-border"></div>
+                    <button class="text-xs text-red-500 font-bold hover:underline" onclick="window.dispatchEvent(new CustomEvent('remove-path', { detail: { lat: ${fromPlace.lat}, lng: ${fromPlace.lng} } }))">
+                        ❌ Remove Path
+                    </button>
+                </div>
+            `)
+            .addTo(map)
+        
+        // Add hover effect
+        p.on('mouseover', () => {
+            p.setStyle({ weight: originalOptions.weight + 3, opacity: 1 })
+        })
+        p.on('mouseout', () => {
+            p.setStyle(originalOptions)
+        })
+
+        // Add click listener to highlight segment and focus itinerary
+        p.on('click', (e: any) => {
+            L.DomEvent.stopPropagation(e)
+            activeDayIndex.value = dayIndices[i]
+            highlightSegment(fromPlace, toPlace)
+            p.openPopup(e.latlng)
+        })
+        
         polylines.push(p)
 
         // Add midpoint icon (approximate middle of the segment)
@@ -598,7 +734,27 @@ async function drawRoute(isInitialLoad = false) {
             iconSize: [40, 24],
             iconAnchor: [20, 12]
         })
-        const midMarker = L.marker([midLat, midLng], { icon: midIcon, interactive: false }).addTo(map)
+        const midMarker = L.marker([midLat, midLng], { icon: midIcon, interactive: true })
+            .bindPopup(`
+                <div class="flex flex-col gap-2 p-2 items-center min-w-[100px]">
+                    <button class="text-xs text-primary font-bold hover:underline" onclick="window.dispatchEvent(new CustomEvent('regenerate-path', { detail: { lat: ${fromPlace.lat}, lng: ${fromPlace.lng} } }))">
+                        🔄 Regenerate
+                    </button>
+                    <div class="h-px w-full bg-border"></div>
+                    <button class="text-xs text-red-500 font-bold hover:underline" onclick="window.dispatchEvent(new CustomEvent('remove-path', { detail: { lat: ${fromPlace.lat}, lng: ${fromPlace.lng} } }))">
+                        ❌ Remove Path
+                    </button>
+                </div>
+            `)
+            .addTo(map)
+        
+        midMarker.on('click', (e: any) => {
+            L.DomEvent.stopPropagation(e)
+            activeDayIndex.value = dayIndices[i]
+            highlightSegment(fromPlace, toPlace)
+            midMarker.openPopup()
+        })
+        
         markers.push(midMarker)
     }
 
@@ -647,6 +803,45 @@ async function drawRoute(isInitialLoad = false) {
         // Start animating
         animateMarker(routeCoords, places)
     }
+}
+
+function highlightSegment(fromPlace: Place, toPlace: Place) {
+    markers.forEach(marker => {
+        if (marker.options.icon && marker.options.icon.options.className === 'custom-static-icon') {
+            const latlng = marker.getLatLng()
+            const isHighlighted = (latlng.lat === fromPlace.lat && latlng.lng === fromPlace.lng) ||
+                                  (latlng.lat === toPlace.lat && latlng.lng === toPlace.lng)
+            
+            const icon = L.divIcon({
+                html: `
+                    <div style="
+                        background-color: ${isHighlighted ? '#ef4444' : '#f06723'};
+                        width: ${isHighlighted ? '20px' : '14px'};
+                        height: ${isHighlighted ? '20px' : '14px'};
+                        border-radius: 50%;
+                        border: ${isHighlighted ? '3px' : '2px'} solid white;
+                        box-shadow: ${isHighlighted ? '0 0 15px rgba(239,68,68,0.8)' : '0 2px 4px rgba(0,0,0,0.3)'};
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(${isHighlighted ? '-10px, -10px' : '-7px, -7px'});
+                        transition: all 0.3s ease;
+                    "></div>
+                `,
+                className: 'custom-static-icon',
+                iconSize: isHighlighted ? [20, 20] : [14, 14],
+                iconAnchor: isHighlighted ? [10, 10] : [7, 7]
+            })
+            marker.setIcon(icon)
+            
+            if (isHighlighted) {
+                marker.setZIndexOffset(1000)
+                marker.openPopup()
+            } else {
+                marker.setZIndexOffset(0)
+            }
+        }
+    })
 }
 
 /**

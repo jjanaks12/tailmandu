@@ -114,6 +114,17 @@ onMounted(() => {
     }
 })
 
+watch(activeDayIndex, (newIdx) => {
+    if (newIdx !== null) {
+        nextTick(() => {
+            const el = document.getElementById(`day-card-${newIdx}`)
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
+        })
+    }
+})
+
 watch(() => props.trek, (newTrek) => {
     if (newTrek?.details?.itinerary) {
         itinerary.value = JSON.parse(JSON.stringify(newTrek.details.itinerary))
@@ -150,7 +161,7 @@ watch(() => props.trek, (newTrek) => {
             </div>
 
             <div class="space-y-4 max-h-[72vh] overflow-y-auto pr-2">
-                <div v-for="(day, index) in itinerary" :key="index" @click="activeDayIndex = index" :class="[
+                <div v-for="(day, index) in itinerary" :key="index" @click="activeDayIndex = index" :id="`day-card-${index}`" :class="[
                     'bg-card p-5 rounded-2xl flex gap-5 shadow-sm border border-border border-l-4 transition-all cursor-pointer group',
                     activeDayIndex === index ? 'border-l-primary ring-2 ring-primary/25 bg-primary/[0.01]' : 'border-l-slate-300 dark:border-l-slate-700'
                 ]">
@@ -210,6 +221,7 @@ watch(() => props.trek, (newTrek) => {
                                         <option value="car" class="bg-background text-foreground">🚗 Drive</option>
                                         <option value="offroad" class="bg-background text-foreground">📐 Off-road</option>
                                         <option value="flight" class="bg-background text-foreground">✈️ Flight</option>
+                                        <option value="none" class="bg-background text-foreground">❌ No Path</option>
                                     </select>
 
                                     <button type="button" @click.stop="removePlace(index, pIdx)"

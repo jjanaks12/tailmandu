@@ -7,8 +7,34 @@ import { Prisma } from "@prisma/client"
 import { NextFunction, Request, Response } from "express"
 import createHttpError from "http-errors"
 import moment from "moment"
+import { Redis } from "@/app/lib/services/redis.service"
 
 export class TrekController {
+    public static async clearCache(request: Request, response: Response, next: NextFunction) {
+        try {
+            const trek = await prisma.trek.findUnique({ where: { id: request.params.id as string } })
+            if (trek && trek.slug) {
+                const apiCacheKey = `__api_cache__:/api/treks/${trek.slug}/by_slug`
+                await Redis.client.del(apiCacheKey)
+                
+                // Clear any other API caches (like the trek index if needed, but it's hard to target specific pages)
+                // Also clear general prisma caches just in case
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__cache__/treks*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+                
+                response.json({ message: "Cache cleared successfully" })
+            } else {
+                throw createHttpError(404, 'Trek not found')
+            }
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
             const { per_page = 10, current = 1, s = '', sort } = request.query

@@ -110,6 +110,20 @@ watch([trek, excerpt, slug], () => {
     }
 }, { deep: true })
 
+const isClearingCache = ref(false)
+const clearCache = async () => {
+    isClearingCache.value = true
+    try {
+        await axios.post(`/treks/${route.params.id}/clear_cache`)
+        alert('Page cache cleared successfully!')
+    } catch (e) {
+        console.error('Failed to clear cache', e)
+        alert('Failed to clear cache')
+    } finally {
+        isClearingCache.value = false
+    }
+}
+
 const discardChanges = async () => {
     clearAutosave()
     hasUnsavedChanges.value = false
@@ -154,7 +168,7 @@ const init = async () => {
     if (savedState) {
         try {
             const savedStateData = JSON.parse(savedState)
-            
+
             // Only restore inline-editable fields to prevent overwriting sub-components (like QA, Pricing, etc) that save independently
             if (trek.value && savedStateData.trek?.details) {
                 trek.value.details.included = savedStateData.trek.details.included || []
@@ -163,7 +177,7 @@ const init = async () => {
                 trek.value.details.mandatoryGear = savedStateData.trek.details.mandatoryGear || []
                 trek.value.details.optionalGear = savedStateData.trek.details.optionalGear || []
             }
-            
+
             excerpt.value = savedStateData.excerpt
             slug.value = savedStateData.slug || ''
             hasUnsavedChanges.value = true
@@ -220,6 +234,11 @@ onMounted(init)
                                 <EyeIcon class="w-3.5 h-3.5" />
                                 Preview
                             </NuxtLink>
+                        </Button>
+
+                        <Button size="sm" modifier="outline" @click="clearCache" :disabled="isClearingCache">
+                            <Loader2Icon v-if="isClearingCache" class="w-3.5 h-3.5 mr-1 animate-spin" />
+                            Clear Page Cache
                         </Button>
 
                         <!-- View Bookings Sheet Toggle -->
