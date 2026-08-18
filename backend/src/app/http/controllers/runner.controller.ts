@@ -269,7 +269,7 @@ export class RunnerController {
                 summary: stageCategory.excerpt,
                 description: stageCategory.description,
                 location: stageCategory.location,
-                url: `http://race.trailmandu.com/races/${event.slug}/stage/${stageCategory.stage.id}`
+                url: `https://trailmandu.com/races/${event.slug}/stage/${stageCategory.stage.id}`
             })
 
             await sendEmail('welcome', {
@@ -288,7 +288,8 @@ export class RunnerController {
                 stage: stageCategory.stage,
                 stageCategory: { ...stageCategory, start, end },
                 links: {
-                    event: 'http://race.trailmandu.com'
+                    "Trailmandu": 'https://trailmandu.com',
+                    event: 'https://trailmandu.com'
                 }
             }, {
                 recipients: [{

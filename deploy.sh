@@ -5,7 +5,7 @@
 # ==========================================
 SERVER_IP="185.181.252.149"  # <-- CHANGE THIS TO YOUR ACTUAL IP
 USERNAME="trailmandu"
-REMOTE_PATH="race.trailmandu.com" # Relative to your cPanel home directory
+REMOTE_PATH="public_html" # Relative to your cPanel home directory. Usually public_html for the main domain
 BUILD_CMD="npm run build"
 UPLOAD_DIR="./frontend/.output"
 ZIP_NAME="deploy.zip"
