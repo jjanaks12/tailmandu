@@ -58,14 +58,14 @@ export class MapService {
         return sampled
     }
 
-    private static getRouteType(place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' {
-        if (place.routeType) return place.routeType
+    private static getRouteType(place: Place): 'foot' | 'bike' | 'car' | 'offroad' | 'flight' | 'none' {
+        if (place.routeType) return place.routeType as any
         if (place.offRoad) return 'offroad'
         return 'foot'
     }
 
-    private static async fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight'): Promise<[number, number][]> {
-        if (type === 'flight' || type === 'offroad') {
+    private static async fetchRouteGeometry(from: Place, to: Place, type: 'foot' | 'bike' | 'car' | 'offroad' | 'flight' | 'none'): Promise<[number, number][]> {
+        if (type === 'flight' || type === 'offroad' || type === 'none') {
             return [[from.lat, from.lng], [to.lat, to.lng]]
         }
 
@@ -76,6 +76,19 @@ export class MapService {
         }
         const profile = profileMap[type] || 'trekking'
 
+        // For long car routes, use OSRM as it's faster and has higher limits than BRouter
+        if (type === 'car') {
+            try {
+                const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`
+                const { data: osrmData } = await axios.get(osrmUrl, { timeout: 10000 })
+                if (osrmData.code === 'Ok' && osrmData.routes.length > 0) {
+                    return osrmData.routes[0].geometry.coordinates.map((c: number[]) => [c[1], c[0]])
+                }
+            } catch (e) {
+                console.error('OSRM failed on backend, falling back to BRouter', e)
+            }
+        }
+
         try {
             const url = `https://brouter.de/brouter?lonlats=${from.lng},${from.lat}|${to.lng},${to.lat}&profile=${profile}&alternativeidx=0&format=geojson`
             const { data } = await axios.get(url, { timeout: 10000 })
@@ -85,7 +98,8 @@ export class MapService {
                 const trackLength = parseInt(feature.properties['track-length']) || 0
                 const straightLineDist = this.distance(from.lat, from.lng, to.lat, to.lng)
 
-                if (straightLineDist > 500 && (trackLength > straightLineDist * 5 || trackLength < straightLineDist * 0.2)) {
+                // Relaxed safeguard for mountain routes which can zigzag heavily
+                if (straightLineDist > 2000 && (trackLength > straightLineDist * 15 || trackLength < straightLineDist * 0.2)) {
                     console.warn(`BRouter route rejected (absurd distance: ${trackLength}m vs ${straightLineDist}m). Falling back to straight line.`)
                     return [[from.lat, from.lng], [to.lat, to.lng]]
                 }
