@@ -32,6 +32,8 @@ router.get('/resources/:filetype/:filename', async (request: Request, response: 
         }
 
         response.set('Content-Type', contentType[request.params.filetype as keyof typeof contentType] || 'application/octet-stream')
+        // Cache images and static resources in the browser for 1 year
+        response.set('Cache-Control', 'public, max-age=31536000, immutable')
         response.send(data)
     })
 })
