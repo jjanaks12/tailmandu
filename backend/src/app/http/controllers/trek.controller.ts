@@ -16,7 +16,7 @@ export class TrekController {
             if (trek && trek.slug) {
                 const apiCacheKey = `__api_cache__:/api/treks/${trek.slug}/by_slug`
                 await Redis.client.del(apiCacheKey)
-                
+
                 // Clear any other API caches (like the trek index if needed, but it's hard to target specific pages)
                 // Also clear general prisma caches just in case
                 for await (const key of Redis.client.scanIterator({
@@ -25,7 +25,7 @@ export class TrekController {
                 })) {
                     await Redis.client.del(key)
                 }
-                
+
                 response.json({ message: "Cache cleared successfully" })
             } else {
                 throw createHttpError(404, 'Trek not found')
@@ -78,21 +78,40 @@ export class TrekController {
                 },
                 include: {
                     tags: true,
-                    gallery: {
-                        where: {
-                            deleted_at: null
-                        },
-                        include: {
-                            images: true
-                        }
-                    },
                     thumbnail: true,
                     category: true
                 }
             })
 
-            // Re-sort the fetched treks to match the ordered IDs
-            const treks = ids.map(i => treksUnsorted.find(t => t.id === i.id)).filter(Boolean)
+            // Re-sort the fetched treks to match the ordered IDs and compute extra fields from details
+            const treks = ids.map(i => {
+                const t = treksUnsorted.find(t => t.id === i.id)
+                if (!t) return null
+
+                let starting_price = t.price
+                const details = t.details as any
+                
+                let distance = null
+                let duration = null
+                let elevation = null
+                
+                if (details) {
+                    if (Array.isArray(details.pricing) && details.pricing.length > 0) {
+                        starting_price = Math.min(...details.pricing.map((p: any) => Number(p.price) || 0)).toString()
+                    }
+                    
+                    distance = details.stats?.distance || null
+                    elevation = details.stats?.maxElevation || null
+                    
+                    if (Array.isArray(details.itinerary)) {
+                        duration = details.itinerary.length
+                    }
+                }
+
+                // Omit details from the response to keep the payload size small
+                const { details: _, ...rest } = t
+                return { ...rest, starting_price, distance, duration, elevation }
+            }).filter(Boolean)
 
             const total = await prisma.trek.count()
             response.send({
@@ -362,18 +381,18 @@ export class TrekController {
             if (!trek) {
                 throw createHttpError(404, 'Trek not found')
             }
-            
+
             const details = (trek.details as any) || {}
             const existingFileId = details.gpxFile?.id
-            
+
             const file = await fileUpload.saveFile(request.body.file, existingFileId, 'gpx')
-            
+
             details.gpxFile = {
                 id: file.id,
                 fileName: file.file_name,
                 originalName: request.body.originalName || 'map.gpx'
             }
-            
+
             response.send(await prisma.trek.update({
                 where: { id: trek.id },
                 data: {

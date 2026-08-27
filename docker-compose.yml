@@ -47,16 +47,10 @@ services:
     restart: always
     ports:
       - "8000:8000"
-    environment:
-      - PORT=8000
-      - NODE_ENV=production
-      - DATABASE_URL=mysql://root:cloud@mysql:3306/trailmandu?connection_limit=10&pool_timeout=20&allowPublicKeyRetrieval=true&useSSL=false&multipleStatements=true
-      - REDIS_URL=redis://redis:6379
-      - ACCESS_TOKEN_SECRET=44bac78259aa9c895330e95705e8251113321aff7776972a8b5f8718bd5ad901
-      - REFRESH_TOKEN_SECRET=6aa0b9430e699bb9e609cc2f27b9c4bd63dc618576c1801ed6bcf9d0a8f6d17e
-      - APP_NAME=trailmaindu
-      - MAIL_ADMIN=admin@trailmandu.com
-      - MAILTRAP_TOKEN=a06a97429342ce7a3f9e7fcceb83fb8b
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/src/resources/uploads:/app/dist/src/resources/uploads
     command: >
       sh -c "npx prisma migrate deploy && node dist/src/prisma/import-backup.js && npm run start"
     depends_on:
@@ -64,6 +58,19 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trailmandu-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:
