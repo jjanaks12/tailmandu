@@ -41,7 +41,7 @@ onMounted(fetch)
             <TableRow v-for="sponsor in sponsors" :key="sponsor.id">
                 <TableCell>
                     <Avatar class="w-12 h-12 inline-block align-middle">
-                        <AvatarImage :src="showImage(sponsor.thumbnail.file_name as string)" />
+                        <AvatarImage :src="showImage(sponsor.thumbnail?.file_name as string)" />
                         <AvatarFallback>{{ sponsor.name.charAt(0).toUpperCase() }}</AvatarFallback>
                     </Avatar>
                     {{ sponsor.name }}

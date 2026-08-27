@@ -231,52 +231,6 @@ export class EventController {
             response.send(await prisma.trailRace.findFirst({
                 where: { id: request.params.event_id as string },
                 include: {
-                    stages: {
-                        include: {
-                            thumbnail: true,
-                            stage_categories: {
-                                include: {
-                                    checkpoints: {
-                                        where: {
-                                            deleted_at: null
-                                        }
-                                    },
-                                    runners: {
-                                        include: {
-                                            personal: {
-                                                include: {
-                                                    gender: true
-                                                }
-                                            },
-                                            volunteer_on_checkpoints: {
-                                                include: {
-                                                    checkpoint: true
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            volunteers: {
-                                include: {
-                                    personal: {
-                                        include: {
-                                            avatar: true,
-                                            gender: true,
-                                            country: true,
-                                            age_category: true,
-                                            size: true
-                                        }
-                                    },
-                                    checkpoints: true,
-                                    stages: true
-                                }
-                            }
-                        },
-                        where: {
-                            deleted_at: null
-                        }
-                    },
                     thumbnail: true,
                     map_file: true,
                     gallery: {

@@ -12,11 +12,13 @@ import { toast } from 'vue-sonner'
 import bibCard from './bibCard.vue'
 import { useAppStore } from '~/store/app'
 import { sortRunner } from '~/lib/filters/runner'
+import { useStageStore } from '~/store/stage.js'
 
 interface RunnerListProps {
-    stages: Stage[]
+    eventId: string
 }
 
+const { fetch: fetchStages } = useStageStore()
 const emit = defineEmits(['update'])
 const { axios } = useAxios()
 const route = useRoute()
@@ -40,8 +42,9 @@ const stageCategoryID = ref<string | null>(null)
 const selectedRunner = ref<EventRunner | null>(null)
 const { genders } = storeToRefs(useAppStore())
 
+const { stages } = storeToRefs(useStageStore())
 const updatedRunners = computed(() => sortRunner(runners.value))
-// const hasStartedRace = computed(() => props.stages.filter(stage => stage.stage_categories).filter(category => moment.utc(category.start).isAfter(moment.utc())))
+// const hasStartedRace = computed(() => stages.value.filter(stage => stage.stage_categories).filter(category => moment.utc(category.start).isAfter(moment.utc())))
 
 onKeyStroke(['command', '/'], () => {
     nextTick(() => {
@@ -51,7 +54,7 @@ onKeyStroke(['command', '/'], () => {
 
 const stageCategoryList = computed(() => {
     if (!stageID.value) return []
-    return props.stages.find((stage) => stage.id === stageID.value)?.stage_categories || []
+    return stages.value.find((stage) => stage.id === stageID.value)?.stage_categories || []
 })
 
 const fetch = async () => {
@@ -114,7 +117,8 @@ const downloadCSV = async () => {
 
 watch([paymentStatusOpt, stageID, stageCategoryID, paymentTypeOpt, genderOpt], fetch)
 watchDebounced(searchText, fetch, { debounce: 1000 })
-onMounted(() => {
+onMounted(async () => {
+    await fetchStages(props.eventId)
     interval = setInterval(() => {
         fetch()
     }, 15000)

@@ -2,13 +2,17 @@
 import { CheckIcon, CopyIcon } from 'lucide-vue-next'
 import type { Checkpoint, Stage, Volunteer } from '~/lib/types'
 import { useAxios } from '~/services/axios'
+import { useStageStore } from '~/store/stage'
 
 interface VolunteerListProps {
-    stages: Stage[]
+    eventId: string
 }
 
+const { fetch: fetchStages } = useStageStore()
 const emit = defineEmits(['update'])
 const props = defineProps<VolunteerListProps>()
+
+const { stages } = storeToRefs(useStageStore())
 
 const selectedVolunteer = ref<Volunteer | null>(null)
 const checkpoints = ref<Checkpoint[]>([])
@@ -19,7 +23,7 @@ const selectedStage = ref('')
 const { copy, copied } = useClipboard()
 const { axios } = useAxios()
 
-const stage = computed(() => props.stages.find(stage => stage.id == selectedStage.value))
+const stage = computed(() => stages.value.find(stage => stage.id == selectedStage.value))
 
 const deleteVolunteer = async () => {
     await axios.delete(`/volunteers/${selectedVolunteer.value?.id}`)
@@ -27,6 +31,10 @@ const deleteVolunteer = async () => {
     showDeleteModal.value = false
     selectedVolunteer.value = null
 }
+
+onMounted(async () => {
+    await fetchStages(props.eventId)
+})
 </script>
 
 <template>
