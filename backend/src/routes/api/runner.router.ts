@@ -7,6 +7,7 @@ import { RunnerController } from '@/app/http/controllers/runner.controller'
 const router = Router()
 
 router.get('/', [verifyAccessToken], RunnerController.stageCategoryList)
+router.get('/recent', [verifyAccessToken], RunnerController.recent)
 router.get('/:runner_id', [verifyAccessToken], RunnerController.get)
 router.get('/get_by_email/:email', [ghostRateLimit], RunnerController.getByEmail)
 router.put('/:runner_id', [verifyAccessToken], RunnerController.update)

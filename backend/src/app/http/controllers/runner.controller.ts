@@ -1,12 +1,10 @@
 import { NextFunction, Request, Response } from "express"
-import Bcrypt from 'bcrypt'
 
 import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/file.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
 import createHttpError from "http-errors"
-import ical, { ICalCalendarMethod } from "ical-generator"
 
 import { prisma } from '@/app/lib/services/prisma.service'
 import { PaymentMethod, PaymentStatus } from "@prisma/client/index-browser"
@@ -206,35 +204,25 @@ export class RunnerController {
                 })
             } */
 
-            let runner = await prisma.eventRunner.findFirst({
-                where: {
-                    event_id: eventId,
-                    stage_id: validationData.stage_id,
-                    personal_id: personal.id
-                }
-            })
+            let matchedCategories = [stageCategory]
+            if (validationData.is_season_pass) {
+                const stages = await prisma.stage.findMany({
+                    where: { event_id: eventId },
+                    include: { stage_categories: true }
+                })
 
-            if (runner)
-                throw createHttpError(409, `You have already registered for this event`)
+                matchedCategories = []
+                for (const stage of stages) {
+                    const match = stage.stage_categories.find(c => c.name === stageCategory.name)
+                    if (match) matchedCategories.push(match as any)
+                }
+            }
 
             const [min] = stageCategory.bib_range.split('-')
-            const bib = (Number(min) + (event.runners.length + 1))
+            const baseBib = (Number(min) + (event.runners.length + 1))
             const runnerCon = new RunnerController()
-
-            runner = await prisma.eventRunner.create({
-                data: {
-                    bib: (await runnerCon.checkBIB(bib, validationData.stage_category_id)).toString().padStart(3, '0'),
-                    event_id: eventId,
-                    personal_id: personal.id,
-                    stage_id: validationData.stage_id,
-                    stage_category_id: validationData.stage_category_id,
-                    want_lunch: validationData.description.want_lunch ?? false,
-                    club_name: validationData.description.club_name,
-                    emergency_contact_name: validationData.description.emergency_contact_name,
-                    emergency_contact_no: validationData.description.emergency_contact_phone,
-                    shirt_id: validationData.size_id
-                }
-            })
+            const checkedBib = await runnerCon.checkBIB(baseBib, validationData.stage_category_id)
+            const finalBib = checkedBib.toString().padStart(3, '0')
 
             let paymentBody: any = {}
             if (validationData.payment_screenshot) {
@@ -243,21 +231,66 @@ export class RunnerController {
                 paymentBody.image_id = image.id
             }
 
-            const stageCategoryPayment = await prisma.stageCategoryPayment.findFirst({
-                where: {
-                    stage_category_id: validationData.stage_category_id,
-                    type: validationData.payment_type
+            const createdRunners = []
+            let runner: any = null
+            let payment: any = null
+
+            for (const category of matchedCategories) {
+                const existingRunner = await prisma.eventRunner.findFirst({
+                    where: {
+                        event_id: eventId,
+                        stage_id: category.stage_id,
+                        personal_id: personal.id
+                    }
+                })
+
+                if (existingRunner) {
+                    if (!validationData.is_season_pass) {
+                        throw createHttpError(409, `You have already registered for this event`)
+                    } else {
+                        continue
+                    }
                 }
-            })
-            const payment = await prisma.payment.create({
-                data: {
-                    ...paymentBody,
-                    amount: stageCategoryPayment.amount,
-                    stage_category_id: validationData.stage_category_id,
-                    runner_id: runner.id,
-                    method: validationData.payment_method
+
+                runner = await prisma.eventRunner.create({
+                    data: {
+                        bib: finalBib,
+                        event_id: eventId,
+                        personal_id: personal.id,
+                        stage_id: category.stage_id,
+                        stage_category_id: category.id,
+                        want_lunch: validationData.description.want_lunch ?? false,
+                        club_name: validationData.description.club_name,
+                        emergency_contact_name: validationData.description.emergency_contact_name,
+                        emergency_contact_no: validationData.description.emergency_contact_phone,
+                        shirt_id: validationData.size_id
+                    }
+                })
+                createdRunners.push(runner)
+
+                const stageCategoryPayment = await prisma.stageCategoryPayment.findFirst({
+                    where: {
+                        stage_category_id: category.id,
+                        type: validationData.payment_type
+                    }
+                })
+
+                if (stageCategoryPayment) {
+                    payment = await prisma.payment.create({
+                        data: {
+                            ...paymentBody,
+                            amount: stageCategoryPayment.amount,
+                            stage_category_id: category.id,
+                            runner_id: runner.id,
+                            method: validationData.payment_method
+                        }
+                    })
                 }
-            })
+            }
+
+            if (createdRunners.length === 0) {
+                throw createHttpError(409, `You have already registered for all stages of this event`)
+            }
             /* const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
             const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
 
@@ -450,6 +483,32 @@ export class RunnerController {
                     checkpoint_id: request.params.checkpoint_id as string
                 }
             }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async recent(request: Request, response: Response, next: NextFunction) {
+        try {
+            const runners = await prisma.eventRunner.findMany({
+                where: {
+                    deleted_at: null
+                },
+                include: {
+                    personal: true,
+                    stage: {
+                        include: {
+                            event: true
+                        }
+                    },
+                    status: true
+                },
+                orderBy: {
+                    created_at: 'desc'
+                },
+                take: request.query.per_page ? parseInt(request.query.per_page as string) : 5
+            })
+            response.send(runners)
         } catch (error) {
             next(error)
         }

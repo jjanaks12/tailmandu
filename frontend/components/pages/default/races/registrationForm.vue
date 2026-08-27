@@ -10,7 +10,7 @@ import * as Y from 'yup'
 import DatePicker from "@/components/DatePicker.vue"
 import { useAppStore } from "~/store/app"
 import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
-import type { Payment, Personal, StageCategoryPayment, TrailRace } from "~/lib/types"
+import type { Personal, StageCategoryPayment, TrailRace } from "~/lib/types"
 import { useEventStore } from "~/store/event"
 import moment from "moment"
 import { showImage } from '@/lib/filters'
@@ -43,13 +43,35 @@ const stageList = computed(() => props.trailRace.stages
         .filter(stage_category => moment(stage_category.end as string).isAfter(moment())).length > 0 ? stage : null)
     .filter(stage => stage !== null))
 // getting stage categories of selected stage
-const availabeStageCategoryList = computed(() => stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories)
+const availabeStageCategoryList = computed(() => {
+    if (form.value?.values.is_season_pass) {
+        return stageList.value[0]?.stage_categories
+    }
+    return stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories
+})
 // getting price of selected stage category
 const prices = computed(() => availabeStageCategoryList.value?.find(stage_category => stage_category.id === form.value?.values.stage_category_id))
 const payment = computed(() => {
     const type = form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
     form.value?.setFieldValue('payment_type', type)
-    return prices.value?.payment.find(payment => payment.type === type) ?? {} as StageCategoryPayment
+    
+    const basePayment = prices.value?.payment.find(payment => payment.type === type)
+    if (!basePayment) return {} as StageCategoryPayment
+    
+    if (form.value?.values.is_season_pass) {
+        const categoryName = prices.value?.name
+        let totalAmount = 0
+        stageList.value.forEach(stage => {
+            const matchedCategory = stage.stage_categories.find(c => c.name === categoryName)
+            if (matchedCategory) {
+                const p = matchedCategory.payment.find(p => p.type === type)
+                if (p) totalAmount += Number(p.amount)
+            }
+        })
+        return { ...basePayment, amount: String(totalAmount) } as StageCategoryPayment
+    }
+
+    return basePayment
 })
 
 const onSubmit: SubmissionHandler = async (values: any) => {
@@ -328,45 +350,58 @@ onMounted(() => {
                             <ErrorMessage class="error__message" name="age_category_id" />
                         </Field> -->
                     </div>
-                    <div class="flex gap-2 md:gap-4">
-                        <Field name="stage_id" as="div" v-slot="{ value, handleChange }"
-                            :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner', 'w-full': mode === 'volunteer' }">
-                            <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
-                                <Target :size="16" class="text-gray-400" />
-                                Races
+                    <div class="flex flex-col gap-4">
+                        <Field name="is_season_pass" as="div" v-slot="{ value, handleChange }" class="space-y-2" v-if="mode === 'runner' && stageList.length > 1">
+                            <Label class="flex items-start gap-2 border p-4 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors" :class="{'border-primary bg-primary/5': value}">
+                                <Checkbox :model-value="value" @update:model-value="(val) => { handleChange(val); if(val) form?.setFieldValue('stage_id', stageList[0].id) }" />
+                                <div class="grow flex flex-col gap-1">
+                                    <span class="font-medium text-gray-900">Get a Season Pass</span>
+                                    <span class="text-sm text-gray-500">Register for all stages of this event at once and get the same bib number for the whole season.</span>
+                                </div>
                             </Label>
-                            <Select :model-value="value" @update:model-value="handleChange">
-                                <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <SelectValue placeholder="Choose your stage" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem v-for="s in stageList" :key="s.id" :value="String(s.id)">
-                                        {{ s.name }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <ErrorMessage class="error__message" name="stage_id" />
+                            <ErrorMessage class="error__message" name="is_season_pass" />
                         </Field>
-                        <Field name="stage_category_id" as="div" v-slot="{ value, handleChange }"
-                            class="w-1/2 space-y-2" v-if="mode === 'runner'">
-                            <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
-                                <Target :size="16" class="text-gray-400" />
-                                Distance
-                            </Label>
-                            <Select :model-value="value" @update:model-value="handleChange">
-                                <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <SelectValue
-                                        :placeholder="form?.values?.stage_id ? 'Choose your stage catgeory' : 'Select an stage first'" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem v-for="sc in availabeStageCategoryList" :key="sc.id"
-                                        :value="String(sc.id)">
-                                        {{ sc.name }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <ErrorMessage class="error__message" name="stage_category_id" />
-                        </Field>
+
+                        <div class="flex gap-2 md:gap-4">
+                            <Field name="stage_id" as="div" v-slot="{ value, handleChange }"
+                                :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner', 'w-full': mode === 'volunteer', 'hidden': form?.values.is_season_pass }">
+                                <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                    <Target :size="16" class="text-gray-400" />
+                                    Races
+                                </Label>
+                                <Select :model-value="value" @update:model-value="handleChange">
+                                    <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <SelectValue placeholder="Choose your stage" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem v-for="s in stageList" :key="s.id" :value="String(s.id)">
+                                            {{ s.name }}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <ErrorMessage class="error__message" name="stage_id" />
+                            </Field>
+                            <Field name="stage_category_id" as="div" v-slot="{ value, handleChange }"
+                                :class="{ 'space-y-2': true, 'w-1/2': mode === 'runner' && !form?.values.is_season_pass, 'w-full': mode === 'runner' && form?.values.is_season_pass }" v-if="mode === 'runner'">
+                                <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                    <Target :size="16" class="text-gray-400" />
+                                    Distance
+                                </Label>
+                                <Select :model-value="value" @update:model-value="handleChange">
+                                    <SelectTrigger class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <SelectValue
+                                            :placeholder="form?.values?.stage_id || form?.values?.is_season_pass ? 'Choose your stage category' : 'Select a stage first'" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem v-for="sc in availabeStageCategoryList" :key="sc.id"
+                                            :value="String(sc.id)">
+                                            {{ sc.name }}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <ErrorMessage class="error__message" name="stage_category_id" />
+                            </Field>
+                        </div>
                     </div>
                     <template v-if="mode == 'runner'">
                         <Field name="description.club_name" as="div" v-slot="{ field }" class="space-y-2">

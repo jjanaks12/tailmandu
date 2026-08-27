@@ -20,8 +20,9 @@ const { can } = useAuthorization()
             <PagesDashboardEventStats v-if="can('*', 'Admin')" />
         </div>
         <div class="w-1/3 space-y-4">
-            <PagesDashboardRecentBookings />
-            <PagesDashboardRecentOrders />
+            <PagesDashboardRecentBookings v-if="can('*', 'Admin')" />
+            <PagesDashboardRecentOrders v-if="can('*', 'Admin')" />
+            <PagesDashboardRecentRegistrations v-if="can('*', 'Admin')" />
         </div>
     </div>
 </template>

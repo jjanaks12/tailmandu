@@ -26,8 +26,13 @@ export const stageSchema = Y.object({
 })
 
 export const trailRaceRunner = Y.object({
-    stage_id: Y.string().required().label('Stage'),
-    stage_category_id: Y.string().required().label('Stage category'),
+    stage_id: Y.string().when('is_season_pass', {
+        is: true,
+        then: schema => schema.optional(),
+        otherwise: schema => schema.required()
+    }).label('Stage'),
+    stage_category_id: Y.string().required().label('Stage'),
+    is_season_pass: Y.boolean().optional().label('Season Pass'),
     first_name: Y.string().required().label("First name"),
     middle_name: Y.string().nullable().label("Middle name"),
     last_name: Y.string().required().label("Last name"),
