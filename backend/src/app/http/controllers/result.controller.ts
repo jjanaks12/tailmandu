@@ -28,7 +28,9 @@ export class ResultController {
                             first_name: true,
                             last_name: true,
                             gender: true,
-                            country: true
+                            country: true,
+                            itra_id: true,
+                            date_of_birth: true
                         }
                     }
                 }

@@ -250,7 +250,7 @@ const isSticky = computed(() => y.value > 450)
                     </Button>
                     <Button size="sm" as-child v-else>
                         <NuxtLink
-                            :to="$localePath({ name: 'races-id-stage-stage_id-result', params: { id: trailRace.id, stage_id: selectedStage?.id } })">
+                            :to="$localePath({ name: 'races-slug-stage-stage_id-result', params: { slug: trailRace.slug, stage_id: selectedStage?.id } })">
                             View Results
                         </NuxtLink>
                     </Button>
@@ -632,7 +632,7 @@ const isSticky = computed(() => y.value > 450)
                             </p>
                             <Button size="xl" as-child>
                                 <NuxtLink
-                                    :to="$localePath({ name: 'races-id-stage-stage_id-result', params: { id: trailRace.id, stage_id: selectedStage?.id } })">
+                                    :to="$localePath({ name: 'races-slug-stage-stage_id-result', params: { slug: trailRace.slug, stage_id: selectedStage?.id } })">
                                     View Results
                                 </NuxtLink>
                             </Button>

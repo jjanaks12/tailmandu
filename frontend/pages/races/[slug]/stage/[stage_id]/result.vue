@@ -6,7 +6,7 @@ import { useAppStore } from '~/store/app'
 
 import KVRLogo from '~/assets/images/kvr-summit-logo.png'
 import trailmanduLogo from '~/assets/images/logo.png'
-import { LoaderIcon, XIcon } from 'lucide-vue-next'
+import { LoaderIcon, XIcon, ArrowLeftIcon, DownloadIcon } from 'lucide-vue-next'
 import { getDuration, sortRunner } from '~/lib/filters/runner'
 import { useAuthStore } from '~/store/auth'
 
@@ -20,8 +20,6 @@ const { axios } = useAxios()
 const route = useRoute()
 
 const runners = ref<EventRunner[]>([])
-const stage = ref<Stage | null>(null)
-const stageCategoryList = ref<StageCategory[]>([])
 const selectGender = ref<string>('')
 const selectStage = ref<StageCategory | null>(null)
 const isLoading = ref(false)
@@ -37,22 +35,16 @@ const filteredRunners = computed(() => updatedRunners.value
 )
 const showResult = computed(() => !!user.value)
 
-const fetchStageCategory = async () => {
-    const { data } = await axios.get(`/events/${route.params.stage_id as string}/stage_categories`)
-    stageCategoryList.value = data
-}
+const { data: stageCategoryList } = await useAsyncData<StageCategory[]>('stage-category', () => axios.get(`/events/${route.params.stage_id as string}/stage_categories`).then(res => res.data))
 
-const fetchStage = async () => {
-    const { data } = await axios.get<Stage>(`/events/stages/${route.params.stage_id as string}`)
-    stage.value = data
-}
+const { data: stage } = await useAsyncData<Stage>('stage', () => axios.get(`/events/stages/${route.params.stage_id as string}`).then(res => res.data))
 
 useHead(() => {
     if (!stage.value) return { title: 'Loading Results...' }
 
     const currentTitle = `${stage.value.name} Results - Trailmandu`
     const currentDescription = stage.value.description || `View race results for ${stage.value.name} organized by Trailmandu.`
-    const canonical = `https://trailmandu.com/races/${route.params.id}/stage/${route.params.stage_id}/result`
+    const canonical = `https://trailmandu.com/races/${route.params.slug}/stage/${route.params.stage_id}/result`
     const image = stage.value.thumbnail?.file_name
         ? showImage(stage.value.thumbnail.file_name)
         : 'https://trailmandu.com/logo.png'
@@ -114,8 +106,8 @@ const getFinalDuration = (volunteerCheckpoints: VolunteerCheckpoint[]) => {
 }
 
 const fetchRunnerResult = async () => {
-    if (selectStage.value) {
-        const { data } = await axios.get(`/events/${route.params.id as string}/${route.params.stage_id as string}/results`, {
+    if (selectStage.value && stage.value) {
+        const { data } = await axios.get(`/events/${stage.value.event_id}/${route.params.stage_id as string}/results`, {
             params: {
                 gender: selectGender.value ? selectGender.value : undefined,
                 stage_category: selectStage.value?.id
@@ -123,6 +115,45 @@ const fetchRunnerResult = async () => {
         })
         runners.value = data
     }
+}
+
+const downloadCSV = () => {
+    const headers = ['Family Name', 'First Name', 'Gender', 'Birthdate', 'Nationality', 'ITRA ID', 'Bib number']
+
+    const rows = filteredRunners.value.map(runner => {
+        const p = runner.personal
+        return [
+            p?.last_name || '',
+            p?.first_name || '',
+            p?.gender?.name?.charAt(0) || '',
+            p?.date_of_birth ? formatDate(p.date_of_birth, 'YYYY-MM-DD') : '',
+            p?.country?.abbr || p?.country?.code || p?.country?.name || '',
+            p?.itra_id || '',
+            runner.bib || ''
+        ]
+    })
+
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(e => e.map(field => `"${field}"`).join(","))
+    ].join("\n")
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    
+    const nameParts = [stage.value?.name || 'results']
+    if (selectStage.value) nameParts.push(selectStage.value.name)
+    if (selectGender.value) {
+        const gender = genders.value.find(g => g.id === selectGender.value)
+        if (gender) nameParts.push(gender.name)
+    }
+    
+    link.setAttribute("download", `${nameParts.join('-')}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 }
 
 const init = () => {
@@ -137,13 +168,18 @@ watch([selectGender, selectStage], fetchRunnerResult)
 watch(user, init)
 
 onMounted(init)
-onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
 </script>
 
 <template>
     <section class="result__section bg-black bg-repeat text-white pb-12 w-full min-h-screen relative z-[1]"
         v-if="showResult">
         <header class="pt-12 pb-20 relative">
+            <Button as-child modifier="outline" variant="light" class="absolute top-4 left-4">
+                <NuxtLink :to="$localePath({ name: 'races-slug', params: { slug: route.params.slug as string } })">
+                    <ArrowLeftIcon class="w-4 h-4" />
+                    Back to Race
+                </NuxtLink>
+            </Button>
             <strong class="block block--left [--block-bg:var(--color-yellow-400)] [--block-color:var(--color-black)]"
                 v-if="stage">
                 {{ stage?.name }}
@@ -190,39 +226,38 @@ onBeforeMount(() => Promise.all([fetchStageCategory(), fetchStage()]))
                     <Button @click="selectGender = ''" modifier="link" size="sm" v-if="selectGender">
                         <XIcon />
                     </Button>
+                    <Button @click="downloadCSV" variant="secondary" class="flex items-center gap-2"
+                        v-if="filteredRunners.length > 0">
+                        <DownloadIcon class="w-4 h-4" />
+                        Download CSV
+                    </Button>
                 </div>
             </div>
         </header>
-        <div class="container">
+        <div class="container overflow-x-auto">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Rank</TableHead>
-                        <TableHead>BIB</TableHead>
-                        <TableHead>Name</TableHead>
+                        <TableHead>Family Name</TableHead>
+                        <TableHead>First Name</TableHead>
                         <TableHead>Gender</TableHead>
-                        <TableHead>Country</TableHead>
-                        <TableHead>Timing</TableHead>
+                        <TableHead>Birthdate</TableHead>
+                        <TableHead>Nationality</TableHead>
+                        <TableHead>ITRA ID</TableHead>
+                        <TableHead>Bib number</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody class="data-body">
                     <TableRow v-for="runner in filteredRunners" :key="runner.id" class="data-row">
-                        <TableCell class="data-count"></TableCell>
-                        <TableCell>{{ runner.bib }}</TableCell>
-                        <TableCell>
-                            {{ runner.personal.first_name }}
-                            {{ runner.personal.middle_name }}
-                            {{ runner.personal.last_name }}
-                        </TableCell>
-                        <TableCell>{{ runner.personal.gender.name }}</TableCell>
-                        <TableCell>{{ runner.personal.country.name }}</TableCell>
-                        <TableCell>
-                            {{ ['DISQUALIFIED', 'DID_NOT_FINISH'].includes(runner?.status?.status)
-                                ? runner?.status?.status
-                                : runner.volunteer_on_checkpoints.length > 0
-                                    ? getFinalDuration(runner.volunteer_on_checkpoints)
-                                    : 'N/A' }}
-                        </TableCell>
+                        <TableCell>{{ runner.personal?.last_name || '-' }}</TableCell>
+                        <TableCell>{{ runner.personal?.first_name || '-' }}</TableCell>
+                        <TableCell>{{ runner.personal?.gender?.name?.charAt(0) || '-' }}</TableCell>
+                        <TableCell>{{ runner.personal?.date_of_birth ? formatDate(runner.personal.date_of_birth,
+                            'YYYY-MM-DD') : '-' }}</TableCell>
+                        <TableCell>{{ runner.personal?.country?.abbr || runner.personal?.country?.code ||
+                            runner.personal?.country?.name || '-' }}</TableCell>
+                        <TableCell>{{ runner.personal?.itra_id || '-' }}</TableCell>
+                        <TableCell>{{ runner.bib || '-' }}</TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

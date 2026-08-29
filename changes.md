@@ -10,7 +10,7 @@ outstanding
 
 ## 2026 Aug 25
 - [X] season pass
-- [ ] update result pass - as per ITRA
+- [X] update result pass - as per ITRA
 - [ ] block future race
 - [ ] inspect blog "Best running headlamp for..."
 - [ ] total distance on event

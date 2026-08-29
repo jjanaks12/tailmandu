@@ -63,6 +63,7 @@ export type Personal = {
     last_name?: string
     email: string
     date_of_birth?: string
+    itra_id?: string
     gender_id: string
     phone_number?: string
     created_at: Date
