@@ -18,6 +18,13 @@ const { stages } = storeToRefs(useStageStore())
 
 const showDialog = ref(false)
 const editStage = ref<Stage | null>(null)
+const activeTab = ref<string>('')
+
+watch(stages, (newStages) => {
+    if (newStages.length > 0 && (!activeTab.value || !newStages.find(s => s.id === activeTab.value))) {
+        activeTab.value = newStages[0].id
+    }
+}, { immediate: true })
 
 onMounted(async () => {
     await fetch(props.eventId)
@@ -25,46 +32,77 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="text-right mb-12">
-        <Button variant="secondary" @click="showDialog = true">
-            <PlusIcon />
+    <!-- Page Header Section -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 mt-4 md:mt-0 gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-foreground font-headline">Stages</h2>
+            <p class="text-muted-foreground mt-1 font-body">Manage stage details, categories, and checkpoints.</p>
+        </div>
+        <Button
+            class="bg-gradient-to-r from-primary to-[#d95514] text-primary-foreground px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 self-start md:self-auto"
+            @click="showDialog = true">
+            <PlusIcon class="w-5 h-5" />
             Add stage
         </Button>
     </div>
-    <div class="space-y-4">
-        <Tabs orientation="vertical" :default-value="stages[0]?.id" class="flex-row gap-4">
-            <TabsList class="flex-col h-full">
-                <TabsTrigger v-for="stage in stages" :value="stage.id">{{ stage.name }}</TabsTrigger>
-            </TabsList>
-            <div class="grow">
-                <TabsContent v-for="stage in stages" :value="stage.id">
-                    <div class="flex justify-end gap-2 pb-4 mb-8 border-b">
-                        <Button variant="destructive" @click="async () => {
+
+    <!-- Main Layout Grid -->
+    <Tabs orientation="vertical" v-model="activeTab" class="flex flex-col lg:flex-row gap-6 w-full">
+        <!-- Left: Stage List (Switcher) -->
+        <TabsList class="flex flex-col h-auto w-full lg:w-64 shrink-0 gap-2 bg-transparent p-0 justify-start">
+            <TabsTrigger v-for="stage in stages" :key="stage.id" :value="stage.id"
+                class="w-full flex-none min-h-16 text-left px-4 py-3 rounded-lg font-semibold relative overflow-hidden data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary data-[state=inactive]:bg-muted/50 data-[state=inactive]:text-muted-foreground hover:data-[state=inactive]:bg-muted transition-colors justify-start z-10 after:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-1 after:bg-primary after:rounded-l-lg after:opacity-0 data-[state=active]:after:opacity-100 after:transition-opacity truncate">
+                {{ stage.name }}
+            </TabsTrigger>
+        </TabsList>
+
+        <!-- Center: Stage Editor Canvas -->
+        <div class="flex-1 min-w-0">
+            <TabsContent v-for="stage in stages" :key="stage.id" :value="stage.id"
+                class="m-0 focus-visible:outline-none">
+                <div class="bg-white rounded-xl p-6 shadow-sm border relative">
+                    <!-- Action Icons Top Right -->
+                    <div class="absolute top-6 right-6 flex gap-2">
+                        <Button variant="destructive" size="icon" @click="async () => {
                             await destory(stage.id)
                             fetch(eventId)
-                        }">
-                            <TrashIcon />
+                        }" class="w-8 h-8">
+                            <TrashIcon class="w-4 h-4" />
                         </Button>
-                        <Button size="icon" @click="() => {
+                        <Button variant="secondary" size="icon" @click="() => {
                             showDialog = true
                             editStage = stage
-                        }">
-                            <PencilIcon />
+                        }" class="w-8 h-8">
+                            <PencilIcon class="w-4 h-4" />
                         </Button>
                     </div>
-                    <div class="space-y-2">
-                        <h2 class="text-xl">{{ stage.name }}</h2>
-                        <div class="space-x-3">
-                            <Badge v-if="stage.runners.length > 0">runners {{ stage.runners.length }}</Badge>
-                            <Badge v-if="stage.volunteers.length > 0">volunteers {{ stage.volunteers.length }}</Badge>
+
+                    <h3 class="text-xl font-bold text-foreground pr-24 mb-2 font-headline">{{ stage.name }}</h3>
+
+                    <div class="flex gap-2 mb-4">
+                        <div v-if="stage.runners?.length > 0"
+                            class="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary/10 text-xs font-bold uppercase tracking-wider">
+                            runners {{ stage.runners.length }}
                         </div>
-                        <p v-text="stage.excerpt" />
-                        <CategoryList :stage-id="stage.id" @update="emit('update')" />
+                        <div v-if="stage.volunteers?.length > 0"
+                            class="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary/10 text-xs font-bold uppercase tracking-wider">
+                            volunteers {{ stage.volunteers.length }}
+                        </div>
                     </div>
-                </TabsContent>
-            </div>
-        </Tabs>
-    </div>
+
+                    <p class="text-muted-foreground text-sm leading-relaxed max-w-3xl font-body">
+                        {{ stage.excerpt }}
+                    </p>
+
+                    <!-- Divider -->
+                    <div class="h-px w-full bg-border my-8" />
+
+                    <!-- Category List Component -->
+                    <CategoryList :stage-id="stage.id" @update="emit('update')" />
+                </div>
+            </TabsContent>
+        </div>
+    </Tabs>
     <!-- Showing add / edit form for stage -->
     <Dialog :open="showDialog" @update:open="showDialog = false">
         <DialogContent class="sm:max-w-[1000px] max-h-full overflow-y-auto">

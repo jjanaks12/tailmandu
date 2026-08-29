@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
-import TrailRaceStageList from '@/components/pages/dashboard/event/stages/list.vue'
 import EventSidebar from '@/components/pages/dashboard/event/sidebar.vue'
+import { ChevronRightIcon } from 'lucide-vue-next'
 
 definePageMeta({
     layout: 'admin',
@@ -20,20 +20,24 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+    <div class="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
         <NuxtLink to="/dashboard/events" class="hover:text-primary transition-colors">Events</NuxtLink>
-        <span>/</span>
-        <NuxtLink :to="`/dashboard/events/${route.params.id}`" class="hover:text-primary transition-colors">{{ trailRace?.name || 'Loading...' }}</NuxtLink>
-        <span>/</span>
-        <span class="text-gray-900 font-medium">Stages</span>
+        <ChevronRightIcon />
+        <NuxtLink :to="`/dashboard/events/${route.params.id}`" class="hover:text-primary transition-colors">{{
+            trailRace?.name || 'Loading...' }}</NuxtLink>
+        <ChevronRightIcon />
+        <span class="text-foreground font-semibold">Stages</span>
     </div>
 
-    <div class="flex flex-col md:flex-row gap-6">
-        <div class="flex-grow">
+    <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex-grow min-w-0">
             <template v-if="trailRace">
-                <TrailRaceStageList :event-id="(route.params.id as string)" @update="async () => trailRace = await get(route.params.id as string)" />
+                <PagesDashboardEventStagesList :event-id="(route.params.id as string)"
+                    @update="async () => trailRace = await get(route.params.id as string)" />
             </template>
         </div>
-        <EventSidebar />
+        <div class="w-full lg:w-64 shrink-0">
+            <EventSidebar />
+        </div>
     </div>
 </template>
