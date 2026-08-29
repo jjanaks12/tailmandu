@@ -14,7 +14,8 @@ const { breakpoints } = storeToRefs(useAppStore())
 const { isLoggedin } = storeToRefs(useAuthStore())
 const { toggleSidebar } = useSidebar()
 const { y: scrollY } = useWindowScroll()
-const isScrolled = computed(() => scrollY.value > 20)
+const route = useRoute()
+const isScrolled = computed(() => route.meta.transparentHeader !== true || scrollY.value > 20)
 </script>
 
 <template>

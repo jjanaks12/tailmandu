@@ -27,7 +27,8 @@ const getImageUrl = (fileName: string | undefined) => fileName ? `${serverUrl}re
 definePageMeta({
     validate: async (route) => {
         return ['treks', 'fastpacking'].includes(route.params.type as string)
-    }
+    },
+    transparentHeader: true
 })
 
 const type = computed(() => route.params.type as string)
@@ -281,7 +282,7 @@ onMounted(async () => {
                                 <div>
                                     <p class="text-sm uppercase font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                        }}</p>
+                                    }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm uppercase font-bold mb-1">Distance</p>

@@ -31,7 +31,16 @@ export const trailRaceRunner = Y.object({
         then: schema => schema.optional(),
         otherwise: schema => schema.required()
     }).label('Stage'),
-    stage_category_id: Y.string().required().label('Stage'),
+    stage_category_id: Y.string().when('is_season_pass', {
+        is: true,
+        then: schema => schema.optional(),
+        otherwise: schema => schema.required()
+    }).label('Stage'),
+    season_pass_categories: Y.array().of(Y.string().required()).when('is_season_pass', {
+        is: true,
+        then: schema => schema.required().min(1),
+        otherwise: schema => schema.optional()
+    }).label('Season Pass Categories'),
     is_season_pass: Y.boolean().optional().label('Season Pass'),
     first_name: Y.string().required().label("First name"),
     middle_name: Y.string().nullable().label("Middle name"),

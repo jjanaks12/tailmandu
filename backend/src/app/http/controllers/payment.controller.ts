@@ -42,7 +42,7 @@ export class PaymentController {
             const validationData = await stageCategoryPaymentSchema.validate(request.body, { abortEarly: false })
 
             if (request.body.image) {
-                const fileUpload = new FileHandler('images')
+                const fileUpload = new FileHandler('payments')
                 const image = await fileUpload.saveFile(request.body.image)
                 body.image_id = image.id
             }
@@ -72,7 +72,7 @@ export class PaymentController {
             const body: any = {}
 
             if (request.body.image) {
-                const fileUpload = new FileHandler('images')
+                const fileUpload = new FileHandler('payments')
                 const image = await fileUpload.saveFile(request.body.image, payment?.image_id)
                 body.image_id = image.id
             }

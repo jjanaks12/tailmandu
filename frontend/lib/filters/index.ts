@@ -1,4 +1,4 @@
-export { showImage, getGPXFile } from './show_image'
+export { showImage, showPaymentImage, getGPXFile } from './show_image'
 export { abbr } from './abbr'
 export { humanize, formatDate, slugify, fixDateTime, distanceToKm } from './humanize'
 export { isObjEq } from './isObjectEqual'

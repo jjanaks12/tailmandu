@@ -8,7 +8,7 @@ import { __basedir } from "@/index"
 import moment from "moment"
 import { Image } from '@prisma/client/index-browser'
 
-type AvailableFolders = 'images' | 'vidoes' | 'gpx'
+type AvailableFolders = 'images' | 'vidoes' | 'gpx' | 'payments'
 
 export class FileHandler {
     uploadPath = path.join(__basedir, '/uploads/')

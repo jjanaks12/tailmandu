@@ -12,6 +12,10 @@ const route = useRoute()
 const { getBySlug } = useEventStore()
 const { public: { serverUrl } } = useRuntimeConfig()
 
+definePageMeta({
+    transparentHeader: true
+})
+
 const selectedStage = ref<Stage | null>(null)
 const selectedStageCategory = ref<StageCategory | null>(null)
 
@@ -20,6 +24,19 @@ const { data: trailRace } = await useAsyncData<TrailRace | null>(`trail-race-${r
 })
 const isFinished = computed(() => moment().isAfter(moment(trailRace.value?.end as string)))
 const isUpcoming = computed(() => moment().isBefore(moment(trailRace.value?.start as string)))
+
+const isSelectedStageUpcoming = computed(() => {
+    if (!selectedStage.value) return false;
+    return selectedStage.value.stage_categories.some(cat => moment(cat.end as string).isAfter(moment()));
+})
+
+const isNextOrCurrentRace = computed(() => {
+    if (!selectedStage.value) return false;
+    const upcoming = trailRace.value?.stages.filter(stage =>
+        stage.stage_categories.some(cat => moment(cat.end as string).isAfter(moment()))
+    ) || [];
+    return upcoming.length > 0 && upcoming[0].id === selectedStage.value.id;
+})
 
 const totalDistance = computed(() => {
     // if (!trailRace.value?.stages) return 0
@@ -609,7 +626,7 @@ const isSticky = computed(() => y.value > 450)
                             class="absolute -right-12 -bottom-12 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <MountainIcon class="w-64 h-64" />
                         </div>
-                        <template v-if="isUpcoming">
+                        <template v-if="isNextOrCurrentRace">
                             <h4 class="text-3xl text-gray-900 font-display font-black mb-4 relative z-10 leading-tight">
                                 Ready to Conquer?
                             </h4>
@@ -624,7 +641,7 @@ const isSticky = computed(() => y.value > 450)
                                 </NuxtLink>
                             </Button>
                         </template>
-                        <template v-else>
+                        <template v-else-if="!isSelectedStageUpcoming">
                             <h4 class="text-3xl font-display font-black mb-4 relative z-10 leading-tight">Race Results
                             </h4>
                             <p class="mb-10 relative z-10 leading-relaxed font-medium">
@@ -634,6 +651,20 @@ const isSticky = computed(() => y.value > 450)
                                 <NuxtLink
                                     :to="$localePath({ name: 'races-slug-stage-stage_id-result', params: { slug: trailRace.slug, stage_id: selectedStage?.id } })">
                                     View Results
+                                </NuxtLink>
+                            </Button>
+                        </template>
+                        <template v-else>
+                            <h4 class="text-3xl text-gray-900 font-display font-black mb-4 relative z-10 leading-tight">
+                                Planning Ahead?
+                            </h4>
+                            <p class="mb-10 relative z-10 leading-relaxed font-medium">
+                                Individual registration for this stage is not open yet, but you can secure your spot for all remaining stages with a Season Pass!
+                            </p>
+                            <Button size="xl" as-child>
+                                <NuxtLink
+                                    :to="$localePath({ name: 'races-slug-runner', params: { slug: route.params.slug } })">
+                                    Get Season Pass
                                 </NuxtLink>
                             </Button>
                         </template>

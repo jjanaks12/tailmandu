@@ -6,7 +6,8 @@ import { showImage } from '~/lib/filters'
 import { useEventStore } from '~/store/event'
 
 definePageMeta({
-    layout: 'default'
+    layout: 'default',
+    transparentHeader: true
 })
 
 useHead({

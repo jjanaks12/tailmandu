@@ -31,7 +31,6 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 const vZIndex = {
   mounted(el: HTMLElement) {
     const a = useZIndex().getNextZIndex(true)
-    console.log(a);
 
     el.style.zIndex = String(a)
   }

@@ -1,12 +1,15 @@
 <script lang="ts" setup>
-import { ArrowBigLeft } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 
 const route = useRoute()
+const config = useRuntimeConfig()
 const { getBySlug } = useEventStore()
-const trailRace = ref<TrailRace | null>(null)
+
+const { data: trailRace, pending: isPending } = await useAsyncData<TrailRace | null>(`trail-race-runner-${route.params.slug}`, async () => {
+    return await getBySlug(route.params.slug as string)
+})
 
 onBeforeMount(async () => {
     trailRace.value = await getBySlug(route.params.slug as string)
@@ -19,7 +22,7 @@ useHead(() => {
     const currentDescription = trailRace.value.excerpt || `Register as a volunteer for ${trailRace.value.name}. Help support this premier trail race organized by Trailmandu.`
     const canonical = `https://trailmandu.com/races/${trailRace.value.slug}/volunteer`
     const image = trailRace.value.thumbnail?.file_name
-        ? showImage(trailRace.value.thumbnail.file_name)
+        ? config.public.serverUrl + 'resources/images/' + trailRace.value.thumbnail.file_name
         : 'https://trailmandu.com/logo.png'
 
     return {
@@ -74,28 +77,33 @@ useHead(() => {
 </script>
 
 <template>
-    <section v-if="trailRace" class="overflow-hidden">
-        <figure class="fixed inset-0 -z-[1]">
-            <img :src="showImage(trailRace.thumbnail?.file_name as string)" :alt="trailRace.name"
-                class="size-full object-cover">
-        </figure>
-        <div class="container">
-            <div class="bg-white/90 p-12 mt-12 rounded-tl-2xl rounded-tr-2xl">
-                <div class="space-y-4 mb-16">
-                    <h1 class="text-primary text-3xl">{{ trailRace?.name }}</h1>
-                    <p v-text="trailRace.excerpt" />
-                    <div class="flex justify-center">
-                        <Button size="lg" as-child>
-                            <NuxtLink :to="`/races/${route.params.slug as string}`" as-child>
-                                <ArrowBigLeft />
-                                Back to main event
-                            </NuxtLink>
-                        </Button>
+    <section v-if="!isPending && trailRace" class="min-h-screen w-full">
+        <PagesDefaultRacesRegistrationForm :event-id="trailRace.id" :trail-race="trailRace" mode="volunteer" />
+    </section>
+    <div v-else class="h-screen w-screen overflow-hidden flex flex-col md:flex-row relative bg-gray-50">
+        <div class="hidden md:flex flex-col w-1/2 h-full relative">
+            <Skeleton class="w-full h-full rounded-none" />
+        </div>
+        <div class="w-full md:w-1/2 h-full p-6 md:py-16 overflow-y-auto flex flex-col items-center">
+            <div class="w-full max-w-2xl">
+                <div class="flex justify-between items-start mb-10">
+                    <div class="space-y-4">
+                        <Skeleton class="h-10 w-48" />
+                        <Skeleton class="h-4 w-64" />
+                    </div>
+                    <Skeleton class="hidden md:block h-8 w-20" />
+                </div>
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                    <div class="space-y-4">
+                        <Skeleton class="h-8 w-32" />
+                        <Skeleton class="h-4 w-64" />
+                    </div>
+                    <Skeleton class="h-12 w-full" />
+                    <div class="flex justify-end pt-2">
+                        <Skeleton class="h-10 w-32" />
                     </div>
                 </div>
-                <PagesDefaultRacesRegistrationForm :event-id="trailRace.id" :trail-race="trailRace" mode="volunteer" />
             </div>
         </div>
-    </section>
-    <div v-else>loading....</div>
+    </div>
 </template>

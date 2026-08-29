@@ -4,7 +4,7 @@ import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
 import { stageCategoryPaymentSchema } from '@/lib/schema/event.schema'
 import { useAxios } from '~/services/axios'
 import { type StageCategoryPayment, paymentTypes } from '~/lib/types'
-import { showImage } from '~/lib/filters'
+import { showPaymentImage } from '~/lib/filters'
 
 interface PaymentFormProps {
     stageCategoryId: string
@@ -98,7 +98,7 @@ onMounted(init)
                 <label class="flex justify-center items-center p-3 border border-dashed border-gray-300 rounded-md">
                     <input type="file" accept="image/*" @change="fileHandler" class="sr-only" />
                     <img v-if="payment?.screenshot || values.image"
-                        :src="values.image ?? showImage(payment?.screenshot.file_name as string)" alt="Image"
+                        :src="values.image ?? showPaymentImage(payment?.screenshot.file_name as string)" alt="Image"
                         class="w-full h-auto object-contain" />
                     <div class="text-center" v-else>
                         <strong class="text-lg block">Upload image</strong>

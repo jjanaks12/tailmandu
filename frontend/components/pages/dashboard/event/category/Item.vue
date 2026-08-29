@@ -38,8 +38,9 @@ const endEvent = async () => {
                 <div class="flex-1 space-y-1">
                     <div class="flex items-baseline gap-2 mb-1">
                         <CardTitle class="text-lg font-headline">{{ stageCategory.name }}</CardTitle>
-                        <span class="text-xs text-muted-foreground font-body">BIB range: ({{ stageCategory.bib_range
-                            }})</span>
+                        <span class="text-xs text-muted-foreground font-body">
+                            BIB range: ({{ stageCategory.bib_range }})
+                        </span>
                     </div>
                     <CardDescription class="text-sm leading-relaxed font-body">
                         {{ stageCategory.excerpt }}
@@ -56,9 +57,9 @@ const endEvent = async () => {
             </CardHeader>
         </Card>
 
-        <div class="border-t border-dashed pt-4 mb-4" v-if="stageCategory.payment?.length > 0">
+        <div class="border-t border-dashed my-8 pt-8">
             <StageCategoryPaymentList :stage-category-id="stageCategory.id" :payments="stageCategory.payment"
-                @update="emit('update')" />
+                @update="$emit('update')" />
         </div>
 
         <div class="border-t border-dashed my-8 pt-8">

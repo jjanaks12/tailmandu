@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { MoveLeftIcon, RefreshCwIcon, ClipboardListIcon, UsersIcon, ImagePlayIcon, MapIcon, HandHeartIcon, SettingsIcon, FlagIcon } from 'lucide-vue-next'
+import { MoveLeftIcon, RefreshCwIcon, EraserIcon, ClipboardListIcon, UsersIcon, ImagePlayIcon, MapIcon, HandHeartIcon, SettingsIcon, FlagIcon } from 'lucide-vue-next'
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 import { formatDate } from '~/lib/filters'
+import ClearCacheButton from '@/components/pages/dashboard/event/ClearCacheButton.vue'
 import TrailRaceUploadImage from '@/components/pages/dashboard/event/imageUpload.vue'
 import TrailMapUploadMap from '@/components/pages/dashboard/event/mapUpload.vue'
 import TrailRaceDescription from '@/components/pages/dashboard/event/description.vue'
@@ -39,8 +40,9 @@ onBeforeMount(() => {
     <template v-if="trailRace">
         <TrailRaceUploadImage :trail-race="trailRace" @update="fetchEventDetail" />
         <div class="bg-white flex items-center gap-4 px-4 pt-4 pb-20 -mt-16 rounded-xl relative z-10">
-            <div class="flex-grow">
+            <div class="flex-grow flex items-center gap-4">
                 <h1 class="text-2xl">{{ trailRace?.name }}</h1>
+                <ClearCacheButton :event-id="route.params.id as string" />
             </div>
             <div class="flex gap-2 items-center">
                 <Button @click="fetchEventDetail" variant="secondary" modifier="outline" size="icon">

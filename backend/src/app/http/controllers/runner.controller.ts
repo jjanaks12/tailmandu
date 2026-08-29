@@ -116,19 +116,21 @@ export class RunnerController {
             if (validationData.date_of_birth)
                 body.date_of_birth = moment(validationData.date_of_birth, "YYYY-MM-DD").toISOString()
 
+            const baseCategoryId = validationData.is_season_pass ? validationData.season_pass_categories[0] : validationData.stage_category_id
+
             const event = await prisma.trailRace.findFirst({
                 where: { id: eventId },
                 include: {
                     runners: {
                         where: {
-                            stage_category_id: validationData.stage_category_id
+                            stage_category_id: baseCategoryId
                         }
                     }
                 }
             })
 
             const stageCategory = await prisma.stageCategory.findFirst({
-                where: { id: validationData.stage_category_id },
+                where: { id: baseCategoryId },
                 include: {
                     stage: {
                         include: {
@@ -213,7 +215,7 @@ export class RunnerController {
 
                 matchedCategories = []
                 for (const stage of stages) {
-                    const match = stage.stage_categories.find(c => c.name === stageCategory.name)
+                    const match = stage.stage_categories.find(c => validationData.season_pass_categories.includes(c.id))
                     if (match) matchedCategories.push(match as any)
                 }
             }
@@ -221,12 +223,12 @@ export class RunnerController {
             const [min] = stageCategory.bib_range.split('-')
             const baseBib = (Number(min) + (event.runners.length + 1))
             const runnerCon = new RunnerController()
-            const checkedBib = await runnerCon.checkBIB(baseBib, validationData.stage_category_id)
+            const checkedBib = await runnerCon.checkBIB(baseBib, baseCategoryId)
             const finalBib = checkedBib.toString().padStart(3, '0')
 
             let paymentBody: any = {}
             if (validationData.payment_screenshot) {
-                const fileUpload = new FileHandler('images')
+                const fileUpload = new FileHandler('payments')
                 const image = await fileUpload.saveFile(validationData.payment_screenshot)
                 paymentBody.image_id = image.id
             }

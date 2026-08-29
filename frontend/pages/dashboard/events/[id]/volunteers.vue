@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import ClearCacheButton from '@/components/pages/dashboard/event/ClearCacheButton.vue'
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 import VolunteerList from '@/components/pages/dashboard/event/volunteer/list.vue'
@@ -20,13 +21,16 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+    <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-2 text-sm text-gray-500">
         <NuxtLink to="/dashboard/events" class="hover:text-primary transition-colors">Events</NuxtLink>
         <span>/</span>
         <NuxtLink :to="`/dashboard/events/${route.params.id}`" class="hover:text-primary transition-colors">{{ trailRace?.name || 'Loading...' }}</NuxtLink>
         <span>/</span>
         <span class="text-gray-900 font-medium">Volunteers</span>
     </div>
+    <ClearCacheButton :event-id="route.params.id as string" />
+</div>
 
     <div class="flex flex-col md:flex-row gap-6">
         <div class="flex-grow">

@@ -11,7 +11,7 @@ outstanding
 ## 2026 Aug 25
 - [X] season pass
 - [X] update result pass - as per ITRA
-- [ ] block future race
+- [X] block future race
 - [ ] inspect blog "Best running headlamp for..."
 - [ ] total distance on event
 - [ ] elevation profile on events
@@ -19,5 +19,5 @@ outstanding
 - [ ] coupon for elite
 - [ ] **Trip Advisor** update
 - [ ] SEO check once
-- [ ] price start should be from low on treks / fastpacking
+- [X] price start should be from low on treks / fastpacking
 - [ ] ITRA id on registration form

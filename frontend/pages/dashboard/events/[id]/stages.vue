@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import ClearCacheButton from '@/components/pages/dashboard/event/ClearCacheButton.vue'
 import type { TrailRace } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 import EventSidebar from '@/components/pages/dashboard/event/sidebar.vue'
@@ -20,7 +21,8 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+    <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-2 text-sm text-muted-foreground">
         <NuxtLink to="/dashboard/events" class="hover:text-primary transition-colors">Events</NuxtLink>
         <ChevronRightIcon />
         <NuxtLink :to="`/dashboard/events/${route.params.id}`" class="hover:text-primary transition-colors">{{
@@ -28,6 +30,8 @@ onMounted(async () => {
         <ChevronRightIcon />
         <span class="text-foreground font-semibold">Stages</span>
     </div>
+    <ClearCacheButton :event-id="route.params.id as string" />
+</div>
 
     <div class="flex flex-col lg:flex-row gap-6">
         <div class="flex-grow min-w-0">

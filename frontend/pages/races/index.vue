@@ -8,6 +8,10 @@ const { fetchPublic } = useEventStore()
 const { params } = storeToRefs(useEventStore())
 const { public: { serverUrl } } = useRuntimeConfig()
 
+definePageMeta({
+    transparentHeader: true
+})
+
 const searchQuery = ref('')
 const { data: events, pending: isLoading, refresh } = await useAsyncData<TrailRace[]>('race', async () => {
     await fetchPublic()

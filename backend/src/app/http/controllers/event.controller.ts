@@ -6,8 +6,35 @@ import { eventSchema } from "@/app/lib/schema/event.schema"
 import moment from "moment"
 import { FileHandler } from "@/app/lib/services/file.service"
 import { prisma } from '@/app/lib/services/prisma.service'
+import { Redis } from '@/app/lib/services/redis.service'
 
 export class EventController {
+    public static async clearCache(request: Request, response: Response, next: NextFunction) {
+        try {
+            const event = await prisma.trailRace.findUnique({ where: { id: request.params.id as string } })
+            if (event && event.slug) {
+                // Clear all API caches
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__api_cache__*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+
+                // Clear all database and other general caches
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__cache__/*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+            }
+            response.send({ message: 'Cache cleared successfully' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
             const { per_page = 10, current = 1, s = '', sort, status } = request.query as any

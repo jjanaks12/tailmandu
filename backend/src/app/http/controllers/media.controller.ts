@@ -370,6 +370,9 @@ export class MediaController {
                 }
             }
 
+            whereClause.payments = { none: {} }
+            whereClause.stage_category_payments = { none: {} }
+
             // Get total count of matching images for pagination calculations
             const total = await prisma.image.count({
                 where: whereClause

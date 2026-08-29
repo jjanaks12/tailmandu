@@ -4,8 +4,7 @@ dist
 *-dup.*
 .DS_Store
 
-backend/src/resources/uploads/images/
-backend/src/resources/uploads/gpx/
+backend/src/resources/uploads
 frontend/.nuxt
 frontend/.output
 

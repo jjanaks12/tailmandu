@@ -7,7 +7,7 @@ import { watchDebounced } from '@vueuse/core'
 import { CommandIcon, DownloadIcon, LoaderIcon } from 'lucide-vue-next'
 import { onKeyStroke } from '@vueuse/core'
 import RunnerItem from './RunnerItem.vue'
-import { showImage } from '~/lib/filters'
+import { showImage, showPaymentImage } from '~/lib/filters'
 import { toast } from 'vue-sonner'
 import bibCard from './bibCard.vue'
 import { useAppStore } from '~/store/app'
@@ -277,7 +277,7 @@ onUnmounted(() => {
                     </div>
                     <figure class="text-xs border p-1 rounded-sm" v-if="payment?.screenshot">
                         <figcaption>Screenshot of payment</figcaption>
-                        <img :src="showImage(payment?.screenshot?.file_name)">
+                        <img :src="showPaymentImage(payment?.screenshot?.file_name as string)">
                     </figure>
                 </div>
                 <span class="text-center block p-3 text-gray-500 bg-accent rounded"
@@ -375,7 +375,7 @@ onUnmounted(() => {
                     </div>
                     <figure class="text-xs border p-1 rounded-sm" v-if="selectedRunner?.payments[0]?.screenshot">
                         <figcaption>Screenshot of payment</figcaption>
-                        <img :src="showImage(selectedRunner?.payments[0]?.screenshot?.file_name)">
+                        <img :src="showPaymentImage(selectedRunner?.payments[0]?.screenshot?.file_name as string)">
                     </figure>
                 </div>
             </div>

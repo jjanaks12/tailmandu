@@ -5,6 +5,12 @@ export const showImage = (fileName: string) => {
     return fileName ? serverUrl + 'resources/images/' + fileName : '/images/not-found.png'
 }
 
+export const showPaymentImage = (fileName: string) => {
+    const { public: { serverUrl } } = useRuntimeConfig()
+
+    return fileName ? serverUrl + 'resources/payments/' + fileName : '/images/not-found.png'
+}
+
 export const getGPXFile = (fileName: string) => {
     const { public: { serverUrl } } = useRuntimeConfig()
 
