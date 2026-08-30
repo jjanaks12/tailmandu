@@ -14,7 +14,7 @@ const currentStageCategory = computed(() => props.stage?.stage_categories
     .sort((a, b) => moment.utc(a.start).diff(moment.utc(b.start)))[0])
 
 const totalDistance = computed(() => props.stage?.stage_categories.reduce((total, category) => total + parseInt(category.distance ?? '0'), 0))
-// const totalElevation = computed(() => props.stage?.stage_categories.reduce((total, category) => total + parseInt(category.elevation || '0'), 0))
+const totalElevation = computed(() => props.stage?.stage_categories.reduce((total, category) => total + parseInt(category.elevation || '0'), 0))
 
 const difficulty = computed(() => {
     if (!props.stage?.stage_categories) return '-'
@@ -41,17 +41,17 @@ const difficulty = computed(() => {
                 <Countdown v-if="currentStageCategory?.start" :date="currentStageCategory.start" variant="compact" />
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="grid grid-cols-3 gap-4 mb-8">
             <div class="text-center p-4 bg-slate-100 dark:bg-slate-700/50 text-gray-600 dark:text-white rounded-xl">
-                <div class="text-xl font-bold">{{ distanceToKm(totalDistance) }}</div>
+                <div class="font-bold">{{ distanceToKm(totalDistance) }}</div>
                 <div class="text-xs uppercase opacity-60">{{ $t('home.banner.distance') }}</div>
             </div>
-            <!-- <div class="text-center p-4 bg-slate-100 dark:bg-slate-700/50 text-gray-600 dark:text-white rounded-xl">
-                <div class="text-xl font-bold">{{ totalElevation ? totalElevation.toLocaleString() + 'm' : '-' }}</div>
-                <div class="text-xs uppercase opacity-60">{{ $t('home.banner.elevation') }}</div>
-            </div> -->
             <div class="text-center p-4 bg-slate-100 dark:bg-slate-700/50 text-gray-600 dark:text-white rounded-xl">
-                <div class="text-xl font-bold">{{ difficulty }}</div>
+                <div class="font-bold">{{ totalElevation ? totalElevation.toLocaleString() + 'm' : '-' }}</div>
+                <div class="text-xs uppercase opacity-60">{{ $t('home.banner.elevation') }}</div>
+            </div>
+            <div class="text-center p-4 bg-slate-100 dark:bg-slate-700/50 text-gray-600 dark:text-white rounded-xl">
+                <div class="font-bold">{{ difficulty }}</div>
                 <div class="text-xs uppercase opacity-60">{{ $t('home.banner.difficulty') }}</div>
             </div>
         </div>

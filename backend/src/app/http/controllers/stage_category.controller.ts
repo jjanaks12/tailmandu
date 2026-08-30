@@ -55,7 +55,8 @@ export class StageCategoryController {
                     stage_id: validationData.stage_id,
                     location: validationData.location,
                     difficulty: validationData.difficulty,
-                    distance: validationData.distance
+                    distance: validationData.distance,
+                    elevation: validationData.elevation
                 }
             }))
         } catch (error) {
@@ -93,11 +94,10 @@ export class StageCategoryController {
                     location: validationData.location,
                     difficulty: validationData.difficulty,
                     distance: validationData.distance,
+                    elevation: validationData.elevation,
                     bib_range: validationData.bib_range
                 }
             })
-
-            console.log(body, stageCategory);
             response.send(stageCategory)
         } catch (error) {
             next(error)

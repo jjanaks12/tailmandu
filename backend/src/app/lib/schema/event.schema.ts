@@ -95,6 +95,7 @@ export const stageCategorySchema = Y.object({
     excerpt: Y.string().required().label('Excerpt'),
     description: Y.string().required().label('Short description'),
     distance: Y.string().required().label('Distance'),
+    elevation: Y.string().label('Elevation Gain'),
     difficulty: Y.string().oneOf(['moderate', 'easy', 'difficult']).required().label('Difficulty'),
     location: Y.string().required().label('Location'),
     start: Y.string().required().label('Start'),

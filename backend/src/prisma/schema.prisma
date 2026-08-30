@@ -426,6 +426,7 @@ model StageCategory {
   excerpt     String
   description String    @db.Text
   distance    String?
+  elevation   String?
   difficulty  String?
   location    String
   start       DateTime?

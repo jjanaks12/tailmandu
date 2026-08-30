@@ -13,9 +13,9 @@ outstanding
 - [X] update result pass - as per ITRA
 - [X] block future race
 - [X] inspect blog "Best running headlamp for..."
-- [ ] total distance on event
-- [ ] elevation profile on events
-- [ ] race guide book - pdf upload and view
+- [X] total distance on event
+- [X] elevation profile on events
+- [X] race guide book - pdf upload and view
 - [ ] coupon for elite
 - [ ] **Trip Advisor** update
 - [ ] SEO check once

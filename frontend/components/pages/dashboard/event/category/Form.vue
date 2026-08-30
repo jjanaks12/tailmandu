@@ -7,6 +7,7 @@ import { fixDateTime, getGPXFile } from '~/lib/filters'
 import { stageCategorySchema } from '~/lib/schema/event.schema'
 import type { StageCategory } from '~/lib/types'
 import { useAxios } from '~/services/axios'
+import gpxParser from 'gpxparser'
 
 interface CategoryFormProps {
     stageId: string
@@ -50,11 +51,35 @@ const mapFileHandler = (event: Event, fieldName: string) => {
 
     const reader = new FileReader()
     const file = files[0]
-    reader.onload = () => {
+    reader.onload = async () => {
         GPXFilename.value = file.name
 
         if (form.value)
             form.value.setFieldValue(fieldName, reader.result as string)
+
+        try {
+            const xmlString = await file.text()
+            const gpx = new gpxParser()
+            gpx.parse(xmlString)
+
+            if (gpx.tracks && gpx.tracks.length > 0) {
+                const track = gpx.tracks[0]
+                const elevationGain = Math.round(track.elevation.pos)
+                if (form.value) {
+                    form.value.setFieldValue('distance', track.distance.total.toFixed(2))
+                    form.value.setFieldValue('elevation', elevationGain.toString())
+                }
+            } else if (gpx.routes && gpx.routes.length > 0) {
+                const route = gpx.routes[0]
+                const elevationGain = Math.round(route.elevation.pos)
+                if (form.value) {
+                    form.value.setFieldValue('distance', route.distance.total.toFixed(2))
+                    form.value.setFieldValue('elevation', elevationGain.toString())
+                }
+            }
+        } catch (e) {
+            console.error("Error parsing GPX file for distance and elevation:", e)
+        }
     }
     if (file)
         reader.readAsDataURL(file)
@@ -87,6 +112,7 @@ onMounted(() => {
                 excerpt: props.category.excerpt,
                 description: props.category.description,
                 distance: props.category.distance,
+                elevation: props.category.elevation,
                 difficulty: props.category.difficulty,
                 location: props.category.location,
                 start: props.category.start,
@@ -169,7 +195,12 @@ onMounted(() => {
                 <Input v-bind="field" id="ef__distance" />
                 <ErrorMessage class="error__message" name="distance" />
             </Field>
-            <Field name="bib_range" v-slot="{ field }" as="div" class="w-2/4 flex flex-col gap-2">
+            <Field name="elevation" v-slot="{ field }" as="div" class="w-1/4 flex flex-col gap-2">
+                <Label for="ef__elevation">Elevation Gain</Label>
+                <Input v-bind="field" id="ef__elevation" />
+                <ErrorMessage class="error__message" name="elevation" />
+            </Field>
+            <Field name="bib_range" v-slot="{ field }" as="div" class="w-1/4 flex flex-col gap-2">
                 <Label for="ef__bib_range">BIB Range</Label>
                 <Input v-bind="field" id="ef__bib_range" />
                 <ErrorMessage class="error__message" name="bib_range" />

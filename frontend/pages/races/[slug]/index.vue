@@ -57,7 +57,7 @@ const parsedDetails = computed(() => {
     }
 })
 
-/* const totalElevationGain = computed(() => {
+const totalElevationGain = computed(() => {
     if (!trailRace.value?.stages) return "0"
     const sum = trailRace.value.stages.reduce((acc, stage) => {
         return acc + stage.stage_categories.reduce((t, st) => {
@@ -66,7 +66,7 @@ const parsedDetails = computed(() => {
         }, 0)
     }, 0)
     return sum.toLocaleString('en-US')
-}) */
+})
 
 if (trailRace.value && trailRace.value.stages.length > 0) {
     let initialStage = trailRace.value.stages[0]
@@ -343,12 +343,12 @@ const isSticky = computed(() => y.value > 450)
                             <div class="flex items-baseline gap-1">
                                 <span
                                     class="text-4xl font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">
-                                    {{ totalDistance }}
+                                    {{ totalDistance.toFixed(2) }}
                                 </span>
                                 <span class="text-sm font-bold text-slate-400 uppercase">KM</span>
                             </div>
                         </div>
-                        <!-- <div
+                        <div
                             class="bg-white dark:bg-deep-slate p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col gap-3 group hover:border-primary/50 transition-colors">
                             <span class="text-slate-400 text-[10px] font-black uppercase tracking-widest">
                                 Vert Gain
@@ -360,7 +360,7 @@ const isSticky = computed(() => y.value > 450)
                                 </span>
                                 <span class="text-sm font-bold text-slate-400 uppercase">M</span>
                             </div>
-                        </div> -->
+                        </div>
                         <div
                             class="bg-white dark:bg-deep-slate p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col gap-3">
                             <span
@@ -468,7 +468,11 @@ const isSticky = computed(() => y.value > 450)
                                     </div>
                                     <div class="flex justify-between text-sm font-bold">
                                         <span class="text-slate-400">Distance</span>
-                                        <span>{{ (parseFloat(cat.distance) / 1000) }} KM</span>
+                                        <span>{{ (parseFloat(cat.distance) / 1000).toFixed(2) }} KM</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm font-bold">
+                                        <span class="text-slate-400">Elevation Gain</span>
+                                        <span>{{ cat.elevation }} M</span>
                                     </div>
                                     <div class="pt-4">
                                         <div
