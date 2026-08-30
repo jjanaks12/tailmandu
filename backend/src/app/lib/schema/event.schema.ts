@@ -50,6 +50,7 @@ export const trailRaceRunner = Y.object({
     middle_name: Y.string().nullable().label("Middle name"),
     last_name: Y.string().required().label("Last name"),
     email: Y.string().email().required().label("Email"),
+    itra_id: Y.string().nullable().label("ITRA ID"),
     phone_number: Y.string().required().label("Phone number"),
     date_of_birth: Y.string().required().label("Date of birth"),
     country_id: Y.string().required().label("Country"),

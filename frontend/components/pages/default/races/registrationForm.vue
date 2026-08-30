@@ -316,7 +316,7 @@ onMounted(() => {
                                 </Field>
                             </div>
 
-                            <!-- Date of Birth -->
+                            <!-- Date of Birth and ITRA ID -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Field name="date_of_birth" as="div" v-slot="{ field }" class="space-y-2">
                                     <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -327,6 +327,15 @@ onMounted(() => {
                                         :model-value="field.value ? parseDate(field.value as string) : undefined"
                                         @update:model-value="$event ? field.onChange($event.toString()) : undefined" />
                                     <ErrorMessage class="error__message" name="date_of_birth" />
+                                </Field>
+
+                                <Field name="itra_id" as="div" v-slot="{ field }" class="space-y-2" v-if="mode === 'runner'">
+                                    <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                        <Target :size="16" class="text-gray-400" />
+                                        ITRA ID (Optional)
+                                    </Label>
+                                    <Input v-bind="field" placeholder="Enter your ITRA ID" class="h-12 text-base" />
+                                    <ErrorMessage class="error__message" name="itra_id" />
                                 </Field>
                             </div>
 

@@ -10,12 +10,17 @@ definePageMeta({
     transparentHeader: true
 })
 
+const title = 'Trailmandu - From The City To The Mountains'
+const description = "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes."
+const url = 'https://trailmandu.com'
+const image = 'https://trailmandu.com/images/home-slider01.webp'
+
 useHead({
+    title,
+    link: [
+        { rel: 'canonical', href: url }
+    ],
     meta: [
-        {
-            name: 'description',
-            content: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes."
-        },
         {
             name: 'keywords',
             content: 'trail running, fastpacking, nepal running, marathon nepal, trailmandu, adventure runs nepal, himalayas race, skyrunning nepal'
@@ -31,15 +36,15 @@ useHead({
             innerHTML: JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'SportsOrganization',
-                '@id': 'https://trailmandu.com/#organization',
+                '@id': `${url}/#organization`,
                 'name': 'Trailmandu',
-                'url': 'https://trailmandu.com',
+                'url': url,
                 'logo': {
                     '@type': 'ImageObject',
-                    'url': 'https://trailmandu.com/logo.png',
+                    'url': `${url}/logo.png`,
                     'caption': 'Trailmandu Logo'
                 },
-                'description': "From the City to the Peaks: Trailmandu organizes premier adventure trail runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
+                'description': description,
                 'address': {
                     '@type': 'PostalAddress',
                     'addressLocality': 'Kathmandu',
@@ -62,37 +67,33 @@ useHead({
             innerHTML: JSON.stringify({
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
-                '@id': 'https://trailmandu.com/#website',
-                'url': 'https://trailmandu.com',
+                '@id': `${url}/#website`,
+                'url': url,
                 'name': 'Trailmandu',
                 'description': "Trailmandu's Adventure Runs in Nepal",
                 'publisher': {
-                    '@id': 'https://trailmandu.com/#organization'
+                    '@id': `${url}/#organization`
                 }
             })
         } as any
     ]
 })
 
-const { locales, setLocale } = useI18n()
-
 useSeoMeta({
-    title: 'Trailmandu - From The City To The Mountains',
-    description: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
-    ogTitle: 'Trailmandu - From The City To The Mountains',
-    ogDescription: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
-    ogImage: '/images/home-slider01.webp',
-    ogUrl: 'https://trailmandu.com',
+    title,
+    description,
+    ogTitle: title,
+    ogDescription: description,
+    ogImage: image,
+    ogUrl: url,
     ogType: 'website',
     twitterCard: 'summary_large_image',
-    twitterTitle: 'Trailmandu - From The City To The Mountains',
-    twitterDescription: "From the City to the Peaks: Trailmandu organizes premier adventure runs, skyrunning events, and fastpacking challenges across Nepal's scenic natural routes.",
-    twitterImage: '/images/home-slider01.webp'
+    twitterTitle: title,
+    twitterDescription: description,
+    twitterImage: image
 })
 
-onMounted(() => {
-    useTitle('Trailmandu - From The City To The Mountains')
-})
+const { locales, setLocale } = useI18n()
 
 const { axios } = useAxios()
 const sponsorGroups = ref<SponsorType[]>([])
@@ -111,7 +112,7 @@ onMounted(fetchSponsors)
 </script>
 
 <template>
-    <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans">
+    <main class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans">
         <PagesDefaultHomeBannerHero />
         <PagesDefaultHomeRace />
         <PagesDefaultHomeAdventures />
@@ -129,7 +130,7 @@ onMounted(fetchSponsors)
                 <div class="grid md:grid-cols-2 gap-8">
                     <div
                         class="relative overflow-hidden rounded-3xl group p-12 h-96 flex flex-col justify-end text-white">
-                        <img alt="Runner profile"
+                        <img alt="Trailmandu runner competing in a high-altitude Himalayan trail race"
                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             src="/images/home-runner.jpeg" />
                         <div class="absolute inset-0 bg-gradient-to-t from-deep-slate via-deep-slate/40 to-transparent">
@@ -148,7 +149,7 @@ onMounted(fetchSponsors)
                     </div>
                     <div
                         class="relative overflow-hidden rounded-3xl group p-12 h-96 flex flex-col justify-end text-white">
-                        <img alt="Volunteers at race"
+                        <img alt="Trailmandu volunteers assisting runners at a high-altitude aid station"
                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             src="/images/home-volunteer.JPG" />
                         <div
@@ -216,5 +217,5 @@ onMounted(fetchSponsors)
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
-    </body>
+    </main>
 </template>

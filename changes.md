@@ -20,4 +20,4 @@ outstanding
 - [ ] **Trip Advisor** update
 - [ ] SEO check once
 - [X] price start should be from low on treks / fastpacking
-- [ ] ITRA id on registration form
+- [X] ITRA id on registration form
