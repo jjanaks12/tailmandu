@@ -15,7 +15,8 @@ export const stageSchema = Y.object({
     excerpt: Y.string().required().label('excerpt'),
     description: Y.string().required().label('Description'),
     location: Y.string().required().label('Location'),
-    thumbnail: Y.string().required().label('Thumbnail')
+    thumbnail: Y.string().required().label('Thumbnail'),
+    guide_book_file: Y.string().optional().label('Guide book file')
 })
 
 export const checkpointSchema = Y.object({

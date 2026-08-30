@@ -4,8 +4,12 @@ import type { Gallery, WithCount } from '~/lib/types'
 import { useAxios } from '~/services/axios'
 
 const { axios } = useAxios()
-const galleries = ref<WithCount<Gallery>[]>([])
 const params = useUrlSearchParams('history')
+
+const { data: galleries } = await useAsyncData<WithCount<Gallery>[]>('gallaries', async () => {
+    const { data } = await axios.get('/medias/gallery_name')
+    return data
+})
 
 useHead(() => {
     const title = 'TM Clicks Gallery | Trailmandu'
@@ -62,15 +66,8 @@ definePageMeta({
     layout: 'default'
 })
 
-const totalImages = computed(() => galleries.value.reduce((acc, curr) => acc + (curr._count?.images ?? 0), 0))
-const filteredCategories = computed(() => galleries.value.filter((gallery) => gallery.name.toLowerCase().includes(((params.s as string ?? '')).toLowerCase() || '')))
-
-const fetch = async () => {
-    const { data } = await axios.get('/medias/gallery_name')
-    galleries.value = data
-}
-
-onMounted(fetch)
+const totalImages = computed(() => galleries.value?.reduce((acc, curr) => acc + (curr._count?.images ?? 0), 0))
+const filteredCategories = computed(() => galleries.value?.filter((gallery) => gallery.name.toLowerCase().includes(((params.s as string ?? '')).toLowerCase() || '')))
 </script>
 
 <template>

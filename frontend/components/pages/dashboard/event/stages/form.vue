@@ -24,8 +24,10 @@ const form = ref<FormContext | null>(null)
 const startDate = ref()
 const endDate = ref()
 const showFile = ref({
-    thumbnail: false
+    thumbnail: false,
+    guide_book_file: false
 })
+const guideBookFileName = ref('')
 
 const formSubmit = async (values: any) => {
     isLoading.value = true
@@ -52,6 +54,19 @@ const imageFileHandler = (event: Event, fieldName: string) => {
         reader.readAsDataURL(file)
 }
 
+const guideBookFileHandler = (event: Event, fieldName: string) => {
+    const files = (event.target as HTMLInputElement).files ?? []
+    if (files?.length == 0) return
+    const reader = new FileReader()
+    const file = files[0]
+    reader.onload = () => {
+        guideBookFileName.value = file.name
+        if (form.value)
+            form.value.setFieldValue(fieldName, reader.result as string)
+    }
+    if (file) reader.readAsDataURL(file)
+}
+
 const removeFile = (fieldName: string) => {
     if (form.value) {
         form.value.resetField(fieldName)
@@ -71,11 +86,14 @@ const init = () => {
                 location: props.stage.location,
                 difficulty: props.stage.difficulty,
                 distance: props.stage.distance,
-                thumbnail: props.stage.thumbnail.file_name,
+                thumbnail: props.stage.thumbnail?.file_name,
+                guide_book_file: props.stage.guide_book_file?.file_name,
             })
 
-            if (props.stage.thumbnail.file_name)
+            if (props.stage.thumbnail?.file_name)
                 showFile.value.thumbnail = true
+            if (props.stage.guide_book_file?.file_name)
+                showFile.value.guide_book_file = true
         }
     }
 }
@@ -149,6 +167,30 @@ onBeforeMount(() => {
             <Label for="esf__location">Location</Label>
             <Input v-bind="field" id="esf__location" />
             <ErrorMessage class="error__message" name="location" />
+        </Field>
+        <Field name="guide_book_file" v-slot="{ value, field }" as="div" class="flex flex-col gap-2">
+            <Label>Guide Book (PDF)</Label>
+            <div class="w-full flex flex-col gap-2 relative">
+                <div v-if="showFile.guide_book_file" class="flex items-center justify-between p-4 border rounded-sm">
+                    <span>{{ stage?.guide_book_file?.file_name }}</span>
+                    <Button type="button" @click="showFile.guide_book_file = false" size="sm" modifier="outline">Change file</Button>
+                </div>
+                <template v-else>
+                    <label class="py-4 px-4 flex border border-dashed rounded-sm cursor-pointer">
+                        <input type="file" @change="guideBookFileHandler($event, 'guide_book_file')" accept="application/pdf" class="hidden" />
+                        <span class="text-gray-700 flex-grow">
+                            {{ guideBookFileName ? guideBookFileName : 'Upload PDF guide book' }}
+                        </span>
+                    </label>
+                    <Button type="button" @click="() => {
+                        removeFile('guide_book_file')
+                        guideBookFileName = ''
+                    }" v-if="guideBookFileName" size="icon" modifier="outline" class="absolute top-1/2 right-2 -translate-y-1/2">
+                        <XIcon />
+                    </Button>
+                </template>
+            </div>
+            <ErrorMessage class="error__message" name="guide_book_file" />
         </Field>
         <Field name="description" v-slot="{ value, handleChange }" as="div" class="flex flex-col gap-2">
             <TiptapEditor :model-value="value ?? ''" @update:model-value="handleChange" :disabled="false"

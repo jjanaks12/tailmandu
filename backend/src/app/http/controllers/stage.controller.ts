@@ -17,6 +17,7 @@ export class StageController {
                 include: {
                     runners: true,
                     thumbnail: true,
+                    guide_book_file: true,
                     volunteers: true
                 }
             }))
@@ -34,6 +35,12 @@ export class StageController {
                 const file = new FileHandler('images')
                 const image = await file.saveFile(validationData.thumbnail)
                 body.image_id = image.id
+            }
+
+            if (validationData.guide_book_file) {
+                const file = new FileHandler('files')
+                const image = await file.saveFile(validationData.guide_book_file)
+                body.guide_book_file_id = image.id
             }
 
             if (request.body.start)
@@ -69,6 +76,12 @@ export class StageController {
                 body.image_id = image.id
             }
 
+            if (validationData.guide_book_file && isBase64(validationData.guide_book_file)) {
+                const file = new FileHandler('files')
+                const image = await file.saveFile(validationData.guide_book_file, stage.guide_book_file_id)
+                body.guide_book_file_id = image.id
+            }
+
             response.send(await prisma.stage.update({
                 where: {
                     id: request.params.stage_id as string
@@ -96,6 +109,7 @@ export class StageController {
                 },
                 include: {
                     thumbnail: true,
+                    guide_book_file: true,
                     stage_categories: {
                         include: {
                             map_file: true

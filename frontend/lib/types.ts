@@ -185,6 +185,8 @@ export type Stage = {
     map_file: Image
     image_id: string
     thumbnail: Image
+    guide_book_file_id?: string
+    guide_book_file?: Image
     runners: EventRunner[]
     volunteers: Volunteer[]
     stage_categories: StageCategory[]

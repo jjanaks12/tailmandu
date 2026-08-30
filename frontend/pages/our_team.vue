@@ -5,24 +5,33 @@ import { ExternalLinkIcon } from 'lucide-vue-next'
 import { capitalize } from 'vue'
 import Icon from '~/components/icon.vue'
 import { showImage } from '~/lib/filters'
+import type { TeamMember } from '~/lib/types'
 import { useTeamStore } from '~/store/team'
 
 definePageMeta({
     layout: 'default'
 })
 
+const { public: { serverUrl } } = useRuntimeConfig()
+const { data: teams, pending: isLoading } = await useAsyncData<TeamMember[]>('teams', async () => {
+    const { fetchPublicTeams } = useTeamStore()
+    const { teams } = storeToRefs(useTeamStore())
+    await fetchPublicTeams()
+    return teams.value
+})
+
 useHead(() => {
     const title = 'Our Team | Trailmandu'
     const description = 'Meet the passionate team behind Trailmandu, organizing premier skyrunning events and adventure runs across Nepal.'
     const canonical = 'https://trailmandu.com/our_team'
-    const image = img01 || 'https://trailmandu.com/logo.png'
+    const logoUrl = '/images/logo.png'
 
     const members = (teams.value || []).map(member => ({
         '@type': 'OrganizationRole',
         'member': {
             '@type': 'Person',
             'name': member.name,
-            'image': member.image ? showImage(member.image.file_name) : undefined,
+            'image': member.image ? `${serverUrl}resources/images/${member.image.file_name}` : logoUrl,
             'jobTitle': member.positions || [],
             'sameAs': member.social ? Object.values(member.social).filter(Boolean) : []
         },
@@ -41,14 +50,14 @@ useHead(() => {
             // Open Graph
             { property: 'og:title', content: title },
             { property: 'og:description', content: description },
-            { property: 'og:image', content: image },
+            { property: 'og:image', content: logoUrl },
             { property: 'og:url', content: canonical },
             { property: 'og:type', content: 'website' },
             // Twitter
             { name: 'twitter:card', content: 'summary_large_image' },
             { name: 'twitter:title', content: title },
             { name: 'twitter:description', content: description },
-            { name: 'twitter:image', content: image }
+            { name: 'twitter:image', content: logoUrl }
         ],
         script: [
             {
@@ -75,9 +84,6 @@ useHead(() => {
         ]
     }
 })
-
-const { fetchPublicTeams } = useTeamStore()
-const { teams, isLoading } = storeToRefs(useTeamStore())
 
 const socialIcons: Record<string, keyof typeof Icons> = {
     facebook: 'FacebookIcon',
@@ -131,8 +137,6 @@ const formatLink = (url: string) => {
     }
     return cleanUrl
 }
-
-onMounted(fetchPublicTeams)
 </script>
 
 <template>
@@ -144,7 +148,7 @@ onMounted(fetchPublicTeams)
                 Loading team members...
             </div>
 
-            <div v-else-if="!teams.length" class="text-center text-muted-foreground py-20">
+            <div v-else-if="!teams?.length" class="text-center text-muted-foreground py-20">
                 No team members found.
             </div>
 

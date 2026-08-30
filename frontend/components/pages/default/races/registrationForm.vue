@@ -189,7 +189,7 @@ onMounted(() => {
 <template>
     <div class="w-screen flex flex-col md:flex-row relative bg-gray-50" v-if="upcomingStages.length > 0">
         <!-- Left Fixed Panel -->
-        <div class="hidden md:flex flex-col w-1/2 h-[calc(100vh-81px)] text-white sticky top-[81px] left-0">
+        <div class="hidden md:flex flex-col w-1/2 h-screen text-white sticky top-[81px] left-0">
             <img :src="showImage(trailRace.thumbnail?.file_name as string)" :alt="trailRace.name"
                 class="absolute inset-0 w-full h-full object-cover" />
             <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-transparent"></div>
@@ -329,7 +329,8 @@ onMounted(() => {
                                     <ErrorMessage class="error__message" name="date_of_birth" />
                                 </Field>
 
-                                <Field name="itra_id" as="div" v-slot="{ field }" class="space-y-2" v-if="mode === 'runner'">
+                                <Field name="itra_id" as="div" v-slot="{ field }" class="space-y-2"
+                                    v-if="mode === 'runner'">
                                     <Label class="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <Target :size="16" class="text-gray-400" />
                                         ITRA ID (Optional)

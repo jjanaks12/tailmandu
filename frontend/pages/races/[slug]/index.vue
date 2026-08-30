@@ -391,14 +391,23 @@ const isSticky = computed(() => y.value > 450)
                             <h3 class="text-4xl text-gray-800 font-display font-black tracking-tight">{{
                                 selectedStage.name }}</h3>
                         </div>
-                        <div class="flex gap-3">
-                            <Badge v-if="selectedStage.difficulty === 'difficult'"
-                                class="bg-red-500/10 text-red-500 border-none font-bold uppercase tracking-tighter">
-                                TECHNICAL
-                            </Badge>
-                            <Badge class="bg-primary/10 text-primary border-none font-bold uppercase tracking-tighter">
-                                HIGH ALTITUDE
-                            </Badge>
+                        <div class="flex flex-col items-end gap-3">
+                            <div class="flex gap-3">
+                                <Badge v-if="selectedStage.difficulty === 'difficult'"
+                                    class="bg-red-500/10 text-red-500 border-none font-bold uppercase tracking-tighter">
+                                    TECHNICAL
+                                </Badge>
+                                <Badge
+                                    class="bg-primary/10 text-primary border-none font-bold uppercase tracking-tighter">
+                                    HIGH ALTITUDE
+                                </Badge>
+                            </div>
+                            <Button v-if="selectedStage.guide_book_file?.file_name" as-child modifier="outline"
+                                size="sm">
+                                <a :href="showImage(selectedStage.guide_book_file.file_name)" target="_blank" download>
+                                    Download Guide Book
+                                </a>
+                            </Button>
                         </div>
                     </div>
 
@@ -659,7 +668,8 @@ const isSticky = computed(() => y.value > 450)
                                 Planning Ahead?
                             </h4>
                             <p class="mb-10 relative z-10 leading-relaxed font-medium">
-                                Individual registration for this stage is not open yet, but you can secure your spot for all remaining stages with a Season Pass!
+                                Individual registration for this stage is not open yet, but you can secure your spot for
+                                all remaining stages with a Season Pass!
                             </p>
                             <Button size="xl" as-child>
                                 <NuxtLink
