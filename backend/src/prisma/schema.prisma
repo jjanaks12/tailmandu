@@ -209,6 +209,7 @@ model Image {
   seo_og_images           SeoMetadata[]          @relation("seo_og_image")
   static_pages_featured   StaticPage[]           @relation("page_featured_image")
   team_members_image      TeamMember[]           @relation("team_member_image")
+  guide_books             Stage[]                @relation("guide_book_file")
 
   @@map("images")
 }
@@ -404,10 +405,12 @@ model Stage {
   updated_at  DateTime?
   deleted_at  DateTime?
 
-  event_id  String
-  event     TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
-  image_id  String?
-  thumbnail Image?    @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
+  event_id           String
+  event              TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  image_id           String?
+  thumbnail          Image?    @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: Cascade)
+  guide_book_file_id String?
+  guide_book_file    Image?    @relation("guide_book_file", fields: [guide_book_file_id], references: [id], onDelete: Cascade)
 
   runners            EventRunner[]
   volunteers         Volunteer[]
