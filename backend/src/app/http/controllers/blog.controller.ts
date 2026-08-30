@@ -6,8 +6,35 @@ import { blogPostSchema } from '@/app/lib/schema/blog.schema'
 import createHttpError from 'http-errors'
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
+import { Redis } from '@/app/lib/services/redis.service'
 
 export class BlogController {
+    public static async clearCache(request: Request, response: Response, next: NextFunction) {
+        try {
+            const blog = await prisma.blogPost.findUnique({ where: { id: request.params.id as string } })
+            if (blog && blog.slug) {
+                // Clear all API caches
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__api_cache__*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+
+                // Clear all database and other general caches
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__cache__/*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+            }
+            response.send({ message: 'Cache cleared successfully' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async index(request: Request<{}, {}, {}, APIQuery>, response: Response, next: NextFunction) {
         try {
             const { per_page = 10, current = 1, s = '', sort, status } = request.query

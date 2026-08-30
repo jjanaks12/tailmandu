@@ -186,6 +186,7 @@ model Image {
   id          String    @id @default(cuid())
   file_name   String
   description String
+  detail      Json?
   created_at  DateTime  @default(now())
   updated_at  DateTime?
 
@@ -605,16 +606,16 @@ model Tag {
 }
 
 model Gallery {
-  id          String    @id @default(cuid())
-  name        String
-  description String?   @db.Text
-  image_order Json?
-  created_at  DateTime  @default(now())
-  updated_at  DateTime?
-  deleted_at  DateTime?
+  id           String    @id @default(cuid())
+  name         String
+  description  String?   @db.Text
+  image_order  Json?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
   hide_gallery Boolean   @default(true)
 
-  images        Image[] @relation("GalleryToImage")
+  images   Image[]     @relation("GalleryToImage")
   tags     Tag[]
   events   TrailRace[]
   treks    Trek[]
@@ -1009,7 +1010,7 @@ model BlogPost {
   featured_image_id String?
   featured_image    Image?        @relation("blog_featured_image", fields: [featured_image_id], references: [id])
 
-  tags Tag[]
+  tags     Tag[]
   comments BlogComment[]
 
   @@map("blog_posts")
@@ -1102,27 +1103,27 @@ model TeamMember {
 }
 
 model BlogComment {
-  id           String   @id @default(cuid())
-  content      String   @db.Text
-  rating       Int?     // 1 to 5 stars
-  
-  parent_id    String?
-  parent       BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: Cascade)
-  replies      BlogComment[] @relation("CommentReplies")
+  id      String @id @default(cuid())
+  content String @db.Text
+  rating  Int? // 1 to 5 stars
+
+  parent_id String?
+  parent    BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies   BlogComment[] @relation("CommentReplies")
 
   author_name  String?
   author_email String?
   user_id      String?
-  user         User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  user         User?   @relation(fields: [user_id], references: [id], onDelete: SetNull)
 
-  post_id      String
-  post         BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  post_id String
+  post    BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
-  status       String   @default("approved")
+  status String @default("approved")
 
-  created_at   DateTime  @default(now())
-  updated_at   DateTime?
-  deleted_at   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
 
   @@map("blog_comments")
 }

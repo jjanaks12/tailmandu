@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { CalendarIcon, UserIcon, ArrowLeftIcon, ArrowRightIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, TagIcon } from 'lucide-vue-next'
+import { CalendarIcon, UserIcon, ArrowLeftIcon, ArrowRightIcon, Share2Icon, TwitterIcon, FacebookIcon, LinkedinIcon, TagIcon, Loader2Icon } from 'lucide-vue-next'
+import { useAuthStore } from '~/store/auth'
+import { storeToRefs } from 'pinia'
 import { useBlogStore } from '~/store/blog'
 import { showImage, parseContent } from '~/lib/filters'
 import CommentSection from '~/components/pages/blogs/CommentSection.vue'
+import DraggableImage from '~/components/DraggableImage.vue'
 import Swiper from 'swiper'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 
@@ -10,6 +13,10 @@ const route = useRoute()
 const { getPublicPostBySlug } = useBlogStore()
 const { data: post, pending: isLoading } = await useAsyncData(`post-${route.params.slug}`, () => getPublicPostBySlug(route.params.slug as string))
 const { public: { serverUrl } } = useRuntimeConfig()
+
+const authStore = useAuthStore()
+const { permissions } = storeToRefs(authStore)
+const hasManagePermission = computed(() => permissions.value.includes('blog_edit'))
 
 const initSwipers = () => {
     if (typeof window === 'undefined') return
@@ -185,13 +192,9 @@ onMounted(initSwipers)
             </header>
 
             <!-- Featured Image -->
-            <div class="max-w-6xl mx-auto px-4 mb-16" v-if="post.featured_image">
-                <figure
-                    class="aspect-video lg:aspect-[21/9] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10">
-                    <img :src="showImage(post.featured_image.file_name)" :alt="post.title"
-                        class="w-full h-full object-cover" />
-                </figure>
-            </div>
+            <DraggableImage v-if="post.featured_image" :image="post.featured_image" :alt="post.title"
+                :has-manage-permission="hasManagePermission" container-class="max-w-6xl mx-auto px-4 mb-16"
+                figure-class="aspect-video lg:aspect-[21/9] rounded-[2.5rem]" />
 
             <!-- Content Area -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-16 text-gray-800">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SlidersHorizontalIcon, ChevronRightIcon } from 'lucide-vue-next'
+import { SlidersHorizontalIcon, ChevronRightIcon, SearchIcon } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import { useBlogStore } from '~/store/blog'
 
@@ -84,6 +84,17 @@ const filterByCategory = (slug: string | null) => {
     fetchPublicPosts(slug || undefined)
 }
 
+const searchQuery = ref(params.value?.s || '')
+let searchTimeout: any = null
+
+const onSearch = () => {
+    if (searchTimeout) clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(() => {
+        params.value.s = searchQuery.value
+        fetchPublicPosts(selectedCategory.value || undefined)
+    }, 500)
+}
+
 const featuredPost = computed(() => posts.value.find(p => p.is_featured) || posts.value[0])
 const remainingPosts = computed(() => posts.value.filter(p => p.id !== featuredPost.value?.id))
 </script>
@@ -113,14 +124,20 @@ const remainingPosts = computed(() => posts.value.filter(p => p.id !== featuredP
 
         <!-- Categories & Filter -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 mb-16">
-            <div class="flex flex-wrap items-center justify-center gap-3">
-                <Button @click="filterByCategory(null)" :modifier="!selectedCategory ? 'default' : 'outline'">
-                    {{ $t('public_blogs.all_stories') }}
-                </Button>
-                <Button v-for="category in categories" :key="category.id" @click="filterByCategory(category.slug)"
-                    :modifier="selectedCategory === category.slug ? 'default' : 'outline'">
-                    {{ category.name }}
-                </Button>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                    <Button @click="filterByCategory(null)" :modifier="!selectedCategory ? 'default' : 'outline'">
+                        {{ $t('public_blogs.all_stories') }}
+                    </Button>
+                    <Button v-for="category in categories" :key="category.id" @click="filterByCategory(category.slug)"
+                        :modifier="selectedCategory === category.slug ? 'default' : 'outline'">
+                        {{ category.name }}
+                    </Button>
+                </div>
+                <div class="relative w-full md:w-72">
+                    <SearchIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input type="text" v-model="searchQuery" @input="onSearch" :placeholder="$t('public_blogs.search_placeholder') || 'Search stories...'" class="pl-9 w-full bg-white dark:bg-deep-slate border-slate-200 dark:border-slate-700" />
+                </div>
             </div>
         </div>
 

@@ -12,7 +12,7 @@ outstanding
 - [X] season pass
 - [X] update result pass - as per ITRA
 - [X] block future race
-- [ ] inspect blog "Best running headlamp for..."
+- [X] inspect blog "Best running headlamp for..."
 - [ ] total distance on event
 - [ ] elevation profile on events
 - [ ] race guide book - pdf upload and view

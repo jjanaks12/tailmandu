@@ -424,7 +424,7 @@ export class MediaController {
 
     public static async updateImage(request: Request, response: Response, next: NextFunction) {
         try {
-            const { image, description, tags: inputTags } = request.body
+            const { image, description, tags: inputTags, detail } = request.body
             const { id } = request.params
 
             if (image) {
@@ -436,6 +436,10 @@ export class MediaController {
 
             if (description !== undefined) {
                 updateData.description = description
+            }
+
+            if (detail !== undefined) {
+                updateData.detail = detail
             }
 
             if (inputTags !== undefined && Array.isArray(inputTags)) {
@@ -465,6 +469,23 @@ export class MediaController {
                     tags: true
                 }
             })
+
+            // Clear all API and general caches so the updated focal point is reflected
+            if (detail !== undefined) {
+                const { Redis } = require('@/app/lib/services/redis.service')
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__api_cache__*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+                for await (const key of Redis.client.scanIterator({
+                    MATCH: `__cache__/*`,
+                    COUNT: 100
+                })) {
+                    await Redis.client.del(key)
+                }
+            }
 
             response.send(updatedImage)
         } catch (error) {

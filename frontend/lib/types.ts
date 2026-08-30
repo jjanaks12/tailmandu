@@ -99,6 +99,7 @@ export type Image = {
     updated_at?: Date
     personal: Personal[]
     tags: Tag[]
+    detail?: any
 }
 
 export type Tag = {

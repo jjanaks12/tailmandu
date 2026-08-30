@@ -225,7 +225,10 @@ onMounted(init)
             </TabsContent>
         </Tabs>
 
-        <div class="py-6 border-t border-border flex justify-end sticky bottom-0 bg-background">
+        <div class="py-6 border-t border-border flex justify-between items-center sticky bottom-0 bg-background z-10">
+            <div class="flex gap-2 items-center">
+                <slot name="bottom-actions" />
+            </div>
             <Button type="submit" :disabled="isLoading" class="min-w-[150px]">
                 <Loader2Icon v-if="isLoading" class="animate-spin mr-2" />
                 {{ $t('dashboard.blogs.form.submit') }}
