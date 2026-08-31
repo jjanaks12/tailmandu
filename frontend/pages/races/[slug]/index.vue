@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { CalendarIcon, MapPinIcon, MountainIcon, ZapIcon, ChevronRightIcon, MapIcon, ActivityIcon, TrophyIcon } from 'lucide-vue-next'
+import { CalendarIcon, MapPinIcon, MountainIcon, ZapIcon, ChevronRightIcon, MapIcon, ActivityIcon, TrophyIcon, BookOpenIcon } from 'lucide-vue-next'
 import { formatDate, getGPXFile, showImage } from '~/lib/filters'
 import type { TrailRace, Stage, StageCategory } from '~/lib/types'
 import { useEventStore } from '~/store/event'
 import moment from 'moment'
 import { Autoplay, Virtual } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { useAppStore } from '~/store/app'
+import { getFile } from '~/lib/filters/show_image'
 
 const route = useRoute()
 const { getBySlug } = useEventStore()
@@ -402,12 +402,6 @@ const isSticky = computed(() => y.value > 450)
                                     HIGH ALTITUDE
                                 </Badge>
                             </div>
-                            <Button v-if="selectedStage.guide_book_file?.file_name" as-child modifier="outline"
-                                size="sm">
-                                <a :href="showImage(selectedStage.guide_book_file.file_name)" target="_blank" download>
-                                    Download Guide Book
-                                </a>
-                            </Button>
                         </div>
                     </div>
 
@@ -630,6 +624,27 @@ const isSticky = computed(() => y.value > 450)
                                 <ActivityIcon v-else class="w-6 h-6 animate-pulse shrink-0" />
                             </div>
                         </nav>
+                    </div>
+                    <!-- Guide Book Banner -->
+                    <div v-if="selectedStage?.guide_book_file?.file_name"
+                        class="bg-primary/5 rounded-[2.5rem] p-6 flex flex-col items-center text-center gap-4 border border-primary/20 relative overflow-hidden shadow-lg shadow-primary/5">
+                        <div class="absolute -right-6 -top-6 text-primary/10">
+                            <BookOpenIcon class="w-32 h-32" />
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center w-full">
+                            <BookOpenIcon class="w-8 h-8 text-primary mb-2" />
+                            <h4 class="font-black text-xl text-primary uppercase tracking-widest mb-1">Guide Book</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 font-bold mb-4 px-4">Everything you
+                                need to know
+                                about {{ selectedStage.name }}</p>
+                            <Button as-child modifier="outline"
+                                class="w-full bg-white dark:bg-deep-slate border-primary text-primary hover:bg-primary hover:text-white shadow-sm">
+                                <a :href="getFile(selectedStage.guide_book_file.file_name, 'files')" target="_blank"
+                                    download>
+                                    Download
+                                </a>
+                            </Button>
+                        </div>
                     </div>
 
                     <!-- Registration CTA -->

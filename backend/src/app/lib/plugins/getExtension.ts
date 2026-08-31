@@ -8,8 +8,6 @@ var signatures: any = {
 
 export const getExtension = (base64Data: any) => {
     for (var s in signatures) {
-        console.log(s);
-        
         if (base64Data.indexOf(s) === 0) {
             return Promise.resolve(signatures[s])
         }

@@ -58,6 +58,7 @@ export const useEventStore = defineStore('event', () => {
 
     const getBySlug = async (slug: string) => {
         const { data } = await axios<TrailRace>(`/events/by_slug/${slug}`)
+        console.log(data);
 
         return data ?? null
     }

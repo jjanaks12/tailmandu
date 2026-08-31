@@ -1,4 +1,10 @@
 
+export const getFile = (fileName: string, type: 'images' | 'files' | 'gpx') => {
+    const { public: { serverUrl } } = useRuntimeConfig()
+
+    return fileName ? serverUrl + 'resources/' + type + '/' + fileName : '/images/not-found.png'
+}
+
 export const showImage = (fileName: string) => {
     const { public: { serverUrl } } = useRuntimeConfig()
 

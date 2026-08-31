@@ -75,8 +75,6 @@ export class HomeController {
                 }
             })
 
-            console.log(data)
-
             const sanitizeDates = (obj: any): any => {
                 if (obj === null || obj === undefined) return obj;
                 if (obj instanceof Date) {

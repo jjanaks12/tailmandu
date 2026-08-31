@@ -149,7 +149,6 @@ export class VolunteerController {
                     }
                 }
             })
-            console.log(volunteer)
             response.send(volunteer.flatMap((v) => v.stages))
         } catch (error) {
             next(error)

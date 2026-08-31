@@ -17,7 +17,6 @@ export class JWT {
 
             jwt.sign(payload, secret, options, (error, token) => {
                 if (error) {
-                    console.log(error.message);
                     reject(createHttpError.InternalServerError())
                 }
 
@@ -38,7 +37,6 @@ export class JWT {
 
             jwt.sign(payload, secret, options, async (error, token) => {
                 if (error) {
-                    console.log(error.message);
                     reject(createHttpError.InternalServerError())
                 }
 

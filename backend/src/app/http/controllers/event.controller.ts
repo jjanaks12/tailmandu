@@ -73,10 +73,10 @@ export class EventController {
                         },
                         include: {
                             stage_categories: true,
-                            thumbnail: true
+                            thumbnail: true,
+                            guide_book_file: true
                         }
                     },
-                    runners: true,
                     thumbnail: true,
                     gallery: {
                         include: {
@@ -175,7 +175,8 @@ export class EventController {
                         },
                         include: {
                             stage_categories: true,
-                            thumbnail: true
+                            thumbnail: true,
+                            guide_book_file: true
                         }
                     },
                     thumbnail: true
@@ -285,6 +286,7 @@ export class EventController {
                     stages: {
                         include: {
                             thumbnail: true,
+                            guide_book_file: true,
                             stage_categories: {
                                 include: {
                                     map_file: true,

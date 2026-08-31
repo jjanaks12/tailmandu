@@ -10,7 +10,5 @@ export const hasAdminAccess = async (request: Request, response: Response, next:
             permissions: true
         }
     })
-    console.log(role);
-
     next()
 }
