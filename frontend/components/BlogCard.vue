@@ -23,7 +23,8 @@ const formatDate = (date: string) => {
         <figure class="relative aspect-[16/9] overflow-hidden">
             <img v-if="post.featured_image" :src="showImage(post.featured_image.file_name)" :alt="post.title"
                 loading="lazy"
-                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                :style="{ objectPosition: `${post.featured_image?.detail?.focal_point?.x}% ${post.featured_image?.detail?.focal_point?.y}%` }" />
             <div
                 class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             </div>

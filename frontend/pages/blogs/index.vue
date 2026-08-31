@@ -136,7 +136,9 @@ const remainingPosts = computed(() => posts.value.filter(p => p.id !== featuredP
                 </div>
                 <div class="relative w-full md:w-72">
                     <SearchIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input type="text" v-model="searchQuery" @input="onSearch" :placeholder="$t('public_blogs.search_placeholder') || 'Search stories...'" class="pl-9 w-full bg-white dark:bg-deep-slate border-slate-200 dark:border-slate-700" />
+                    <Input type="text" v-model="searchQuery" @input="onSearch"
+                        :placeholder="$t('public_blogs.search_placeholder') || 'Search stories...'"
+                        class="pl-9 w-full bg-white dark:bg-deep-slate border-slate-200 dark:border-slate-700" />
                 </div>
             </div>
         </div>
