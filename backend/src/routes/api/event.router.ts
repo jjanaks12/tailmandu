@@ -11,6 +11,7 @@ import { StageCategoryController } from '@/app/http/controllers/stage_category.c
 import { SponsorController } from '@/app/http/controllers/sponsor.controller'
 import { PaymentController } from '@/app/http/controllers/payment.controller'
 import { ResultController } from '@/app/http/controllers/result.controller'
+import { SeasonPassController } from '@/app/http/controllers/season_pass.controller'
 
 const router = Router()
 
@@ -76,6 +77,15 @@ router.delete('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.de
 // PAYMENTS
 router.get('/:event_id/payments', [verifyAccessToken], PaymentController.index)
 router.put('/:event_id/payments/:payment_id', [verifyAccessToken], PaymentController.updatePaymentStatus)
+
+// SEASON PASS
+router.get('/:event_id/season-passes', [verifyAccessToken], SeasonPassController.index)
+router.post('/season-passes', [verifyAccessToken], SeasonPassController.store)
+router.put('/season-passes/:id', [verifyAccessToken], SeasonPassController.update)
+router.delete('/season-passes/:id', [verifyAccessToken], SeasonPassController.destroy)
+router.post('/season-passes/payments', [verifyAccessToken], SeasonPassController.storePayment)
+router.put('/season-passes/payments/:payment_id', [verifyAccessToken], SeasonPassController.updatePayment)
+router.delete('/season-passes/payments/:payment_id', [verifyAccessToken], SeasonPassController.destroyPayment)
 
 // RESULTS
 router.get('/:event_id/:stage_id/results', [], ResultController.index)

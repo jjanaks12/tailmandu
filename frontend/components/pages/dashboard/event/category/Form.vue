@@ -64,25 +64,28 @@ const mapFileHandler = (event: Event, fieldName: string) => {
 
             if (gpx.tracks && gpx.tracks.length > 0) {
                 const track = gpx.tracks[0]
-                const elevationGain = Math.round(track.elevation.pos)
+                const distanceKm = track.distance && track.distance.total ? (track.distance.total / 1000) : 0
+                const elevationGain = track.elevation && track.elevation.pos ? Math.round(track.elevation.pos) : 0
                 if (form.value) {
-                    form.value.setFieldValue('distance', track.distance.total.toFixed(2))
-                    form.value.setFieldValue('elevation', elevationGain.toString())
+                    form.value.setFieldValue('distance', distanceKm > 0 ? distanceKm.toFixed(2) : '')
+                    form.value.setFieldValue('elevation', elevationGain > 0 ? elevationGain.toString() : '')
                 }
             } else if (gpx.routes && gpx.routes.length > 0) {
                 const route = gpx.routes[0]
-                const elevationGain = Math.round(route.elevation.pos)
+                const distanceKm = route.distance && route.distance.total ? (route.distance.total / 1000) : 0
+                const elevationGain = route.elevation && route.elevation.pos ? Math.round(route.elevation.pos) : 0
                 if (form.value) {
-                    form.value.setFieldValue('distance', route.distance.total.toFixed(2))
-                    form.value.setFieldValue('elevation', elevationGain.toString())
+                    form.value.setFieldValue('distance', distanceKm > 0 ? distanceKm.toFixed(2) : '')
+                    form.value.setFieldValue('elevation', elevationGain > 0 ? elevationGain.toString() : '')
                 }
             }
         } catch (e) {
             console.error("Error parsing GPX file for distance and elevation:", e)
         }
     }
-    if (file)
+    if (file) {
         reader.readAsDataURL(file)
+    }
 }
 
 const removeFile = (fieldName: string) => {

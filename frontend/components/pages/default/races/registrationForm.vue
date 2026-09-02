@@ -73,24 +73,19 @@ const payment = computed(() => {
 
     const basePayment = prices.value?.payment.find(payment => payment.type === type)
 
-    if (form.value?.values.is_season_pass) {
-        let totalAmount = 0
-        const selectedCategories = form.value?.values.season_pass_categories || []
-
-        selectedCategories.forEach((categoryId: string) => {
-            if (categoryId) {
-                let p = null
-                for (const stage of upcomingStages.value) {
-                    const matchedCategory = stage.stage_categories.find(c => String(c.id) === String(categoryId))
-                    if (matchedCategory) {
-                        p = matchedCategory.payment.find(pay => pay.type === type)
-                        break
-                    }
-                }
-                if (p) totalAmount += Number(p.amount)
+    if (form.value?.values.is_season_pass && form.value?.values.season_pass_id) {
+        const seasonPass = props.trailRace.season_passes?.find(sp => sp.id === form.value?.values.season_pass_id)
+        if (seasonPass) {
+            const spPayment = seasonPass.payments?.find(p => p.type === type)
+            if (spPayment) {
+                return { 
+                    amount: spPayment.amount, 
+                    type: spPayment.type, 
+                    description: spPayment.description,
+                    screenshot: spPayment.screenshot
+                } as StageCategoryPayment
             }
-        })
-        if (totalAmount > 0) return { ...(basePayment || {}), amount: String(totalAmount) } as StageCategoryPayment
+        }
         return {} as StageCategoryPayment
     }
 
@@ -422,39 +417,45 @@ onMounted(() => {
                         </Field> -->
                             </div>
                             <div class="flex flex-col gap-4">
-                                <Field name="is_season_pass" as="div" v-slot="{ value, handleChange }" class="space-y-2"
-                                    v-if="mode === 'runner' && upcomingStages.length > 1">
-                                    <Label
-                                        class="block bg-primary/5 p-5 rounded-xl border relative cursor-pointer hover:bg-primary/10 transition-colors"
-                                        :class="value ? 'border-primary' : 'border-primary/20'">
-                                        <div
-                                            class="absolute -top-3 right-4 bg-primary text-primary-foreground px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm">
-                                            Best Value
-                                        </div>
-                                        <div class="flex items-center gap-3 mb-3">
-                                            <div
-                                                class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                                <MountainIcon class="w-4 h-4" />
-                                            </div>
-                                            <div>
-                                                <h4 class="font-bold text-gray-900 text-sm">Season Pass {{ new
-                                                    Date(trailRace.start as string).getFullYear() }}</h4>
-                                                <p class="text-xs text-gray-500">The ultimate trail experience</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center justify-between mt-2 group">
-                                            <span class="font-bold text-sm text-gray-900">Add to Registration</span>
-                                            <Checkbox :model-value="value" @update:model-value="(val) => {
-                                                handleChange(val);
-                                                if (val) {
-                                                    const initialCategories = upcomingStages.map(stage => stage.stage_categories[0]?.id)
-                                                    form?.setFieldValue('season_pass_categories', initialCategories)
-                                                }
-                                            }" />
-                                        </div>
-                                    </Label>
-                                    <ErrorMessage class="error__message" name="is_season_pass" />
-                                </Field>
+                                <div class="space-y-4" v-if="mode === 'runner' && upcomingStages.length > 1 && trailRace.season_passes && trailRace.season_passes.length > 0">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h4 class="font-bold text-gray-900 text-sm">Season Passes</h4>
+                                        <span class="bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm">Best Value</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <Field name="season_pass_id" as="div" v-slot="{ value, handleChange }" v-for="pass in trailRace.season_passes" :key="pass.id">
+                                            <Label class="block bg-primary/5 p-4 rounded-xl border relative cursor-pointer hover:bg-primary/10 transition-colors"
+                                                :class="value === pass.id ? 'border-primary shadow-md' : 'border-primary/20'">
+                                                <div class="flex items-center gap-3 mb-2">
+                                                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                                        <MountainIcon class="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="font-bold text-gray-900 text-sm">{{ pass.name }}</h4>
+                                                        <p class="text-xs text-gray-500 mb-1">
+                                                            {{ pass.stage_categories?.map(c => c.name).join(', ') || 'All stages included' }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center justify-between mt-4">
+                                                    <span class="font-semibold text-sm text-gray-900">Select Pass</span>
+                                                    <Checkbox :model-value="value === pass.id" @update:model-value="(checked) => {
+                                                        if (checked) {
+                                                            handleChange(pass.id);
+                                                            form?.setFieldValue('is_season_pass', true);
+                                                            const initialCategories = pass.stage_categories?.map(c => c.id) || upcomingStages.map(stage => stage.stage_categories[0]?.id)
+                                                            form?.setFieldValue('season_pass_categories', initialCategories)
+                                                        } else {
+                                                            handleChange(undefined);
+                                                            form?.setFieldValue('is_season_pass', false);
+                                                        }
+                                                    }" />
+                                                </div>
+                                            </Label>
+                                        </Field>
+                                    </div>
+                                    <ErrorMessage class="error__message" name="season_pass_id" />
+                                </div>
 
                                 <div class="flex gap-2 md:gap-4" v-if="!form?.values.is_season_pass">
                                     <Field name="stage_id" as="div" v-slot="{ value, handleChange }"
@@ -499,32 +500,7 @@ onMounted(() => {
                                         <ErrorMessage class="error__message" name="stage_category_id" />
                                     </Field>
                                 </div>
-                                <div v-else-if="mode === 'runner' && form?.values.is_season_pass" class="space-y-4">
-                                    <div v-for="(stage, index) in upcomingStages" :key="stage.id"
-                                        class="flex flex-col md:flex-row gap-4 items-end bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                        <div class="w-full md:w-1/2">
-                                            <Label class="text-sm font-medium text-gray-700">{{ stage.name }}</Label>
-                                            <p class="text-xs text-gray-500 mt-1">{{ new
-                                                Date(stage.start).toLocaleDateString() }}</p>
-                                        </div>
-                                        <Field :name="`season_pass_categories[${index}]`" as="div"
-                                            v-slot="{ value, handleChange }" class="w-full md:w-1/2 space-y-2">
-                                            <Select :model-value="value" @update:model-value="handleChange">
-                                                <SelectTrigger class="w-full h-12 bg-white">
-                                                    <SelectValue placeholder="Select distance" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem v-for="sc in stage.stage_categories" :key="sc.id"
-                                                        :value="String(sc.id)">
-                                                        {{ sc.name }}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <ErrorMessage class="error__message"
-                                                :name="`season_pass_categories[${index}]`" />
-                                        </Field>
-                                    </div>
-                                </div>
+
                             </div>
                             <template v-if="mode == 'runner'">
                                 <Field name="description.club_name" as="div" v-slot="{ field }" class="space-y-2">

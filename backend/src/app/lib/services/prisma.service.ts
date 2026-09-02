@@ -9,7 +9,9 @@ const cacheMapping: Record<string, string> = {
     SocialLink: 'social_links',
     Country: 'countries',
     City: 'cities',
-    User: 'users'
+    User: 'users',
+    SeasonPass: 'seasonpasses',
+    SeasonPassPayment: 'seasonpasspayments'
 }
 
 // 1. Create the base client

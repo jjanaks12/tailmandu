@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { LoaderIcon } from 'lucide-vue-next'
 import { Form, Field, ErrorMessage, type FormContext } from 'vee-validate'
-import { stageCategoryPaymentSchema } from '@/lib/schema/event.schema'
+import { seasonPassPaymentSchema } from '@/lib/schema/event.schema'
 import { useAxios } from '~/services/axios'
-import { type StageCategoryPayment, paymentTypes } from '~/lib/types'
+import { type SeasonPassPayment, paymentTypes } from '~/lib/types'
 import { showPaymentImage } from '~/lib/filters'
 
 interface PaymentFormProps {
-    stageCategoryId: string
+    seasonPassId: string
     availablePayments: string[]
-    payment?: StageCategoryPayment | null
+    payment?: SeasonPassPayment | null
 }
 
 const emit = defineEmits(['update'])
@@ -25,7 +25,7 @@ const handleSubmit = async (values: any) => {
     isLoading.value = true
 
     const method = props.payment ? 'put' : 'post'
-    const url = props.payment ? `/payments/${props.payment.id}` : '/payments'
+    const url = props.payment ? `/events/season-passes/payments/${props.payment.id}` : '/events/season-passes/payments'
 
     await axios[method](url, values)
     isLoading.value = false
@@ -49,7 +49,7 @@ const init = () => {
     if (props.payment) {
         form.value?.setFieldValue('amount', props.payment.amount)
         form.value?.setFieldValue('type', props.payment.type)
-        form.value?.setFieldValue('description', props.payment.description ?? '')
+        form.value?.setFieldValue('description', props.payment.description)
     }
 }
 onMounted(init)
@@ -59,9 +59,9 @@ onMounted(init)
     <div class="flex items-center gap-2">
         <h1>Upload payment details here</h1>
     </div>
-    <Form ref="form" :validation-schema="stageCategoryPaymentSchema" @submit="handleSubmit" class="space-y-4"
+    <Form ref="form" :validation-schema="seasonPassPaymentSchema" @submit="handleSubmit" class="space-y-4"
         v-slot="{ values }">
-        <Field name="stage_category_id" type="hidden" v-slot="{ field }" :value="stageCategoryId">
+        <Field name="season_pass_id" type="hidden" v-slot="{ field }" :value="seasonPassId">
             <input type="hidden" v-bind="field" />
         </Field>
         <Field name="payment_id" type="hidden" v-slot="{ field }" :value="payment?.id">

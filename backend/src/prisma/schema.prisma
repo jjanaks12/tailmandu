@@ -200,6 +200,7 @@ model Image {
   sponsort_types          SponsorType[]
   sponsors                Sponsor[]
   stage_category_payments StageCategoryPayment[]
+  season_pass_payments    SeasonPassPayment[]
   // stage_category_bibs     StageCategory[]        @relation("stage_category_bib")
   tags                    Tag[]
   galleries               Gallery[]              @relation("GalleryToImage")
@@ -450,6 +451,7 @@ model StageCategory {
   payment     StageCategoryPayment[]
   payments    Payment[]
   ranks       Rank[]
+  season_passes SeasonPass[]
 
   @@map("stage_categories")
 }
@@ -472,13 +474,14 @@ model TrailRace {
   map_file_id String?
   map_file    Image?  @relation("map_image", fields: [map_file_id], references: [id], onDelete: SetNull)
 
-  stages     Stage[]
-  runners    EventRunner[]
-  gallery_id String?
-  gallery    Gallery?      @relation(fields: [gallery_id], references: [id])
-  partners   Partner[]
-  sponsors   Sponsor[]
-  tags       Tag[]
+  stages        Stage[]
+  season_passes SeasonPass[]
+  runners       EventRunner[]
+  gallery_id    String?
+  gallery       Gallery?      @relation(fields: [gallery_id], references: [id])
+  partners      Partner[]
+  sponsors      Sponsor[]
+  tags          Tag[]
 
   @@map("events")
 }
@@ -498,6 +501,39 @@ model StageCategoryPayment {
   screenshot        Image         @relation(fields: [image_id], references: [id], onDelete: Cascade)
 
   @@map("stage_category_payments")
+}
+
+model SeasonPass {
+  id         String    @id @default(cuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  event_id String
+  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  payments SeasonPassPayment[]
+  stage_categories StageCategory[]
+
+  @@map("season_passes")
+}
+
+model SeasonPassPayment {
+  id          String      @id @default(cuid())
+  amount      Decimal
+  created_at  DateTime    @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+  type        PaymentType
+  description String?
+
+  season_pass_id String
+  season_pass    SeasonPass @relation(fields: [season_pass_id], references: [id], onDelete: Cascade)
+  image_id       String
+  screenshot     Image      @relation(fields: [image_id], references: [id], onDelete: Cascade)
+
+  @@map("season_pass_payments")
 }
 
 model User {

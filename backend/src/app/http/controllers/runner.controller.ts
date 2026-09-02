@@ -272,18 +272,43 @@ export class RunnerController {
                 })
                 createdRunners.push(runner)
 
-                const stageCategoryPayment = await prisma.stageCategoryPayment.findFirst({
-                    where: {
-                        stage_category_id: category.id,
-                        type: validationData.payment_type
-                    }
-                })
+                let paymentAmount = 0;
+                let shouldCreatePayment = false;
 
-                if (stageCategoryPayment) {
+                if (validationData.is_season_pass && validationData.season_pass_id) {
+                    if (createdRunners.length === 1) {
+                        const seasonPassPayment = await prisma.seasonPassPayment.findFirst({
+                            where: {
+                                season_pass_id: validationData.season_pass_id,
+                                type: validationData.payment_type
+                            }
+                        })
+                        if (seasonPassPayment) {
+                            paymentAmount = Number(seasonPassPayment.amount);
+                            shouldCreatePayment = true;
+                        }
+                    } else {
+                        paymentAmount = 0;
+                        shouldCreatePayment = true;
+                    }
+                } else {
+                    const stageCategoryPayment = await prisma.stageCategoryPayment.findFirst({
+                        where: {
+                            stage_category_id: category.id,
+                            type: validationData.payment_type
+                        }
+                    })
+                    if (stageCategoryPayment) {
+                        paymentAmount = Number(stageCategoryPayment.amount);
+                        shouldCreatePayment = true;
+                    }
+                }
+
+                if (shouldCreatePayment) {
                     payment = await prisma.payment.create({
                         data: {
                             ...paymentBody,
-                            amount: stageCategoryPayment.amount,
+                            amount: paymentAmount,
                             stage_category_id: category.id,
                             runner_id: runner.id,
                             method: validationData.payment_method

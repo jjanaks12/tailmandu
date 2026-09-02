@@ -42,6 +42,11 @@ export const trailRaceRunner = Y.object({
         otherwise: schema => schema.optional()
     }).label('Season Pass Categories'),
     is_season_pass: Y.boolean().optional().label('Season Pass'),
+    season_pass_id: Y.string().when('is_season_pass', {
+        is: true,
+        then: schema => schema.required(),
+        otherwise: schema => schema.optional()
+    }).label('Season Pass ID'),
     first_name: Y.string().required().label("First name"),
     middle_name: Y.string().nullable().label("Middle name"),
     last_name: Y.string().required().label("Last name"),
@@ -96,7 +101,7 @@ export const stageCategorySchema = Y.object({
     excerpt: Y.string().required().label('Excerpt'),
     description: Y.string().required().label('Short description'),
     distance: Y.string().required().label('Distance'),
-    elevation: Y.string().label('Elevation Gain'),
+    elevation: Y.string().nullable().label('Elevation Gain'),
     difficulty: Y.string().oneOf(['moderate', 'easy', 'difficult']).required().label('Difficulty'),
     location: Y.string().required().label('Location'),
     start: Y.string().required().label('Start'),
@@ -130,6 +135,26 @@ export const stageCategoryPaymentSchema = Y.object({
     stage_category_id: Y.string().required().label('Stage category'),
     type: Y.string().oneOf(paymentTypes).required().label('Payment type'),
     amount: Y.number().required().label('Amount'),
+    description: Y.string().label('Description'),
+    image: Y.string().when('payment_id', {
+        is: undefined,
+        then: schema => schema.required(),
+        otherwise: schema => schema.notRequired()
+    }).label('Image')
+})
+
+export const seasonPassSchema = Y.object({
+    id: Y.string().optional().label('Id'),
+    name: Y.string().required().label('Name'),
+    event_id: Y.string().required().label('Event'),
+    category_ids: Y.array().of(Y.string()).optional().label('Category Ids')
+})
+
+export const seasonPassPaymentSchema = Y.object({
+    payment_id: Y.string().optional().label('Payment'),
+    season_pass_id: Y.string().required().label('Season pass'),
+    amount: Y.number().required().label('Amount'),
+    type: Y.string().oneOf(paymentTypes).required().label('Type'),
     description: Y.string().label('Description'),
     image: Y.string().when('payment_id', {
         is: undefined,

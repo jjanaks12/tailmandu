@@ -108,7 +108,7 @@ onMounted(async () => {
         <DialogContent class="sm:max-w-[1000px] max-h-full overflow-y-auto">
             <DialogHeader>
                 <DialogTitle>Stage form</DialogTitle>
-                <DialogDescription>Fill in the details below to create or update a stage for this event.
+                <DialogDescription>Fill in the details below to create or update a race for this event.
                 </DialogDescription>
             </DialogHeader>
             <TrailMapStageForm :event-id="eventId" :stage="editStage" @update="() => {

@@ -139,6 +139,7 @@ export type TrailRace = {
     volunteers: Volunteer[]
     checkpoints: Checkpoint[]
     stages: Stage[]
+    season_passes?: SeasonPass[]
     runners: EventRunner[]
     tags: Tag[]
     gallery_id?: string
@@ -429,6 +430,32 @@ export type StageCategoryPayment = {
     deleted_at: string
     stage_category_id: string
     stage_category: StageCategory
+    image_id: string
+    screenshot: Image
+}
+
+export type SeasonPass = {
+    id: string
+    name: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    event_id: string
+    event: TrailRace
+    payments: SeasonPassPayment[]
+    stage_categories?: StageCategory[]
+}
+
+export type SeasonPassPayment = {
+    id: string
+    amount: string
+    type: PaymentType
+    description: string
+    created_at: string
+    updated_at: string
+    deleted_at: string
+    season_pass_id: string
+    season_pass: SeasonPass
     image_id: string
     screenshot: Image
 }

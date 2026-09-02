@@ -259,11 +259,29 @@ export class EventController {
             response.send(await prisma.trailRace.findFirst({
                 where: { id: request.params.event_id as string },
                 include: {
+                    season_passes: {
+                        include: {
+                            payments: {
+                                include: {
+                                    screenshot: true
+                                }
+                            },
+                            stage_categories: true
+                        }
+                    },
                     thumbnail: true,
                     map_file: true,
                     gallery: {
                         include: {
                             images: true
+                        }
+                    },
+                    stages: {
+                        include: {
+                            stage_categories: true
+                        },
+                        where: {
+                            deleted_at: null
                         }
                     }
                 }
@@ -281,6 +299,16 @@ export class EventController {
                     gallery: {
                         include: {
                             images: true
+                        }
+                    },
+                    season_passes: {
+                        include: {
+                            payments: {
+                                include: {
+                                    screenshot: true
+                                }
+                            },
+                            stage_categories: true
                         }
                     },
                     stages: {

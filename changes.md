@@ -21,3 +21,10 @@ outstanding
 - [ ] SEO check once
 - [X] price start should be from low on treks / fastpacking
 - [X] ITRA id on registration form
+
+## 2026 Aug 31
+- [ ] newsletter for past runners
+- [ ] two banner 
+    - season pass
+    - trip advisor
+- [ ] searcn pass payments (separate)
