@@ -27,4 +27,4 @@ outstanding
 - [ ] two banner 
     - season pass
     - trip advisor
-- [ ] searcn pass payments (separate)
+- [X] season pass payments (separate)
