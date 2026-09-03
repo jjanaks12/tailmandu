@@ -50,7 +50,12 @@ export const prisma = basePrisma.$extends({
                     console.log(`[CACHE INVALIDATED] ${model}`)
                     const keys: string[] = []
                     for await (const key of Redis.client.scanIterator({
-                        MATCH: `__cache__/${folder}*`
+                        MATCH: `__cache__/*`
+                    })) {
+                        keys.push(key)
+                    }
+                    for await (const key of Redis.client.scanIterator({
+                        MATCH: `__api_cache__*`
                     })) {
                         keys.push(key)
                     }

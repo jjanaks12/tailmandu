@@ -19,8 +19,17 @@ definePageMeta({
 const selectedStage = ref<Stage | null>(null)
 const selectedStageCategory = ref<StageCategory | null>(null)
 
+import { useAuthStore } from '~/store/auth';
+
+const authStore = useAuthStore()
+
 const { data: trailRace } = await useAsyncData<TrailRace | null>(`trail-race-${route.params.slug}`, async () => {
     return await getBySlug(route.params.slug as string)
+}, {
+    getCachedData: (key, nuxtApp) => {
+        if (authStore.isLoggedin) return undefined
+        return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
+    }
 })
 const isFinished = computed(() => moment().isAfter(moment(trailRace.value?.end as string)))
 const isUpcoming = computed(() => moment().isBefore(moment(trailRace.value?.start as string)))

@@ -12,11 +12,20 @@ definePageMeta({
     transparentHeader: true
 })
 
+import { useAuthStore } from '~/store/auth';
+
+const authStore = useAuthStore()
 const searchQuery = ref('')
+
 const { data: events, pending: isLoading, refresh } = await useAsyncData<TrailRace[]>('race', async () => {
     await fetchPublic()
     const { events } = storeToRefs(useEventStore())
     return events.value
+}, {
+    getCachedData: (key, nuxtApp) => {
+        if (authStore.isLoggedin) return undefined
+        return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
+    }
 })
 
 const handleSearch = () => {

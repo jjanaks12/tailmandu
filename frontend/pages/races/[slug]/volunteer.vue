@@ -7,8 +7,17 @@ const route = useRoute()
 const config = useRuntimeConfig()
 const { getBySlug } = useEventStore()
 
-const { data: trailRace, pending: isPending } = await useAsyncData<TrailRace | null>(`trail-race-runner-${route.params.slug}`, async () => {
+import { useAuthStore } from '~/store/auth';
+
+const authStore = useAuthStore()
+
+const { data: trailRace, pending: isPending } = await useAsyncData<TrailRace | null>(`trail-race-volunteer-${route.params.slug}`, async () => {
     return await getBySlug(route.params.slug as string)
+}, {
+    getCachedData: (key, nuxtApp) => {
+        if (authStore.isLoggedin) return undefined
+        return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
+    }
 })
 
 onBeforeMount(async () => {
