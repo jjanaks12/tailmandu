@@ -167,6 +167,7 @@ model EventRunner {
   status                   EventRunnerStatus?
   rank                     Rank?
   runner_attendances       RunnerAttendance[]
+  addons                   RunnerAddon[]
 
   @@unique([bib, stage_category_id])
   @@map("event_runners")
@@ -417,6 +418,8 @@ model Stage {
   volunteers         Volunteer[]
   stage_categories   StageCategory[]
   runner_attendances RunnerAttendance[]
+  pricing_tiers      PricingTier[]
+  addons             EventAddon[]       @relation("AddonStages")
 
   @@map("stages")
 }
@@ -446,25 +449,25 @@ model StageCategory {
    * bib_image   Image?  @relation("stage_category_bib", fields: [image_id], references: [id], onDelete: Cascade)
    */
 
-  checkpoints Checkpoint[]
-  runners     EventRunner[]
-  payment     StageCategoryPayment[]
-  payments    Payment[]
-  ranks       Rank[]
+  checkpoints   Checkpoint[]
+  runners       EventRunner[]
+  payment       StageCategoryPayment[]
+  payments      Payment[]
+  ranks         Rank[]
   season_passes SeasonPass[]
 
   @@map("stage_categories")
 }
 
 model TrailRace {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String?
-  start       DateTime
-  end         DateTime
-  excerpt     String?   @db.Text
-  description String    @db.LongText
-  details     Json      @default("{}")
+  id           String    @id @default(cuid())
+  name         String
+  slug         String?
+  start        DateTime
+  end          DateTime
+  excerpt      String?   @db.Text
+  description  String    @db.LongText
+  details      Json      @default("{}")
   created_at   DateTime  @default(now())
   updated_at   DateTime?
   deleted_at   DateTime?
@@ -483,6 +486,8 @@ model TrailRace {
   partners      Partner[]
   sponsors      Sponsor[]
   tags          Tag[]
+  pricing_tiers PricingTier[]
+  addons        EventAddon[]
 
   @@map("events")
 }
@@ -514,7 +519,7 @@ model SeasonPass {
   event_id String
   event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
 
-  payments SeasonPassPayment[]
+  payments         SeasonPassPayment[]
   stage_categories StageCategory[]
 
   @@map("season_passes")
@@ -557,6 +562,60 @@ model User {
   enquiries       Enquiry[]
 
   @@map("users")
+}
+
+model PricingTier {
+  id         String    @id @default(cuid())
+  name       String
+  price         Decimal   @db.Decimal(10, 2)
+  is_time_based Boolean   @default(false)
+  start_date    DateTime?
+  end_date      DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  event_id String
+  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  stage_id String?
+  stage    Stage?  @relation(fields: [stage_id], references: [id], onDelete: Cascade)
+
+  @@map("pricing_tiers")
+}
+
+model EventAddon {
+  id           String    @id @default(cuid())
+  name         String
+  price        Decimal   @db.Decimal(10, 2)
+  is_mandatory Boolean   @default(false)
+  apply_to_all Boolean   @default(true)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
+
+  event_id String
+  event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  stages        Stage[]       @relation("AddonStages")
+  runner_addons RunnerAddon[]
+
+  @@map("event_addons")
+}
+
+model RunnerAddon {
+  id          String    @id @default(cuid())
+  amount_paid Decimal   @db.Decimal(10, 2)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  deleted_at  DateTime?
+
+  runner_id String
+  runner    EventRunner @relation(fields: [runner_id], references: [id], onDelete: Cascade)
+  addon_id  String
+  addon     EventAddon  @relation(fields: [addon_id], references: [id], onDelete: Cascade)
+
+  @@map("runner_addons")
 }
 
 model Volunteer {

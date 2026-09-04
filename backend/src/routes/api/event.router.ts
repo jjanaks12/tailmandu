@@ -12,6 +12,7 @@ import { SponsorController } from '@/app/http/controllers/sponsor.controller'
 import { PaymentController } from '@/app/http/controllers/payment.controller'
 import { ResultController } from '@/app/http/controllers/result.controller'
 import { SeasonPassController } from '@/app/http/controllers/season_pass.controller'
+import { PricingController } from '@/app/http/controllers/pricing.controller'
 
 const router = Router()
 
@@ -92,5 +93,9 @@ router.put('/:event_id/payments/:payment_id', [verifyAccessToken], PaymentContro
 
 // RESULTS
 router.get('/:event_id/:stage_id/results', [], ResultController.index)
+
+// PRICING
+router.get('/:event_id/pricing', [verifyAccessToken], PricingController.index)
+router.post('/:event_id/pricing', [verifyAccessToken], PricingController.update)
 
 export default router
