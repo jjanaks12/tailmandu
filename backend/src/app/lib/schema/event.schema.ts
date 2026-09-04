@@ -134,7 +134,7 @@ export const stageCategoryPaymentSchema = Y.object({
     stage_category_id: Y.string().required().label('Stage category'),
     amount: Y.number().required().label('Amount'),
     type: Y.string().oneOf(Object.values(PaymentType)).required().label('Type'),
-    description: Y.string().label('Description'),
+    description: Y.string().nullable().optional().label('Description'),
     image: Y.string().when('payment_id', {
         is: undefined,
         then: schema => schema.required(),
@@ -154,7 +154,7 @@ export const seasonPassPaymentSchema = Y.object({
     season_pass_id: Y.string().required().label('Season pass'),
     amount: Y.number().required().label('Amount'),
     type: Y.string().oneOf(Object.values(PaymentType)).required().label('Type'),
-    description: Y.string().label('Description'),
+    description: Y.string().nullable().optional().label('Description'),
     image: Y.string().when('payment_id', {
         is: undefined,
         then: schema => schema.required(),

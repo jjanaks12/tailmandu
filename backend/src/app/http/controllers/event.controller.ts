@@ -126,7 +126,10 @@ export class EventController {
                 include: {
                     thumbnail: true,
                     _count: {
-                        select: { stages: true, runners: true }
+                        select: { 
+                            stages: { where: { deleted_at: null } }, 
+                            runners: { where: { deleted_at: null } }
+                        }
                     }
                 },
                 where,

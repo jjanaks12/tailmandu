@@ -33,6 +33,15 @@ const form = useForm({
     }
 })
 
+const toggleCategory = (checked: boolean | string, categoryId: string) => {
+    const current = form.values.category_ids || [];
+    if (checked) {
+        form.setFieldValue('category_ids', [...current, categoryId]);
+    } else {
+        form.setFieldValue('category_ids', current.filter(id => id !== categoryId));
+    }
+}
+
 const onSubmit = form.handleSubmit(async (values) => {
     try {
         loading.value = true
@@ -65,14 +74,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Field name="category_ids" type="checkbox" :value="category.id" v-for="category in stage.stage_categories" :key="category.id" v-slot="{ field }">
                         <Label class="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-muted/50 transition-colors">
-                            <Checkbox v-bind="field" :checked="form.values.category_ids?.includes(category.id)" @update:checked="(checked) => {
-                                const current = form.values.category_ids || [];
-                                if (checked) {
-                                    form.setFieldValue('category_ids', [...current, category.id]);
-                                } else {
-                                    form.setFieldValue('category_ids', current.filter(id => id !== category.id));
-                                }
-                            }" />
+                            <Checkbox v-bind="field" :checked="form.values.category_ids?.includes(category.id)" @update:checked="toggleCategory($event, category.id)" />
                             <span class="text-sm">{{ category.name }}</span>
                         </Label>
                     </Field>

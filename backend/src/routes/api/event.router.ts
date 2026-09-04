@@ -76,10 +76,6 @@ router.post('/:event_id/sponsors', [verifyAccessToken], SponsorController.create
 router.put('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.update)
 router.delete('/sponsors/:sponsor_id', [verifyAccessToken], SponsorController.destroy)
 
-// PAYMENTS
-router.get('/:event_id/payments', [verifyAccessToken], PaymentController.index)
-router.put('/:event_id/payments/:payment_id', [verifyAccessToken], PaymentController.updatePaymentStatus)
-
 // SEASON PASS
 router.get('/:event_id/season-passes', [verifyAccessToken], SeasonPassController.index)
 router.post('/season-passes', [verifyAccessToken], SeasonPassController.store)
@@ -88,6 +84,10 @@ router.delete('/season-passes/:id', [verifyAccessToken], SeasonPassController.de
 router.post('/season-passes/payments', [verifyAccessToken], SeasonPassController.storePayment)
 router.put('/season-passes/payments/:payment_id', [verifyAccessToken], SeasonPassController.updatePayment)
 router.delete('/season-passes/payments/:payment_id', [verifyAccessToken], SeasonPassController.destroyPayment)
+
+// PAYMENTS
+router.get('/:event_id/payments', [verifyAccessToken], PaymentController.index)
+router.put('/:event_id/payments/:payment_id', [verifyAccessToken], PaymentController.updatePaymentStatus)
 
 // RESULTS
 router.get('/:event_id/:stage_id/results', [], ResultController.index)
