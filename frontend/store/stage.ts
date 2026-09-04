@@ -7,9 +7,10 @@ export const useStageStore = defineStore('stage', () => {
 
     const { axios } = useAxios()
 
-    const fetch = async (eventId: string) => {
+    const fetch = async (eventId: string, withDeleted: boolean = false) => {
         isLoading.value = true
-        const { data } = await axios.get<Stage[]>(`/events/${eventId}/stages`)
+        const url = `/events/${eventId}/stages${withDeleted ? '?with_deleted=true' : ''}`
+        const { data } = await axios.get<Stage[]>(url)
 
         if (data)
             stages.value = data
@@ -28,8 +29,12 @@ export const useStageStore = defineStore('stage', () => {
         await axios.delete(`/events/stages/${stageId}`)
     }
 
+    const restore = async (stageId: string) => {
+        await axios.patch(`/events/stages/${stageId}/restore`)
+    }
+
     return {
         stages, isLoading,
-        fetch, save, destory
+        fetch, save, destory, restore
     }
 })

@@ -8,6 +8,7 @@ import { showImage } from '~/lib/filters'
 import { stageSchema } from '~/lib/schema/event.schema'
 import type { Stage } from '~/lib/types'
 import { useStageStore } from '~/store/stage'
+import { useEventStore } from '~/store/event'
 
 interface StageFormProps {
     eventId: string
@@ -17,6 +18,8 @@ interface StageFormProps {
 const props = defineProps<StageFormProps>()
 const emit = defineEmits(['update'])
 const { save } = useStageStore()
+const eventStore = useEventStore()
+const { events } = storeToRefs(eventStore)
 
 const isLoading = ref(false)
 const thumbnailFile = ref('')
@@ -115,6 +118,12 @@ onBeforeMount(() => {
     if (form.value)
         init()
 })
+
+onMounted(async () => {
+    if (events.value.length === 0) {
+        await eventStore.fetch()
+    }
+})
 </script>
 
 <template>
@@ -148,7 +157,18 @@ onBeforeMount(() => {
             </div>
         </template>
         <Field name="event_id" v-slot="{ field }" as="div" class="flex flex-col gap-2">
-            <Input type="hidden" v-bind="field" id="esf__name" />
+            <Label for="esf__event">Event</Label>
+            <Select v-bind="field" :default-value="stage?.event_id ?? eventId">
+                <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select an event" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem v-for="e in events" :key="e.id" :value="e.id">
+                        {{ e.name }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
+            <ErrorMessage class="error__message" name="event_id" />
         </Field>
         <Field name="id" v-slot="{ field }" as="div" class="flex flex-col gap-2">
             <Input type="hidden" v-bind="field" id="esf__id" />

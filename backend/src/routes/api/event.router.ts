@@ -40,6 +40,7 @@ router.get('/:event_id/stages', [verifyAccessToken], StageController.index)
 router.post('/:event_id/stages', [verifyAccessToken], StageController.create)
 router.put('/stages/:stage_id', [verifyAccessToken], StageController.update)
 router.delete('/stages/:stage_id', [verifyAccessToken], StageController.destory)
+router.patch('/stages/:stage_id/restore', [verifyAccessToken], StageController.restore)
 router.get('/stages/:stage_id', [], StageController.view)
 router.get('/stages/:stage_id/runners', [verifyAccessToken], StageController.listRunners)
 

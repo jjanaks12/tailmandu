@@ -13,12 +13,13 @@ interface TrailRaceStageListProps {
 
 const emit = defineEmits(['update'])
 const props = defineProps<TrailRaceStageListProps>()
-const { fetch, destory } = useStageStore()
+const { fetch, destory, restore } = useStageStore()
 const { stages } = storeToRefs(useStageStore())
 
 const showDialog = ref(false)
 const editStage = ref<Stage | null>(null)
 const activeTab = ref<string>('')
+const showDeleted = ref(false)
 
 watch(stages, (newStages) => {
     if (newStages.length > 0 && (!activeTab.value || !newStages.find(s => s.id === activeTab.value))) {
@@ -27,7 +28,11 @@ watch(stages, (newStages) => {
 }, { immediate: true })
 
 onMounted(async () => {
-    await fetch(props.eventId)
+    await fetch(props.eventId, showDeleted.value)
+})
+
+watch(showDeleted, async (newVal) => {
+    await fetch(props.eventId, newVal)
 })
 </script>
 
@@ -38,12 +43,18 @@ onMounted(async () => {
             <h2 class="text-3xl font-bold text-foreground font-headline">Stages</h2>
             <p class="text-muted-foreground mt-1 font-body">Manage stage details, categories, and checkpoints.</p>
         </div>
-        <Button
-            class="bg-gradient-to-r from-primary to-[#d95514] text-primary-foreground px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 self-start md:self-auto"
-            @click="showDialog = true">
-            <PlusIcon class="w-5 h-5" />
-            Add stage
-        </Button>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <Switch id="show-deleted" v-model="showDeleted" />
+                <Label for="show-deleted" class="text-sm cursor-pointer whitespace-nowrap">Show Deleted</Label>
+            </div>
+            <Button
+                class="bg-gradient-to-r from-primary to-[#d95514] text-primary-foreground px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 self-start md:self-auto"
+                @click="showDialog = true">
+                <PlusIcon class="w-5 h-5" />
+                Add stage
+            </Button>
+        </div>
     </div>
 
     <!-- Main Layout Grid -->
@@ -51,8 +62,11 @@ onMounted(async () => {
         <!-- Left: Stage List (Switcher) -->
         <TabsList class="flex flex-col h-auto w-full lg:w-64 shrink-0 gap-2 bg-transparent p-0 justify-start">
             <TabsTrigger v-for="stage in stages" :key="stage.id" :value="stage.id"
-                class="w-full flex-none min-h-16 text-left px-4 py-3 rounded-lg font-semibold relative overflow-hidden data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary data-[state=inactive]:bg-muted/50 data-[state=inactive]:text-muted-foreground hover:data-[state=inactive]:bg-muted transition-colors justify-start z-10 after:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-1 after:bg-primary after:rounded-l-lg after:opacity-0 data-[state=active]:after:opacity-100 after:transition-opacity truncate">
+                class="w-full flex-none min-h-16 text-left px-4 py-3 rounded-lg font-semibold relative overflow-hidden data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary data-[state=inactive]:bg-muted/50 data-[state=inactive]:text-muted-foreground hover:data-[state=inactive]:bg-muted transition-colors justify-start z-10 after:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-1 after:bg-primary after:rounded-l-lg after:opacity-0 data-[state=active]:after:opacity-100 after:transition-opacity truncate"
+                :class="stage.deleted_at ? 'line-through opacity-70' : ''">
                 {{ stage.name }}
+                <span v-if="stage.deleted_at"
+                    class="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded uppercase font-bold not-italic no-underline">Deleted</span>
             </TabsTrigger>
         </TabsList>
 
@@ -63,9 +77,15 @@ onMounted(async () => {
                 <div class="bg-white rounded-xl p-6 shadow-sm border relative">
                     <!-- Action Icons Top Right -->
                     <div class="absolute top-6 right-6 flex gap-2">
-                        <Button variant="destructive" size="icon" @click="async () => {
+                        <Button v-if="stage.deleted_at" modifier="outline" size="sm" @click="async () => {
+                            await restore(stage.id)
+                            fetch(eventId, showDeleted)
+                        }" class="h-8">
+                            Restore
+                        </Button>
+                        <Button v-else variant="destructive" size="icon" @click="async () => {
                             await destory(stage.id)
-                            fetch(eventId)
+                            fetch(eventId, showDeleted)
                         }" class="w-8 h-8">
                             <TrashIcon class="w-4 h-4" />
                         </Button>
@@ -80,13 +100,13 @@ onMounted(async () => {
                     <h3 class="text-xl font-bold text-foreground pr-24 mb-2 font-headline">{{ stage.name }}</h3>
 
                     <div class="flex gap-2 mb-4">
-                        <div v-if="stage.runners?.length > 0"
+                        <div
                             class="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary/10 text-xs font-bold uppercase tracking-wider">
-                            runners {{ stage.runners.length }}
+                            runners {{ stage.runners?.length || 0 }}
                         </div>
-                        <div v-if="stage.volunteers?.length > 0"
+                        <div
                             class="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary/10 text-xs font-bold uppercase tracking-wider">
-                            volunteers {{ stage.volunteers.length }}
+                            volunteers {{ stage.volunteers?.length || 0 }}
                         </div>
                     </div>
 
@@ -114,7 +134,7 @@ onMounted(async () => {
             <TrailMapStageForm :event-id="eventId" :stage="editStage" @update="() => {
                 showDialog = false
                 editStage = null
-                fetch(eventId)
+                fetch(eventId, showDeleted)
                 emit('update')
             }" />
         </DialogContent>

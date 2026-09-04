@@ -9,10 +9,10 @@ import { prisma } from '@/app/lib/services/prisma.service'
 export class StageController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
-            response.send(await prisma.stage.findMany({
+            const data = await prisma.stage.findMany({
                 where: {
                     event_id: request.params.event_id as string,
-                    deleted_at: null
+                    ...(String(request.query.with_deleted) !== 'true' && { deleted_at: null })
                 },
                 include: {
                     runners: true,
@@ -20,7 +20,8 @@ export class StageController {
                     guide_book_file: true,
                     volunteers: true
                 }
-            }))
+            });
+            response.send(data);
         } catch (error) {
             next(error)
         }
@@ -131,6 +132,21 @@ export class StageController {
                 },
                 data: {
                     deleted_at: moment.utc().toISOString()
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async restore(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.stage.update({
+                where: {
+                    id: request.params.stage_id as string
+                },
+                data: {
+                    deleted_at: null
                 }
             }))
         } catch (error) {
