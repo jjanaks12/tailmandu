@@ -1,22 +1,10 @@
 <script lang="ts" setup>
 import { CalendarIcon, EllipsisVertical, Eye, Pencil, Search, SlidersVertical, Trash } from 'lucide-vue-next'
-import { Form, Field } from 'vee-validate'
 
 import EventForm from './form.vue'
 import { formatDate } from '@/lib/filters'
 import { useEventStore } from '~/store/event'
 import type { TrailRace } from '~/lib/types'
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 
 useHead({
     title: 'Events'
@@ -30,7 +18,7 @@ definePageMeta({
 
 const statuses = ['completed', 'ongoing', 'coming soon', 'deleted']
 const { events, isLoading, params } = storeToRefs(useEventStore())
-const { fetch, remove } = useEventStore()
+const { fetch, remove, publish, unpublish } = useEventStore()
 
 const showForm = ref(false)
 const trailRace = ref<TrailRace | null>(null)
@@ -60,13 +48,15 @@ onMounted(fetch)
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Statuses</SelectItem>
-                            <SelectItem v-for="status in statuses" :value="status" class="capitalize">{{ status }}</SelectItem>
+                            <SelectItem v-for="status in statuses" :value="status" class="capitalize">{{ status }}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
             </div>
         </div>
-        <form class="max-w-[320px] w-full flex items-center gap-2" @submit.prevent="() => { params.current = 1; fetch(); }">
+        <form class="max-w-[320px] w-full flex items-center gap-2"
+            @submit.prevent="() => { params.current = 1; fetch(); }">
             <Input v-model="params.s" placeholder="Search Events" />
             <Button variant="secondary" size="lg" type="submit">
                 <Search />
@@ -87,7 +77,9 @@ onMounted(fetch)
                 <TableCell>
                     <strong class="block text-lg">
                         <NuxtLink :to="`/dashboard/events/${trailEvent.id}`"
-                            class="hover:text-primary transition-colors">{{ trailEvent.name }}</NuxtLink>
+                            class="hover:text-primary transition-colors mr-2">{{ trailEvent.name }}</NuxtLink>
+                        <Badge variant="outline" v-if="trailEvent.published_at"
+                            class="text-green-600 border-green-600 bg-green-50">Published</Badge>
                     </strong>
                     <em class="not-italic block">Starts from {{ formatDate(trailEvent.start) }}</em>
                     <em class="not-italic block">Ends At {{ formatDate(trailEvent.end) }}</em>
@@ -119,6 +111,15 @@ onMounted(fetch)
                                 <DropdownMenuItem @click="eventToDelete = trailEvent">
                                     <Trash />
                                     <span>Delete</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem @click="publish(trailEvent.id)" v-if="!trailEvent.published_at">
+                                    Publish
+                                </DropdownMenuItem>
+                                <DropdownMenuItem @click="unpublish(trailEvent.id)" v-else>
+                                    Unpublish
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />

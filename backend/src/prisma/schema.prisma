@@ -465,9 +465,10 @@ model TrailRace {
   excerpt     String?   @db.Text
   description String    @db.LongText
   details     Json      @default("{}")
-  created_at  DateTime  @default(now())
-  updated_at  DateTime?
-  deleted_at  DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
+  published_at DateTime?
 
   image_id    String?
   thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: SetNull)

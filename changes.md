@@ -31,5 +31,5 @@ outstanding
 
 - [ ] change launch price to 500
 - [ ] change launch notes not working
-- [ ] publish and unpublish races
+- [X] publish and unpublish races
 - [X] when admin opens no cache for races

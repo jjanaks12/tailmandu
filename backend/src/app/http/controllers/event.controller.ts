@@ -109,7 +109,8 @@ export class EventController {
             const skip = (current - 1) * per_page
 
             const where: Prisma.TrailRaceWhereInput = {
-                deleted_at: null
+                deleted_at: null,
+                published_at: { not: null }
             }
 
             if (s) {
@@ -151,7 +152,8 @@ export class EventController {
         try {
             const events = await prisma.trailRace.findMany({
                 where: {
-                    deleted_at: null
+                    deleted_at: null,
+                    published_at: { not: null }
                 },
                 orderBy: [{ created_at: 'desc' }],
             })
@@ -166,7 +168,8 @@ export class EventController {
         try {
             const events = await prisma.trailRace.findFirst({
                 where: {
-                    deleted_at: null
+                    deleted_at: null,
+                    published_at: { not: null }
                 },
                 include: {
                     stages: {
@@ -294,7 +297,10 @@ export class EventController {
     public static async getBySlug(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.trailRace.findFirst({
-                where: { slug: request.params.slug as string },
+                where: { 
+                    slug: request.params.slug as string,
+                    published_at: { not: null }
+                },
                 include: {
                     gallery: {
                         include: {
@@ -367,6 +373,36 @@ export class EventController {
                 },
                 data: {
                     details: request.body.details
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async publish(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id as string
+                },
+                data: {
+                    published_at: moment.utc().toISOString()
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public static async unpublish(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id as string
+                },
+                data: {
+                    published_at: null
                 }
             }))
         } catch (error) {

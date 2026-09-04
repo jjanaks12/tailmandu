@@ -132,6 +132,7 @@ export type TrailRace = {
     created_at: string
     updated_at?: string
     deleted_at?: string
+    published_at?: string
     image_id?: string
     thumbnail?: Image
     map_file_id?: string

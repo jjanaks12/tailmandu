@@ -51,6 +51,16 @@ export const useEventStore = defineStore('event', () => {
         fetch()
     }
 
+    const publish = async (id: string) => {
+        await axios.post(`/events/${id}/publish`)
+        fetch()
+    }
+
+    const unpublish = async (id: string) => {
+        await axios.post(`/events/${id}/unpublish`)
+        fetch()
+    }
+
     const get = async (id: string) => {
         const { data } = await axios<TrailRace>(`/events/${id}`)
         return data
@@ -117,6 +127,6 @@ export const useEventStore = defineStore('event', () => {
     return {
         isLoading, params, events, currentRace,
         currentStage,
-        fetch, fetchPublic, save, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer, remove, fetchCurrentRace
+        fetch, fetchPublic, save, publish, unpublish, get, saveDescription, saveDetails, saveMap, saveGalleryId, getBySlug, saveRunner, saveVoluteer, remove, fetchCurrentRace
     }
 })
