@@ -54,24 +54,73 @@ const availabeStageCategoryList = computed(() => {
     }
     return stageList.value.find(stage => stage.id === form.value?.values.stage_id)?.stage_categories
 })
-const prices = computed(() => {
-    if (form.value?.values.is_season_pass) {
-        const categories = form.value?.values.season_pass_categories || []
-        if (categories.length > 0) {
-            for (const stage of upcomingStages.value) {
-                const match = stage.stage_categories.find(c => String(c.id) === String(categories[0]))
-                if (match) return match
-            }
-        }
-        return null
+const selectedAddons = ref<string[]>([])
+
+const toggleAddon = (addonId: string, checked: boolean) => {
+    if (checked) {
+        if (!selectedAddons.value.includes(addonId)) selectedAddons.value.push(addonId)
+    } else {
+        selectedAddons.value = selectedAddons.value.filter(id => id !== addonId)
     }
-    return availabeStageCategoryList.value?.find(stage_category => stage_category.id === form.value?.values.stage_category_id)
+}
+
+const activeTier = computed(() => {
+    const stageId = form.value?.values.stage_id
+    const tiers = props.trailRace.pricing_tiers || []
+    
+    // helper to check if tier is active today
+    const isActive = (tier: any) => {
+        if (!tier.is_time_based) return true
+        if (!tier.start_date || !tier.end_date) return false
+        const now = moment()
+        return moment(tier.start_date).isSameOrBefore(now) && moment(tier.end_date).isSameOrAfter(now)
+    }
+
+    if (stageId) {
+        // try to find active stage-specific tier
+        const stageTiers = tiers.filter(t => t.stage_id === stageId && isActive(t))
+        if (stageTiers.length > 0) return stageTiers[0]
+    }
+    
+    // fallback to default tiers
+    const defaultTiers = tiers.filter(t => !t.stage_id && isActive(t))
+    if (defaultTiers.length > 0) return defaultTiers[0]
+    
+    return null
 })
+
+const applicableAddons = computed(() => {
+    const addons = props.trailRace.addons || []
+    const stageId = form.value?.values.stage_id
+    
+    if (form.value?.values.is_season_pass) {
+        return addons.filter(a => a.apply_to_all)
+    }
+
+    if (!stageId) return []
+
+    return addons.filter(addon => {
+        if (addon.apply_to_all) return true
+        if (addon.stages && addon.stages.some(s => String(s.id) === String(stageId))) return true
+        return false
+    })
+})
+
+const addonsTotal = computed(() => {
+    return applicableAddons.value.reduce((total, addon) => {
+        if (addon.is_mandatory || selectedAddons.value.includes(addon.id)) {
+            return total + Number(addon.price)
+        }
+        return total
+    }, 0)
+})
+
 const payment = computed(() => {
     const type = form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
     form.value?.setFieldValue('payment_type', type)
 
-    const basePayment = prices.value?.payment.find(payment => payment.type === type)
+    let screenshot = null
+    let description = null
 
     if (form.value?.values.is_season_pass && form.value?.values.season_pass_id) {
         const seasonPass = props.trailRace.season_passes?.find(sp => sp.id === form.value?.values.season_pass_id)
@@ -79,7 +128,7 @@ const payment = computed(() => {
             const spPayment = seasonPass.payments?.find(p => p.type === type)
             if (spPayment) {
                 return { 
-                    amount: spPayment.amount, 
+                    amount: String(Number(spPayment.amount) + addonsTotal.value), 
                     type: spPayment.type, 
                     description: spPayment.description,
                     screenshot: spPayment.screenshot
@@ -89,8 +138,29 @@ const payment = computed(() => {
         return {} as StageCategoryPayment
     }
 
-    if (!basePayment) return {} as StageCategoryPayment
-    return basePayment
+    // Regular stage registration
+    // Fetch old StageCategoryPayment to get the QR code / description just in case
+    const stageCategory = availabeStageCategoryList.value?.find(sc => sc.id === form.value?.values.stage_category_id)
+    const oldPayment = stageCategory?.payment?.find(p => p.type === type)
+
+    let basePrice = 0;
+    if (activeTier.value) {
+        basePrice = Number(activeTier.value.price)
+    }
+
+    // fallback to old logic if no dynamic pricing tiers exist
+    if (!activeTier.value && oldPayment) {
+        basePrice = Number(oldPayment.amount)
+    }
+
+    if (basePrice === 0 && addonsTotal.value === 0 && !oldPayment) return {} as StageCategoryPayment
+
+    return {
+        amount: String(basePrice + addonsTotal.value),
+        type,
+        description: oldPayment?.description,
+        screenshot: oldPayment?.screenshot
+    } as unknown as StageCategoryPayment
 })
 
 const onSubmit: SubmissionHandler = async (values: any) => {
@@ -98,8 +168,10 @@ const onSubmit: SubmissionHandler = async (values: any) => {
         isLoading.value = true
         if (props.mode == 'volunteer')
             showThankyouDialog.value = await saveVoluteer(values, props.trailRace.id)
-        else
-            showThankyouDialog.value = await saveRunner(values, props.trailRace.id)
+        else {
+            const payload = { ...values, selected_addons: selectedAddons.value }
+            showThankyouDialog.value = await saveRunner(payload, props.trailRace.id)
+        }
     } catch (error) {
         console.log(error)
     } finally {
@@ -501,6 +573,30 @@ onMounted(() => {
                                     </Field>
                                 </div>
 
+                                <div v-if="applicableAddons.length > 0 && mode === 'runner'" class="mt-4 p-4 border rounded-xl bg-gray-50/50">
+                                    <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4">
+                                        <Target :size="16" class="text-primary" /> Extra Add-ons
+                                    </h4>
+                                    <div class="space-y-3">
+                                        <label v-for="addon in applicableAddons" :key="addon.id" 
+                                            class="flex items-center justify-between p-3 border rounded-lg cursor-pointer bg-white transition-colors"
+                                            :class="{'hover:bg-primary/5 hover:border-primary/30': !addon.is_mandatory, 'opacity-70 bg-gray-100 cursor-not-allowed': addon.is_mandatory, 'border-primary shadow-sm': selectedAddons.includes(addon.id)}">
+                                            <div class="flex items-center gap-3">
+                                                <Checkbox 
+                                                    :checked="addon.is_mandatory || selectedAddons.includes(addon.id)" 
+                                                    :disabled="addon.is_mandatory"
+                                                    @update:checked="(checked: boolean) => toggleAddon(addon.id, checked)"
+                                                />
+                                                <div>
+                                                    <span class="block font-medium text-sm text-gray-900">{{ addon.name }}</span>
+                                                    <span class="text-[10px] text-primary uppercase font-bold tracking-wider" v-if="addon.is_mandatory">Mandatory</span>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-semibold text-gray-900">Rs. {{ addon.price }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+
                             </div>
                             <template v-if="mode == 'runner'">
                                 <Field name="description.club_name" as="div" v-slot="{ field }" class="space-y-2">
@@ -559,13 +655,13 @@ onMounted(() => {
                         <h3 class="text-2xl font-light mb-2">
                             Registration fees for
                             <span class="text-primary font-bold">{{ values?.is_season_pass ? 'Season Pass' :
-                                prices?.name }}</span>
+                                (activeTier?.name || 'Registration') }}</span>
                         </h3>
                         <div class="md:flex items-center justify-between space-y-6 md:space-y-0 md:gap-6 pb-5">
                             <div class="grow space-y-3">
                                 <em class="text-gray-600 block not-italic text-2xl">
                                     NPR
-                                    {{ values.description.want_lunch ? Number(payment?.amount) + 480 : payment?.amount
+                                    {{ values.description?.want_lunch ? Number(payment?.amount) + 480 : payment?.amount
                                     }}
                                 </em>
                                 <div class="md:flex gap-4">

@@ -145,6 +145,8 @@ export type TrailRace = {
     tags: Tag[]
     gallery_id?: string
     gallery?: Gallery
+    pricing_tiers?: PricingTier[]
+    addons?: EventAddon[]
     _count?: {
         stages: number
         runners: number
@@ -513,6 +515,33 @@ export type TrekCategory = {
     created_at: string
     updated_at?: string
     deleted_at?: string
+}
+
+export type Setting = {
+    id: string
+    key: string
+    value: string
+}
+
+export type PricingTier = {
+    id: string
+    name: string
+    price: string | number
+    is_time_based: boolean
+    start_date?: string
+    end_date?: string
+    event_id: string
+    stage_id?: string
+}
+
+export type EventAddon = {
+    id: string
+    name: string
+    price: string | number
+    is_mandatory: boolean
+    apply_to_all: boolean
+    event_id: string
+    stages?: Stage[]
 }
 
 export type Trek = {

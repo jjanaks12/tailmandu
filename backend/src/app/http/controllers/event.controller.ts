@@ -185,7 +185,13 @@ export class EventController {
                             guide_book_file: true
                         }
                     },
-                    thumbnail: true
+                    thumbnail: true,
+                    pricing_tiers: true,
+                    addons: {
+                        include: {
+                            stages: true
+                        }
+                    }
                 },
                 orderBy: [{ created_at: 'desc' }]
             })
@@ -345,7 +351,13 @@ export class EventController {
                         }
                     },
                     thumbnail: true,
-                    map_file: true
+                    map_file: true,
+                    pricing_tiers: true,
+                    addons: {
+                        include: {
+                            stages: true
+                        }
+                    }
                 }
             }))
         } catch (error) {
