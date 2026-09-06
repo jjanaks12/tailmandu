@@ -36,6 +36,9 @@ const isLoadingCheckEmail = ref(false)
 const showThankyouDialog = ref(false)
 const showLiabilitiesDialog = ref(false)
 const showPoliciesDialog = ref(false)
+const formStageId = computed(() => form.value?.values?.stage_id || null)
+const formStageCategoryId = computed(() => form.value?.values?.stage_category_id || null)
+const formIsSeasonPass = computed(() => !!form.value?.values?.is_season_pass)
 
 // getting list of available stages
 const upcomingStages = computed(() => props.trailRace.stages
@@ -64,10 +67,10 @@ const toggleAddon = (addonId: string, checked: boolean) => {
     }
 }
 
-const activeTier = computed(() => {
-    const stageId = form.value?.values.stage_id
+const availableTiers = computed(() => {
+    const stageId = formStageId.value
     const tiers = props.trailRace.pricing_tiers || []
-    
+
     // helper to check if tier is active today
     const isActive = (tier: any) => {
         if (!tier.is_time_based) return true
@@ -77,23 +80,53 @@ const activeTier = computed(() => {
     }
 
     if (stageId) {
-        // try to find active stage-specific tier
+        // try to find active stage-specific tiers
         const stageTiers = tiers.filter(t => t.stage_id === stageId && isActive(t))
-        if (stageTiers.length > 0) return stageTiers[0]
+        if (stageTiers.length > 0) return stageTiers
     }
-    
+
     // fallback to default tiers
     const defaultTiers = tiers.filter(t => !t.stage_id && isActive(t))
-    if (defaultTiers.length > 0) return defaultTiers[0]
-    
-    return null
+    if (defaultTiers.length > 0) return defaultTiers
+
+    return []
+})
+
+const selectedTierId = ref<string | null>(null)
+
+const activeTier = computed(() => {
+    if (selectedTierId.value) {
+        return availableTiers.value.find(t => String(t.id) === String(selectedTierId.value)) || null
+    }
+    // Auto-select first if none selected
+    return availableTiers.value[0] || null
+})
+
+watch(() => availableTiers.value, (tiers) => {
+    if (tiers && tiers.length > 0 && !tiers.find(t => String(t.id) === String(selectedTierId.value))) {
+        selectedTierId.value = String(tiers[0].id)
+        form.value?.setFieldValue('pricing_tier_id', tiers[0].id)
+    }
+}, { immediate: true })
+
+watch(selectedTierId, (newId) => {
+    if (newId) {
+        form.value?.setFieldValue('pricing_tier_id', String(newId))
+    }
+})
+
+watch(() => form.value?.values.country_id, (newCountryId) => {
+    if (form.value) {
+        const type = newCountryId == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
+        form.value.setFieldValue('payment_type', type)
+    }
 })
 
 const applicableAddons = computed(() => {
     const addons = props.trailRace.addons || []
-    const stageId = form.value?.values.stage_id
-    
-    if (form.value?.values.is_season_pass) {
+    const stageId = formStageId.value
+
+    if (formIsSeasonPass.value) {
         return addons.filter(a => a.apply_to_all)
     }
 
@@ -107,6 +140,7 @@ const applicableAddons = computed(() => {
 })
 
 const addonsTotal = computed(() => {
+    console.log(applicableAddons.value)
     return applicableAddons.value.reduce((total, addon) => {
         if (addon.is_mandatory || selectedAddons.value.includes(addon.id)) {
             return total + Number(addon.price)
@@ -117,19 +151,18 @@ const addonsTotal = computed(() => {
 
 const payment = computed(() => {
     const type = form.value?.values.country_id == company.value?.address.country_id ? 'NATIONAL' : 'INTERNATIONAL'
-    form.value?.setFieldValue('payment_type', type)
 
     let screenshot = null
     let description = null
 
-    if (form.value?.values.is_season_pass && form.value?.values.season_pass_id) {
+    if (formIsSeasonPass.value && form.value?.values.season_pass_id) {
         const seasonPass = props.trailRace.season_passes?.find(sp => sp.id === form.value?.values.season_pass_id)
         if (seasonPass) {
             const spPayment = seasonPass.payments?.find(p => p.type === type)
             if (spPayment) {
-                return { 
-                    amount: String(Number(spPayment.amount) + addonsTotal.value), 
-                    type: spPayment.type, 
+                return {
+                    amount: String(Number(spPayment.amount)),
+                    type: spPayment.type,
                     description: spPayment.description,
                     screenshot: spPayment.screenshot
                 } as StageCategoryPayment
@@ -140,7 +173,7 @@ const payment = computed(() => {
 
     // Regular stage registration
     // Fetch old StageCategoryPayment to get the QR code / description just in case
-    const stageCategory = availabeStageCategoryList.value?.find(sc => sc.id === form.value?.values.stage_category_id)
+    const stageCategory = availabeStageCategoryList.value?.find(sc => String(sc.id) === String(formStageCategoryId.value))
     const oldPayment = stageCategory?.payment?.find(p => p.type === type)
 
     let basePrice = 0;
@@ -156,7 +189,7 @@ const payment = computed(() => {
     if (basePrice === 0 && addonsTotal.value === 0 && !oldPayment) return {} as StageCategoryPayment
 
     return {
-        amount: String(basePrice + addonsTotal.value),
+        amount: String(basePrice),
         type,
         description: oldPayment?.description,
         screenshot: oldPayment?.screenshot
@@ -437,7 +470,7 @@ onMounted(() => {
                                         <Users :size="16" class="text-gray-400" />
                                         Gender
                                     </Label>
-                                    <Select :model-value="value" @update:model-value="handleChange">
+                                    <Select :model-value="value ? String(value) : undefined" @update:model-value="handleChange">
                                         <SelectTrigger class="w-full h-12">
                                             <SelectValue placeholder="Select gender" />
                                         </SelectTrigger>
@@ -474,7 +507,7 @@ onMounted(() => {
                                 <Users :size="16" class="text-gray-400" />
                                 Age group
                             </Label>
-                            <Select :model-value="value" @update:model-value="handleChange">
+                            <Select :model-value="value ? String(value) : undefined" @update:model-value="handleChange">
                                 <SelectTrigger class="w-full h-12">
                                     <SelectValue placeholder="Age group" />
                                 </SelectTrigger>
@@ -489,23 +522,30 @@ onMounted(() => {
                         </Field> -->
                             </div>
                             <div class="flex flex-col gap-4">
-                                <div class="space-y-4" v-if="mode === 'runner' && upcomingStages.length > 1 && trailRace.season_passes && trailRace.season_passes.length > 0">
+                                <div class="space-y-4"
+                                    v-if="mode === 'runner' && upcomingStages.length > 1 && trailRace.season_passes && trailRace.season_passes.length > 0">
                                     <div class="flex items-center gap-2 mb-2">
                                         <h4 class="font-bold text-gray-900 text-sm">Season Passes</h4>
-                                        <span class="bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm">Best Value</span>
+                                        <span
+                                            class="bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm">Best
+                                            Value</span>
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <Field name="season_pass_id" as="div" v-slot="{ value, handleChange }" v-for="pass in trailRace.season_passes" :key="pass.id">
-                                            <Label class="block bg-primary/5 p-4 rounded-xl border relative cursor-pointer hover:bg-primary/10 transition-colors"
+                                        <Field name="season_pass_id" as="div" v-slot="{ value, handleChange }"
+                                            v-for="pass in trailRace.season_passes" :key="pass.id">
+                                            <Label
+                                                class="block bg-primary/5 p-4 rounded-xl border relative cursor-pointer hover:bg-primary/10 transition-colors"
                                                 :class="value === pass.id ? 'border-primary shadow-md' : 'border-primary/20'">
                                                 <div class="flex items-center gap-3 mb-2">
-                                                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                                    <div
+                                                        class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                                                         <MountainIcon class="w-4 h-4" />
                                                     </div>
                                                     <div>
                                                         <h4 class="font-bold text-gray-900 text-sm">{{ pass.name }}</h4>
                                                         <p class="text-xs text-gray-500 mb-1">
-                                                            {{ pass.stage_categories?.map(c => c.name).join(', ') || 'All stages included' }}
+                                                            {{pass.stage_categories?.map(c => c.name).join(', ') ||
+                                                                'All stages included'}}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -536,7 +576,7 @@ onMounted(() => {
                                             <Target :size="16" class="text-gray-400" />
                                             Races
                                         </Label>
-                                        <Select :model-value="value" @update:model-value="handleChange">
+                                        <Select :model-value="value ? String(value) : undefined" @update:model-value="(val) => { handleChange(String(val)); }">
                                             <SelectTrigger
                                                 class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 <SelectValue placeholder="Choose your stage" />
@@ -556,7 +596,7 @@ onMounted(() => {
                                             <Target :size="16" class="text-gray-400" />
                                             Distance
                                         </Label>
-                                        <Select :model-value="value" @update:model-value="handleChange">
+                                        <Select :model-value="value ? String(value) : undefined" @update:model-value="(val) => { handleChange(String(val)); }">
                                             <SelectTrigger
                                                 class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 <SelectValue
@@ -573,26 +613,54 @@ onMounted(() => {
                                     </Field>
                                 </div>
 
-                                <div v-if="applicableAddons.length > 0 && mode === 'runner'" class="mt-4 p-4 border rounded-xl bg-gray-50/50">
+                                <div v-if="availableTiers.length > 0 && mode === 'runner'" class="mt-6">
+                                    <Label class="text-sm font-medium text-gray-700 flex items-center gap-2 mb-3">
+                                        Pricing Tier
+                                    </Label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <label v-for="tier in availableTiers" :key="tier.id"
+                                            class="flex items-center justify-between p-4 border rounded-xl cursor-pointer bg-white transition-colors"
+                                            :class="{ 'border-primary bg-primary/5': String(selectedTierId) === String(tier.id), 'hover:border-gray-300': String(selectedTierId) !== String(tier.id) }">
+                                            <div class="flex items-center gap-3">
+                                                <input type="radio" :value="tier.id" v-model="selectedTierId"
+                                                    class="text-primary focus:ring-primary w-4 h-4" />
+                                                <div class="flex flex-col">
+                                                    <span class="font-semibold text-gray-900">{{ tier.name }}</span>
+                                                    <span class="text-xs text-gray-500"
+                                                        v-if="tier.is_time_based && tier.end_date">Until {{
+                                                            moment(tier.end_date).format('MMM D, YYYY') }}</span>
+                                                </div>
+                                            </div>
+                                            <span class="font-bold text-gray-900">Rs. {{ tier.price }}</span>
+                                        </label>
+                                    </div>
+                                    <Field name="pricing_tier_id" type="hidden" />
+                                </div>
+
+                                <div v-if="applicableAddons.length > 0 && mode === 'runner'"
+                                    class="mt-4 p-4 border rounded-xl bg-gray-50/50">
                                     <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4">
                                         <Target :size="16" class="text-primary" /> Extra Add-ons
                                     </h4>
                                     <div class="space-y-3">
-                                        <label v-for="addon in applicableAddons" :key="addon.id" 
+                                        <label v-for="addon in applicableAddons" :key="addon.id"
                                             class="flex items-center justify-between p-3 border rounded-lg cursor-pointer bg-white transition-colors"
-                                            :class="{'hover:bg-primary/5 hover:border-primary/30': !addon.is_mandatory, 'opacity-70 bg-gray-100 cursor-not-allowed': addon.is_mandatory, 'border-primary shadow-sm': selectedAddons.includes(addon.id)}">
+                                            :class="{ 'hover:bg-primary/5 hover:border-primary/30': !addon.is_mandatory, 'opacity-70 bg-gray-100 cursor-not-allowed': addon.is_mandatory, 'border-primary shadow-sm': selectedAddons.includes(addon.id) }">
                                             <div class="flex items-center gap-3">
-                                                <Checkbox 
-                                                    :checked="addon.is_mandatory || selectedAddons.includes(addon.id)" 
+                                                <Checkbox
+                                                    :model-value="addon.is_mandatory || selectedAddons.includes(addon.id)"
                                                     :disabled="addon.is_mandatory"
-                                                    @update:checked="(checked: boolean) => toggleAddon(addon.id, checked)"
-                                                />
+                                                    @update:model-value="(checked) => toggleAddon(addon.id, checked === true)" />
                                                 <div>
-                                                    <span class="block font-medium text-sm text-gray-900">{{ addon.name }}</span>
-                                                    <span class="text-[10px] text-primary uppercase font-bold tracking-wider" v-if="addon.is_mandatory">Mandatory</span>
+                                                    <span class="block font-medium text-sm text-gray-900">{{ addon.name
+                                                    }}</span>
+                                                    <span
+                                                        class="text-[10px] text-primary uppercase font-bold tracking-wider"
+                                                        v-if="addon.is_mandatory">Mandatory</span>
                                                 </div>
                                             </div>
-                                            <span class="text-sm font-semibold text-gray-900">Rs. {{ addon.price }}</span>
+                                            <span class="text-sm font-semibold text-gray-900">Rs. {{ addon.price
+                                            }}</span>
                                         </label>
                                     </div>
                                 </div>
@@ -630,23 +698,7 @@ onMounted(() => {
                                             name="description.emergency_contact_phone" />
                                     </Field>
                                 </div>
-                                <Field name="description.want_lunch" as="div" v-slot="{ value, handleChange }"
-                                    class="space-y-2">
-                                    <Label id="rf__want_lunch" class="flex items-start gap-2">
-                                        <Checkbox :model-value="value" @update:model-value="handleChange"
-                                            :default-value="false" />
-                                        <div class="grow flex flex-col gap-2">
-                                            <span class="font-medium text-gray-700">I want to order lunch after
-                                                race.</span>
-                                            <em class="text-sm font-light not-italic">Please Note*: Lunch is only
-                                                provided to
-                                                those who pre- ordered and pre-paid which is 480 per person and not
-                                                included in
-                                                registration fee.</em>
-                                        </div>
-                                    </Label>
-                                    <ErrorMessage class="error__message" name="description.want_lunch" />
-                                </Field>
+
                             </template>
                         </div>
                     </div>
@@ -660,9 +712,7 @@ onMounted(() => {
                         <div class="md:flex items-center justify-between space-y-6 md:space-y-0 md:gap-6 pb-5">
                             <div class="grow space-y-3">
                                 <em class="text-gray-600 block not-italic text-2xl">
-                                    NPR
-                                    {{ values.description?.want_lunch ? Number(payment?.amount) + 480 : payment?.amount
-                                    }}
+                                    NPR {{ Number(payment?.amount || 0) + addonsTotal }}
                                 </em>
                                 <div class="md:flex gap-4">
                                     <div class="grow mb-4 md:mb-0">
