@@ -29,7 +29,7 @@ outstanding
     - trip advisor
 - [X] season pass payments (separate)
 
-- [ ] change launch price to 500
+- [X] change launch price to 500
 - [X] change launch notes not working
 - [X] publish and unpublish races
 - [X] when admin opens no cache for races
