@@ -470,7 +470,8 @@ onMounted(() => {
                                         <Users :size="16" class="text-gray-400" />
                                         Gender
                                     </Label>
-                                    <Select :model-value="value ? String(value) : undefined" @update:model-value="handleChange">
+                                    <Select :model-value="value ? String(value) : undefined"
+                                        @update:model-value="handleChange">
                                         <SelectTrigger class="w-full h-12">
                                             <SelectValue placeholder="Select gender" />
                                         </SelectTrigger>
@@ -576,7 +577,8 @@ onMounted(() => {
                                             <Target :size="16" class="text-gray-400" />
                                             Races
                                         </Label>
-                                        <Select :model-value="value ? String(value) : undefined" @update:model-value="(val) => { handleChange(String(val)); }">
+                                        <Select :model-value="value ? String(value) : undefined"
+                                            @update:model-value="(val) => { handleChange(String(val)); }">
                                             <SelectTrigger
                                                 class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 <SelectValue placeholder="Choose your stage" />
@@ -596,7 +598,8 @@ onMounted(() => {
                                             <Target :size="16" class="text-gray-400" />
                                             Distance
                                         </Label>
-                                        <Select :model-value="value ? String(value) : undefined" @update:model-value="(val) => { handleChange(String(val)); }">
+                                        <Select :model-value="value ? String(value) : undefined"
+                                            @update:model-value="(val) => { handleChange(String(val)); }">
                                             <SelectTrigger
                                                 class="w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 <SelectValue
@@ -653,14 +656,14 @@ onMounted(() => {
                                                     @update:model-value="(checked) => toggleAddon(addon.id, checked === true)" />
                                                 <div>
                                                     <span class="block font-medium text-sm text-gray-900">{{ addon.name
-                                                    }}</span>
+                                                        }}</span>
                                                     <span
                                                         class="text-[10px] text-primary uppercase font-bold tracking-wider"
                                                         v-if="addon.is_mandatory">Mandatory</span>
                                                 </div>
                                             </div>
                                             <span class="text-sm font-semibold text-gray-900">Rs. {{ addon.price
-                                            }}</span>
+                                                }}</span>
                                         </label>
                                     </div>
                                 </div>
@@ -787,11 +790,7 @@ onMounted(() => {
                                     @update:model-value="handleChange($event); if (!value) showLiabilitiesDialog = true;"
                                     :default-value="false" id="rf__liabilities" />
                                 <label for="rf__liabilities">
-                                    Yes, I agree, I am
-                                    <NuxtLink to="/info/liabilities" target="_blank" class="underline text-primary">
-                                        liable
-                                    </NuxtLink>
-                                    to my own action.
+                                    Yes, I agree, I am liable to my own action.
                                 </label>
                                 <ErrorMessage class="error__message" name="liabilities" />
                             </Field>
@@ -800,11 +799,7 @@ onMounted(() => {
                                     @update:model-value="handleChange($event); if (!value) showPoliciesDialog = true;"
                                     :default-value="false" id="rf__policies" />
                                 <label for="rf__policies">
-                                    Yes, I agree to all the
-                                    <NuxtLink to="/info/privacy-policy" target="_blank" class="underline text-primary">
-                                        policies
-                                    </NuxtLink>
-                                    mentioned.
+                                    Yes, I agree to all the policies mentioned.
                                 </label>
                                 <ErrorMessage class="error__message" name="policies" />
                             </Field>
@@ -866,33 +861,7 @@ onMounted(() => {
                 </DialogDescription>
             </DialogHeader>
             <div id="content" class="text-gray-700 text__holder max-h-[calc(100vh-200px)] overflow-y-auto">
-                <p>I understand that participating in the KVR Summit challenge by Trailmandu the Challenge is
-                    potentially
-                    hazardous, and I should not enter and participate unless I am medically able and properly trained.
-                    In
-                    consideration of the acceptance of this entry, I assume full and complete responsibility for any
-                    injury
-                    or accident that may occur while I am travelling to or from the event, during the event, or while I
-                    am
-                    on the premises.</p>
-                <p>I am also aware of and assume all risks associated with participating in this event, including but
-                    not
-                    limited to falls, contact with other participants, effects of weather, traffic, and conditions of
-                    the
-                    road. I, for myself and my heirs and executors, hereby waive, release, and forever discharge the
-                    event
-                    organisers, sponsors, promoters, and each of their agents, representatives, successors, and assigns,
-                    as
-                    well as all other persons associated with the event, from all liabilities, claims, actions, or
-                    damages
-                    that I may have against them arising out of or in any way connected with my participation in this
-                    event.
-                    I understand that this waiver includes any claims, whether caused by negligence, the action or
-                    inaction
-                    of any of the above parties, or otherwise.</p>
-                <p>I hereby grant full permission to any and all of the above parties to use any photographs,
-                    videotapes,
-                    motion pictures, website images, recordings, or any other record of this event.</p>
+                <div v-if="trailRace.liability_waiver" v-html="trailRace.liability_waiver" />
             </div>
             <DialogFooter>
                 <Button type="button" @click="showLiabilitiesDialog = false">
@@ -910,46 +879,7 @@ onMounted(() => {
                 </DialogDescription>
             </DialogHeader>
             <div id="content" class="text-gray-700 text__holder max-h-[calc(100vh-200px)] overflow-y-auto">
-                <h2>Food Policy</h2>
-                <ul>
-                    <li>We provide checkpoint food only.</li>
-                    <li>Lunch will be available on a pre-order basis and must be paid and reserve food coupon.</li>
-                    <li>Water will be provided at all checkpoints and at the finish line.</li>
-                    <li>The primary food served will be Dal-Bhat (pre-paid only) or you can order from menu which will
-                        be
-                        pay
-                        first
-                    </li>
-                    <li>service by hotel themselves and preparing might take time.</li>
-                    <li>If you have purchased a full package, please see the note which doesn't include food and
-                        transportation.</li>
-                </ul>
-                <h2>Refund Policy</h2>
-                <ul>
-                    <li>Refunds are available until one week before race day (Friday).</li>
-                    <li>No refunds will be issued from Saturday one week before the race.</li>
-                    <li>No registration transfers are allowed.</li>
-                    <li>No refunds for packages.</li>
-                </ul>
-                <h2>Safety Policy</h2>
-                <ul>
-                    <li>First aid will be available at specific checkpoints and the finish line.</li>
-                    <li>We do not provide personal Insurance.</li>
-                    <li>No dashing pushing to others and always respect each other's.</li>
-                    <li>Trail running is not a competition it's a family/community so always priorities safety of others
-                        too.</li>
-                </ul>
-                <h2>Transportation Policy</h2>
-                <ul>
-                    <li>We do not provide transportation.</li>
-                    <li>All the Start/Finish points are accessible and easy to get online transportation which is easy
-                        to
-                        get in
-                        and
-                        out</li>
-                    <li>as per you prefer time so we are not providing Bus service</li>
-                    <li>You can use Indrive /Pathao/ Yango or local transportation</li>
-                </ul>
+                <div v-if="trailRace.policies" v-html="trailRace.policies" />
             </div>
             <DialogFooter>
                 <Button type="button" @click="showPoliciesDialog = false">

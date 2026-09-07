@@ -395,6 +395,22 @@ export class EventController {
         }
     }
 
+    public static async updateLegal(request: Request, response: Response, next: NextFunction) {
+        try {
+            response.send(await prisma.trailRace.update({
+                where: {
+                    id: request.params.event_id as string
+                },
+                data: {
+                    liability_waiver: request.body.liability_waiver,
+                    policies: request.body.policies
+                }
+            }))
+        } catch (error) {
+            next(error)
+        }
+    }
+
     public static async publish(request: Request, response: Response, next: NextFunction) {
         try {
             response.send(await prisma.trailRace.update({

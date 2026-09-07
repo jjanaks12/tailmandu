@@ -471,7 +471,10 @@ model TrailRace {
   created_at   DateTime  @default(now())
   updated_at   DateTime?
   deleted_at   DateTime?
-  published_at DateTime?
+  published_at     DateTime?
+
+  liability_waiver String? @db.LongText
+  policies         String? @db.LongText
 
   image_id    String?
   thumbnail   Image?  @relation("thumbnail_image", fields: [image_id], references: [id], onDelete: SetNull)
