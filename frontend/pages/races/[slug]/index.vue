@@ -3,7 +3,7 @@ import { CalendarIcon, MapPinIcon, MountainIcon, ZapIcon, ChevronRightIcon, MapI
 import { formatDate, getGPXFile, showImage } from '~/lib/filters'
 import type { TrailRace, Stage, StageCategory } from '~/lib/types'
 import { useEventStore } from '~/store/event'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { Autoplay, Virtual } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { getFile } from '~/lib/filters/show_image'
@@ -218,7 +218,7 @@ const selectedStageStartTime = computed(() => {
         moment(a.start).diff(moment(b.start))
     )[0]
 
-    return moment.utc(earliestCat.start).local().format('MMM D, YYYY • hh:mm A')
+    return moment.tz(earliestCat.start, 'Asia/Kathmandu').format('MMM D, YYYY • hh:mm A')
 })
 
 const selectStage = (stage: Stage) => {
@@ -467,7 +467,7 @@ const isSticky = computed(() => y.value > 450)
                                 <div class="space-y-4">
                                     <div class="flex justify-between text-sm font-bold">
                                         <span class="text-slate-400">Start Time</span>
-                                        <span>{{ moment(cat.start).format('hh:mm A') }}</span>
+                                        <span>{{ moment.tz(cat.start, 'Asia/Kathmandu').format('hh:mm A') }}</span>
                                     </div>
                                     <div class="flex justify-between text-sm font-bold">
                                         <span class="text-slate-400">Distance</span>
