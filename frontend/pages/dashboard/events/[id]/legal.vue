@@ -34,7 +34,7 @@ onMounted(async () => {
 const saveLegal = async () => {
     isSaving.value = true
     try {
-        await axios.put(`/api/events/${route.params.id}/update_legal`, {
+        await axios.put(`/events/${route.params.id}/update_legal`, {
             liability_waiver: liability_waiver.value,
             policies: policies.value
         })
@@ -52,11 +52,13 @@ const saveLegal = async () => {
         <div class="flex items-center gap-2 text-sm text-gray-500">
             <NuxtLink to="/dashboard/events" class="hover:text-primary transition-colors">Events</NuxtLink>
             <span>/</span>
-            <NuxtLink :to="`/dashboard/events/${route.params.id}`" class="hover:text-primary transition-colors">{{ trailRace?.name || 'Loading...' }}</NuxtLink>
+            <NuxtLink :to="`/dashboard/events/${route.params.id}`" class="hover:text-primary transition-colors">
+                {{ trailRace?.name || 'Loading...' }}
+            </NuxtLink>
             <span>/</span>
             <span class="text-gray-900 font-medium">Legal & Policies</span>
         </div>
-        <ClearCacheButton :event-id="route.params.id as string" />
+        <ClearCacheButton :event-id="(route.params.id as string)" />
     </div>
 
     <div class="flex flex-col md:flex-row gap-6">
@@ -74,7 +76,8 @@ const saveLegal = async () => {
                         </div>
                     </div>
                     <div>
-                        <Label class="text-sm font-medium mb-2 block">Policies (Food, Refund, Safety, Transportation)</Label>
+                        <Label class="text-sm font-medium mb-2 block">Policies (Food, Refund, Safety,
+                            Transportation)</Label>
                         <div class="border rounded-md">
                             <TiptapEditor v-model="policies" />
                         </div>
