@@ -1,13 +1,17 @@
 import { NextFunction, Request, Response } from "express"
 
-import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import moment from "moment"
+import createHttpError from "http-errors"
+import Bcrypt from 'bcrypt'
+
+
+import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import { FileHandler } from "@/app/lib/services/file.service"
 import { useMailTrap } from "@/app/lib/services/mailtrap"
-import createHttpError from "http-errors"
-
 import { prisma } from '@/app/lib/services/prisma.service'
 import { PaymentMethod, PaymentStatus } from "@prisma/client/index-browser"
+import ical, { ICalCalendarMethod } from "ical-generator"
+
 export class RunnerController {
     public static async index(request: Request, response: Response, next: NextFunction) {
         try {
@@ -189,7 +193,7 @@ export class RunnerController {
                     }
                 })
 
-            /* let user = await prisma.user.findFirst({ where: { personal_id: personal.id } })
+            let user = await prisma.user.findFirst({ where: { personal_id: personal.id } })
             if (!user) {
                 const salt = await Bcrypt.genSalt(10)
                 const hashPassword = await Bcrypt.hash('password', salt)
@@ -206,7 +210,7 @@ export class RunnerController {
                         role_id: role.id
                     }
                 })
-            } */
+            }
 
             let matchedCategories = [stageCategory]
             if (validationData.is_season_pass) {
@@ -320,7 +324,7 @@ export class RunnerController {
             if (createdRunners.length === 0) {
                 throw createHttpError(409, `You have already registered for all stages of this event`)
             }
-            /* const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
+            const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
             const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
 
             const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
@@ -364,7 +368,7 @@ export class RunnerController {
                 filename: `${stageCategory.stage.name} - ${stageCategory.name}.ics`,
                 type: "text/calendar; charset=UTF-8; method=REQUEST",
                 disposition: 'attachment'
-            }], 'event') */
+            }], 'event')
 
             response.send(payment)
         } catch (error) {
