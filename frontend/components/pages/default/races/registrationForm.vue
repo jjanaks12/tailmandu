@@ -13,7 +13,7 @@ import { trailRaceRunner, trailRaceVolunteer } from "~/lib/schema/event.schema"
 import type { Personal, StageCategoryPayment, TrailRace } from "~/lib/types"
 import { useEventStore } from "~/store/event"
 import moment from "moment"
-import { showImage, showPaymentImage, getGPXFile } from '~/lib/filters'
+import { showImage, showPaymentImage } from '~/lib/filters'
 import { useAxios } from "~/services/axios"
 
 interface RegistrationFormProps {
@@ -532,9 +532,8 @@ onMounted(() => {
                                             Value</span>
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <Field name="season_pass_id" as="div" v-slot="{ value, handleChange }"
-                                            v-for="pass in trailRace.season_passes" :key="pass.id">
-                                            <Label
+                                        <Field name="season_pass_id" v-slot="{ value, handleChange }">
+                                            <Label v-for="pass in trailRace.season_passes" :key="pass.id"
                                                 class="block bg-primary/5 p-4 rounded-xl border relative cursor-pointer hover:bg-primary/10 transition-colors"
                                                 :class="value === pass.id ? 'border-primary shadow-md' : 'border-primary/20'">
                                                 <div class="flex items-center gap-3 mb-2">
