@@ -23,6 +23,7 @@ import enquiryRouter from '@/routes/api/enquiry.router'
 import pageRouter from '@/routes/api/page.router'
 import teamRouter from '@/routes/api/team.router'
 import reviewRouter from '@/routes/api/review.router'
+import queueRouter from '@/routes/api/queues.router'
 
 const router = Router()
 
@@ -49,5 +50,6 @@ router.use('/enquiries', enquiryRouter)
 router.use('/pages', pageRouter)
 router.use('/teams', teamRouter)
 router.use('/reviews', reviewRouter)
+router.use('/queues', queueRouter)
 
 export default router

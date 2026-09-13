@@ -1234,3 +1234,14 @@ model BlogComment {
 
   @@map("blog_comments")
 }
+
+model EmailLog {
+  id         String   @id @default(cuid())
+  recipient  String
+  subject    String?
+  status     String   // "SUCCESS", "FAILED"
+  error      String?  @db.Text
+  created_at DateTime @default(now())
+
+  @@map("email_logs")
+}

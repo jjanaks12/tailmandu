@@ -209,6 +209,13 @@ export const useMenu = () => {
         slug: 'settings',
         permissions: [],
         subMenu: [{
+            title: 'Queues',
+            path: '/dashboard/queues',
+            slug: 'queues',
+            icon: 'ListFilter',
+            role: 'Admin',
+            permissions: '*'
+        }, {
             title: 'Change password',
             path: '/dashboard/change_password',
             slug: 'change_password',
