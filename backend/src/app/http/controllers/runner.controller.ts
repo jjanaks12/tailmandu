@@ -272,7 +272,8 @@ export class RunnerController {
                         club_name: validationData.description.club_name,
                         emergency_contact_name: validationData.description.emergency_contact_name,
                         emergency_contact_no: validationData.description.emergency_contact_phone,
-                        shirt_id: validationData.size_id
+                        shirt_id: validationData.size_id,
+                        season_pass_id: validationData.is_season_pass ? validationData.season_pass_id : null
                     }
                 })
                 createdRunners.push(runner)
@@ -544,7 +545,8 @@ export class RunnerController {
                             event: true
                         }
                     },
-                    status: true
+                    status: true,
+                    season_pass: true
                 },
                 orderBy: {
                     created_at: 'desc'

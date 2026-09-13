@@ -10,6 +10,7 @@ interface RunnerItemProps {
     rank?: number
     runner: EventRunner
     hasEventStarted?: boolean
+    id?: string
 }
 
 const emit = defineEmits(['show:runner', 'show:payment', 'updated:payment', 'fetch', 'edit'])
@@ -24,16 +25,19 @@ const showDisqualificationModal = ref<boolean>(false)
 const showDidNotFinishModal = ref<boolean>(false)
 const showEditDialog = ref(false)
 const checkpointData = ref<VolunteerCheckpoint | null>(null)
+
+const runnerIdFromQuery = useRouteQuery('runner_id')
+
 const hasPayment = computed(() => props.runner.payments.length > 0)
 const activeRunner = computed(() => !['DISQUALIFIED', 'DID_NOT_FINISH'].includes(props.runner?.status?.status))
 const classList = computed(() => (props.rank
     ? {
         'bg-primary/50 hover:bg-primary/50': props.rank == 1 && activeRunner.value,
         'bg-primary/30 hover:bg-primary/30': props.rank == 2 && activeRunner.value,
-        'bg-primary/10 hover:bg-primary/10': props.rank == 3 && activeRunner.value
+        'bg-primary/10 hover:bg-primary/10': props.rank == 3 && activeRunner.value,
+        'bg-secondary/10': runnerIdFromQuery.value === props.runner.id
     }
-    : {}))
-
+    : { 'bg-secondary/10': runnerIdFromQuery.value === props.runner.id }))
 const { copy, copied } = useClipboard()
 
 const deleteRunner = async () => {
@@ -68,10 +72,11 @@ const doAttendance = async () => {
     await axios.put(`/runners/${props.runner.id}/${props.runner.stage_category.stage_id}/attendance`)
     emit('fetch')
 }
+console
 </script>
 
 <template>
-    <TableRow class="relative" :class="classList">
+    <TableRow class="relative" :class="classList" :id="id">
         <TableCell>
             <ChevronUpIcon class="inline-block vertical-align-middle" @click="showTiming = !showTiming"
                 v-if="runner.volunteer_on_checkpoints?.length > 0" />
@@ -182,7 +187,7 @@ const doAttendance = async () => {
             </div>
         </TableCell>
     </TableRow>
-    <TableRow v-if="runner.volunteer_on_checkpoints?.length && showTiming" :class="classList">
+    <TableRow v-if="runner.volunteer_on_checkpoints?.length && showTiming" :class="classList" :id="id">
         <TableCell colspan="6">
             <Table>
                 <TableHeader>

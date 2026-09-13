@@ -223,6 +223,8 @@ export type EventRunner = {
     rank: Rank
     status: EventRunnerStatus
     runner_attendances: RunnerAttendance[]
+    season_pass_id?: string
+    season_pass?: SeasonPass
 }
 
 export type RunnerAttendance = {

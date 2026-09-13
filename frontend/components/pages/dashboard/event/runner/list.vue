@@ -7,7 +7,7 @@ import { watchDebounced } from '@vueuse/core'
 import { CommandIcon, DownloadIcon, LoaderIcon } from 'lucide-vue-next'
 import { onKeyStroke } from '@vueuse/core'
 import RunnerItem from './RunnerItem.vue'
-import { showImage, showPaymentImage } from '~/lib/filters'
+import { showPaymentImage } from '~/lib/filters'
 import { toast } from 'vue-sonner'
 import bibCard from './bibCard.vue'
 import { useAppStore } from '~/store/app'
@@ -32,7 +32,7 @@ const runnerPaymentDialog = ref(false)
 const showRunnerEdit = ref(false)
 
 const runners = ref<EventRunner[]>([])
-const stageID = ref<string | null>(null)
+const stageID = useRouteQuery('stage_id', null)
 const paymentStatusOpt = ref<PaymentStatus | null>(null)
 const paymentTypeOpt = ref<PaymentType | null>(null)
 const genderOpt = ref<Gender | null>(null)
@@ -74,6 +74,15 @@ const fetch = async () => {
         })
         runners.value = data
         isLoading.value = false
+
+        if (route.query.runner_id) {
+            nextTick(() => {
+                const el = document.getElementById(`runner-${route.query.runner_id}`)
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
+            })
+        }
     }
 }
 
@@ -115,8 +124,9 @@ const downloadCSV = async () => {
     link.click()
 }
 
-watch([paymentStatusOpt, stageID, stageCategoryID, paymentTypeOpt, genderOpt], fetch)
+watch([paymentStatusOpt, stageID, stageCategoryID, paymentTypeOpt, genderOpt], fetch, { immediate: true })
 watchDebounced(searchText, fetch, { debounce: 1000 })
+
 onMounted(async () => {
     await fetchStages(props.eventId)
     interval = setInterval(() => {
@@ -225,6 +235,8 @@ onUnmounted(() => {
                 </TableHeader>
                 <TableBody>
                     <RunnerItem v-for="(runner, index) in updatedRunners" :runner="runner"
+                        :id="`runner-${runner.id}`"
+                        :class="{ 'bg-yellow-100 dark:bg-yellow-900/30': route.query.runner_id === runner.id }"
                         @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                         @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
                         @updated:payment="updatePaymentStatus" @fetch="fetch"

@@ -74,7 +74,8 @@ onMounted(fetchRegistrations)
 
             <!-- Registration list -->
             <div v-else class="divide-y">
-                <div v-for="runner in registrations" :key="runner.id"
+                <NuxtLink v-for="runner in registrations" :key="runner.id"
+                    :to="`/dashboard/events/${runner.stage?.event?.id || runner.event?.id}/runners?stage_id=${runner.stage_id}&runner_id=${runner.id}`"
                     class="flex items-center gap-3 px-6 py-4 hover:bg-muted/50 transition-colors group">
 
                     <!-- Avatar / Icon -->
@@ -85,11 +86,11 @@ onMounted(fetchRegistrations)
 
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium truncate">
+                        <p class="text-sm font-medium truncate group-hover:text-primary transition-colors">
                             {{ runner.personal?.first_name }} {{ runner.personal?.last_name }}
                         </p>
                         <div class="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                            <span class="truncate">{{ runner.stage?.event?.name || 'Event Registration' }}</span>
+                            <span class="truncate">{{ runner.season_pass ? 'Season Pass' : (runner.stage?.name || 'Event Registration') }}</span>
                             <span class="shrink-0">·</span>
                             <ClockIcon class="w-3 h-3 shrink-0" />
                             <span class="shrink-0">{{ formatDate(runner.created_at) }}</span>
@@ -101,7 +102,10 @@ onMounted(fetchRegistrations)
                         {{ statusLabel(runner.status) }}
                     </Badge>
 
-                </div>
+                    <!-- Arrow icon for link -->
+                    <ArrowRightIcon class="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0" />
+
+                </NuxtLink>
             </div>
         </CardContent>
     </Card>

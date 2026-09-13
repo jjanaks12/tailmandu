@@ -169,6 +169,9 @@ model EventRunner {
   runner_attendances       RunnerAttendance[]
   addons                   RunnerAddon[]
 
+  season_pass_id String?
+  season_pass    SeasonPass? @relation(fields: [season_pass_id], references: [id], onDelete: Cascade)
+
   @@unique([bib, stage_category_id])
   @@map("event_runners")
 }
@@ -471,7 +474,7 @@ model TrailRace {
   created_at   DateTime  @default(now())
   updated_at   DateTime?
   deleted_at   DateTime?
-  published_at     DateTime?
+  published_at DateTime?
 
   liability_waiver String? @db.LongText
   policies         String? @db.LongText
@@ -524,6 +527,7 @@ model SeasonPass {
 
   payments         SeasonPassPayment[]
   stage_categories StageCategory[]
+  runners          EventRunner[]
 
   @@map("season_passes")
 }
@@ -568,15 +572,15 @@ model User {
 }
 
 model PricingTier {
-  id         String    @id @default(cuid())
-  name       String
+  id            String    @id @default(cuid())
+  name          String
   price         Decimal   @db.Decimal(10, 2)
   is_time_based Boolean   @default(false)
   start_date    DateTime?
   end_date      DateTime?
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-  deleted_at DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime?
+  deleted_at    DateTime?
 
   event_id String
   event    TrailRace @relation(fields: [event_id], references: [id], onDelete: Cascade)
