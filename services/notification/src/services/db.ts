@@ -10,7 +10,7 @@ const pool: mariadb.Pool = mariadb.createPool({
     connectionLimit: 5,
 });
 
-const adapter = new PrismaMariaDb(pool);
+const adapter = new PrismaMariaDb(pool as any);
 
 export const prisma = new PrismaClient({ adapter });
 
