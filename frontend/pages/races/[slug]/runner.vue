@@ -89,7 +89,7 @@ useHead(() => {
         <div class="hidden md:flex flex-col w-1/2 h-full relative">
             <Skeleton class="w-full h-full rounded-none" />
         </div>
-        <div class="w-full md:w-1/2 h-full p-6 md:py-16 overflow-y-auto flex flex-col items-center">
+        <div class="w-full md:w-1/2 h-full p-6 md:py-16 overflow-y-auto flex flex-col items-center justify-center">
             <div class="w-full max-w-2xl">
                 <div class="flex justify-between items-start mb-10">
                     <div class="space-y-4">

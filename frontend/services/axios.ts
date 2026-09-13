@@ -4,7 +4,7 @@ import { useAuthStore } from '~/store/auth'
 export const useAxios = () => {
     const { public: { apiUrl } } = useRuntimeConfig()
 
-    const baseURL = process.server ? 'http://backend:8000/api/' : apiUrl
+    const baseURL = process.server ? (process.env.NUXT_PUBLIC_API_URL || apiUrl) : apiUrl
 
     const instance = axios.create({
         baseURL: baseURL
@@ -26,7 +26,7 @@ export const useAxios = () => {
         const { refreshToken } = useAuthStore()
         const currentRoute = null
 
-        if (error.response.data.error.message == 'jwt expired') {
+        if (error.response?.data?.error?.message === 'jwt expired') {
             const originalRequest = error.config
             originalRequest._retry = true
 
@@ -42,10 +42,10 @@ export const useAxios = () => {
                 })
         }
 
-        if (error.response.data.error.message == 'Unauthorized') {
+        if (error.response?.data?.error?.message === 'Unauthorized') {
             token.value = null
         }
-        return error
+        return Promise.reject(error)
     })
 
     return { axios: instance }
