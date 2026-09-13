@@ -74,15 +74,18 @@ export default defineNuxtConfig({
     ],
     server: {
       allowedHosts: (process.env.NUXT_ALLOWED_HOSTS ?? []) as string[]
+    },
+    optimizeDeps: {
+      include: ['lucide-vue-next', 'moment', 'leaflet', 'chart.js']
     }
   },
 
   runtimeConfig: {
     public: {
-      appName: process.env.NUXT_APP_NAME,
-      serverUrl: process.env.NUXT_SERVER_URL,
-      apiUrl: process.env.NUXT_API_URL,
-      mailAdmin: process.env.NUXT_MAIL_ADMIN,
+      appName: process.env.NUXT_PUBLIC_APP_NAME,
+      serverUrl: process.env.NUXT_PUBLIC_SERVER_URL,
+      apiUrl: process.env.NUXT_PUBLIC_API_URL,
+      mailAdmin: process.env.NUXT_PUBLIC_MAIL_ADMIN,
     }
   },
 
@@ -155,5 +158,7 @@ export default defineNuxtConfig({
         }
       }
     }
-  }
+  },
+
+  sourcemap: false
 })

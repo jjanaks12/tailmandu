@@ -4,8 +4,10 @@ import { useAuthStore } from '~/store/auth'
 export const useAxios = () => {
     const { public: { apiUrl } } = useRuntimeConfig()
 
+    const baseURL = process.server ? 'http://backend:8000/api/' : apiUrl
+
     const instance = axios.create({
-        baseURL: apiUrl
+        baseURL: baseURL
     })
 
     instance.interceptors.request.use(request => {

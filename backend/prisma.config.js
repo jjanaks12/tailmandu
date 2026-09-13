@@ -1,9 +1,9 @@
-import { defineConfig, env } from 'prisma/config'
-import path from 'node:path'
+const { defineConfig, env } = require('prisma/config');
+const path = require('node:path');
 
-import 'dotenv/config'
+require('dotenv/config');
 
-export default defineConfig({
+module.exports = defineConfig({
     datasource: {
         url: env('DATABASE_URL')
     },
@@ -17,4 +17,4 @@ export default defineConfig({
     typedSql: {
         path: path.join("src/prisma", "queries"),
     }
-})
+});

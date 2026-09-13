@@ -7,7 +7,7 @@ import Bcrypt from 'bcrypt'
 
 import { trailRaceRunner } from "@/app/lib/schema/event.schema"
 import { FileHandler } from "@/app/lib/services/file.service"
-import { useMailTrap } from "@/app/lib/services/mailtrap"
+import { emailQueue } from "@/queue/email.queue"
 import { prisma } from '@/app/lib/services/prisma.service'
 import { PaymentMethod, PaymentStatus } from "@prisma/client/index-browser"
 import ical, { ICalCalendarMethod } from "ical-generator"
@@ -115,7 +115,7 @@ export class RunnerController {
             const validationData = await trailRaceRunner.validate(request.body, { abortEarly: false })
             const eventId = request.params.event_id as string
             const body: any = {}
-            const { sendEmail } = useMailTrap()
+
 
             if (validationData.date_of_birth)
                 body.date_of_birth = moment(validationData.date_of_birth, "YYYY-MM-DD").toISOString()
@@ -229,7 +229,8 @@ export class RunnerController {
             const [min] = stageCategory.bib_range.split('-')
             const baseBib = (Number(min) + (event.runners.length + 1))
             const runnerCon = new RunnerController()
-            const checkedBib = await runnerCon.checkBIB(baseBib, baseCategoryId)
+            const categoryIds = matchedCategories.map((c: any) => c.id)
+            const checkedBib = await runnerCon.checkBIB(baseBib, categoryIds)
             const finalBib = checkedBib.toString().padStart(3, '0')
 
             let paymentBody: any = {}
@@ -338,37 +339,44 @@ export class RunnerController {
                 url: `https://trailmandu.com/races/${event.slug}/stage/${stageCategory.stage.id}`
             })
 
-            await sendEmail('welcome', {
-                title: 'Thank you for signing up for race',
-                user: {
-                    name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
-                    email: validationData.email,
-                    bib: runner.bib,
-                    country: personal.country.name,
-                    gender: personal.gender.name,
-                    contact_no: personal.phone_number,
-                    dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
-                    emergency_contact: validationData.description.emergency_contact_name,
-                    emergency_contact_no: validationData.description.emergency_contact_phone,
+            await emailQueue.add('sendEmail', {
+                fileName: 'welcome',
+                replacements: {
+                    title: 'Thank you for signing up for race',
+                    user: {
+                        name: [validationData.first_name, validationData.middle_name, validationData.last_name].join(' '),
+                        email: validationData.email,
+                        bib: runner.bib,
+                        country: personal.country.name,
+                        gender: personal.gender.name,
+                        contact_no: personal.phone_number,
+                        dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
+                        emergency_contact: validationData.description.emergency_contact_name,
+                        emergency_contact_no: validationData.description.emergency_contact_phone,
+                    },
+                    stage: stageCategory.stage,
+                    stageCategory: { ...stageCategory, start, end },
+                    links: {
+                        "Trailmandu": 'https://trailmandu.com',
+                        event: 'https://trailmandu.com'
+                    }
                 },
-                stage: stageCategory.stage,
-                stageCategory: { ...stageCategory, start, end },
-                links: {
-                    "Trailmandu": 'https://trailmandu.com',
-                    event: 'https://trailmandu.com'
-                }
-            }, {
-                recipients: [{
-                    email: validationData.email,
-                    name: validationData.first_name,
+                props: {
+                    recipients: [{
+                        email: validationData.email,
+                        name: validationData.first_name,
+                    }],
+                    subject: 'Welcome to Trailmandu'
+                },
+                senderEmail: 'info@trailmandu.com',
+                attachments: [{
+                    content: Buffer.from(calendar.toString()).toString('base64'),
+                    filename: `${stageCategory.stage.name} - ${stageCategory.name}.ics`,
+                    type: "text/calendar; charset=UTF-8; method=REQUEST",
+                    disposition: 'attachment'
                 }],
-                subject: 'Welcome to Trailmandu'
-            }, 'info@trailmandu.com', [{
-                content: Buffer.from(calendar.toString()),
-                filename: `${stageCategory.stage.name} - ${stageCategory.name}.ics`,
-                type: "text/calendar; charset=UTF-8; method=REQUEST",
-                disposition: 'attachment'
-            }], 'event')
+                category: 'event'
+            })
 
             response.send(payment)
         } catch (error) {
@@ -376,19 +384,21 @@ export class RunnerController {
         }
     }
 
-    private async checkBIB(bib: number, stage_category_id: string) {
-        let newBib = bib
-        const bibExists = await prisma.eventRunner.findFirst({
-            where: {
-                bib: newBib.toString().padStart(3, '0'),
-                stage_category_id
+    private async checkBIB(bib: number, stage_category_ids: string[]) {
+        let currentBib = bib;
+        while (true) {
+            const bibExists = await prisma.eventRunner.findFirst({
+                where: {
+                    bib: currentBib.toString().padStart(3, '0'),
+                    stage_category_id: { in: stage_category_ids }
+                }
+            });
+            if (bibExists) {
+                currentBib++;
+            } else {
+                return currentBib;
             }
-        })
-        if (bibExists) {
-            newBib = newBib + 1
-            await this.checkBIB(newBib, stage_category_id)
         }
-        return newBib
     }
 
     public static async update(request: Request, response: Response, next: NextFunction) {
