@@ -60,7 +60,9 @@ const parsedDetails = computed(() => {
         let parsed = typeof trailRace.value.details === 'string'
             ? JSON.parse(trailRace.value.details)
             : trailRace.value.details
-        return Array.isArray(parsed) ? parsed : []
+        if (Array.isArray(parsed)) return parsed
+        if (parsed && Array.isArray(parsed.topics)) return parsed.topics
+        return []
     } catch {
         return []
     }

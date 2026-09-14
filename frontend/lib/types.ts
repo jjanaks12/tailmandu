@@ -210,6 +210,7 @@ export type EventRunner = {
     personal_id: string
     club_name: string
     personal: Personal
+    event_id: string
     event: TrailRace
     stage_id: string
     stage: Stage

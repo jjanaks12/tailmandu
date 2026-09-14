@@ -35,7 +35,9 @@ const initTopics = () => {
                 : props.trailRace.details
 
             if (Array.isArray(parsed)) {
-                topics.value = parsed.map(t => ({ ...t, collapsed: true }))
+                topics.value = parsed.map((t: any) => ({ ...t, collapsed: true }))
+            } else if (parsed && Array.isArray(parsed.topics)) {
+                topics.value = parsed.topics.map((t: any) => ({ ...t, collapsed: true }))
             } else {
                 topics.value = []
             }
@@ -109,7 +111,15 @@ const save = async () => {
     try {
         // Strip out the 'collapsed' property before saving
         const cleanTopics = topics.value.map(({ id, title, content }) => ({ id, title, content }))
-        const success = await store.saveDetails(props.trailRace.id, cleanTopics)
+        
+        let currentDetails = typeof props.trailRace.details === 'string' ? JSON.parse(props.trailRace.details) : (props.trailRace.details || {})
+        if (Array.isArray(currentDetails)) {
+            currentDetails = { topics: cleanTopics }
+        } else {
+            currentDetails.topics = cleanTopics
+        }
+        
+        const success = await store.saveDetails(props.trailRace.id, JSON.stringify(currentDetails))
         if (success) {
             toast.success('Details updated successfully')
             emit('update')
