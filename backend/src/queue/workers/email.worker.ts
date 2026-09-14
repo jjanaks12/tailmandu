@@ -19,39 +19,46 @@ const transporter = nodemailer.createTransport({
 });
 
 export const emailWorker = new Worker('emailQueue', async (job: Job) => {
-    const { fileName, replacements, to, subject, html, text } = job.data;
-    
-    // Attempt to extract the recipient email
-    let recipientEmail = to;
-    if (!recipientEmail && replacements && replacements.user && replacements.user.email) {
-        recipientEmail = replacements.user.email;
-    }
-
-    if (!recipientEmail) {
-        throw new Error('Recipient email is missing in job data');
-    }
-
-    let finalSubject = subject || (replacements && replacements.title) || 'No Subject';
-    let finalHtml = html;
-
-    // If there's no HTML but there are replacements, generate a basic HTML dump
-    if (!finalHtml && replacements) {
-        finalHtml = `
-            <h2>${finalSubject}</h2>
-            <p>Here are the details for your registration:</p>
-            <ul>
-                ${Object.entries(replacements.user || {}).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
-            </ul>
-        `;
-    }
+    let recipientEmail = 'unknown';
+    let finalSubject = 'No Subject';
 
     try {
+        const { fileName, replacements, to, subject, html, text, props, attachments } = job.data;
+        
+        // Attempt to extract the recipient email
+        recipientEmail = to;
+        if (!recipientEmail && replacements && replacements.user && replacements.user.email) {
+            recipientEmail = replacements.user.email;
+        }
+        if (!recipientEmail && props && props.recipients && props.recipients.length > 0) {
+            recipientEmail = props.recipients[0].email;
+        }
+
+        if (!recipientEmail) {
+            throw new Error('Recipient email is missing in job data');
+        }
+
+        finalSubject = subject || (props && props.subject) || (replacements && replacements.title) || 'No Subject';
+        let finalHtml = html;
+
+        // If there's no HTML but there are replacements, generate a basic HTML dump
+        if (!finalHtml && replacements) {
+            finalHtml = `
+                <h2>${finalSubject}</h2>
+                <p>Here are the details for your registration:</p>
+                <ul>
+                    ${Object.entries(replacements.user || {}).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+                </ul>
+            `;
+        }
+
         const info = await transporter.sendMail({
-            from: process.env.MAIL_ADMIN || 'admin@trailmandu.com',
+            from: process.env.MAIL_ADMIN || job.data.senderEmail || 'admin@trailmandu.com',
             to: recipientEmail,
             subject: finalSubject,
             text: text || 'Please view this email in an HTML compatible client.',
-            html: finalHtml
+            html: finalHtml,
+            attachments: attachments || []
         });
 
         // Save log to DB
@@ -67,14 +74,18 @@ export const emailWorker = new Worker('emailQueue', async (job: Job) => {
         return info;
     } catch (error: any) {
         // Save failed log to DB
-        await prisma.emailLog.create({
-            data: {
-                recipient: recipientEmail,
-                subject: finalSubject,
-                status: 'FAILED',
-                error: error.message || 'Unknown error'
-            }
-        });
+        try {
+            await prisma.emailLog.create({
+                data: {
+                    recipient: recipientEmail,
+                    subject: finalSubject,
+                    status: 'FAILED',
+                    error: error.message || 'Unknown error'
+                }
+            });
+        } catch (dbError) {
+            console.error('Failed to save emailLog to DB:', dbError);
+        }
         console.error(`Failed to send email to ${recipientEmail}:`, error);
         throw error;
     }

@@ -2,7 +2,7 @@
 import moment from 'moment'
 import { paymentStatus, type EventRunner, type PaymentStatus, type Stage, type PaymentType, paymentMethods, type Gender } from '~/lib/types'
 import { useAxios } from '~/services/axios'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { watchDebounced } from '@vueuse/core'
 import { CommandIcon, DownloadIcon, LoaderIcon } from 'lucide-vue-next'
 import { onKeyStroke } from '@vueuse/core'
@@ -22,6 +22,7 @@ const { fetch: fetchStages } = useStageStore()
 const emit = defineEmits(['update'])
 const { axios } = useAxios()
 const route = useRoute()
+const router = useRouter()
 const props = defineProps<RunnerListProps>()
 let interval: NodeJS.Timeout
 
@@ -80,6 +81,13 @@ const fetch = async () => {
                 const el = document.getElementById(`runner-${route.query.runner_id}`)
                 if (el) {
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+                    // Remove runner_id after a few seconds so it doesn't auto-scroll on next interval refresh
+                    setTimeout(() => {
+                        const query = { ...route.query }
+                        delete query.runner_id
+                        router.replace({ query })
+                    }, 3000)
                 }
             })
         }
@@ -234,14 +242,14 @@ onUnmounted(() => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <RunnerItem v-for="(runner, index) in updatedRunners" :runner="runner"
-                        :id="`runner-${runner.id}`"
+                    <RunnerItem v-for="(runner, index) in updatedRunners" :runner="runner" :id="`runner-${runner.id}`"
                         :class="{ 'bg-yellow-100 dark:bg-yellow-900/30': route.query.runner_id === runner.id }"
                         @show:runner="runnerDetailDialog = true; selectedRunner = runner"
                         @show:payment="runnerPaymentDialog = true; selectedRunner = runner"
                         @updated:payment="updatePaymentStatus" @fetch="fetch"
                         :rank="runner.volunteer_on_checkpoints.length > 0 ? index + 1 : 0"
-                        @edit="showRunnerEdit = true; selectedRunner = runner" :hasEventStarted="true" />
+                        @edit="showRunnerEdit = true; selectedRunner = runner" :hasEventStarted="true"
+                        :selected-stage="stageID" />
                     <TableRow v-if="runners.length === 0">
                         <TableCell colspan="5">
                             <span class="text-center block p-3 text-gray-500 bg-accent rounded">

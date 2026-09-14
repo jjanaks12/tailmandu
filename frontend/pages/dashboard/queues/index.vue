@@ -17,7 +17,7 @@ interface EmailLog {
     id: string
     recipient: string
     subject: string
-    status: 'SUCCESS' | 'FAILED'
+    status: 'SUCCESS' | 'FAILED' | 'WAITING' | 'ACTIVE' | 'DELAYED' | 'QUEUED'
     error: string | null
     created_at: string
 }
@@ -56,6 +56,19 @@ const fetchCountsAndLogs = async () => {
 const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString()
 }
+
+const getBadgeVariant = (status: string) => {
+    switch (status) {
+        case 'SUCCESS': return 'default'
+        case 'FAILED': return 'destructive'
+        case 'ACTIVE': return 'info'
+        case 'WAITING': return 'secondary'
+        case 'DELAYED': return 'outline'
+        default: return 'outline'
+    }
+}
+
+const selectedError = ref<string | null>(null)
 
 onMounted(() => {
     fetchCountsAndLogs()
@@ -154,11 +167,11 @@ onMounted(() => {
                             <TableCell>{{ log.recipient }}</TableCell>
                             <TableCell class="max-w-xs truncate" :title="log.subject">{{ log.subject }}</TableCell>
                             <TableCell>
-                                <Badge :variant="log.status === 'SUCCESS' ? 'default' : 'destructive'">
+                                <Badge :variant="getBadgeVariant(log.status)">
                                     {{ log.status }}
                                 </Badge>
-                                <div v-if="log.error" class="text-xs text-red-500 mt-1 truncate max-w-[200px]"
-                                    :title="log.error">
+                                <div v-if="log.error" class="text-xs text-red-500 mt-1 truncate max-w-[200px] cursor-pointer hover:underline"
+                                    @click="selectedError = log.error" title="Click to view full error">
                                     {{ log.error }}
                                 </div>
                             </TableCell>
@@ -172,5 +185,19 @@ onMounted(() => {
                 </Table>
             </div>
         </div>
+
+        <Dialog :open="selectedError !== null" @update:open="selectedError = null">
+            <DialogContent class="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Error Details</DialogTitle>
+                </DialogHeader>
+                <div class="mt-4 p-4 bg-muted rounded-md overflow-auto max-h-96 text-sm font-mono whitespace-pre-wrap break-words">
+                    {{ selectedError }}
+                </div>
+                <DialogFooter>
+                    <Button @click="selectedError = null">Close</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

@@ -179,11 +179,10 @@ onMounted(fetchSponsors)
                     <p
                         class="text-center text-xs font-semibold uppercase tracking-widest text-slate-300 dark:text-slate-600 mb-6">
                         {{ group.name }}</p>
-                    <div
-                        class="flex flex-wrap justify-center gap-12 items-center opacity-40 grayscale hover:grayscale-0 transition-all">
+                    <div class="flex flex-wrap justify-center gap-12 items-center">
                         <div v-for="sponsor in group.sponsors" :key="sponsor.id" class="flex justify-center">
                             <a :href="sponsor.url" target="_blank" rel="noopener noreferrer">
-                                <img :alt="sponsor.name" class="h-12 object-contain"
+                                <img :alt="sponsor.name" class="h-16 object-contain"
                                     :src="sponsor.thumbnail ? showImage(sponsor.thumbnail.file_name) : ''" />
                             </a>
                         </div>

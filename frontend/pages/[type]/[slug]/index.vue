@@ -282,7 +282,7 @@ onMounted(async () => {
                                 <div>
                                     <p class="text-sm uppercase font-bold mb-1">Difficulty</p>
                                     <p class="text-xl font-black capitalize">{{ trek.details?.stats?.grade || 'Moderate'
-                                    }}</p>
+                                        }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm uppercase font-bold mb-1">Distance</p>
@@ -320,7 +320,8 @@ onMounted(async () => {
                                 <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
                                 <div class="w-3.5 h-3.5 rounded-full bg-[#00aa6c]"></div>
                             </div>
-                            <a href="#"
+                            <a href="https://www.tripadvisor.com/Attraction_Review-g293890-d34601326-Reviews-Trailmandu_From_The_City_To_The_Mountains-Kathmandu_Kathmandu_Valley_Bagmati_Zon.html"
+                                target="_blank"
                                 class="text-[#00aa6c] font-bold text-sm underline underline-offset-4 decoration-2 hover:text-[#00aa6c]/80">
                                 100+ Reviews in TripAdvisor
                             </a>

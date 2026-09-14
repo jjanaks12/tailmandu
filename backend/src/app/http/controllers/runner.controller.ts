@@ -825,4 +825,87 @@ export class RunnerController {
             next(error)
         }
     }
+
+    public static async sendConfirmationEmail(request: Request, response: Response, next: NextFunction) {
+        try {
+            const runner = await prisma.eventRunner.findFirst({
+                where: { id: request.params.runner_id as string },
+                include: {
+                    personal: {
+                        include: { country: true, gender: true }
+                    },
+                    stage_category: {
+                        include: {
+                            stage: {
+                                include: { event: true }
+                            }
+                        }
+                    }
+                }
+            })
+
+            if (!runner) throw createHttpError.NotFound('Runner not found')
+
+            const personal = runner.personal
+            const stageCategory = runner.stage_category
+            const event = stageCategory.stage.event
+
+            const start = moment.utc(stageCategory.start).local().format('DD-MM-YYYY hh:mm a')
+            const end = moment.utc(stageCategory.end).local().format('DD-MM-YYYY hh:mm a')
+
+            const calendar = ical({ name: `${stageCategory.stage.name} - ${stageCategory.name}` })
+            calendar.method(ICalCalendarMethod.REQUEST)
+            calendar.createEvent({
+                start: new Date(stageCategory.start),
+                end: new Date(stageCategory.end),
+                summary: stageCategory.excerpt,
+                description: stageCategory.description,
+                location: stageCategory.location,
+                url: `https://trailmandu.com/races/${event.slug}/stage/${stageCategory.stage.id}`
+            })
+
+            await emailQueue.add('sendEmail', {
+                fileName: 'welcome',
+                replacements: {
+                    title: 'Thank you for signing up for race',
+                    user: {
+                        name: [personal.first_name, personal.middle_name, personal.last_name].join(' '),
+                        email: personal.email,
+                        bib: runner.bib,
+                        country: personal.country.name,
+                        gender: personal.gender.name,
+                        contact_no: personal.phone_number,
+                        dob: moment(personal.date_of_birth).format('DD-MM-YYYY'),
+                        emergency_contact: runner.emergency_contact_name,
+                        emergency_contact_no: runner.emergency_contact_no,
+                    },
+                    stage: stageCategory.stage,
+                    stageCategory: { ...stageCategory, start, end },
+                    links: {
+                        "Trailmandu": 'https://trailmandu.com',
+                        event: 'https://trailmandu.com'
+                    }
+                },
+                props: {
+                    recipients: [{
+                        email: personal.email,
+                        name: personal.first_name,
+                    }],
+                    subject: 'Welcome to Trailmandu'
+                },
+                senderEmail: 'info@trailmandu.com',
+                attachments: [{
+                    content: Buffer.from(calendar.toString()).toString('base64'),
+                    filename: `${stageCategory.stage.name} - ${stageCategory.name}.ics`,
+                    type: "text/calendar; charset=UTF-8; method=REQUEST",
+                    disposition: 'attachment'
+                }],
+                category: 'event'
+            })
+
+            response.send('Confirmation email queued')
+        } catch (error) {
+            next(error)
+        }
+    }
 }
