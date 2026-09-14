@@ -48,7 +48,7 @@ const didNotFinishRunner = async () => {
         <strong class="block">{{ fullName }}</strong>
         <em class="not-italic text-3xl text-black block">{{ runner.bib }}</em>
         <span class="block" v-if="timer">{{ moment.utc(timer).local().format('YYYY-MM-DD HH:mm:ss') }}</span>
-        <span :class="{ 'flag': true, ['flag-' + runner.personal.country.abbr]: true }"></span><br />
+        <span :class="['fi', 'fi-' + runner.personal.country.abbr.toLowerCase()]"></span><br />
         {{ runner.status }}
         <Button variant="destructive" @click="showDidnotfinishedDialog = true" v-if="!runner.status && !timer">
             Did not finished

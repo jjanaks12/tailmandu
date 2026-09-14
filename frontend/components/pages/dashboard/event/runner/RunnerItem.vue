@@ -121,7 +121,7 @@ const sendConfirmationEmail = async () => {
                     </Badge>
                 </div>
                 <div class="flex gap-2 items-center">
-                    <span :class="{ 'flag': true, ['flag-' + runner.personal.country.abbr]: true }" />
+                    <span :class="['fi', 'fi-' + runner.personal.country.abbr]" />
                     {{ runner.personal?.country?.name }}
                 </div>
             </TableCell>

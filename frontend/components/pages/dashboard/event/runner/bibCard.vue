@@ -4,8 +4,6 @@ import PrindD from 'printd'
 import type { EventRunner } from '~/lib/types'
 import BIBBg25kImg from '~/assets/images/bib-25k.png'
 import BIBBg10kImg from '~/assets/images/bib-10k.png'
-import FlagData from '~/lib/bin/flag.json'
-import flagImg from '@/assets/images/flags_responsive.png'
 import { DownloadIcon } from 'lucide-vue-next'
 import { showImage } from '~/lib/filters'
 import { useEventStore } from '~/store/event'
@@ -128,18 +126,16 @@ const getBibImage = (runner: EventRunner) => {
                             </div>
 
                             <!-- Flag -->
-                            <div v-if="eventSettings.bib_layout.flag" :style="{
-                                position: 'absolute',
-                                top: (eventSettings.bib_layout.flag.top || 0) + '%',
-                                left: (eventSettings.bib_layout.flag.left || 0) + '%',
-                                transform: 'translate(-50%, -50%)',
-                                width: ((eventSettings.bib_layout.flag.width || 44) / 10) + 'cqw',
-                                height: ((eventSettings.bib_layout.flag.height || 30) / 10) + 'cqw',
-                                backgroundImage: `url(${flagImg})`,
-                                backgroundRepeat: 'no-repeat',
-                                backgroundSize: '100%',
-                                backgroundPosition: (FlagData as Record<string, string>)[runner.personal.country?.abbr || '']
-                            }"></div>
+                            <div v-if="eventSettings.bib_layout.flag"
+                                :class="runner.personal.country?.abbr ? `fi fi-${runner.personal.country.abbr.toLowerCase()}` : ''"
+                                :style="{
+                                    position: 'absolute',
+                                    top: (eventSettings.bib_layout.flag.top || 0) + '%',
+                                    left: (eventSettings.bib_layout.flag.left || 0) + '%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: ((eventSettings.bib_layout.flag.width || 44) / 10) + 'cqw',
+                                    height: ((eventSettings.bib_layout.flag.height || 30) / 10) + 'cqw',
+                                }"></div>
 
                             <!-- Bib Number -->
                             <div v-if="eventSettings.bib_layout.bib" :style="{
@@ -168,10 +164,8 @@ const getBibImage = (runner: EventRunner) => {
                                     {{ runner.personal.middle_name }}
                                     {{ runner.personal.last_name }}
                                 </strong>
-                                <span style="width: 4.4cqw; height: 3.0cqw; background-size: 100%;" :style="{
-                                    background: `url(${flagImg}) no-repeat`,
-                                    backgroundPosition: (FlagData as Record<string, string>)[runner.personal.country?.abbr || ''],
-                                }"></span>
+                                <span style="width: 4.4cqw; height: 3.0cqw; background-size: cover; background-position: center; display: inline-block;"
+                                    :class="runner.personal.country?.abbr ? `fi fi-${runner.personal.country.abbr.toLowerCase()}` : ''"></span>
                             </div>
                             <em style="color: #fff; font-size: 18cqw; font-weight: bold; font-style: normal;">{{
                                 runner.bib }}</em>
