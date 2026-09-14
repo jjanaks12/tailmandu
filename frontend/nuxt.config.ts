@@ -68,7 +68,7 @@ export default defineNuxtConfig({
       nodePolyfills({
         include: ["url"],
         globals: {
-          process: true
+          process: false
         }
       })
     ],
