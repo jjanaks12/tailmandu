@@ -288,6 +288,15 @@ export class EventController {
                             images: true
                         }
                     },
+                    sponsors: {
+                        where: {
+                            deleted_at: null
+                        },
+                        include: {
+                            thumbnail: true,
+                            sponsorType: true
+                        }
+                    },
                     stages: {
                         include: {
                             stage_categories: true
@@ -324,6 +333,15 @@ export class EventController {
                                 }
                             },
                             stage_categories: true
+                        }
+                    },
+                    sponsors: {
+                        where: {
+                            deleted_at: null
+                        },
+                        include: {
+                            thumbnail: true,
+                            sponsorType: true
                         }
                     },
                     stages: {

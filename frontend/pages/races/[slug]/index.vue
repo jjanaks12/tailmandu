@@ -721,6 +721,36 @@ const isSticky = computed(() => y.value > 450)
                 </div>
             </aside>
         </main>
+
+        <!-- Sponsors Section -->
+        <section v-if="trailRace?.sponsors?.length"
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-slate-200 dark:border-slate-800">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl text-gray-800 dark:text-white font-display font-black tracking-tight">
+                    Our Sponsors
+                </h2>
+                <p class="text-slate-500 mt-2">Thanks to our amazing sponsors for making this event possible.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-8 lg:gap-16">
+                <a v-for="sponsor in trailRace.sponsors" :key="sponsor.id" :href="sponsor.url" target="_blank"
+                    rel="noopener noreferrer"
+                    class="group flex flex-col items-center gap-4 transition-transform hover:-translate-y-1">
+                    <div
+                        class="relative w-40 h-24 sm:w-48 sm:h-28 p-6 bg-white dark:bg-deep-slate rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center overflow-hidden group-hover:shadow-md group-hover:border-primary/30 transition-all">
+                        <img v-if="sponsor.thumbnail" :src="showImage(sponsor.thumbnail.file_name)" :alt="sponsor.name"
+                            class="max-w-full max-h-full object-contain filter dark:invert dark:opacity-70 dark:group-hover:opacity-100 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" />
+                        <span v-else
+                            class="text-lg font-bold text-slate-400 group-hover:text-primary transition-colors text-center">{{
+                                sponsor.name }}</span>
+                    </div>
+                    <span
+                        class="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-primary transition-colors">{{
+                            sponsor.sponsorType?.name }}</span>
+                </a>
+            </div>
+        </section>
+
     </div>
 </template>
 

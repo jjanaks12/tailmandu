@@ -149,6 +149,7 @@ export type TrailRace = {
     gallery?: Gallery
     pricing_tiers?: PricingTier[]
     addons?: EventAddon[]
+    sponsors?: Sponsor[]
     _count?: {
         stages: number
         runners: number
