@@ -9,7 +9,8 @@ export class SponsorController {
         try {
             response.send(await prisma.sponsor.findMany({
                 where: {
-                    race_id: request.params.race_id as string
+                    race_id: request.params.event_id as string,
+                    deleted_at: null
                 },
                 include: {
                     sponsorType: true,
