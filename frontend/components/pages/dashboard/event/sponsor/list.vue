@@ -20,6 +20,20 @@ const fetch = async () => {
     sponsors.value = data
 }
 
+const sponsorToDelete = ref<Sponsor | null>(null)
+
+const confirmDelete = async () => {
+    console.log(sponsorToDelete.value)
+    if (!sponsorToDelete.value) return;
+    try {
+        await axios.delete(`/events/sponsors/${sponsorToDelete.value.id}`)
+        sponsorToDelete.value = null
+        fetch()
+    } catch (err) {
+        console.error(err)
+    }
+}
+
 onMounted(fetch)
 </script>
 
@@ -50,8 +64,11 @@ onMounted(fetch)
                 <TableCell>{{ sponsor.sponsorType.name }}</TableCell>
                 <TableCell>{{ sponsor.url }}</TableCell>
                 <TableCell>
-                    <Button type="button" variant="secondary"
-                        @click="editSponsor = sponsor; showDialog = true">Edit</Button>
+                    <div class="flex gap-2">
+                        <Button type="button" variant="secondary"
+                            @click="editSponsor = sponsor; showDialog = true">Edit</Button>
+                        <Button type="button" variant="destructive" @click="sponsorToDelete = sponsor">Delete</Button>
+                    </div>
                 </TableCell>
             </TableRow>
         </TableBody>
@@ -64,7 +81,24 @@ onMounted(fetch)
                     Add a new sponsor to the event
                 </DialogDescription>
             </DialogHeader>
-            <SponsorForm :event-id="props.eventId" :sponsor="editSponsor" @close="showDialog = false; fetch()" />
+            <SponsorForm v-if="showDialog" :event-id="props.eventId" :sponsor="editSponsor"
+                @close="showDialog = false; editSponsor = null; fetch()" />
         </DialogContent>
     </Dialog>
+
+    <AlertDialog :open="sponsorToDelete != null" @update:open="(val) => { if (!val) sponsorToDelete = null }">
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the sponsor
+                    and remove its data from our servers.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel @click="sponsorToDelete = null">Cancel</AlertDialogCancel>
+                <AlertDialogAction @click="confirmDelete" class="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
 </template>
